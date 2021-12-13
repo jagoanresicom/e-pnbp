@@ -1,0 +1,13 @@
+obj/
+bin/
+.vs/
+\.vs/Pnbp/v14/
+.svn/
+
+*.csproj
+
+Uploads/pengembalian/
+
+Content/Uploads/
+
+*.user

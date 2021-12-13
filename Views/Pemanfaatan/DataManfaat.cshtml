@@ -1,0 +1,153 @@
+﻿@*@model List<Pnbp.Entities.SatkerAlokasi>*@
+@model Pnbp.Entities.DataManfaat
+
+<style>
+    .editors {
+        display: none;
+    }
+
+    /*tr:hover,*/
+    /*tr.selected, tr.selected {
+        background-color: #B0BED9 !important;
+    }*/
+</style>
+
+@*<link href='@Url.Content("~/resources/css/table.css")' rel="stylesheet">*@
+
+<div class="" id="dynamic_content">
+    <div class="page-title">
+        <div class="title_left" style="width:100%">
+            <h2 style="width:100%"><span id="LabelTitle">Daftar Pemanfaatan Per Satuan Kerja</span></h2>
+        </div>
+    </div>
+    <div class="clearfix" style="padding-bottom:5px"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="table-responsive" style="border:none">
+                    <section id="flip-scroll">
+                        <table class="table table-striped hover dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th class="numeric">No.</th>
+                                    <th>Kode Satker</th>
+                                    <th>Nama Satker</th>
+                                    <th class="numeric">Anggaran</th>
+                                    <th class="numeric">Alokasi</th>
+                                    <th class="numeric">Aktif?</th>
+                                    <th style="text-align:center; width:5%;">Entri</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listsatkerholder">
+                                @foreach (var item in Model.satkermanfaat)
+                                {
+                                    <tr>
+                                        <td class="numeric">@(item.RNumber)</td>
+                                        <td hidden>@item.Kantorid</td>
+                                        <td>@item.Kodesatker</td>
+                                        <td onclick="showsatker('@item.Kantorid', '@item.Namasatker')" style="cursor: pointer">@item.Namasatker</td>
+                                        <td class="numeric">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        <td class="numeric">@item.Nilaialokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        @* <td>@item.Statusaktif</td>*@
+                                        <td class="centertaligncolumn">
+                                            @if (@item.Statusaktif == "Aktif")
+                                            {
+                                                if (@Model.UserAdmin)
+                                                {
+                                                <input type="checkbox" checked="checked" name="table_records">
+                                                }
+                                                else
+                                                {
+                                                <input type="checkbox" checked="checked" disabled="disabled" name="table_records">
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (@Model.UserAdmin)
+                                                {
+                                                <input type="checkbox" name="table_records">
+                                                }
+                                                else
+                                                {
+                                                <input type="checkbox" disabled="disabled" name="table_records">
+                                                }
+                                            }
+                                        </td>
+                                        <td style="text-align:center;cursor: pointer;" onclick="showsatker('@item.Kantorid', '@item.Namasatker');"><i class="fa fa-pencil"></i></td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td colspan="3" class="numeric">Total</td>
+                                    <td class="myLabelContentRight">@Model.satkermanfaat.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    <td class="myLabelContentRight">@Model.satkermanfaat.Sum(a => a.Nilaialokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    <td colspan="2" class="centertaligncolumn"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    //$(document).on('dblclick', 'tr', function () {
+    //    $(this).addClass("selected");
+    //    var id = $(this).attr('id');
+    //    //alert(id);
+    ////    showsatker(id,'');
+    //});
+    //$("tr").click(function () {
+    //    $(this).addClass("selected").siblings().removeClass("selected");
+    //});
+
+    $('td').click(function (event) {
+        if ($(event.target).is('input')) {
+            $('input:checkbox', this).prop('checked', function (i, value) {
+                if (confirm("Apakah Data akan di ubah?")) {
+                    $(this).addClass("selected");
+                    var a = $(this).closest("tr").find("td:eq(1)").text();
+                    var pdata = { kantorid: a, bolCheck: value };
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("UpdateStatusSatker", "Pemanfaatan")',
+                        data: pdata,
+                        success: function (data, textStatus, XMLHttpRequest) {
+                            $.unblockUI();
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) { alert(textStatus); $.unblockUI(); }
+                    });
+                }
+                else {
+                    return !value;
+                }
+            });
+        }
+    });
+
+
+    function showsatker(id, namasatker) {
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        var pdata = { kantorid: id, namakantor: namasatker };
+        $.pjax({
+            container: "#dynamic_content",
+            type: 'POST',
+            @*url: '@Url.Action("DetilSatkerManfaat", "Pemanfaatan")',*@
+            url: '@Url.Action("DataManfaatDetail", "Pemanfaatan")',
+            data: pdata,
+            success: function (data, textStatus, XMLHttpRequest) {
+                $('#right_col').html(data);
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $.unblockUI();
+            }
+        });
+    };
+</script>

@@ -1,0 +1,110 @@
+﻿@model Pnbp.Entities.FilterRekapAlokasi
+@{
+    ViewBag.Judul = "Rekap Alokasi";
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .tdcenter {
+        text-align: center;
+    }
+</style>
+
+@*<link href='@Url.Content("~/resources/css/table.css")' rel="stylesheet">*@
+
+<div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:20px">
+                <div class="x_title">
+                    <h2 class="sub-header">@(ViewBag.Judul)</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up" title="Hide Form"></i></a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" id="frmFindData" method="post">
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.DropDownListFor(model => model.tahun, new SelectList(@Model.lstahun, "value", "tahun"), " -- Pilih Tahun --", new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "tahun" })
+                            </div>
+                        </div>
+
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                <button id="find-btn" type="submit" class="btn btn-success">Cari</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_content">
+                    <div class="row">
+                        <div class="clearfix"></div>
+                        <div id="rekapalokasiholder" class="table-responsive">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select2_single').select2({ width: 'resolve' });
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#back-to-top').fadeIn();
+            } else {
+                $('#back-to-top').fadeOut();
+            }
+        });
+    });
+
+    $("#reset-btn").on("click", function (e) {
+        $('#tahun').prop('selectedIndex', 1).trigger('change');
+        //$('#tahun').val('2018').trigger('change');
+    });
+
+    $("#frmFindData").submit(function (e) {
+        formToPost = $('#frmFindData');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarRekapAlokasi", "Alokasi")',
+            data: $('#frmFindData').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#rekapalokasiholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });
+        e.preventDefault();
+        return false;
+    });
+    
+</script>

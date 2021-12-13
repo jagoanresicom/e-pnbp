@@ -1,0 +1,101 @@
+﻿@*@model List<Pnbp.Entities.StatistikPenerimaan>*@
+
+@{
+    ViewBag.Judul = "Rincian Realisasi Penerimaan";
+    var get_data = ViewBag.data;
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .tdcenter {
+        text-align: center;
+    }
+</style>
+
+@*<link href='@Url.Content("~/resources/css/table.css")' rel="stylesheet">*@
+
+<table class="table table-striped table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th class="tdcenter">No.</th>
+            <th class="tdcenter">Kode Satker</th>
+            <th class="tdcenter">Nama Satker</th>
+            <th class="tdcenter">Nama Prosedur</th>
+            <th class="tdcenter">Target Fisik</th>
+            <th class="tdcenter">Realisasi Fisik</th>
+            <th class="tdcenter">Persentase Fisik</th>
+            <th class="tdcenter">Target Penerimaan</th>
+            <th class="tdcenter">Realisasi Penerimaan</th>
+            <th class="tdcenter">Persentase Penerimaan</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (get_data.Count > 0)
+                    {
+                        var no = 1;
+                        foreach (var item in get_data)
+                        {
+                <tr>
+                    <td class="numeric">@no</td>
+                    <td>@item.kodesatker</td>
+                    <td>@item.namakantor</td>
+                    <td>@item.namaprosedur</td>
+                    <td class="text-center">@item.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td class="text-center">@item.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td class="text-center">@item.persentasefisik</td>
+                    <td class="text-right">@item.nilaitarget.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td class="text-right">@item.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td class="text-center">@item.persentasepenerimaan</td>
+                </tr>
+                no ++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">Data Kosong</td>
+            </tr>
+        }
+        @*<tr>
+                <td class="numeric">#</td>
+                <td colspan="2" style="text-align:right;">Total</td>
+                <td class="numeric">@get_data.Sum(a => a.penerimaan).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                <td></td>
+                <td class="numeric">@get_data.Sum(a => a.operasional).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+            </tr>*@
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    //$(document).ready(function () {
+    //    $.unblockUI();
+    //});
+    var showDetailBreakdownPenerimaan = function (k, n, v) {
+        var pdata = { Id: k, pTahun: n, pBulan: v };
+        @*$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.pjax({
+            container: "#penerimaanholder",
+            type: 'POST',
+            url: '@Url.Action("RealisasiPenerimaanDetailBreakdown", "Penerimaan")',
+            data: pdata,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#penerimaanholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });*@
+        $.unblockUI();
+    }
+</script>

@@ -1,0 +1,37 @@
+e - PNBP :
+
+username : suwandi 
+password : atrbpn2016
+
+
+deploy production e - Procurement :
+
+controller : mapping reviewer
+models : get_notifreviewitd
+
+memori 4 gb
+memori 1 tb
+
+𝚒𝚛𝚟𝚊𝚗.𝚖𝚊𝚞𝚕𝚊𝚗𝚊
+𝚍𝚣𝚊𝚔𝚢214
+
+SELECT
+	                    dt.*
+                    FROM
+	                    (
+		                    SELECT
+			                    pn.NTPN,
+			                    pn.KODEBILLING,
+			                    PN.TANGGAL,
+			                    PN.NAMAKANTOR,
+			                    PN.NAMAPROSEDUR,
+			                    SM.NAMA_WAJIB_BAYAR,
+			                    SM.TOTAL_NOMINAL_BILLING,
+			                    PN.NOMORBERKAS
+		                    FROM
+			                    rekappenerimaandetail PN
+		                    LEFT JOIN KKPWEB.BERKASSIMPONI SM ON PN.KODEBILLING = SM.KODEBILLING
+		                    LEFT JOIN DI305 DI ON SM.DI305ID = DI.DI305ID
+		                    WHERE
+			                    PN.KODEBILLING = '820190201341480'
+	                    ) dt

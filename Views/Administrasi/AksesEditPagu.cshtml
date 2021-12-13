@@ -1,0 +1,149 @@
+﻿@model Pnbp.Entities.Konfigurasi
+
+<div class="" id="dynamic_content">
+    <div class="page-title">
+        <div class="title_left"><h2 style="width:100%">Akses Edit Data Pagu <small>Edit data pagu oleh user lain</small></h2></div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:20px">
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" id="frmEditPagu" method="post">
+                        <div class="form-group" style="padding-bottom:6px;">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div id="gender" class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-primary active" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default" id="LabelOpEditPaguYa">
+                                        @Html.RadioButtonFor(model => model.Nilai, "Ya", new { id = "OpEditPaguYa" })
+                                        @Html.Label("OpEditPaguYa", "Ya", new { @style = "font-family: 'Varela Round', sans-serif; font-weight: normal;" })
+                                    </label>
+                                    <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default" id="LabelOpEditPaguTidak">
+                                        @Html.RadioButtonFor(model => model.Nilai, "Personal", new { id = "OpEditPaguTidak" })
+                                        @Html.Label("OpEditPaguTidak", "Tidak", new { @style = "font-family: 'Varela Round', sans-serif; font-weight: normal;" })
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        @*<div class="ln_solid"></div>*@
+                        @*<div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <button id="save-btn" type="submit" class="btn btn-success">Simpan</button>
+                            </div>
+                        </div>*@
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    (function (a) { a.createModal = function (b) { defaults = { title: "", message: "Your Message Goes Here!", closeButton: true, scrollable: false }; var b = a.extend({}, defaults, b); var c = (b.scrollable === true) ? 'style="max-height: 420px;overflow-y: auto;"' : ""; html = '<div class="modal fade" id="myModal">'; html += '<div class="modal-dialog">'; html += '<div class="modal-content">'; html += '<div class="modal-header">'; html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'; if (b.title.length > 0) { html += '<h4 class="modal-title">' + b.title + "</h4>" } html += "</div>"; html += '<div class="modal-body" ' + c + ">"; html += b.message; html += "</div>"; html += '<div class="modal-footer">'; if (b.closeButton === true) { html += '<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>' } html += "</div>"; html += "</div>"; html += "</div>"; html += "</div>"; a("body").prepend(html); a("#myModal").modal().on("hidden.bs.modal", function () { a(this).remove() }) } })(jQuery);
+
+    function showmsg(judul, isi) {
+        $.createModal({
+            title: judul,
+            message: isi,
+            closeButton: true,
+            scrollable: false
+        });
+        return false;
+    };
+
+    $(document).ready(function () {
+
+        loadData();
+        
+    });
+
+    var loadData = function () {
+
+        $.ajax({
+            url: '@Url.Action("GetAksesEditPagu", "Administrasi")',
+            success: function (response) {
+                if (response == 'Y') {
+                    $("#LabelOpEditPaguTidak").attr('class', 'btn btn-default');
+                    $("#LabelOpEditPaguYa").attr('class', 'btn btn-primary active');
+                }
+                else {
+                    $("#LabelOpEditPaguTidak").attr('class', 'btn btn-primary active');
+                    $("#LabelOpEditPaguYa").attr('class', 'btn btn-default');
+                }
+            },
+            error: function (response) { }
+        });
+    };
+
+    $("#LabelOpEditPaguYa").on("click", function (e) {
+        $("#LabelOpEditPaguTidak").attr('class', 'btn btn-default');
+        $("#LabelOpEditPaguYa").attr('class', 'btn btn-primary active');
+
+        var frm = new FormData();
+        frm.append("KataKunci", "AKSESEDITMANFAAT");
+        frm.append("Nilai", "Y");
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SimpanAksesEditPagu", "Administrasi")',
+            data: frm,
+            contentType: false,
+            processData: false,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.Status) {
+                    showmsg('Informasi', data.Pesan);
+                }
+                else {
+                    showmsg('Perhatian', data.Pesan);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+        });
+
+        e.preventDefault();
+        return false;
+    });
+
+    $("#LabelOpEditPaguTidak").on("click", function (e) {
+        $("#LabelOpEditPaguTidak").attr('class', 'btn btn-primary active');
+        $("#LabelOpEditPaguYa").attr('class', 'btn btn-default');
+
+        var frm = new FormData();
+        frm.append("KataKunci", "AKSESEDITMANFAAT");
+        frm.append("Nilai", "N");
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SimpanAksesEditPagu", "Administrasi")',
+            data: frm,
+            contentType: false,
+            processData: false,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data.Status) {
+                    showmsg('Informasi', data.Pesan);
+                }
+                else {
+                    showmsg('Perhatian', data.Pesan);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+        });
+
+        e.preventDefault();
+        return false;
+    });
+
+    //$("#frmEditPagu").submit(function (e) {
+        
+    //    e.preventDefault();
+    //    return false;
+    //});
+
+    
+
+</script>
+
