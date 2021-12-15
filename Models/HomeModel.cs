@@ -169,7 +169,7 @@ namespace Pnbp.Models
 
                 string query =
                     @" SELECT BULAN, SUM( TERALOKASI ) AS Jumlah FROM REKAPALOKASI WHERE TIPEMANFAAT = 'NONOPS' AND TAHUN = ( SELECT ( to_char( SYSDATE, 'YYYY' )) AS Y FROM dual )  GROUP BY BULAN ";
-                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
+                //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
 
                 //if (!string.IsNullOrEmpty(pSatker))
                 //{
@@ -196,7 +196,7 @@ namespace Pnbp.Models
 
                 string query =
                     @" SELECT BULAN AS BULANALOKOPS, SUM( TERALOKASI ) AS JUMLAHOPS FROM REKAPALOKASI WHERE TIPEMANFAAT = 'OPS' AND TAHUN = ( SELECT ( to_char( SYSDATE, 'YYYY' )) AS Y FROM dual )  GROUP BY BULAN ";
-                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
+                //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
 
                 //if (!string.IsNullOrEmpty(pSatker))
                 //{
@@ -261,7 +261,7 @@ namespace Pnbp.Models
 	                        b.TIPE = 'NONOPS'
                         GROUP BY
 	                        SUBSTR (A .TANGGAL, 4, 3)";
-                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
+                //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
 
                 //query += "ORDER BY BULAN ";
 
@@ -320,7 +320,7 @@ namespace Pnbp.Models
 	                        b.TIPE = 'OPS'
                         GROUP BY
 	                        SUBSTR (A .TANGGAL, 4, 3)";
-                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
+                //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
 
                 //query += "ORDER BY BULAN ";
 
