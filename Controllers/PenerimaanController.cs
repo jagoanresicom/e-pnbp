@@ -127,15 +127,16 @@ namespace Pnbp.Controllers
             //return Json(data, JsonRequestBehavior.AllowGet);
 
             ViewData["data"] = data;
+            ViewData["tahun"] = pTahun;
             return PartialView("RealisasiPenerimaanDetail", data);
         }
 
-        public ActionResult RealisasiPenerimaanPerbandingan(string berkasId, string kantorId)
+        public ActionResult RealisasiPenerimaanPerbandingan(string berkasId, string kantorId, int tahun)
         {
             var ctx = new PnbpContext();
 
-            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '"+kantorId+"' AND p.BERKASID = '"+berkasId+"'").First();
-            var list_penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "'").ToList();
+            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '"+kantorId+"' AND p.BERKASID = '"+berkasId+"' AND p.TAHUN="+tahun+" ").First();
+            var list_penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "' AND p.TAHUN=" + tahun + " ").ToList();
 
             var alokasi0 = list_penerimaan.Where(x => x.statusalokasi == 0);
             var alokasi1 = list_penerimaan.Where(x => x.statusalokasi == 1);
