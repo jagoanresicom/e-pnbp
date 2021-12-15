@@ -601,6 +601,8 @@ namespace Pnbp.Models
 	                    r1.namaprosedur,
 	                    r1.kodesatker,
 	                    r1.namakantor,
+                        r1.kantorid,
+                        r1.berkasid,
 	                    NVL (b.TARGETFISIK, 0) AS targetfisik,
 	                    COUNT (r1.jumlah) AS jumlah,
 	                    ROUND (
@@ -634,7 +636,7 @@ namespace Pnbp.Models
                 lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pBulan));
             }
 
-            query += " group by r1.namaprosedur, r1.kodesatker, r1.namakantor, b.targetfisik, b.nilaitarget";
+            query += " group by r1.namaprosedur, r1.kodesatker, r1.namakantor, r1.kantorid, r1.berkasid, b.targetfisik, b.nilaitarget";
 
             //return Json(query, JsonRequestBehavior.AllowGet);
 

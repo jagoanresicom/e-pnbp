@@ -283,6 +283,7 @@ namespace Pnbp.Entities
         public string kodesatker { get; set; }
         public string namakantor { get; set; }
         public string kantorid { get; set; }
+        public string berkasid { get; set; }
         public int targetfisik { get; set; }
         public int jumlah { get; set; }
         public Decimal? persentasefisik { get; set; }
