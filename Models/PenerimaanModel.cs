@@ -493,6 +493,8 @@ namespace Pnbp.Models
 
             string query =
                 @" SELECT DISTINCT
+                    r1.kantorid,
+                    r1.berkasid,
                     r1.kodesatker,
 	                r1.namakantor,
 	                r1.namaprosedur,
@@ -524,7 +526,7 @@ namespace Pnbp.Models
                 //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pBulan));
             }
 
-            query += " group by r1.kodesatker, r1.namakantor, r1.namaprosedur, r2.TARGETFISIK, r2.NILAITARGET";
+            query += " group by r1.kantorid, r1.berkasid, r1.kodesatker, r1.namakantor, r1.namaprosedur, r2.TARGETFISIK, r2.NILAITARGET";
 
             using (var ctx = new PnbpContext())
             {

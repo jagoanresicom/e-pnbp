@@ -260,6 +260,7 @@ namespace Pnbp.Entities
         [Key]
         public string kantorid { get; set; }
         public string kodesatker { get; set; }
+        public string berkasid { get; set; }
         public string namakantor { get; set; }
         public string namaprosedur { get; set; }
         public int jumlah { get; set; }

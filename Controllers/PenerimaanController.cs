@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Globalization;
 using OfficeOpenXml;
+using System.Text;
 //using OfficeOpenXml.Style;
 
 namespace Pnbp.Controllers
@@ -127,6 +128,21 @@ namespace Pnbp.Controllers
 
             ViewData["data"] = data;
             return PartialView("RealisasiPenerimaanDetail", data);
+        }
+
+        public ActionResult RealisasiPenerimaanPerbandingan(string berkasId, string kantorId)
+        {
+            var ctx = new PnbpContext();
+
+            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '"+kantorId+"' AND p.BERKASID = '"+berkasId+"'").First();
+            var list_penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "'").ToList();
+
+            var alokasi0 = list_penerimaan.Where(x => x.statusalokasi == 0);
+            var alokasi1 = list_penerimaan.Where(x => x.statusalokasi == 1);
+            ViewData["alokasi0"] = alokasi0;
+            ViewData["alokasi1"] = alokasi1;
+
+            return View();
         }
 
         //public ActionResult RealisasiPenerimaanDetailBreakdown(string Id, string pTahun, string pBulan, string namaprosedur)

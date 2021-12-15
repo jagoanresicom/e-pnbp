@@ -1161,4 +1161,16 @@ namespace Pnbp.Entities
         public string renaksi { get; set; }
         public int? read { get; set; }
     }
+
+    public class DataPenerimaan
+    {
+        public string penerimaanid { get; set; }
+        public int statusalokasi { get; set; }
+        public DateTime tanggal { get; set; }
+        public string namaprosedur { get; set; }
+        public string kodespopp { get; set; }
+        public decimal jumlah { get; set; }
+        public decimal nilaiakhir { get; set; }
+        public string kodesatker { get; set; }
+    }
 }
