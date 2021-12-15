@@ -1171,6 +1171,9 @@ namespace Pnbp.Entities
         public string kodespopp { get; set; }
         public decimal jumlah { get; set; }
         public decimal nilaiakhir { get; set; }
-        public string kodesatker { get; set; }
+        public string kodesatker { get; set; }  
+        public string namakantor { get; set; }
+        public string kodepenerimaan { get; set; }
+        public string jenispenerimaan { get; set; }
     }
 }

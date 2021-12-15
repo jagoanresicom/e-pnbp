@@ -141,6 +141,7 @@ namespace Pnbp.Controllers
             var alokasi1 = list_penerimaan.Where(x => x.statusalokasi == 1);
             ViewData["alokasi0"] = alokasi0;
             ViewData["alokasi1"] = alokasi1;
+            ViewData["penerimaan"] = penerimaan;
 
             return View();
         }
