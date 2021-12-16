@@ -58,7 +58,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Bulan : </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                @Html.DropDownListFor(model => model.bulan, lsbulan, " -- Pilih Bulan --", new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "bulan" })
+                                @Html.DropDownListFor(model => model.bulan, lsbulan, " -- Pilih Bulan --", new { @class = "select2_single form-control input-md", @id = "bulan" })
                             </div>
                         </div>
 
@@ -121,7 +121,7 @@
 
 <script>
     $(document).ready(function () {
-        $('.select2_single').select2({ width: 'resolve' });
+        $('.select2_single').select2({ width: 'resolve' }); 
         $(window).scroll(function () {
             if ($(this).scrollTop() > 50) {
                 $('#back-to-top').fadeIn();

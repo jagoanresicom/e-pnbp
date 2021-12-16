@@ -150,13 +150,27 @@ namespace Pnbp.Controllers
             return View();
         }
 
-        public ActionResult RealisasiPenerimaanPerbandinganSatker(string kantorId, int tahun, int bulan)
+        public ActionResult RealisasiPenerimaanPerbandinganSatker(string kantorId, int tahun, int? bulan)
         {
             var ctx = new PnbpContext();
 
-            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun + " AND p.BULAN=" + bulan + " ").First();
+            var queryPenerimaan = "SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun;
+
+            if(bulan != null)
+            {
+                queryPenerimaan += " AND p.bulan=" + bulan;
+            }
+
+            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>(queryPenerimaan).First();
+
+            var queryList = "SELECT p.*, k.namaprogram FROM PENERIMAAN p LEFT JOIN KODESPAN k ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun;
+            if(bulan != null)
+            {
+                queryList += " AND p.BULAN = " + bulan;
+            }
+
             var list_penerimaan = ctx.Database.SqlQuery<Entities
-                .DataPenerimaan>("SELECT p.*, k.namaprogram FROM PENERIMAAN p LEFT JOIN KODESPAN k ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun + " AND p.bulan = " + bulan + " ")
+                .DataPenerimaan>(queryList)
                 .ToList();
 
             var alokasi0 = list_penerimaan.Where(x => x.statusalokasi == 0);
