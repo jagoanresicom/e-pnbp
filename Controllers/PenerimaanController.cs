@@ -136,7 +136,10 @@ namespace Pnbp.Controllers
             var ctx = new PnbpContext();
 
             var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '"+kantorId+"' AND p.BERKASID = '"+berkasId+"' AND p.TAHUN="+tahun+" AND p.BULAN="+bulan+" ").First();
-            var list_penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "' AND p.TAHUN=" + tahun + " AND p.bulan = "+bulan+" ").ToList();
+            var list_penerimaan = ctx.Database.SqlQuery<Entities
+                .DataPenerimaan>("SELECT p.*, k.namaprogram FROM PENERIMAAN p LEFT JOIN KODESPAN k ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) WHERE p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "' AND p.TAHUN=" + tahun + " AND p.bulan = "+bulan+" ")
+                .ToList();
+
 
             var alokasi0 = list_penerimaan.Where(x => x.statusalokasi == 0);
             var alokasi1 = list_penerimaan.Where(x => x.statusalokasi == 1);

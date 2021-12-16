@@ -1175,5 +1175,9 @@ namespace Pnbp.Entities
         public string namakantor { get; set; }
         public string kodepenerimaan { get; set; }
         public string jenispenerimaan { get; set; }
+        public string namaprogram { get; set; }
+        public string kodebilling { get; set; }
+        public decimal nomorberkas { get; set; }
+        public decimal tahunberkas { get; set; }
     }
 }
