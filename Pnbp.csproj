@@ -3081,6 +3081,7 @@
     <Content Include="Views\Administrasi\get_belanja_span.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Penerimaan\RealisasiPenerimaanPerbandingan.cshtml" />
+    <Content Include="Views\Penerimaan\RealisasiPenerimaanPerbandinganSatker.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

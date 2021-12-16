@@ -150,6 +150,24 @@ namespace Pnbp.Controllers
             return View();
         }
 
+        public ActionResult RealisasiPenerimaanPerbandinganSatker(string kantorId, int tahun, int bulan)
+        {
+            var ctx = new PnbpContext();
+
+            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun + " AND p.BULAN=" + bulan + " ").First();
+            var list_penerimaan = ctx.Database.SqlQuery<Entities
+                .DataPenerimaan>("SELECT p.*, k.namaprogram FROM PENERIMAAN p LEFT JOIN KODESPAN k ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun + " AND p.bulan = " + bulan + " ")
+                .ToList();
+
+            var alokasi0 = list_penerimaan.Where(x => x.statusalokasi == 0);
+            var alokasi1 = list_penerimaan.Where(x => x.statusalokasi == 1);
+            ViewData["alokasi0"] = alokasi0;
+            ViewData["alokasi1"] = alokasi1;
+            ViewData["penerimaan"] = penerimaan;
+
+            return View();
+        }
+
         //public ActionResult RealisasiPenerimaanDetailBreakdown(string Id, string pTahun, string pBulan, string namaprosedur)
         //{
         //    if (string.IsNullOrEmpty(Id))

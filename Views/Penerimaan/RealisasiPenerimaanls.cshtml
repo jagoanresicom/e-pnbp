@@ -8,6 +8,7 @@
             <th class="tdcenter">Nama Satker</th>
             <th class="tdcenter">Penerimaan</th>
             <th class="tdcenter">Operasional</th>
+            <th class="tdcenter"></th>
         </tr>
         <tr>
             <td><span id="totalpenerimaan"></span></td>
@@ -16,13 +17,15 @@
     <tbody>
         @foreach (var item in Model.lspenerimaandetail)
         {
-            <tr onclick="showDetailPenerimaan('@item.kantorid', '@Model.tahun', '@Model.bulan')" style="cursor: pointer">
-                <td class="numeric">@item.urutan</td>
-                <td>@item.kodesatker</td>
-                <td>@item.nama_satker</td>
-                <td class="numeric">@item.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))<input type="text" class="penerimaan" value="@item.penerimaan" onblur="totalpenerimaan()" /></td>
-                <td class="numeric">@item.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            </tr>
+        <tr onclick="showDetailPenerimaan('@item.kantorid', '@Model.tahun', '@Model.bulan')" style="cursor: pointer">
+            <td class="numeric">@item.urutan</td>
+            <td>@item.kodesatker</td>
+            <td>@item.nama_satker</td>
+            <td class="numeric">@item.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))<input type="text" class="penerimaan" value="@item.penerimaan" onblur="totalpenerimaan()" /></td>
+            <td class="numeric">@item.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+            <td class="numeric"><a href="@Url.Action("RealisasiPenerimaanPerbandinganSatker", "penerimaan", new { kantorId = item.kantorid, tahun = Model.tahun, bulan = Model.bulan })" class="btn btn-primary">Perbandingan</a></td>
+
+        </tr>
         }
 
         @*<tr>
