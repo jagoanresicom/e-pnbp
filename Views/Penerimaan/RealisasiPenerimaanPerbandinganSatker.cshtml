@@ -4,6 +4,9 @@
     ViewBag.Judul = "Rincian Realisasi Penerimaan";
     var alokasi0 = ViewBag.alokasi0;
     var alokasi1 = ViewBag.alokasi1;
+    var kantorId = ViewBag.kantorId;
+    var tahun = ViewBag.tahun;
+    var bulan = ViewBag.bulan;
     var penerimaan = ViewBag.penerimaan;
 }
 
@@ -55,19 +58,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in alokasi0)
-                        {
-                            <tr>
-                                <td>@item.tanggal.ToString("dd/MM/yyyy")</td>
-                                <td>@item.kodebilling</td>
-                                <td>@item.nomorberkas</td>
-                                <td>@item.tahunberkas</td>
-                                <td>@item.kodepenerimaan</td>
-                                <td>@item.namaprogram</td>
-                                <td>@item.jumlah</td>
-                                <td>@item.nilaiakhir</td>
-                            </tr>
-                        }
+
                     </tbody>
                 </table>
             </div>
@@ -94,19 +85,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in alokasi1)
-                        {
-                            <tr>
-                                <td>@item.tanggal.ToString("dd/MM/yyyy")</td>
-                                <td>@item.kodebilling</td>
-                                <td>@item.nomorberkas</td>
-                                <td>@item.tahunberkas</td>
-                                <td>@item.kodepenerimaan</td>
-                                <td>@item.namaprogram</td>
-                                <td>@item.jumlah</td>
-                                <td>@item.nilaiakhir</td>
-                            </tr>
-                        }
                     </tbody>
                 </table>
             </div>
@@ -115,8 +93,80 @@
 
 
     <script type="text/javascript">
+    var kantorId = '@kantorId'
+    var tahun = '@tahun';
+        var bulan = '@bulan';
+
     $(document).ready(function () {
-        let tblAlokasi0 = $('#tbl-alokasi0').DataTable();
-        let tblAlokasi1 = $('#tbl-alokasi1').DataTable();
+        let tblAlokasi0 = $('#tbl-alokasi0').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/penerimaan/RealisasiPenerimaanPerbandinganSatkerDt?kantorId=" + kantorId + "&tahun=" + tahun + "&bulan=" + bulan + "&statusAlokasi=false",
+                "type": "POST"
+            },
+            "columns": [
+                {
+                    "data": "tanggal"
+                },
+                {
+                    "data": "kodebilling"
+                },
+                {
+                    "data": "nomorberkas"
+                },
+                {
+                    "data": "tahunberkas"
+                },
+                {
+                    "data": "kodepenerimaan"
+                },
+                {
+                    "data": "namaprogram"
+                },
+                {
+                    "data": "jumlah"
+                },
+                {
+                    "data": "nilaiakhir"
+                }
+            ]
+
+        });
+        let tblAlokasi1 = $('#tbl-alokasi1').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/penerimaan/RealisasiPenerimaanPerbandinganSatkerDt?kantorId=" + kantorId + "&tahun=" + tahun + "&bulan=" + bulan + "&statusAlokasi=true",
+                "type": "POST"
+            },
+            "columns": [
+                {
+                    "data": "tanggal"
+                },
+                {
+                    "data": "kodebilling"
+                },
+                {
+                    "data": "nomorberkas"
+                },
+                {
+                    "data": "tahunberkas"
+                },
+                {
+                    "data": "kodepenerimaan"
+                },
+                {
+                    "data": "namaprogram"
+                },
+                {
+                    "data": "jumlah"
+                },
+                {
+                    "data": "nilaiakhir"
+                }
+            ]
+
+        });
     });
     </script>
