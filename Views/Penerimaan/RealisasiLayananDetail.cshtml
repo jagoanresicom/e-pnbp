@@ -40,7 +40,7 @@
             {
         <tr>
             <td class="numeric">@no</td>
-            <td><a href="@Url.Action("RealisasiPenerimaanPerbandingan", "penerimaan", new { berkasid = item.berkasid, kantorId = item.kantorid, tahun = ViewBag.tahun, bulan=ViewBag.bulan })">@item.namaprosedur</a></td>
+            <td>@item.namaprosedur</td>
             <td>@item.kodesatker</td>
             <td>@item.namakantor</td>
             <td>@item.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>

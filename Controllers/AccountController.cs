@@ -28,7 +28,7 @@ namespace Pnbp.Controllers
                 //ModelState.AddModelError("", "The user name or password provided is incorrect.");
                 OracleMembershipProvider provider = (OracleMembershipProvider)System.Web.Security.Membership.Providers["OracleMembershipProvider"];
 
-                if (provider.ValidateUser(model.UserName, model.Password) || true) //(passwordList.Count > 0 && (passwordList[0].pWord == passWord))
+                if (provider.ValidateUser(model.UserName, model.Password)) //(passwordList.Count > 0 && (passwordList[0].pWord == passWord))
                 {
                     //Session["UserName"] = model.UserName;
                     //HttpCookie cookie = System.Web.Security.FormsAuthentication.GetAuthCookie(model.UserName, true);

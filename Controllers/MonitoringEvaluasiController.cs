@@ -23,6 +23,50 @@ namespace Pnbp.Controllers
         //    return View();
         //}
 
+
+        struct CountResult
+        {
+            public int Count { get; set; }
+        }
+
+        public struct DatatablesRequest
+        {
+            public int Draw { get; set; }
+
+            public int Start { get; set; }
+
+            public int Length { get; set; }
+
+            public SearchParam Search { get; set; }
+
+            public ColumnParam[] Columns { get; set; }
+
+            public OrderParam[] Order { get; set; }
+
+            public IDictionary<string, dynamic> Filter { get; set; }
+
+            public struct OrderParam
+            {
+                public int Column { get; set; }
+                public string Dir { get; set; }
+            }
+
+            public struct ColumnParam
+            {
+                public string Data { get; set; }
+                public string Name { get; set; }
+                public bool Searchable { get; set; }
+                public bool Orderable { get; set; }
+                public SearchParam SearchParam { get; set; }
+            }
+
+            public struct SearchParam
+            {
+                public string Value { get; set; }
+                public bool Regex { get; set; }
+            }
+        }
+
         public ActionResult Penerimaan()
         {
             Entities.CariPenerimaan find = new Entities.CariPenerimaan();
@@ -393,5 +437,89 @@ namespace Pnbp.Controllers
             db.Database.ExecuteSqlCommand(do_read);
             return Json(new { result = do_read }, JsonRequestBehavior.AllowGet);
         }
+
+        public async Task<JsonResult> AlokasiDT(DatatablesRequest req, bool statusAlokasi,string kodeSpopp, string kantorId, int tahun, int? bulan)
+        {
+            var ctx = new PnbpContext();
+
+            var queryBase = @"
+                SELECT 
+                    {0}
+                FROM PENERIMAAN p
+                LEFT JOIN KODESPAN k 
+                ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) 
+                    AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) 
+                WHERE p.KANTORID = '" + kantorId + "' AND SUBSTR(p.KODESPOPP, 0, 12)=SUBSTR('"+kodeSpopp+"', 0, 12) AND p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1" : "0");
+
+            if (bulan != null)
+            {
+                queryBase += " AND p.BULAN = " + bulan;
+            }
+
+
+            var recordsTotal = ctx.Database.SqlQuery<CountResult>(string.Format(queryBase, "COUNT(*) as count")).First().Count;
+
+            queryBase += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", req.Start, req.Length);
+
+            var queryList = string.Format(queryBase, "p.*, k.namaprogram");
+
+            var list_penerimaan = await ctx.Database.SqlQuery<Entities
+                .DataPenerimaan>(queryList)
+                .ToListAsync();
+
+            var recordsFiltered = recordsTotal;
+
+            var jsonResult = Json(new
+            {
+                draw = req.Draw,
+                recordsFiltered,
+                recordsTotal,
+                data = list_penerimaan.Select(x => new
+                {
+                    x.jumlah,
+                    x.jenispenerimaan,
+                    x.kodebilling,
+                    x.kodesatker,
+                    x.kodepenerimaan,
+                    x.namaprogram,
+                    x.namaprosedur,
+                    x.tahunberkas,
+                    x.statusalokasi,
+                    x.nomorberkas,
+                    x.nilaiakhir,
+                    x.namakantor,
+                    tanggal = x.tanggal.ToString("dd/mm/yyyy")
+                })
+            });
+
+            jsonResult.MaxJsonLength = int.MaxValue;
+
+            return jsonResult;
+        }
+
+        public struct DataPelayanan
+        {
+            public string KodeSpopp { get; set; }
+            public string Nama { get; set; }
+        }
+
+        public ActionResult Alokasi()
+        {
+            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
+            var ctx = new PnbpContext();
+
+            var sqlQuery = "SELECT KODESPOPP, NAMA FROM kkpweb.PROSEDUR WHERE STATUSHAPUS <> 1";
+            var pelayanan = ctx.Database.SqlQuery<DataPelayanan>(sqlQuery).ToList();
+
+            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
+            ViewData["get_propinsi"] = get_propinsi;
+            ViewData["pelayanan"] = pelayanan;
+
+            return View();
+        }
+
+    
+
+     
     }
 }

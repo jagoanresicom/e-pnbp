@@ -3082,6 +3082,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Penerimaan\RealisasiPenerimaanPerbandingan.cshtml" />
     <Content Include="Views\Penerimaan\RealisasiPenerimaanPerbandinganSatker.cshtml" />
+    <Content Include="Views\MonitoringEvaluasi\Alokasi.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
