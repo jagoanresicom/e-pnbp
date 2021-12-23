@@ -17,86 +17,78 @@
 </style>
 
 @*<link href='@Url.Content("~/resources/css/table.css")' rel="stylesheet">*@
-
-<table class="table table-striped table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
-    <thead>
-        <tr>
-            <th class="tdcenter">No.</th>
-            <th class="tdcenter">Kode Satker</th>
-            <th class="tdcenter">Nama Satker</th>
-            <th class="tdcenter">Nama Prosedur</th>
-            <th class="tdcenter">Target Fisik</th>
-            <th class="tdcenter">Realisasi Fisik</th>
-            <th class="tdcenter">Persentase Fisik</th>
-            <th class="tdcenter">Target Penerimaan</th>
-            <th class="tdcenter">Realisasi Penerimaan</th>
-            <th class="tdcenter">Persentase Penerimaan</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @if (get_data.Count > 0)
-                    {
-                        var no = 1;
-                        foreach (var item in get_data)
-                        {
+<div class="x_panel">
+    <div class="x_title">
+        <h2 class="sub-header">Detail Realisasi Penerimaan Per Satuan Kerja</h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <a href="@Url.Action("RealisasiPenerimaan", "Penerimaan")" class="btn btn-info">Kembali</a>
+        <br />
+        <br/>
+        <table id="table-penerimaan" class="table table-striped table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+            <thead>
                 <tr>
-                    <td class="numeric">@no</td>
-                    <td>@item.kodesatker</td>
-                    <td>@item.namakantor</td>
-                    <td>@item.namaprosedur</td>
-                    <td class="text-center">@item.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                    <td class="text-center">@item.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                    <td class="text-center">@item.persentasefisik</td>
-                    <td class="text-right">@item.nilaitarget.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                    <td class="text-right">@item.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                    <td class="text-center">@item.persentasepenerimaan</td>
+                    <th class="tdcenter">Kode Satker</th>
+                    <th class="tdcenter">Nama Satker</th>
+                    <th class="tdcenter">Nama Prosedur</th>
+                    <th class="tdcenter">Target Fisik</th>
+                    <th class="tdcenter">Realisasi Fisik</th>
+                    <th class="tdcenter">Persentase Fisik</th>
+                    <th class="tdcenter">Target Penerimaan</th>
+                    <th class="tdcenter">Realisasi Penerimaan</th>
+                    <th class="tdcenter">Persentase Penerimaan</th>
                 </tr>
-                no ++;
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="6" class="text-center">Data Kosong</td>
-            </tr>
-        }
-        @*<tr>
-                <td class="numeric">#</td>
-                <td colspan="2" style="text-align:right;">Total</td>
-                <td class="numeric">@get_data.Sum(a => a.penerimaan).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                <td></td>
-                <td class="numeric">@get_data.Sum(a => a.operasional).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            </tr>*@
-    </tbody>
-</table>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
 
 <script type="text/javascript">
-    //$(document).ready(function () {
-    //    $.unblockUI();
-    //});
-    var showDetailBreakdownPenerimaan = function (k, n, v) {
-        var pdata = { Id: k, pTahun: n, pBulan: v };
-        @*$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-        $.pjax({
-            container: "#penerimaanholder",
-            type: 'POST',
-            url: '@Url.Action("RealisasiPenerimaanDetailBreakdown", "Penerimaan")',
-            data: pdata,
-            success: function (data, textStatus, XMLHttpRequest) {
-                if (data == 'noresults') {
-                    showmsg('Status', 'Tidak ada data yang ditemukan');
-                }
-                else {
-                    $('#penerimaanholder').html(data);
-                }
-                $.unblockUI();
+    var kantorId = "@ViewData["kantorId"]";
+    var pTahun = "@ViewData["tahun"]";
+    var pBulan = "@ViewData["bulan"]";
+
+    $(document).ready(function () {
+        $('#table-penerimaan').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/Penerimaan/realisasipenerimaandetailDt?id=" + kantorId + "&pTahun=" + pTahun + "&pBulan=" + pBulan,
+                "type": "POST"
             },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(XMLHttpRequest, textStatus, errorThrown);
-                $.unblockUI();
-            }
-        });*@
-        $.unblockUI();
-    }
+            "columns": [
+                {
+                    "data": "kodesatker"
+                },
+                {
+                    "data": "namakantor"
+                },
+                {
+                    "data": "namaprosedur"
+                },
+                {
+                    "data": "targetfisik"
+                },
+                {
+                    "data": "jumlah"
+                },
+                {
+                    "data": "persentasefisik"
+                },
+                {
+                    "data": "nilaitarget"
+                },
+                {
+                    "data": "penerimaan"
+                },
+                {
+                    "data": "persentasepenerimaan"
+                }
+            ]
+        })
+    })
 </script>

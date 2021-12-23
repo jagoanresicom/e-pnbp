@@ -537,6 +537,57 @@ namespace Pnbp.Models
             return _list;
         }
 
+        public List<Entities.RealisasiPenerimaanDetail> GetRealisasiPenerimaanDetailDT(string id, string pTahun, string pBulan)
+        {
+            List<Entities.RealisasiPenerimaanDetail> _list = new List<Entities.RealisasiPenerimaanDetail>();
+            //List<object> lstparams = new List<object>();
+
+            string query =
+                @" SELECT DISTINCT
+                    r1.kantorid,
+                    r1.berkasid,
+                    r1.kodesatker,
+	                r1.namakantor,
+	                r1.namaprosedur,
+	                NVL (r2.TARGETFISIK, 0) AS targetfisik,
+	                COUNT (r1.jumlah) AS jumlah,
+                    ROUND(NVL(count(r1.JUMLAH)/r2.TARGETFISIK*100,0),2) as persentasefisik,
+	                NVL(r2 .nilaitarget, 0) AS nilaitarget,
+	                SUM (r1.penerimaan) AS penerimaan,
+	                ROUND (SUM(r1.operasional), 2) AS operasional,
+                    round(nvl(sum(r1.penerimaan) / r2.nilaitarget * 100,0),2) as persentasepenerimaan,
+	                ROW_NUMBER () OVER (
+
+		                ORDER BY
+			                SUM (r1.penerimaan) DESC
+	                ) AS urutan
+                FROM
+	                rekappenerimaandetail r1
+                LEFT JOIN TARGETPROSEDUR r2 ON r2.KANTORID = r1.KANTORID and r1.namaprosedur = r2.namaprosedur
+                    where r1.kantorid = '" + id + "'";
+
+            if (!String.IsNullOrEmpty(pTahun))
+            {
+                query += " and r1.tahun = " + pTahun + " ";
+            }
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                query += " and r1.bulan = " + pBulan + " ";
+                //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pBulan));
+            }
+
+            query += " group by r1.kantorid, r1.berkasid, r1.kodesatker, r1.namakantor, r1.namaprosedur, r2.TARGETFISIK, r2.NILAITARGET";
+
+            using (var ctx = new PnbpContext())
+            {
+                //var parameters = lstparams.ToArray();
+                _list = ctx.Database.SqlQuery<Entities.RealisasiPenerimaanDetail>(query).ToList<Entities.RealisasiPenerimaanDetail>();
+            }
+
+            return _list;
+        }
+
         public List<Entities.StatistikPenerimaan> GetRealisasiLayanan(string pTahun, string pBulan, string pTipeKantorId, string pKantorId)
         {
             List<Entities.StatistikPenerimaan> _list = new List<Entities.StatistikPenerimaan>();

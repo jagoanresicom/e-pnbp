@@ -41,7 +41,8 @@
 
 <script type="text/javascript">
     var showDetailPenerimaan = function (k, n, v) {
-        //resetInfiniteScroll();
+        window.location.href = "/penerimaan/realisasipenerimaandetail?id="+ k + "&pTahun="+n+"&pBulan=" + v;
+        @*//resetInfiniteScroll();
         var pdata = { Id: k, pTahun: n, pBulan: v };
         $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.pjax({
@@ -63,7 +64,7 @@
                 $.unblockUI();
             }
         });
-        $.unblockUI();
+        $.unblockUI();*@
     }
 
     function totalpenerimaan()

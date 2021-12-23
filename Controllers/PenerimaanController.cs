@@ -117,19 +117,81 @@ namespace Pnbp.Controllers
 
         public ActionResult RealisasiPenerimaanDetail(string Id, string pTahun, string pBulan)
         {
-            //return Json(pTahun, JsonRequestBehavior.AllowGet);
-
-            //if (string.IsNullOrEmpty(Id))
-            //{
-            //    return RedirectToAction("RealisasiLayanan");
-            //}
-            Models.PenerimaanModel model = new Models.PenerimaanModel();
-            List<Entities.RealisasiPenerimaanDetail> data = model.GetRealisasiPenerimaanDetail(Id, pTahun, pBulan);
-            //return Json(data, JsonRequestBehavior.AllowGet);
-
-            ViewData["data"] = data;
+            ViewData["bulan"] = pBulan;
+            ViewData["kantorId"] = Id;
             ViewData["tahun"] = pTahun;
-            return PartialView("RealisasiPenerimaanDetail", data);
+            return View();
+        }
+
+        public JsonResult RealisasiPenerimaanDetailDT(DatatablesRequest req, string id, string pTahun, string pBulan)
+        {
+            var ctx = new PnbpContext();
+
+            List<Entities.RealisasiPenerimaanDetail> _list = new List<Entities.RealisasiPenerimaanDetail>();
+
+            string baseQuery =
+                @" SELECT
+                   {0}
+                FROM
+	                rekappenerimaandetail r1
+                LEFT JOIN TARGETPROSEDUR r2 ON r2.KANTORID = r1.KANTORID and r1.namaprosedur = r2.namaprosedur
+                    where r1.kantorid = '" + id + "'";
+
+            if (!String.IsNullOrEmpty(pTahun))
+            {
+                baseQuery += " and r1.tahun = " + pTahun + " ";
+            }
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                baseQuery += " and r1.bulan = " + pBulan + " ";
+                //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pBulan));
+            }
+
+            baseQuery += " group by r1.kantorid, r1.berkasid, r1.kodesatker, r1.namakantor, r1.namaprosedur, r2.TARGETFISIK, r2.NILAITARGET";
+
+            
+    
+
+            string countQuery = @"SELECT COUNT(*) as count FROM (" + string.Format(baseQuery, "DISTINCT r1.KANTORID, r1.BERKASID, r1.namakantor, r1.namaprosedur, NVL(r2.TARGETFISIK, 0) AS targetfisik") + ")";
+
+
+            var recordsTotal = ctx.Database.SqlQuery<CountResult>(countQuery).First().Count;
+
+            baseQuery += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", req.Start, req.Length);
+
+            string query = string.Format(baseQuery, @"
+                DISTINCT r1.kantorid,
+                r1.berkasid,
+                r1.kodesatker,
+	            r1.namakantor,
+	            r1.namaprosedur,
+	            NVL (r2.TARGETFISIK, 0) AS targetfisik,
+	            COUNT (r1.jumlah) AS jumlah,
+                ROUND(NVL(count(r1.JUMLAH)/r2.TARGETFISIK*100,0),2) as persentasefisik,
+	            NVL(r2 .nilaitarget, 0) AS nilaitarget,
+	            SUM (r1.penerimaan) AS penerimaan,
+	            ROUND (SUM(r1.operasional), 2) AS operasional,
+                round(nvl(sum(r1.penerimaan) / r2.nilaitarget * 100,0),2) as persentasepenerimaan,
+	            ROW_NUMBER () OVER (
+		            ORDER BY
+			            SUM (r1.penerimaan) DESC
+	            ) AS urutan
+            ");
+
+            _list = ctx.Database.SqlQuery<Entities.RealisasiPenerimaanDetail>(query).ToList<Entities.RealisasiPenerimaanDetail>();
+           
+            var jsonResult = Json(new
+            {
+                draw = req.Draw,
+               recordsTotal,
+               recordsFiltered = recordsTotal,
+               data= _list
+            });
+
+            jsonResult.MaxJsonLength = int.MaxValue;
+
+            return jsonResult;
         }
 
         public ActionResult RealisasiPenerimaanPerbandingan(string berkasId, string kantorId, int tahun, int bulan)
