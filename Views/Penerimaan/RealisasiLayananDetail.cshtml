@@ -16,55 +16,103 @@
 
 @*<link href='@Url.Content("~/resources/css/table.css")' rel="stylesheet">*@
 
-<table class="table table-striped table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
-    <thead>
-        <tr>
-            <th class="tdcenter">No</th>
-            <th class="tdcenter">Nama Prosedur</th>
-            <th class="tdcenter">Kode Satker</th>
-            <th class="tdcenter">Nama Satker</th>
-            <th class="tdcenter">Target Fisik</th>
-            <th class="tdcenter">Realisasi Fisik</th>
-            <th class="tdcenter">Persentase Fisik</th>
-            <th class="tdcenter">Target Penerimaan</th>
-            <th class="tdcenter">Realisasi Penerimaan</th>
-            <th class="tdcenter">Persentase Penerimaan</th>
-        </tr>
-    </thead>
+<div class="x_panel">
+    <div class="x_title">
+        <h2 class="sub-header">Detail Realisasi Penerimaan Perjenis Layanan</h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <a href="@Url.Action("RealisasiLayanan", "Penerimaan")" class="btn btn-info">Kembali</a>
+        <br />
+        <br />
+        <table id="table-penerimaan" class="table table-striped table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                    <th class="tdcenter">Nama Prosedur</th>
+                    <th class="tdcenter">Kode Satker</th>
+                    <th class="tdcenter">Nama Satker</th>
+                    <th class="tdcenter">Target Fisik</th>
+                    <th class="tdcenter">Realisasi Fisik</th>
+                    <th class="tdcenter">Persentase Fisik</th>
+                    <th class="tdcenter">Target Penerimaan</th>
+                    <th class="tdcenter">Realisasi Penerimaan</th>
+                    <th class="tdcenter">Persentase Penerimaan</th>
+                </tr>
+            </thead>
 
-    <tbody>
-        @if (Model.Count > 0)
-        {
-            var no = 1;
-            foreach (var item in Model)
-            {
-        <tr>
-            <td class="numeric">@no</td>
-            <td>@item.namaprosedur</td>
-            <td>@item.kodesatker</td>
-            <td>@item.namakantor</td>
-            <td>@item.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            <td>@item.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            <td>@item.persentasefisik</td>
-            <td class="text-right">@item.targetpenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            <td class="text-right">@item.realisasipenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            <td>@item.persentasepenerimaan</td>
-        </tr>
+            <tbody>
+                @*@if (Model.Count > 0)
+                {
+                    var no = 1;
+                    foreach (var item in Model)
+                    {
+                <tr>
+                    <td class="numeric">@no</td>
+                    <td>@item.namaprosedur</td>
+                    <td>@item.kodesatker</td>
+                    <td>@item.namakantor</td>
+                    <td>@item.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td>@item.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td>@item.persentasefisik</td>
+                    <td class="text-right">@item.targetpenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td class="text-right">@item.realisasipenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td>@item.persentasepenerimaan</td>
+                </tr>
 
-                no++;
-            }
-        }
+                        no++;
+                    }
+                }*@
 
-        @*<tr>
-                <td class="numeric">#</td>
-                <td style="text-align:right;" rowspan="3">Total</td>
-                <td class="numeric">@Model.Sum(a => a.operasional).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-            </tr>*@
-    </tbody>
-</table>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $.unblockUI();
+        var kantorId = "@ViewData["id"]";
+        var pTahun = "@ViewData["tahun"]";
+        var pBulan = "@ViewData["bulan"]";
+
+        $('#table-penerimaan').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/Penerimaan/RealisasiLayananDetailDT?id=" + kantorId + "&pTahun=" + pTahun + "&pBulan=" + pBulan,
+                "type": "POST"
+            },
+            "columns": [
+                {
+                    "data": "namaprosedur"
+                },
+                {
+                    "data": "kodesatker"
+                },
+                {
+                    "data": "namakantor"
+                },
+                {
+                    "data": "targetfisik"
+                },
+                {
+                    "data": "jumlah"
+                },
+                {
+                    "data": "persentasefisik"
+                },
+                {
+                    "data": "targetpenerimaan"
+                },
+                {
+                    "data": "realisasipenerimaan"
+                },
+                {
+                    "data": "persentasepenerimaan"
+                }
+            ]
+        })
     });
 </script>

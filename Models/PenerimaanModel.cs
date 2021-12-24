@@ -56,6 +56,11 @@ namespace Pnbp.Models
             return _dtJumlahPenerimaan;
         }
 
+        struct CountResult
+        {
+            public int Count { get; set; }
+        }
+
         public List<Entities.StatistikNTPN> dtStatistikNTPN(string pKantorId, DateTime pStartDate, DateTime pEndDate, int from, int to)
         {
             var _dtStatistikNTPN = new List<Entities.StatistikNTPN>();
@@ -698,6 +703,85 @@ namespace Pnbp.Models
             }
 
             return _list;
+        }
+
+        public struct RealisasiLayananDetailDTResult
+        {
+            public List<Entities.RealisasiLayananDetail> List { get; set; }
+            public int RecordsTotal { get; set; }
+            public int RecordsFiltered { get; set; }
+        }
+
+        public RealisasiLayananDetailDTResult GetRealisasiLayananDetailDT(string id, string pTahun, string pBulan, int? start, int? length)
+        {
+            List<Entities.RealisasiLayananDetail> _list = new List<Entities.RealisasiLayananDetail>();
+            List<object> lstparams = new List<object>();
+
+            string baseQuery =
+                @"  SELECT 
+                        {0}
+                    FROM
+	                    rekappenerimaandetail r1
+                    LEFT JOIN TARGETPROSEDUR b ON R1.KANTORID = b.KANTORID
+                    AND R1.NAMAPROSEDUR = b.NAMAPROSEDUR
+                    WHERE
+	                    r1.namaprosedur = :param1 and r1.tahun = :param2 ";
+
+            string querySelect = @"DISTINCT
+	                    r1.namaprosedur,
+	                    r1.kodesatker,
+	                    r1.namakantor,
+                        r1.kantorid,
+                        r1.berkasid,
+	                    NVL (b.TARGETFISIK, 0) AS targetfisik,
+	                    COUNT (r1.jumlah) AS jumlah,
+	                    ROUND (
+		                    NVL (
+			                    COUNT (r1.jumlah) / b.targetfisik * 100,
+			                    0
+		                    ),
+		                    2
+	                    ) AS persentasefisik,
+	                    NVL (b.nilaitarget, 0) AS targetpenerimaan,
+	                    SUM (r1.PENERIMAAN) AS realisasipenerimaan,
+	                    ROUND (
+		                    NVL (
+			                    SUM (r1.penerimaan) / b.nilaitarget * 100,
+			                    0
+		                    ),
+		                    2
+	                    ) AS persentasepenerimaan";
+
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param1", id));
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pTahun));
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                baseQuery += " and r1.bulan = :param3 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pBulan));
+            }
+
+            baseQuery += " group by r1.namaprosedur, r1.kodesatker, r1.namakantor, r1.kantorid, r1.berkasid, b.targetfisik, b.nilaitarget";
+
+            baseQuery += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", start, length);
+
+            string query = String.Format(baseQuery, querySelect);
+
+            string countQuery = String.Format(baseQuery, "COUNT(r1.NAMAPROSEDUR ) OVER() as count");
+
+            var parameters = lstparams.ToArray();
+            var count = 0;
+            using (var ctx = new PnbpContext())
+            {
+                count = ctx.Database.SqlQuery<CountResult>(countQuery, parameters).First().Count;
+                _list = ctx.Database.SqlQuery<Entities.RealisasiLayananDetail>(query, parameters).ToList<Entities.RealisasiLayananDetail>();
+            }
+
+            return new RealisasiLayananDetailDTResult {
+                List = _list,
+                RecordsFiltered = count,
+                RecordsTotal = count
+            };
         }
 
         public List<Entities.DataRekonsiliasi> dtDatakkprekonsiliasi(string start, string end)

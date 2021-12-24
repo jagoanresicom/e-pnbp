@@ -18,6 +18,7 @@ using System.Globalization;
 using OfficeOpenXml;
 using System.Text;
 using System.Threading.Tasks;
+using static Pnbp.Models.PenerimaanModel;
 //using OfficeOpenXml.Style;
 
 namespace Pnbp.Controllers
@@ -443,12 +444,30 @@ namespace Pnbp.Controllers
 
             Models.PenerimaanModel model = new Models.PenerimaanModel();
 
-            List<Entities.RealisasiLayananDetail> data = model.GetRealisasiLayananDetail(Id, pTahun, pBulan);
-            //return Json(data, JsonRequestBehavior.AllowGet);
+            ViewData["id"] = Id;
             ViewData["tahun"] = pTahun;
             ViewData["bulan"] = pBulan;
 
-            return PartialView("RealisasiLayananDetail", data);
+            return View();
+        }
+
+        public JsonResult RealisasiLayananDetailDT(DatatablesRequest req, string Id, string pTahun, string pBulan)
+        {
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
+
+            RealisasiLayananDetailDTResult data = model.GetRealisasiLayananDetailDT(Id, pTahun, pBulan, req.Start, req.Length);
+
+            var jsonResult = Json(new
+            {
+                draw  = req.Draw,
+                recordsTotal = data.RecordsTotal,
+                recordsFiltered = data.RecordsFiltered,
+                data = data.List
+            });
+
+            jsonResult.MaxJsonLength = int.MaxValue;
+
+            return jsonResult;
         }
         #endregion
 
