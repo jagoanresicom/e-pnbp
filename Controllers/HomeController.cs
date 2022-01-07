@@ -183,10 +183,33 @@ namespace Pnbp.Controllers
             var total_belanja = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_BELANJA where SUMBER_DANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
             total_belanja.jumlah = (total_belanja.jumlah == null ? 0 : total_belanja.jumlah);
 
+            var getmpops = ctx.Database.SqlQuery<Decimal>("select NVL(sum(TERALOKASI), 0) AS MP from REKAPALOKASI where tahun = " + currentYear + " AND TIPEMANFAAT = 'OPS'").FirstOrDefault();
+            var getbelanjaops = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (a.amount), 0) AS REALISASI FROM SPAN_REALISASI a LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN WHERE b.TIPE = 'OPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21").FirstOrDefault();
 
-            var persenMp = get_mp * 100 / (get_pagu + get_mp);
-            var persenPagu = (get_pagu * 100 / (get_pagu + get_mp));
-            var persenMpVsBelanja = (get_mp / total_realisasi.jumlah) * 100;
+            var getmpnonops = ctx.Database.SqlQuery<Decimal>("select NVL(sum(TERALOKASI), 0) AS MP from REKAPALOKASI where tahun = " + currentYear + " AND TIPEMANFAAT = 'NONOPS'").FirstOrDefault();
+            var getbelanjanonops = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (a.amount), 0) AS REALISASI FROM SPAN_REALISASI a LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN WHERE b.TIPE = 'NONOPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21").FirstOrDefault();
+
+
+            decimal persenMp = 0;
+            decimal persenPagu = 0;
+            decimal persenMpVsBelanja = 0;
+            decimal persenMpVsBelanjaOps = 0;
+            decimal persenMpVsBelanjaNonOps = 0;
+            try
+            {
+                //persenMp = get_mp * 100 / (get_pagu + get_mp);
+                //persenPagu = (get_pagu * 100 / (get_pagu + get_mp))
+                persenMp = (get_mp / get_pagu) * 100;
+                persenPagu = 100 - persenMp;
+                persenMpVsBelanja = ((decimal)total_realisasi.jumlah / get_mp) * 100;
+                persenMpVsBelanjaOps = (getbelanjaops / getmpops) * 100;
+                persenMpVsBelanjaNonOps = (getbelanjanonops / getmpnonops) * 100;
+            } catch (Exception e)
+            {
+                _ = e.StackTrace;
+            }
+            
+
             var jsonResult = new
             {
                 paguVsMp = new
@@ -196,11 +219,20 @@ namespace Pnbp.Controllers
                 },
                 mpVsBelanja = new
                 {
-                    mp = persenMpVsBelanja,
-                    belanja = 100 - persenMpVsBelanja
+                    mp = 100 - persenMpVsBelanja,
+                    belanja = persenMpVsBelanja
+                },
+                mpVsBelanjaOps = new
+                {
+                    mp = 100 - persenMpVsBelanjaOps,
+                    belanja = persenMpVsBelanjaOps
+                },
+                mpVsBelanjaNonOps = new
+                {
+                    mp = 100 - persenMpVsBelanjaNonOps,
+                    belanja = persenMpVsBelanjaNonOps
                 }
             };
-
 
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
@@ -236,54 +268,6 @@ namespace Pnbp.Controllers
             data.tahun = pTahun;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
-        }
-
-        //public JsonResult GetDataMP()
-        //{
-        //    var ctx = new PnbpContext();
-        //    string currentYear = DateTime.Now.Year.ToString();
-        //    var get_mp = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (TERALOKASI),0) AS TERALOKASI FROM REKAPALOKASI WHERE STATUSALOKASI = 1 AND TAHUN = " + currentYear + " ").ToList();
-        //    return Json(get_mp, JsonRequestBehavior.AllowGet);
-        //}
-
-        //public JsonResult GetDataPagu()
-        //{
-        //    var ctx = new PnbpContext();
-        //    string currentYear = DateTime.Now.Year.ToString();
-        //    var get_pagu = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM(NILAIANGGARAN),0) FROM MANFAAT WHERE TAHUN = " + currentYear + "").ToList();
-        //    return Json(get_pagu, JsonRequestBehavior.AllowGet);
-        //}
-
-        public JsonResult GetMpOps()
-        {
-            var ctx = new PnbpContext();
-            string currentYear = DateTime.Now.Year.ToString();
-            var getmpops = ctx.Database.SqlQuery<Decimal>("select NVL(sum(TERALOKASI), 0) AS MP from REKAPALOKASI where tahun = " + currentYear + " AND TIPEMANFAAT = 'OPS'").ToList();
-            return Json(getmpops, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetBelanjaOps()
-        {
-            var ctx = new PnbpContext();
-            string currentYear = DateTime.Now.Year.ToString();
-            var getbelanjaops = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (a.amount), 0) AS REALISASI FROM SPAN_REALISASI a LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN WHERE b.TIPE = 'OPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21").ToList();
-            return Json(getbelanjaops, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetMpNonOps()
-        {
-            var ctx = new PnbpContext();
-            string currentYear = DateTime.Now.Year.ToString();
-            var getmpnonops = ctx.Database.SqlQuery<Decimal>("select NVL(sum(TERALOKASI), 0) AS MP from REKAPALOKASI where tahun = " + currentYear + " AND TIPEMANFAAT = 'NONOPS'").ToList();
-            return Json(getmpnonops, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetBelanjaNonOps()
-        {
-            var ctx = new PnbpContext();
-            string currentYear = DateTime.Now.Year.ToString();
-            var getbelanjanonops = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (a.amount), 0) AS REALISASI FROM SPAN_REALISASI a LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN WHERE b.TIPE = 'NONOPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21").ToList();
-            return Json(getbelanjanonops, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult IndexPartial(string pTahun, string pSatker)
