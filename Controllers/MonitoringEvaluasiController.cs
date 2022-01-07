@@ -181,7 +181,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateRenaksiPenerimaan(FormCollection form)
+        public ActionResult CreateRenaksiPenerimaan(FormCollection form) {
         
             PnbpContext db = new PnbpContext();
 
