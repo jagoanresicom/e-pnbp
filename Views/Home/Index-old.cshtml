@@ -1,9 +1,9 @@
 ﻿@model  Pnbp.Entities.CharDashboard
 @{
-//var penerimaan = ViewBag.total_penerimaan;
-//var belanja = ViewBag.total_belanja;
-//var persentase_penerimaan = ViewBag.persentase_penerimaan;
-//var persentase_belanja = ViewBag.persentase_belanja;
+    var penerimaan = ViewBag.total_penerimaan;
+    var belanja = ViewBag.total_belanja;
+    var persentase_penerimaan = ViewBag.persentase_penerimaan;
+    var persentase_belanja = ViewBag.persentase_belanja;
 }
 <style>
     .control-label {
@@ -11,7 +11,7 @@
         padding-right: 0px;
     }
 </style>
-<script src='@Url.Content("~/resources/js/jquery.min.js")'></script>
+
 <script src='@Url.Content("~/resources/js/echarts.min.js")'></script>
 <script src='@Url.Content("~/resources/js/highcharts/highcharts.js")'></script>
 <script src='@Url.Content("~/resources/js/highcharts/highcharts-more.js")'</script>
@@ -30,7 +30,7 @@
                 <div class="tile-stats" style="height:135px">
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Total<br>Penerimaan</center></h4>
-                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center> <label id="totalPenerimaan"></label> </center></b></h2></div>
+                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D" "><b><center>@penerimaan.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID")) </center></b></h2></div>
                     <p></p>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <div class="tile-stats" style="height:135px">
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Total<br>Belanja</center></h4>
-                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center><label id="totalBelanja"></label> </center></b></h2></div>
+                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D" "><b><center>@belanja.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID")) </center></b></h2></div>
                     <p></p>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                 <div class="tile-stats" style="height:135px">
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Persentase <br> Penerimaan (%)</center></h4>
-                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center><label id="persentasePenerimaan"></label> </center></b></h2></div>
+                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D" "><b><center>@persentase_penerimaan.persentase.ToString("N0", new System.Globalization.CultureInfo("id-ID")) </center></b></h2></div>
                     <p></p>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                 <div class="tile-stats" style="height:135px">
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Persentase <br> Belanja (%)</center></h4>
-                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center><label id="persentaseBelanja"></label> </center></b></h2></div>
+                    <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D" "><b><center>@persentase_belanja.ToString("N0", new System.Globalization.CultureInfo("id-ID")) </center></b></h2></div>
                     <p></p>
                 </div>
             </div>
@@ -102,111 +102,17 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-        //getPaguvsMp();
-        //mpvsbelanja();
-        //mpvsbelanjaops();
-        //mpbelanjanonops();
-        getDashboardLine();
-
-        getTotalPenerimaan();
-        getTotalBelanja();
-        getPersentasiPenerimaan();
-        getPersentaseBelanja();
-
-        getDataHalfPie();
-
+    $(document).ready(function() {
+        getPaguvsMp();
+        mpvsbelanja();
+        mpvsbelanjaops();
+        mpbelanjanonops();
     });
 
-    function getTotalPenerimaan() {
-        $.ajax({
-            url: '@Url.Action("GetTotalPenerimaan", "Home")',
-            success: function (response) {
-                $('#totalPenerimaan').text(response.totalPenerimaan)
-            },
-            error: function (response) {
-                console.log('error', response);
-            }
-        });
-    }
-
-    function getTotalBelanja() {
-        $.ajax({
-            url: '@Url.Action("GetTotalBelanja", "Home")',
-            success: function (response) {
-                $('#totalBelanja').text(response.totalBelanja)
-            },
-            error: function (response) {
-                console.log('error', response);
-            }
-        });
-    }
-
-    function getPersentasiPenerimaan() {
-        $.ajax({
-            url: '@Url.Action("GetPersentasiPenerimaan", "Home")',
-            success: function (response) {
-                $('#persentasePenerimaan').text(response.persentasePenerimaan)
-            },
-            error: function (response) {
-                console.log('error', response);
-            }
-        });
-    }
-
-    function getPersentaseBelanja() {
-        $.ajax({
-            url: '@Url.Action("GetPersentaseBelanja", "Home")',
-            success: function (response) {
-                $('#persentaseBelanja').text(response.persentaseBelanja)
-            },
-            error: function (response) {
-                console.log('error', response);
-            }
-        });
-    }
-
-    function getDataHalfPie() {
-        $.ajax({
-            url: '@Url.Action("GetDataHalfPie", "Home")',
-            success: function (response) {
-                getPaguvsMp(response.paguVsMp.mp, response.paguVsMp.pagu)
-                mpvsbelanja(response.mpVsBelanja.mp, response.mpVsBelanja.belanja)
-                mpvsbelanjaOps(response.mpVsBelanjaOps.mp, response.mpVsBelanjaOps.belanja)
-                mpvsbelanjaNonOps(response.mpVsBelanjaNonOps.mp, response.mpVsBelanjaOps.belanja)
-            },
-            error: function (response) {
-                console.log('error', response);
-            }
-        });
-    }
-
-    function getDashboardLine() {
-        $.ajax({
-            url: '@Url.Action("getDashboardLine", "Home")',
-            success: function (res) {
-                var data = res.data
-                resultArray = data.jumlah;
-                AlokasiOps = data.jumlahops;
-                BulanAlokasiOps = data.bulanAlokOps;
-                belanjaNonOps = data.belanjaNonOps;
-                belanjaOps = data.belanjaOps;
-                bulan = data.bulan;
-                bulanNonOps = data.bulanNonOps;
-                bulanOps = data.bulanAlokOps;
-                showLineDashboard();
-            },
-            error: function (response) {
-                console.log('error', response);
-            }
-        });
-    }
-
-    function getPaguvsMp(persenMp, persenPagu){
-        //var datamp = dataMp;
-        //var datapagu = dataPagu;
-        //var persenMp = Math.round(((datamp || 0) / (datapagu)) * 100);
-        //var persenPagu = 100 - persenMp;
+    function getPaguvsMp(){
+        var datamp = (@Html.Raw(Json.Encode(ViewBag.datamp)));
+        var datapagu = (@Html.Raw(Json.Encode(ViewBag.datapagu)));
+        var persenMp = Math.round(((@Html.Raw(Json.Encode(ViewBag.datamp)) || 0) /(@Html.Raw(Json.Encode(ViewBag.datapagu))))*100);
 
         //alert(isNAN(persenMp));
         Highcharts.chart('paguvsmp', {
@@ -300,8 +206,8 @@
                 name: 'Data',
                 innerSize: '55%',
                 data: [
-                    ['MP', Math.round(persenMp)],
-                    ['PAGU', Math.round(persenPagu)]
+                        ['MP', persenMp],
+                        ['PAGU', 100]
                     @*['PAGU', Math.round(persenbelanja)],
                     ['MP', @nilai_mp[0]],*@
 
@@ -309,7 +215,7 @@
             }, {
                 type: 'gauge',
                 //data: [ Math.round(persenbelanja)],
-                    data: [Math.round(persenMp == 0 ? 0 : persenMp-5)],
+                data: [persenMp],
                 dial: {
                     rearLength: 0
                 }
@@ -317,9 +223,12 @@
         });
     }
 
-    function mpvsbelanja(persenMp, persenBelanja){
+    function mpvsbelanja(){
         //Chart Spedometer MP VS Belanja
-
+        var persenMp = ((@Html.Raw(Json.Encode(ViewBag.datamp)) || 0) / (@Html.Raw(Json.Encode(ViewBag.datarealisasi)) || 0))*100;
+        var datamp = (@Html.Raw(Json.Encode(ViewBag.datamp)));
+        var datarealisasi = (@Html.Raw(Json.Encode(ViewBag.datarealisasi)));
+        //alert(realisasi_dipa)
         Highcharts.chart('mpvsbelanja', {
             chart: {
                 renderTo: 'container',
@@ -411,30 +320,34 @@
                 name: 'Browser share',
                 innerSize: '55%',
                 data: [
-                    ['Belanja', persenBelanja],
-                    ['MP', persenMp],
+                    ['Belanja', 22],
+                    ['MP', 100],
 
                 ]
             }, {
-                    type: 'gauge',
-                    data: [persenBelanja <= 0 ? 0 : (persenBelanja - 5)],
-                    dial: {
-                        rearLength: 0
-                    }
+                type: 'gauge',
+                data: [22],
+                dial: {
+                    rearLength: 0
+                }
             }],
         });
     }
 
-    function mpvsbelanjaOps(persenMp, persenBelanja) {
-        //Chart Spedometer MP VS Belanja
-
+    function mpvsbelanjaops()
+    {
+        //alert(persenbelanja)
+        var get_mpops = @Html.Raw(Json.Encode(ViewBag.getmpops));
+        var get_belanjaops = @Html.Raw(Json.Encode(ViewBag.getbelanjaops));
+        var persentaseops = Math.round((get_belanjaops/get_mpops)*100);
+        //alert(persentaseops)
         Highcharts.chart('belanjaops', {
             chart: {
                 renderTo: 'container',
                 plotBackgroundColor: null,
                 plotBackgroundImage: null,
                 plotBorderWidth: 0,
-                plotShadow: false,
+                plotShadow: false
             },
             title: {
                 text: 'MP VS Belanja OPS',
@@ -443,10 +356,10 @@
                 y: 40
             },
             tooltip: {
-                pointFormat: '{series.data[0]}: <b>{point.y}</b>'
+                pointFormat: '{series.name}: <b>{point.y}%</b>'
             },
             pane: {
-                center: ['50%', '77%'],
+                center: ['50%', '70%'],
                 size: '50%',
                 startAngle: -90,
                 endAngle: 90,
@@ -516,16 +429,16 @@
 
             series: [{
                 type: 'pie',
-                name: 'Browser share',
+                name: '',
                 innerSize: '55%',
                 data: [
-                    ['Belanja', persenBelanja],
-                    ['MP', persenMp],
+                    ['Belanja<br>OPS', persentaseops],
+                    ['MP', 100],
 
                 ]
             }, {
                 type: 'gauge',
-                data: [persenBelanja <= 0 ? 0 : (persenBelanja - 5)],
+                data: [persentaseops],
                 dial: {
                     rearLength: 0
                 }
@@ -533,16 +446,19 @@
         });
     }
 
-    function mpvsbelanjaNonOps(persenMp, persenBelanja) {
-        //Chart Spedometer MP VS Belanja
-
+    function mpbelanjanonops ()
+    {
+        //alert(persenbelanja);
+        var getmpnonops = @Html.Raw(Json.Encode(ViewBag.getmpnonops));
+        var getbelanjanonops = @Html.Raw(Json.Encode(ViewBag.getbelanjanonops));
+        var persentaseops = Math.round((getbelanjanonops/getmpnonops)*100);
         Highcharts.chart('belanjanonops', {
             chart: {
                 renderTo: 'container',
                 plotBackgroundColor: null,
                 plotBackgroundImage: null,
                 plotBorderWidth: 0,
-                plotShadow: false,
+                plotShadow: false
             },
             title: {
                 text: 'MP VS Belanja Non OPS',
@@ -551,10 +467,10 @@
                 y: 40
             },
             tooltip: {
-                pointFormat: '{series.data[0]}: <b>{point.y}</b>'
+                pointFormat: '{series.data[0]}: <b>{point.y}%</b>'
             },
             pane: {
-                center: ['50%', '77%'],
+                center: ['50%', '78%'],
                 size: '50%',
                 startAngle: -90,
                 endAngle: 90,
@@ -627,13 +543,14 @@
                 name: 'Browser share',
                 innerSize: '55%',
                 data: [
-                    ['Belanja', persenBelanja],
-                    ['MP', persenMp],
+                    //['MP', get_mpbelanjaops.persentase],
+                    ['Belanja<br>Non OPS', persentaseops],
+                    ['MP', 100],
 
                 ]
             }, {
                 type: 'gauge',
-                data: [persenBelanja <= 0 ? 0 : (persenBelanja - 5)],
+                data: [persentaseops],
                 dial: {
                     rearLength: 0
                 }
@@ -641,65 +558,92 @@
         });
     }
 
-    function showLineDashboard() {
+    function pembulatan(data) {
+        //return this.value / 1000000000 + 'M';
+        if (this.value >= 1E6) {
+            return '' + data / 1000000000 + 'M';
+        } else if(this.value == 0){
+            return '0';
+        }
+        return '' + data / 1000000 + 'JT';
+    }
+
+
+     //Chart Line Alokasi VS Belanja OPS
+    var resultArray = @Html.Raw(Json.Encode(ViewBag.RESULT));
+
+    var AlokasiOps = @Html.Raw(Json.Encode(ViewBag.RESULTALOKOPS));
+    console.log(AlokasiOps);
+    var BulanAlokasiOps = @Html.Raw(Json.Encode(ViewBag.BULANALOKOPS));
+
+    var belanjaNonOps = @Html.Raw(Json.Encode(ViewBag.belanjaNonOps));
+    var belanjaOps = @Html.Raw(Json.Encode(ViewBag.belanjaOps));
+    var bulan = @Html.Raw(Json.Encode(ViewBag.bulan));
+    var bulanNonOps = @Html.Raw(Json.Encode(ViewBag.bulanNonOps));
+    var bulanOps = @Html.Raw(Json.Encode(ViewBag.bulanOps));
+
+    $(document).ready(function () {
+        //console.log(resultArray[0]);
+        //console.log(bulan);
+        //if(resultArray){
         var alokasi = [];
         var alokasiops = [];
         var nonOps = [];
         var ops = [];
-        for (i = 1; i <= 12; i++) {
+        for (i=1;i<=12;i++){
             var cek = true;
             var cekNonOps = true;
             var cekOps = true;
             var cekAlokasiOps = true;
             //Show Alokasi (Line Chart)
-            $.each(bulan, function (j, v) {
-                if (i == v) {
+            $.each(bulan, function(j,v){
+                if(i == v){
                     alokasi.push(resultArray[j]);
                     cek = false;
                 }
             });
 
-            if (cek) {
+            if(cek){
                 alokasi.push(0);
                 //console.log(bulan);
             }
 
             //Show Alokasi OPS
-            $.each(BulanAlokasiOps, function (j, v) {
-                if (i == v) {
+            $.each(BulanAlokasiOps, function(j,v){
+                if(i == v){
                     alokasiops.push(AlokasiOps[j]);
                     cek = false;
                 }
             });
 
-            if (cekAlokasiOps) {
+            if(cekAlokasiOps){
                 alokasiops.push(0);
                 //console.log(bulan);
             }
             //Show Alokasi OPS
 
             //Show Belanja NonOps (Line Chart)
-            $.each(bulanNonOps, function (j, v) {
-                if (i == v) {
+            $.each(bulanNonOps, function(j,v){
+                if(i == v){
                     nonOps.push(belanjaNonOps[j]);
                     cekNonOps = false;
                 }
             });
 
-            if (cekNonOps) {
+            if(cekNonOps){
                 nonOps.push(0);
                 //console.log(bulan);
             }
 
             //Show Belanja Ops (Line Chart)
-            $.each(bulanOps, function (j, v) {
-                if (i == v) {
+            $.each(bulanOps, function(j,v){
+                if(i == v){
                     ops.push(belanjaOps[j]);
                     cekOps = false;
                 }
             });
 
-            if (cekOps) {
+            if(cekOps){
                 ops.push(0);
                 //console.log(bulan);
             }
@@ -729,11 +673,11 @@
                     text: 'Miliar'
                 },
                 labels: {
-                    formatter: function () {
+                    formatter: function() {
                         //return this.value / 1000000000 + 'M';
                         if (this.value >= 1E6) {
                             return '' + this.value / 1000000000 + 'M';
-                        } else if (this.value == 0) {
+                        } else if(this.value == 0){
                             return '0';
                         }
                         return '' + this.value / 1000000 + 'JT';
@@ -787,11 +731,11 @@
                     text: 'Miliar'
                 },
                 labels: {
-                    formatter: function () {
+                    formatter: function() {
                         //return this.value / 1000000000 + 'M';
                         if (this.value >= 1E6) {
                             return '' + this.value / 1000000000 + 'M';
-                        } else if (this.value == 0) {
+                        } else if(this.value == 0){
                             return '0';
                         }
                         return '' + this.value / 1000000 + 'JT';
@@ -818,6 +762,6 @@
                 data: nonOps
             }]
         });
-    }
-
+       
+    });
 </script>
