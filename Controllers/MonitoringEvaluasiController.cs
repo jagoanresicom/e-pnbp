@@ -182,7 +182,7 @@ namespace Pnbp.Controllers
 
         [HttpPost]
         public ActionResult CreateRenaksiPenerimaan(FormCollection form)
-        {
+        
             PnbpContext db = new PnbpContext();
 
             var kantorid = ((form.AllKeys.Contains("kantorid")) ? form["kantorid"] : "0");
@@ -449,8 +449,16 @@ namespace Pnbp.Controllers
                 LEFT JOIN KODESPAN k 
                 ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) 
                     AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) 
-                WHERE p.KANTORID = '" + kantorId + "' AND SUBSTR(p.KODESPOPP, 0, 12)=SUBSTR('"+kodeSpopp+"', 0, 12) AND p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1" : "0");
+                WHERE p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1" : "0");
 
+            if(!string.IsNullOrEmpty(kantorId))
+            {
+               queryBase += "AND p.KANTORID = '" + kantorId + "'";
+            }
+            if(!string.IsNullOrEmpty(kodeSpopp))
+            {
+                queryBase += "AND SUBSTR(p.KODESPOPP, 0, 12)= SUBSTR('"+kodeSpopp+"', 0, 12)";
+            }
             if (bulan != null)
             {
                 queryBase += " AND p.BULAN = " + bulan;
