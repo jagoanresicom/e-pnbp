@@ -10,6 +10,62 @@
         padding-top: 8px;
         padding-right: 0px;
     }
+
+
+.loader {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.loader.inactive {
+    display: none;
+}
+
+    .loader-wheel {
+        animation: spin 1s infinite linear;
+        border: 2px solid rgba(30, 30, 30, 0.5);
+        border-left: 4px solid #fff;
+        border-radius: 50%;
+        height: 50px;
+        margin-bottom: 10px;
+        width: 50px;
+        margin: 30px auto;
+    }
+
+.loader-text {
+  color: #fff;
+  font-family: arial, sans-serif;
+}
+
+.loader-text:after {
+  content: 'Loading';
+  animation: load 2s linear infinite;
+}
+
+@@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@@keyframes load {
+  0% {
+    content: 'Loading';
+  }
+  33% {
+    content: 'Loading.';
+  }
+  67% {
+    content: 'Loading..';
+  }
+  100% {
+    content: 'Loading...';
+  }
+}
 </style>
 <script src='@Url.Content("~/resources/js/jquery.min.js")'></script>
 <script src='@Url.Content("~/resources/js/echarts.min.js")'></script>
@@ -28,6 +84,9 @@
             @* Card Total Penerimaan *@
             <div class="col-md-3">
                 <div class="tile-stats" style="height:135px">
+                    <div id="loader-penerimaan" class="loader">
+                        <div class="loader-wheel"></div>
+                    </div>
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Total<br>Penerimaan</center></h4>
                     <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center> <label id="totalPenerimaan"></label> </center></b></h2></div>
@@ -38,6 +97,9 @@
             @* Card Total Belanja *@
             <div class="col-md-3">
                 <div class="tile-stats" style="height:135px">
+                    <div id="loader-total-belanja" class="loader">
+                        <div class="loader-wheel"></div>
+                    </div>
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Total<br>Belanja</center></h4>
                     <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center><label id="totalBelanja"></label> </center></b></h2></div>
@@ -48,6 +110,9 @@
             @* Card Persentase Penerimaan *@
             <div class="col-md-3">
                 <div class="tile-stats" style="height:135px">
+                    <div id="loader-persentase-penerimaan" class="loader">
+                        <div class="loader-wheel"></div>
+                    </div>
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Persentase <br> Penerimaan (%)</center></h4>
                     <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center><label id="persentasePenerimaan"></label> </center></b></h2></div>
@@ -58,6 +123,9 @@
             @* Card Persentase Belanja *@
             <div class="col-md-3">
                 <div class="tile-stats" style="height:135px">
+                    <div id="loader-persentase-belanja" class="loader">
+                        <div class="loader-wheel"></div>
+                    </div>
                     @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
                     <h4 style="margin-top:20px"><center>Persentase <br> Belanja (%)</center></h4>
                     <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D"><b><center><label id="persentaseBelanja"></label> </center></b></h2></div>
@@ -68,32 +136,50 @@
             @* pagu vs mp *@
             <div class="col-md-3 col-sm-2 col-xs-12">
                 <div class="x_panel" id="paguvsmp" style="height:250px">
+                    <div class="loader loader-halfpie">
+                        <div class="loader-wheel"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3 col-sm-2 col-xs-12">
                 <div class="x_panel" id="mpvsbelanja" style="height:250px">
+                    <div class="loader loader-halfpie">
+                        <div class="loader-wheel"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3 col-sm-2 col-xs-12">
                 <div class="x_panel" id="belanjaops" style="height:250px">
+                    <div class="loader loader-halfpie">
+                        <div class="loader-wheel"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3 col-sm-2 col-xs-12">
                 <div class="x_panel" id="belanjanonops" style="height:250px">
+                    <div class="loader loader-halfpie">
+                        <div class="loader-wheel"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="x_panel" id="alokasibelanjaops" style="height:250px">
+                    <div class="loader loader-halfpie">
+                        <div class="loader-wheel"></div>
+                    </div>
                 </div>
             </div>
 
             @* Line Chart ALokasi VS Belanja NON OPS *@
             <div class="col-md-6">
                 <div class="x_panel" id="alokasibelanjanonops" style="height:250px">
+                    <div class="loader loader-line">
+                        <div class="loader-wheel"></div>
+                    </div>
                 </div>
             </div>
 
@@ -102,6 +188,9 @@
 </div>
 
 <script>
+    var bulanOps;
+    var belanjaOps;
+
     $(document).ready(function () {
         //getPaguvsMp();
         //mpvsbelanja();
@@ -123,6 +212,8 @@
             url: '@Url.Action("GetTotalPenerimaan", "Home")',
             success: function (response) {
                 $('#totalPenerimaan').text(response.totalPenerimaan)
+
+                $('#loader-penerimaan').addClass('inactive');
             },
             error: function (response) {
                 console.log('error', response);
@@ -135,6 +226,7 @@
             url: '@Url.Action("GetTotalBelanja", "Home")',
             success: function (response) {
                 $('#totalBelanja').text(response.totalBelanja)
+                $('#loader-total-belanja').addClass('inactive');
             },
             error: function (response) {
                 console.log('error', response);
@@ -147,6 +239,7 @@
             url: '@Url.Action("GetPersentasiPenerimaan", "Home")',
             success: function (response) {
                 $('#persentasePenerimaan').text(response.persentasePenerimaan)
+                $('#loader-persentase-penerimaan').addClass('inactive');
             },
             error: function (response) {
                 console.log('error', response);
@@ -159,6 +252,7 @@
             url: '@Url.Action("GetPersentaseBelanja", "Home")',
             success: function (response) {
                 $('#persentaseBelanja').text(response.persentaseBelanja)
+                $('#loader-persentase-belanja').addClass('inactive');
             },
             error: function (response) {
                 console.log('error', response);
@@ -174,6 +268,8 @@
                 mpvsbelanja(response.mpVsBelanja.mp, response.mpVsBelanja.belanja)
                 mpvsbelanjaOps(response.mpVsBelanjaOps.mp, response.mpVsBelanjaOps.belanja)
                 mpvsbelanjaNonOps(response.mpVsBelanjaNonOps.mp, response.mpVsBelanjaOps.belanja)
+
+                $('.loader-halfpie').addClass('inactive');
             },
             error: function (response) {
                 console.log('error', response);
@@ -186,6 +282,7 @@
             url: '@Url.Action("getDashboardLine", "Home")',
             success: function (res) {
                 var data = res.data
+                console.log('data', data);
                 resultArray = data.jumlah;
                 AlokasiOps = data.jumlahops;
                 BulanAlokasiOps = data.bulanAlokOps;
@@ -193,8 +290,9 @@
                 belanjaOps = data.belanjaOps;
                 bulan = data.bulan;
                 bulanNonOps = data.bulanNonOps;
-                bulanOps = data.bulanAlokOps;
+                bulanOps = data.bulanOps;
                 showLineDashboard();
+                $('.loader-line').addClass('inactive');
             },
             error: function (response) {
                 console.log('error', response);
@@ -640,6 +738,7 @@
             }],
         });
     }
+
 
     function showLineDashboard() {
         var alokasi = [];
