@@ -491,6 +491,86 @@ namespace Pnbp.Models
             return _list;
         }
 
+          
+        public struct RealisasiPenerimaanDT
+        {
+            public List<Entities.DaftarRekapPenerimaanDetail> daftarRekapan { get; set; }
+            public int RecordsFiltered { get; set; }
+            public int RecordsTotal { get; set; }
+        }
+        public RealisasiPenerimaanDT GetRealisasiPenerimaanDT(string pTahun, string pBulan, string propinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
+        {
+            List<Entities.DaftarRekapPenerimaanDetail> _list = new List<Entities.DaftarRekapPenerimaanDetail>();
+            List<object> lstparams = new List<object>();
+            var count = 0;
+            string query =
+                @" select 
+                       {0}
+                   from rekappenerimaandetail a 
+                   LEFT JOIN TARGETPROSEDUR b on a.NAMAPROSEDUR = b.NAMAPROSEDUR AND A .KANTORID = b.KANTORID
+                   LEFT JOIN SATKER c ON A.KANTORID = C.KANTORID
+                    where a.tahun = :param1 AND c.KODESATKER IS NOT NULL";
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param1", pTahun));
+            //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", satker));
+
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                query += " and a.bulan = :param2 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pBulan));
+            }
+
+            if (!String.IsNullOrEmpty(propinsi))
+            {
+                query += " and c.induk= :param5 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", propinsi));
+            }
+
+            if (!String.IsNullOrEmpty(satker))
+            {
+                query += " and a.kantorid = :param4 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", satker));
+            }
+
+            if (pTipeKantorId == "2" || pTipeKantorId == "3" || pTipeKantorId == "4")
+            {
+                if (!string.IsNullOrEmpty(pKantorId))
+                {
+                    query += " and a.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :param3 CONNECT BY NOCYCLE PRIOR kantorid = induk) ";
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pKantorId));
+                }
+            }
+
+            query += " group by c.kantorid, c.kodesatker, c.nama_satker";
+
+            var queryCount = string.Format(query, @"COUNT(c.kantorid) OVER() as count");
+
+            query = string.Format(query, @" c.kantorid, 
+                        c.nama_satker, 
+                        c.kodesatker,
+                        nvl(sum(a.penerimaan),0) as penerimaan, 
+                        nvl(round(sum(a.operasional),2),0) as operasional, 
+                        row_number() over (order by sum(a.penerimaan) desc) as urutan");
+
+            query += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", start, length);
+
+
+            using (var ctx = new PnbpContext())
+            {
+                var parameters = lstparams.ToArray();
+                _list = ctx.Database.SqlQuery<Entities.DaftarRekapPenerimaanDetail>(query, parameters).ToList<Entities.DaftarRekapPenerimaanDetail>();
+                count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).First().Count;
+
+            }
+
+            return new RealisasiPenerimaanDT
+            {
+                daftarRekapan = _list,
+                RecordsFiltered = count,
+                RecordsTotal = count
+            };
+        }
+
         public List<Entities.RealisasiPenerimaanDetail> GetRealisasiPenerimaanDetail(string id, string pTahun, string pBulan)
         {
             List<Entities.RealisasiPenerimaanDetail> _list = new List<Entities.RealisasiPenerimaanDetail>();
@@ -591,6 +671,67 @@ namespace Pnbp.Models
             }
 
             return _list;
+        }
+
+        public struct RealisasiLayananDT
+        {
+            public List<Entities.StatistikPenerimaan> ListPenerimaan { get; set; }
+            public int RecordsTotal { get; set; }
+            public int RecordsFiltered { get; set; }
+        }
+
+        public RealisasiLayananDT GetRealisasiLayananDT(string pTahun, string pBulan, string pTipeKantorId, string pKantorId, int start, int length)
+        {
+            List<Entities.StatistikPenerimaan> _list = new List<Entities.StatistikPenerimaan>();
+            List<object> lstparams = new List<object>();
+            var count = 0;
+
+            string query =
+                @"
+                        SELECT 
+                           {0}
+                        FROM
+	                        rekappenerimaandetail r1
+                        WHERE r1.TAHUN = :param1 ";
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param1", pTahun));
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                query += " and r1.bulan = :param2 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pBulan));
+            }
+
+            query += " group by r1.namaprosedur";
+
+            var queryCount = String.Format(query, "COUNT(r1.NAMAPROSEDUR) OVER() as count");
+
+            query = string.Format(query, @"
+                DISTINCT
+	            r1.namaprosedur,
+	            COUNT (r1.jumlah) AS jumlah,
+	            SUM (r1.penerimaan) AS penerimaan,
+	            ROW_NUMBER () OVER (
+
+		            ORDER BY
+			            SUM (r1.penerimaan) DESC
+	            ) AS urutan
+            ");
+
+            query += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", start, length);
+
+            using (var ctx = new PnbpContext())
+            {
+                var parameters = lstparams.ToArray();
+                _list = ctx.Database.SqlQuery<Entities.StatistikPenerimaan>(query, parameters).ToList<Entities.StatistikPenerimaan>();
+                count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).FirstOrDefault().Count;
+            }
+
+            return new RealisasiLayananDT
+            {
+                ListPenerimaan = _list,
+                RecordsFiltered = count,
+                RecordsTotal = count
+            };
         }
 
         public List<Entities.StatistikPenerimaan> GetRealisasiLayanan(string pTahun, string pBulan, string pTipeKantorId, string pKantorId)
@@ -773,7 +914,7 @@ namespace Pnbp.Models
             var count = 0;
             using (var ctx = new PnbpContext())
             {
-                count = ctx.Database.SqlQuery<CountResult>(countQuery, parameters).First().Count;
+                count = ctx.Database.SqlQuery<CountResult>(countQuery, parameters).FirstOrDefault().Count;
                 _list = ctx.Database.SqlQuery<Entities.RealisasiLayananDetail>(query, parameters).ToList<Entities.RealisasiLayananDetail>();
             }
 

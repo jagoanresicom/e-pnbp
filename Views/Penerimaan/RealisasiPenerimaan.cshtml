@@ -26,6 +26,10 @@
     .tdcenter {
         text-align: center;
     }
+
+    #table-penerimaan-dt tbody td {
+        cursor: pointer;
+    }
 </style>
 
 <div class="">
@@ -106,6 +110,19 @@
                         <div class="x_content">
                             <div class="row">
                                 <div class="clearfix"></div>
+                                <div>
+                                    <table id="table-penerimaan-dt" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="tdcenter">No.</th>
+                                                <th class="tdcenter">Kode</th>
+                                                <th class="tdcenter">Nama Satker</th>
+                                                <th class="tdcenter">Penerimaan</th>
+                                                <th class="tdcenter">Operasional</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                                 <div id="penerimaanholder" class="table-responsive">
                                 </div>
                                 <div class="clearfix"></div>
@@ -118,7 +135,58 @@
         </div>
     </div>
 </div>
+<script>
+    
+    $(document).ready(function () {
+        
+    })
+    var tahun = "", bulan = "", propinsi ="", satker = "", dtinstance = null;
 
+    function loadDT() {
+        tahun = $('#tahun').val();
+        bulan = $('#bulan').val();
+        satker = $('#satker').val();
+        propinsi = $('#propinsi').val();
+
+        var url = "/Penerimaan/DaftarRealisasiPenerimaanDT?tahun=" + tahun + "&bulan=" + bulan + "&satker=" + satker + "&propinsi=" + propinsi
+
+        if (dtinstance != null) {
+            dtinstance.ajax.url(url).load();
+            return;
+        }
+
+        dtinstance = $('#table-penerimaan-dt').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": url,
+                "type": "POST"
+            },
+            "columns": [
+                {
+                    "data": "urutan"
+                },
+                {
+                    "data": "kodesatker"
+                },
+                {
+                    "data": "nama_satker"
+                },
+                {
+                    "data": "penerimaan"
+                },
+                {
+                    "data": "operasional"
+                }
+            ]
+        })
+
+        $('#table-penerimaan-dt tbody').on('click', 'tr', function () {
+            var data = dtinstance.row(this).data();
+            window.location.href ="/penerimaan/realisasipenerimaandetail?id="+data.kantorid+"&tahun="+tahun+"&bulan="+bulan
+        });
+    }
+</script>
 <script>
     $(document).ready(function () {
         $('.select2_single').select2({ width: 'resolve' }); 
@@ -134,7 +202,9 @@
 
     $("#reset-btn").on("click", function (e) {
         $('#bulan').val('').trigger('change');
-        $('#tahun').prop('selectedIndex', 1).trigger('change');
+        $('#tahun').val('').trigger('change');
+        $('#propinsi').val('').trigger('change');
+        $('#satker').val('').trigger('change');
     });
 
     var createFirstPaging = function () {
@@ -162,6 +232,8 @@
     };
 
     $("#find-btn").on("click", function (e) {
+        loadDT();
+        return;
         formToPost = $('#frmFindData');
         $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.ajax({
@@ -195,7 +267,7 @@
             data: { kode: provinsi },
             success: function (data) {
                 //console.log(data[0].KantorId);
-                var html = "";
+                var html = "<option value=''>--Pilih Satker--</option>";
                 if (data.length > 0) {
                     $.each(data, function (x) {
                         html += ""

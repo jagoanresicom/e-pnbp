@@ -338,35 +338,35 @@
                                         <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
                                         <li><a href="@Url.Action("PengajuanPengembalianIndex", "Pengembalian")">Pengembalian PNBP</a></li>
                                         @*<li>
-                                            <a><i class="fa fa-file-text-o"></i>Pengembalian PNBP<span class="fa fa-chevron-down"></span></a>
-                                            <ul class="nav child_menu">
-                                                <li><a href="@Url.Action("PengajuanPengembalian", "Pengembalian")">Pengajuan</a></li>
-                                                @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
-                                                {
-                                                    <li><a href="@Url.Action("PersetujuanPengembalian", "Pengembalian")">Persetujuan</a></li>
-                                                }
-                                            </ul>
-                                        </li>*@
+                                                <a><i class="fa fa-file-text-o"></i>Pengembalian PNBP<span class="fa fa-chevron-down"></span></a>
+                                                <ul class="nav child_menu">
+                                                    <li><a href="@Url.Action("PengajuanPengembalian", "Pengembalian")">Pengajuan</a></li>
+                                                    @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+                                                    {
+                                                        <li><a href="@Url.Action("PersetujuanPengembalian", "Pengembalian")">Persetujuan</a></li>
+                                                    }
+                                                </ul>
+                                            </li>*@
                                     </ul>
                                 </li>
                                 <li>
                                     <a><i class="fa fa-file-text-o"></i>Pemanfaatan<span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                    @*@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")*@
-                                    @*{*@
+                                        @*@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")*@
+                                        @*{*@
                                         <li><a href="@Url.Action("RincianAlokasi", "Pemanfaatan")">Rincian Alokasi</a></li>
-                                    @*}*@
+                                        @*}*@
                                         <li><a href="@Url.Action("ListDataManfaat", "Pemanfaatan")">Data Pemanfaatan</a></li>
                                         @*<li><a href="@Url.Action("Prioritas", "Pemanfaatan")">Prioritas Pemanfaatan</a></li>*@
                                         @*<li><a href="@Url.Action("AlokasiPemanfaatan", "Pemanfaatan")">Alokasi Pemanfaatan</a></li>*@
                                         <li><a href="@Url.Action("PersetujuanRevisiManfaat", "Pemanfaatan")">Persetujuan Revisi</a></li>
                                         @*@if(@OtorisasiUser.GetJenisKantorUser() == "Pusat"){
-                                            <li><a href="@Url.Action("EntriRenaksiPusat", "Pemanfaatan")">Entri Renaksi</a></li>
-                                        }
-                                        else
-                                        {
-                                            <li><a href="@Url.Action("EntriRenaksi", "Pemanfaatan")">Entri Renaksi</a></li>
-                                        }*@
+                                                <li><a href="@Url.Action("EntriRenaksiPusat", "Pemanfaatan")">Entri Renaksi</a></li>
+                                            }
+                                            else
+                                            {
+                                                <li><a href="@Url.Action("EntriRenaksi", "Pemanfaatan")">Entri Renaksi</a></li>
+                                            }*@
                                     </ul>
 
                                 </li>
@@ -379,15 +379,15 @@
                                     </ul>
                                 </li>
                                 @*<li>
-                                    <a><i class="fa fa-file-text-o"></i>Pengembalian PNBP<span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu">
-                                        <li><a href="@Url.Action("PengajuanPengembalian", "Pengembalian")">Pengajuan</a></li>
-                                        @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
-                                        {
-                                            <li><a href="@Url.Action("PersetujuanPengembalian", "Pengembalian")">Persetujuan</a></li>
-                                        }
-                                    </ul>
-                                </li>*@
+                                        <a><i class="fa fa-file-text-o"></i>Pengembalian PNBP<span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="@Url.Action("PengajuanPengembalian", "Pengembalian")">Pengajuan</a></li>
+                                            @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+                                            {
+                                                <li><a href="@Url.Action("PersetujuanPengembalian", "Pengembalian")">Persetujuan</a></li>
+                                            }
+                                        </ul>
+                                    </li>*@
                                 @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
                                 {
                                     <li>
@@ -416,26 +416,26 @@
                                     </li>
                                 }
                                 @*<li>
-            <a><i class="fa fa-table"></i>Dashboard<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">
-                <li><a href="@Url.Action("StatistikPenerimaan", "Dashboard")">Statistik Penerimaan</a></li>
-                <li><a href="@Url.Action("StatistikNTPN", "Dashboard")">Statistik NTPN</a></li>
-                <li><a href="@Url.Action("DetilPenerimaan", "Dashboard")">Detil Penerimaan</a></li>
-                <li><a href="@Url.Action("DetilAlokasiManfaat", "Dashboard")">Detil Alokasi Pemanfaatan</a></li>
-                <li><a href="@Url.Action("RekapPaguAlokasi", "Dashboard")">Detil Pagu dan Alokasi</a></li>
-                <li><a href="@Url.Action("RekapPenerimaan", "Dashboard")">Rekapitulasi Penerimaan</a></li>
-                <li><a href="@Url.Action("RekapManfaatPerKantor", "Dashboard")">Rekapitulasi Pemanfaatan Per Kantor</a></li>
-                <li><a href="@Url.Action("RekapManfaatPerProgram", "Dashboard")">Rekapitulasi Pemanfaatan Per Program</a></li>
-            </ul>
-        </li>*@
+                                        <a><i class="fa fa-table"></i>Dashboard<span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="@Url.Action("StatistikPenerimaan", "Dashboard")">Statistik Penerimaan</a></li>
+                                            <li><a href="@Url.Action("StatistikNTPN", "Dashboard")">Statistik NTPN</a></li>
+                                            <li><a href="@Url.Action("DetilPenerimaan", "Dashboard")">Detil Penerimaan</a></li>
+                                            <li><a href="@Url.Action("DetilAlokasiManfaat", "Dashboard")">Detil Alokasi Pemanfaatan</a></li>
+                                            <li><a href="@Url.Action("RekapPaguAlokasi", "Dashboard")">Detil Pagu dan Alokasi</a></li>
+                                            <li><a href="@Url.Action("RekapPenerimaan", "Dashboard")">Rekapitulasi Penerimaan</a></li>
+                                            <li><a href="@Url.Action("RekapManfaatPerKantor", "Dashboard")">Rekapitulasi Pemanfaatan Per Kantor</a></li>
+                                            <li><a href="@Url.Action("RekapManfaatPerProgram", "Dashboard")">Rekapitulasi Pemanfaatan Per Program</a></li>
+                                        </ul>
+                                    </li>*@
                                 @*<li>
-            <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">
-                <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
-                <li><a href="@Url.Action("Kantor", "Administrasi")">Kantor</a></li>
-                <li><a href="@Url.Action("Prioritas", "Administrasi")">Prioritas</a></li>
-            </ul>
-        </li>*@
+                                        <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
+                                            <li><a href="@Url.Action("Kantor", "Administrasi")">Kantor</a></li>
+                                            <li><a href="@Url.Action("Prioritas", "Administrasi")">Prioritas</a></li>
+                                        </ul>
+                                    </li>*@
                             </ul>
                         </div>
                     </div>
@@ -497,6 +497,7 @@
         </div>
     </div>
     @*<script src="../build/js/custom.js"></script>*@
+    <script src="https://cdn.jsdelivr.net/npm/jquery-popover@0.0.4/src/jquery-popover.min.js"></script>
     <script src="../resources/js/custom.js"></script>
     <script src='@Url.Content("~/resources/js/jquery.mCustomScrollbar.concat.min.js")'></script>
     <script src='@Url.Content("~/resources/ckeditor/ckeditor.js")'></script>

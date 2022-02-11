@@ -80,8 +80,8 @@ namespace Pnbp.Controllers
 
             List<Entities.Api> Datahasil = new List<Entities.Api>();
            
-                string currentYear = DateTime.Now.Year.ToString();
-                Datahasil = ctx.Database.SqlQuery<Entities.Api>("SELECT DISTINCT * FROM MANFAAT WHERE TAHUN = " + currentYear + " ").ToList();  
+            string currentYear = DateTime.Now.Year.ToString();
+            Datahasil = ctx.Database.SqlQuery<Entities.Api>("SELECT DISTINCT * FROM MANFAAT WHERE TAHUN = " + currentYear + " ").ToList();  
 
             return Datahasil; //Json(new { status = status, code = code, result = Datahasil }, JsonRequestBehavior.AllowGet);
         }

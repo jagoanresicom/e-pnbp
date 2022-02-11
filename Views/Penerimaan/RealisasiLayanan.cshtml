@@ -26,6 +26,10 @@
     .tdcenter {
         text-align: center;
     }
+
+    #table-layanan-dt tbody tr td {
+        cursor: pointer;
+    }
 </style>
 
 <div class="">
@@ -105,6 +109,17 @@
                         <div class="x_content">
                             <div class="row">
                                 <div class="clearfix"></div>
+                                <div>
+                                    <table id="table-layanan-dt" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="tdcenter">Jenis Layanan</th>
+                                                <th class="text-center">Realisasi Fisik</th>
+                                                <th class="text-center">Realisasi Penerimaan</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                                 <div id="layananholder" class="table-responsive">
                                 </div>
                                 <div class="clearfix"></div>
@@ -117,7 +132,46 @@
         </div>
     </div>
 </div>
+<script>
+    var tahun = "", bulan = "", dtinstance = null;
 
+    function loadDT() {
+        tahun = $('#tahun').val();
+        bulan = $('#bulan').val();
+
+        var url = "/Penerimaan/DaftarRealisasiLayananDT?tahun=" + tahun + "&bulan=" + bulan;
+
+        if (dtinstance != null) {
+            dtinstance.ajax.url(url).load();
+            return;
+        }
+
+        dtinstance = $('#table-layanan-dt').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": url,
+                "type": "POST"
+            },
+            "columns": [
+                {
+                    "data": "namaprosedur"
+                },
+                {
+                    "data": "jumlah"
+                },
+                {
+                    "data": "penerimaan"
+                }
+            ]
+        })
+
+        $('#table-layanan-dt tbody').on('click', 'tr', function () {
+            var data = dtinstance.row(this).data();
+            window.location.href = "/penerimaan/realisasilayanandetail?id=" + data.namaprosedur + "&pTahun=" + tahun + "&pBulan=" + bulan
+        });
+    }
+</script>
 <script>
     $(document).ready(function () {
         $('.select2_single').select2({ width: 'resolve' });
@@ -162,6 +216,8 @@
     };
 
     $("#find-btn").on("click", function (e) {
+        loadDT();
+        return;
         formToPost = $('#frmFindData');
         $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.ajax({

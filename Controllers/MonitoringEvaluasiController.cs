@@ -484,7 +484,7 @@ namespace Pnbp.Controllers
                 recordsTotal,
                 data = list_penerimaan.Select(x => new
                 {
-                    x.jumlah,
+                    jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
                     x.jenispenerimaan,
                     x.kodebilling,
                     x.kodesatker,
@@ -494,7 +494,7 @@ namespace Pnbp.Controllers
                     x.tahunberkas,
                     x.statusalokasi,
                     x.nomorberkas,
-                    x.nilaiakhir,
+                    nilaiakhir = x.nilaiakhir.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
                     x.namakantor,
                     tanggal = x.tanggal.ToString("dd/mm/yyyy")
                 })

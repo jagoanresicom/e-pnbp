@@ -61,6 +61,57 @@ namespace Pnbp.Controllers
             return Json(get_satker, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult DaftarRealisasiPenerimaanDT(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
+        {
+
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+           var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+       
+            var data = model.GetRealisasiPenerimaanDT(
+                reqTahun, 
+                bulan, 
+                propinsi, 
+                satker, 
+                tipekantorid, 
+                kantorid, 
+                req.Start, 
+                req.Length
+            );
+
+            var resp = Json(new {
+                draw = req.Draw,
+                data = data.daftarRekapan.Select(x =>
+                {
+                    var operasional = x.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    return new
+                    {
+                        x.urutan,
+                        penerimaan,
+                        operasional,
+                        x.nilaitarget,
+                        x.nama_satker,
+                        x.namaprosedur,
+                        x.kodesatker,
+                        x.kodepenerimaan,
+                        x.kanwilid,
+                        x.kantorid,
+                        x.jumlah,
+                        x.jenispenerimaan
+                    };
+                }),
+                recordsTotal = data.RecordsTotal,
+                recordsFiltered = data.RecordsFiltered
+            });
+
+            resp.MaxJsonLength = int.MaxValue;
+            return resp;
+        }
+
         public ActionResult DaftarRealisasiPenerimaan(Entities.FilterPenerimaan frm)
         {
             Models.PenerimaanModel model = new Models.PenerimaanModel();
@@ -187,7 +238,25 @@ namespace Pnbp.Controllers
                 draw = req.Draw,
                recordsTotal,
                recordsFiltered = recordsTotal,
-               data= _list
+               data= _list.Select(x => new
+               {
+                   x.berkasid,
+                   x.bulan,
+                   x.jumlah,
+                   x.kantorid,
+                   x.kodesatker,
+                   x.namakantor,
+                   x.namaprosedur,
+                   nilaitarget = x.nilaitarget.Value.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                   x.operasional,
+                   penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                   x.persentasefisik,
+                   x.persentasepenerimaan,
+                   x.tahun,
+                   targetfisik = x.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                   targetpenerimaan = x.targetpenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                   x.urutan
+               })
             });
 
             jsonResult.MaxJsonLength = int.MaxValue;
@@ -382,6 +451,45 @@ namespace Pnbp.Controllers
             return View();
         }
 
+        public ActionResult DaftarRealisasiLayananDT(DatatablesRequest req, string tahun, string bulan)
+        {
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
+            Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+            var data = model.GetRealisasiLayananDT(tahun, bulan, tipekantorid, kantorid, req.Start, req.Length);
+
+            var result= Json(new
+            {
+                draw = req.Draw,
+                data = data.ListPenerimaan.Select(x => {
+                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    return new {
+                        x.jenispenerimaan,
+                        jumlah,
+                        x.kantorid,
+                        x.kanwilid,
+                        x.kodepenerimaan,
+                        x.kodesatker,
+                        x.nama,
+                        x.namaprosedur,
+                        x.operasional,
+                        penerimaan,
+                        x.urutan
+                    };
+                }),
+                recordsTotal = data.RecordsTotal,
+                recordsFiltered=  data.RecordsFiltered
+            });
+
+            result.MaxJsonLength = int.MaxValue;
+
+            return result;
+        }
+
         public ActionResult DaftarRealisasiLayanan(Entities.FilterPenerimaan frm)
         {
             Models.PenerimaanModel model = new Models.PenerimaanModel();
@@ -462,7 +570,22 @@ namespace Pnbp.Controllers
                 draw  = req.Draw,
                 recordsTotal = data.RecordsTotal,
                 recordsFiltered = data.RecordsFiltered,
-                data = data.List
+                data = data.List.Select(x => new
+                {
+                    x.berkasid,
+                    x.namakantor,
+                    x.namaprosedur,
+                    x.kodesatker,
+                    targetfisik = x.targetfisik.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                    targetpenerimaan = x.targetpenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                    realisasipenerimaan = x.realisasipenerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                    x.persentasepenerimaan,
+                    x.persentasefisik,
+                    x.operasional,
+                    x.kantorid,
+                    x.jumlah,
+                    x.urutan
+                })
             });
 
             jsonResult.MaxJsonLength = int.MaxValue;
