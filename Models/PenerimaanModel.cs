@@ -189,8 +189,8 @@ namespace Pnbp.Models
                     count(*) over () TOTALREC
                 FROM
                     rekappenerimaandetail PN 
-                LEFT JOIN KKPWEBDEV.BERKASSIMPONI SM ON PN.KODEBILLING = SM.KODEBILLING 
-                LEFT JOIN KKPWEBDEV.DI305 DI ON SM.DI305ID = DI.DI305ID
+                LEFT JOIN KKPWEB.BERKASSIMPONI SM ON PN.KODEBILLING = SM.KODEBILLING 
+                LEFT JOIN KKPWEB.DI305 DI ON SM.DI305ID = DI.DI305ID
                 LEFT JOIN SATKER SR ON PN.KANTORID = SR.KANTORID
                 WHERE
                     PN.TANGGAL BETWEEN TO_DATE(:param2 || ' 00:00:00','dd/mm/yyyy hh24:mi:ss') AND TO_DATE(:param3 || ' 23:59:59','dd/mm/yyyy hh24:mi:ss') ";
@@ -258,10 +258,10 @@ namespace Pnbp.Models
                                 TO_CHAR(di.tanggal,'dd/mm/yyyy') AS tgl305
 		                    FROM
 			                    rekappenerimaandetail PN
-		                    LEFT JOIN KKPWEBDEV.BERKASSIMPONI SM ON PN.KODEBILLING = SM.KODEBILLING
-                            LEFT JOIN KKPWEBDEV.BERKAS BR ON BR.BERKASID = SM.BERKASID
-                            LEFT JOIN KKPWEBDEV.TIPESTATUSBERKAS STS ON STS.TIPESTATUSBERKASID = BR.STATUSBERKAS
-		                    LEFT JOIN KKPWEBDEV.DI305 DI ON SM.DI305ID = DI.DI305ID
+		                    LEFT JOIN KKPWEB.BERKASSIMPONI SM ON PN.KODEBILLING = SM.KODEBILLING
+                            LEFT JOIN KKPWEB.BERKAS BR ON BR.BERKASID = SM.BERKASID
+                            LEFT JOIN KKPWEB.TIPESTATUSBERKAS STS ON STS.TIPESTATUSBERKASID = BR.STATUSBERKAS
+		                    LEFT JOIN KKPWEB.DI305 DI ON SM.DI305ID = DI.DI305ID
 		                    WHERE
 			                    PN.KODEBILLING = :param1
 	                    ) dt

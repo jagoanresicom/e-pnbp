@@ -551,7 +551,7 @@ namespace Pnbp.Models
                 "        to_char(beritaapp.validsampai, 'DD/MM/YYYY') TanggalBerakhir, " +
                 "        COUNT(1) OVER() TOTAL " +
                 "    FROM " +
-                "        KKPWEBDEV.beritaapp " +
+                "        KKPWEB.beritaapp " +
                 "    WHERE " +
                 "        beritaapp.APPLICATIONNAME = :ApplicationName " +
                 "        AND (beritaapp.STATUSHAPUS IS NULL OR beritaapp.STATUSHAPUS = '0') ";
@@ -606,7 +606,7 @@ namespace Pnbp.Models
                 "    to_char(beritaapp.validsejak, 'DD/MM/YYYY') TanggalMulai, " +
                 "    to_char(beritaapp.validsampai, 'DD/MM/YYYY') TanggalBerakhir " +
                 "FROM " +
-                "    KKPWEBDEV.beritaapp " +
+                "    KKPWEB.beritaapp " +
                 "WHERE " +
                 "    beritaapp.beritaappid = :Id ";
 
@@ -627,7 +627,7 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
-            string query = "SELECT count(*) FROM KKPWEBDEV.beritaapp WHERE (beritaapp.STATUSHAPUS IS NULL OR beritaapp.STATUSHAPUS = '0') ";
+            string query = "SELECT count(*) FROM KKPWEB.beritaapp WHERE (beritaapp.STATUSHAPUS IS NULL OR beritaapp.STATUSHAPUS = '0') ";
 
             if (!String.IsNullOrEmpty(judulBerita))
             {
@@ -665,7 +665,7 @@ namespace Pnbp.Models
                         {
                             // Edit mode
                             sql =
-                                @"UPDATE KKPWEBDEV.beritaapp SET
+                                @"UPDATE KKPWEB.beritaapp SET
                                     judulberita = :JudulBerita, isiberita = :IsiBerita, 
                                     validsejak = TO_DATE(:TanggalMulai,'DD/MM/YYYY'), 
                                     validsampai = TO_DATE(:TanggalBerakhir,'DD/MM/YYYY')
@@ -686,7 +686,7 @@ namespace Pnbp.Models
                         {
                             // Insert Mode
                             sql =
-                                @"INSERT INTO KKPWEBDEV.beritaapp (
+                                @"INSERT INTO KKPWEB.beritaapp (
                                     beritaappid, judulberita, isiberita, validsejak, validsampai, APPLICATIONNAME) VALUES 
                                 (
                                     :Id,:JudulBerita,:IsiBerita,
@@ -745,7 +745,7 @@ namespace Pnbp.Models
 
                         // Hapus beritaapp
                         //string sql = @"DELETE FROM beritaapp WHERE beritaappid = :id";
-                        string sql = @"UPDATE KKPWEBDEV.beritaapp SET STATUSHAPUS = '1', USERHAPUS = :userid WHERE beritaappid = :id";
+                        string sql = @"UPDATE KKPWEB.beritaapp SET STATUSHAPUS = '1', USERHAPUS = :userid WHERE beritaappid = :id";
                         arrayListParameters.Clear();
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("userid", userid));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("id", id));
@@ -794,7 +794,7 @@ namespace Pnbp.Models
                     "        to_char(beritaapp.validsampai, 'dd MONTH yyyy', 'nls_date_language=INDONESIAN') TanggalBerakhir, " +
                     "        COUNT(1) OVER() TOTAL " +
                     "    FROM " +
-                    "        KKPWEBDEV.beritaapp " +
+                    "        KKPWEB.beritaapp " +
                     "    WHERE " +
                     "        beritaapp.APPLICATIONNAME = :ApplicationName " +
                     "        AND (beritaapp.STATUSHAPUS IS NULL OR beritaapp.STATUSHAPUS = '0') " +

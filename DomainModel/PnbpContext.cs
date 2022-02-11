@@ -22,8 +22,8 @@ namespace Pnbp
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("KKPWEBDEV");
-            //modelBuilder.HasDefaultSchema("KKPWEB");
+            //modelBuilder.HasDefaultSchema("KKPWEBDEV");
+            modelBuilder.HasDefaultSchema("KKPWEB");
         }
 
         public DbSet<User> UserData { get; set; }

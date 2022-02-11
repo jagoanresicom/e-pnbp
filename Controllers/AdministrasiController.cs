@@ -941,7 +941,7 @@ namespace Pnbp.Controllers
         public ActionResult RincianBiaya()
         {
             var ctx = new PnbpContext();
-            var get_data = ctx.Database.SqlQuery<Entities.RincianBiaya>("SELECT DISTINCT tarif, nama, nilaioperasional, tipenilaioperasional, kodepenerimaan FROM KKPWEBDEV.biaya WHERE NILAIOPERASIONAL IS NOT NULL").ToList();
+            var get_data = ctx.Database.SqlQuery<Entities.RincianBiaya>("SELECT DISTINCT tarif, nama, nilaioperasional, tipenilaioperasional, kodepenerimaan FROM KKPWEB.biaya WHERE NILAIOPERASIONAL IS NOT NULL").ToList();
             ViewData["get_data"] = get_data;
             //return Json(get_data, JsonRequestBehavior.AllowGet);
             return View();
