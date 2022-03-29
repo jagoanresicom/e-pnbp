@@ -1370,7 +1370,7 @@ namespace Pnbp.Controllers
 
             string tipe = OtorisasiUser.GetJenisKantorUser();
             
-            if(tipe == "Kantah")
+            if(tipe == "Kantah" || tipe == "Pusat")
             {
                 Entities.GetDataBerkasForm result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorid);
                 return Json(result, JsonRequestBehavior.AllowGet);

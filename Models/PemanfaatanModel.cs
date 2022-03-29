@@ -305,7 +305,11 @@ namespace Pnbp.Models
                 //                     r1.kode, r1.kantorid, r1.kodesatker, r1.nama_satker, r1.statusaktif
                 //               ) ";
 
-                string sql = @"SELECT SUM( AMOUNT ) AS TOTALPAGU FROM SPAN_BELANJA WHERE SUMBER_DANA = 'D' AND KDSATKER <> '524465'";
+                if (string.IsNullOrEmpty(tahun))
+                {
+                    tahun = DateTime.Now.Year.ToString();
+                }
+                string sql = $@"SELECT SUM( AMOUNT ) AS TOTALPAGU FROM SPAN_BELANJA WHERE SUMBER_DANA = 'D' AND KDSATKER <> '524465' AND TAHUN = {tahun}";
                 //string sql = @"SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR) + SUM( NILAIALOKASI ) AS ALOKASI  FROM MANFAAT WHERE TAHUN = :Tahun ";
                 //SELECT SUM(ANGGJAN + ANGGFEB + ANGGMAR) + SUM(NILAIALOKASI) AS ALOKASI  FROM MANFAAT WHERE TAHUN = (SELECT(to_char(SYSDATE, 'YYYY')) AS Y FROM dual
 
@@ -1564,8 +1568,13 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
+            if (string.IsNullOrEmpty(tahun))
+            {
+                tahun = DateTime.Now.Year.ToString();
+            }
+
             string query =
-                @"
+                $@"
                   SELECT
                         row_number() over (ORDER BY C.KDSATKER ASC) AS RNumber,
 	                    C.KDSATKER AS KODESATKER,
@@ -1589,6 +1598,7 @@ namespace Pnbp.Models
 	                    WHERE
 		                    SUMBER_DANA = 'D' 
 		                    AND KDSATKER <> '524465' 
+                            AND TAHUN = {tahun}
 	                    GROUP BY
 		                    KDSATKER 
 	                    ) A
@@ -1619,6 +1629,7 @@ namespace Pnbp.Models
 	                    WHERE
 		                    SUMBERDANA = 'D' 
 		                    AND KDSATKER <> '524465' 
+                            AND TAHUN = {tahun}
 	                    GROUP BY
 		                    KDSATKER 
 	                    ) C ON B.KODESATKER = C.KDSATKER
@@ -1781,8 +1792,13 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
+            if (string.IsNullOrEmpty(tahun))
+            {
+                tahun = DateTime.Now.Year.ToString();
+            }
+
             string query =
-                @"SELECT
+                $@"SELECT
 	                    row_number () over ( ORDER BY C.KODESATKER ASC ) AS RNumber,
 	                    C.KODESATKER,
 	                    C.KANTORID,
@@ -1828,7 +1844,7 @@ namespace Pnbp.Models
 	                    FROM
 		                    SPAN_REALISASI A
 		                    LEFT JOIN SPAN_BELANJA B ON A.KDSATKER = B.KDSATKER
-		
+		                WHERE A.TAHUN = {tahun} AND B.TAHUN = {tahun}
 	                    GROUP BY
 		                    A.KDSATKER,
 		                    B.KDSATKER,
@@ -2033,8 +2049,9 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
+            string currentYear = DateTime.Now.Year.ToString();
             string query =
-                @"SELECT
+                $@"SELECT
                         row_number () over ( ORDER BY A.KODE ASC ) AS RNumber,
 	                    A.MANFAATID,
 	                    A.KANTORID,
@@ -2092,6 +2109,7 @@ namespace Pnbp.Models
                     WHERE
 						SUMBERDANA = 'D'
 						AND KDSATKER <> '524465'
+                        AND TAHUN = {currentYear} 
                     GROUP BY
 	                    KDSATKER,
 	                    KEGIATAN,
@@ -2388,8 +2406,9 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
+            string currentYear = DateTime.Now.Year.ToString();
             string query =
-                @"SELECT
+                $@"SELECT
 	                    row_number () over ( ORDER BY C.KODESATKER ASC ) AS RNumber,
 	                    C.KODESATKER,
 	                    C.KANTORID,
@@ -2441,6 +2460,7 @@ namespace Pnbp.Models
 	                    FROM
 		                    SPAN_REALISASI A
 		                    LEFT JOIN SPAN_BELANJA B ON A.KDSATKER = B.KDSATKER 
+                        WHERE A.TAHUN = {currentYear} AND B.TAHUN = {currentYear}  
 	                    GROUP BY
 		                    A.KDSATKER,
 		                    B.KDSATKER,

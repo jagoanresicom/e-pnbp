@@ -96,7 +96,7 @@
                                         else
                                         {
                                             <td class="numeric">@item.Teralokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                                            <td class="numeric">@Math.Round((item.Teralokasi / item.Nilaianggaran * 100), 2)</td>
+                                            <td class="numeric">@item.Teralokasi == 0 || item.Nilaianggaran == 0 ? 0 : Math.Round((item.Teralokasi / item.Nilaianggaran * 100), 2)</td>
                                         }
                                         @*@if (@item.Nilaianggaran == 0)
                                         {

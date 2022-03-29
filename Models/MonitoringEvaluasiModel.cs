@@ -132,8 +132,9 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
+            string currentYear = DateTime.Now.Year.ToString();
             string query =
-                @"
+                $@"
                    SELECT
                         row_number() over (ORDER BY KODESATKER ASC) AS RNumber,
 	                    KODESATKER,
@@ -195,6 +196,7 @@ namespace Pnbp.Models
 	                    WHERE
 		                    SUMBER_DANA = 'D' 
 		                    AND KDSATKER <> '524465' 
+                            AND TAHUN = {currentYear}
 	                    GROUP BY
 		                    KDSATKER 
 	                    ) A
@@ -224,6 +226,7 @@ namespace Pnbp.Models
 	                    WHERE
 		                    SUMBERDANA = 'D' 
 		                    AND KDSATKER <> '524465' 
+                            AND TAHUN = {currentYear} 
 	                    GROUP BY
 		                    KDSATKER 
 	                    ) C ON B.KODESATKER = C.KDSATKER

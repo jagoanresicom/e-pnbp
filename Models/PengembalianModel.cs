@@ -1312,7 +1312,7 @@ namespace Pnbp.Models
                     FROM BERKAS 
                      LEFT JOIN REKAPPENERIMAANDETAIL ON BERKAS.BERKASID = REKAPPENERIMAANDETAIL.BERKASID
                      LEFT JOIN KKPWEB.PEMILIK ON BERKAS.PEMILIKID = PEMILIK.PEMILIKID
-                    WHERE BERKAS.STATUSBERKAS = 4
+                    WHERE BERKAS.STATUSBERKAS = 4 AND BERKAS.NOMOR = :Nomor AND BERKAS.TAHUN = :Tahun AND BERKAS.KANTORID = :KantorId
             ) SELECT 
                     NOTAHUNBERKAS,
                     NAMAPROSEDUR,
@@ -1325,17 +1325,23 @@ namespace Pnbp.Models
 	                TAHUN,
 	                KODEBILLING,
 	                NTPN,
-                    PENERIMAAN,
+                    TO_CHAR(sum(PENERIMAAN)) as PENERIMAAN,
                     KANTORID
-                FROM AA
-            WHERE NOTAHUNBERKAS = '" + NoTahun + "' AND KANTORID = '" + kantorid + "'";
+                FROM AA 
+                GROUP BY NOTAHUNBERKAS, NAMAPROSEDUR, NAMA, ALAMAT, NPWP, NOMOR, BERKASID, STATUSBERKAS, TAHUN, KODEBILLING, NTPN, KANTORID";
+
+            var noTahun = NoTahun.Split('/');
+            decimal nomor = decimal.Parse(noTahun[0]);
+            decimal tahun = decimal.Parse(noTahun[1]);
 
             query = sWhitespace.Replace(query, " ");
-            //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorBerkas", String.Concat("%", NomorBerkas.ToLower(), "%")));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Nomor", nomor));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
 
             using (var ctx = new PnbpContext())
             {
-                var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query).FirstOrDefault();
+                var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query, arrayListParameters.ToArray()).FirstOrDefault();
                 return records;
             }
         }

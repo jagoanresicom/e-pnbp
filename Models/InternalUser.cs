@@ -310,26 +310,27 @@ namespace Pnbp.Models
             return recAdded;
         }
 
-        public int DeleteUser(string username, bool deleteAllRelatedData, string tableName)
-        {
-            int rowsAffected = 0;
+        // TODO comment Revy
+        //public int DeleteUser(string username, bool deleteAllRelatedData, string tableName)
+        //{
+        //    int rowsAffected = 0;
 
-            Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", username);
-            object[] myParams = new object[1] { p1 };
+        //    Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", username);
+        //    object[] myParams = new object[1] { p1 };
 
-            using (var ctx = new PnbpContext())
-            {
-                string sql = "DELETE FROM " + tableName + " WHERE Username = :param1";
-                rowsAffected = ctx.Database.ExecuteSqlCommand(sql, myParams);
-            }
+        //    using (var ctx = new PnbpContext())
+        //    {
+        //        string sql = "DELETE FROM " + tableName + " WHERE Username = :param1";
+        //        rowsAffected = ctx.Database.ExecuteSqlCommand(sql, myParams);
+        //    }
 
-            if (deleteAllRelatedData)
-            {
-                // Process commands to delete all data for the user in the database.
-            }
+        //    if (deleteAllRelatedData)
+        //    {
+        //        // Process commands to delete all data for the user in the database.
+        //    }
 
-            return rowsAffected;
-        }
+        //    return rowsAffected;
+        //}
 
         public Member ValidateUser(string username, string tableName)
         {

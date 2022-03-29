@@ -982,8 +982,9 @@ namespace Pnbp.Controllers
             var BUDGET_TYPE = ((form.AllKeys.Contains("BUDGET_TYPE")) ? form["BUDGET_TYPE"] : "");
             var AMOUNT = ((form.AllKeys.Contains("AMOUNT")) ? form["AMOUNT"] : "");
 
-            string insert_belanja = "INSERT INTO SPAN_BELANJA (KDSATKER, KPPN, BA,BAES1,AKUN,PROGRAM,KEGIATAN,OUTPUT,KEWENANGAN,SUMBER_DANA,CARA_TARIK,LOKASI,BUDGET_TYPE,AMOUNT) " +
-                                            "VALUES ('" + KDSATKER + "','" + KPPN + "','" + BA + "','" + BAES1 + "','" + AKUN + "','" + PROGRAM + "','" + KEGIATAN + "','" + OUTPUT + "','" + KEWENANGAN + "','" + SUMBER_DANA + "','" + CARA_TARIK + "','" + LOKASI + "','" + BUDGET_TYPE + "'," + AMOUNT + ")";
+            string currentYear = DateTime.Now.Year.ToString();
+            string insert_belanja = "INSERT INTO SPAN_BELANJA (KDSATKER, KPPN, BA,BAES1,AKUN,PROGRAM,KEGIATAN,OUTPUT,KEWENANGAN,SUMBER_DANA,CARA_TARIK,LOKASI,BUDGET_TYPE,AMOUNT,TAHUN) " +
+                                            "VALUES ('" + KDSATKER + "','" + KPPN + "','" + BA + "','" + BAES1 + "','" + AKUN + "','" + PROGRAM + "','" + KEGIATAN + "','" + OUTPUT + "','" + KEWENANGAN + "','" + SUMBER_DANA + "','" + CARA_TARIK + "','" + LOKASI + "','" + BUDGET_TYPE + "'," + AMOUNT + ","+ currentYear + ")";
             db.Database.ExecuteSqlCommand(insert_belanja);
             return Json(form, JsonRequestBehavior.AllowGet);
         }

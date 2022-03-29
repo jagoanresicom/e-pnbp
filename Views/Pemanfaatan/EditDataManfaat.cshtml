@@ -318,7 +318,7 @@
         var anggokt = parseFloat($('#nilaiangokt').val() != null && $('#nilaiangokt').val() != "" ? $('#nilaiangokt').val() : 0);
         var anggnov = parseFloat($('#nilaiangnov').val() != null && $('#nilaiangnov').val() != "" ? $('#nilaiangnov').val() : 0);
         var anggdes = parseFloat($('#nilaiangdes').val() != null && $('#nilaiangdes').val() != "" ? $('#nilaiangdes').val() : 0);
-        
+
 
 
 
@@ -379,6 +379,7 @@
             var total = anggjan + anggfeb + anggmar + anggapr + anggmei + anggjun + anggjul + anggagt + anggsep
             $('#txtalokasi').val(total);
         }
+        console.log('data', '@Model.AlokOkt', '@Model.AlokSep');
         if ('@Model.AlokOkt' !== null && '@Model.AlokOkt' !== '' && '@Model.AlokOkt' == '1') {
             $('#nilaiangokt').attr("readonly", true); $('#rankokt').attr("readonly", true);
             var total = anggjan + anggfeb + anggmar + anggapr + anggmei + anggjun + anggjul + anggagt + anggsep + anggokt

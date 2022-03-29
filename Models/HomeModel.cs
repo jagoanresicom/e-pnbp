@@ -221,8 +221,13 @@ namespace Pnbp.Models
                 Regex sWhitespace = new Regex(@"\s+");
                 List<object> lstparams = new List<object>();
 
+                if (string.IsNullOrEmpty(pTahun))
+                {
+                    pTahun = DateTime.Now.Year.ToString();
+                }
+
                 string query =
-                    @"SELECT DISTINCT
+                    $@"SELECT DISTINCT
 	                        SUBSTR (A .TANGGAL, 4, 3) AS Bulan,
 	                        (
 		                        CASE
@@ -258,7 +263,8 @@ namespace Pnbp.Models
                         LEFT JOIN KODESPAN b ON A .KEGIATAN = b.KODE
                         AND A .OUTPUT = b.KEGIATAN
                         WHERE
-	                        b.TIPE = 'NONOPS'
+	                        b.TIPE = 'NONOPS' AND
+                            A.TAHUN = {pTahun} 
                         GROUP BY
 	                        SUBSTR (A .TANGGAL, 4, 3)";
                 //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));
@@ -279,9 +285,14 @@ namespace Pnbp.Models
             {
                 Regex sWhitespace = new Regex(@"\s+");
                 List<object> lstparams = new List<object>();
+                
+                if (string.IsNullOrEmpty(pTahun))
+                {
+                    pTahun = DateTime.Now.Year.ToString();
+                }
 
                 string query =
-                    @"SELECT DISTINCT
+                    $@"SELECT DISTINCT
 	                        SUBSTR (A .TANGGAL, 4, 3) AS Bulan,
 	                        (
 		                        CASE
@@ -317,7 +328,7 @@ namespace Pnbp.Models
                         LEFT JOIN KODESPAN b ON A .KEGIATAN = b.KODE
                         AND A .OUTPUT = b.KEGIATAN
                         WHERE
-	                        b.TIPE = 'OPS'
+	                        b.TIPE = 'OPS' AND TAHUN = {pTahun}
                         GROUP BY
 	                        SUBSTR (A .TANGGAL, 4, 3)";
                 //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", pTahun));

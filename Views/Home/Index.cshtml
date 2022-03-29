@@ -166,9 +166,10 @@
                 </div>
             </div>
 
+            @* Line Chart ALokasi VS Belanja OPS *@
             <div class="col-md-6">
-                <div class="x_panel" id="alokasibelanjaops" style="height:250px">
-                    <div class="loader loader-halfpie">
+                <div class="x_panel" id="alokasibelanjaops"  style="height:250px">
+                    <div class="loader loader-line">
                         <div class="loader-wheel"></div>
                     </div>
                 </div>
@@ -267,7 +268,7 @@
                 getPaguvsMp(response.paguVsMp.mp, response.paguVsMp.pagu)
                 mpvsbelanja(response.mpVsBelanja.mp, response.mpVsBelanja.belanja)
                 mpvsbelanjaOps(response.mpVsBelanjaOps.mp, response.mpVsBelanjaOps.belanja)
-                mpvsbelanjaNonOps(response.mpVsBelanjaNonOps.mp, response.mpVsBelanjaOps.belanja)
+                mpvsbelanjaNonOps(response.mpVsBelanjaNonOps.mp, response.mpVsBelanjaNonOps.belanja)
 
                 $('.loader-halfpie').addClass('inactive');
             },
@@ -383,20 +384,20 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                gauge: {
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '100%'
-                    }
-                }
+                //gauge: {
+                //    dataLabels: {
+                //        enabled: false
+                //    },
+                //    dial: {
+                //        radius: '100%'
+                //    }
+                //}
             },
 
             series: [{
                 type: 'pie',
                 name: 'Data',
-                innerSize: '55%',
+                innerSize: '50%',
                 data: [
                     ['MP', Math.round(persenMp)],
                     ['PAGU', Math.round(persenPagu)]
@@ -404,14 +405,16 @@
                     ['MP', @nilai_mp[0]],*@
 
                     ]
-            }, {
-                type: 'gauge',
-                //data: [ Math.round(persenbelanja)],
-                    data: [Math.round(persenMp == 0 ? 0 : persenMp-5)],
-                dial: {
-                    rearLength: 0
-                }
-            }],
+            },
+                //{
+                //    type: 'gauge',
+                //    //data: [ Math.round(persenbelanja)],
+                //        data: [Math.round(persenMp == 0 ? 0 : persenMp)],
+                //    dial: {
+                //        rearLength: 0
+                //    }
+                //}
+            ],
         });
     }
 
@@ -436,7 +439,7 @@
                 pointFormat: '{series.data[0]}: <b>{point.y}</b>'
             },
             pane: {
-                center: ['50%', '77%'],
+                center: ['50%', '70%'],
                 size: '50%',
                 startAngle: -90,
                 endAngle: 90,
@@ -483,7 +486,7 @@
                 pie: {
                     dataLabels: {
                         enabled: true,
-                        distance: -10,
+                        distance: -50,
                         style: {
                             fontWeight: 'bold',
                             color: 'white',
@@ -494,32 +497,34 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                gauge: {
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '100%'
-                    }
-                }
+                //gauge: {
+                //    dataLabels: {
+                //        enabled: false
+                //    },
+                //    dial: {
+                //        radius: '100%'
+                //    }
+                //}
             },
 
             series: [{
                 type: 'pie',
-                name: 'Browser share',
+                name: 'Data',
                 innerSize: '55%',
                 data: [
                     ['Belanja', persenBelanja],
                     ['MP', persenMp],
 
                 ]
-            }, {
-                    type: 'gauge',
-                    data: [persenBelanja <= 0 ? 0 : (persenBelanja - 5)],
-                    dial: {
-                        rearLength: 0
-                    }
-            }],
+            },
+                //{
+                //    type: 'gauge',
+                //    data: [persenBelanja <= 0 ? 0 : persenBelanja],
+                //    dial: {
+                //        rearLength: 0
+                //    }
+                //}
+            ],
         });
     }
 
@@ -544,7 +549,7 @@
                 pointFormat: '{series.data[0]}: <b>{point.y}</b>'
             },
             pane: {
-                center: ['50%', '77%'],
+                center: ['50%', '70%'],
                 size: '50%',
                 startAngle: -90,
                 endAngle: 90,
@@ -591,7 +596,7 @@
                 pie: {
                     dataLabels: {
                         enabled: true,
-                        distance: -10,
+                        distance: -50,
                         style: {
                             fontWeight: 'bold',
                             color: 'white',
@@ -602,37 +607,41 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                gauge: {
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '100%'
-                    }
-                }
+                //gauge: {
+                //    dataLabels: {
+                //        enabled: false
+                //    },
+                //    dial: {
+                //        radius: '100%'
+                //    }
+                //}
             },
 
             series: [{
                 type: 'pie',
-                name: 'Browser share',
+                name: 'Data',
                 innerSize: '55%',
                 data: [
                     ['Belanja', persenBelanja],
                     ['MP', persenMp],
 
                 ]
-            }, {
-                type: 'gauge',
-                data: [persenBelanja <= 0 ? 0 : (persenBelanja - 5)],
-                dial: {
-                    rearLength: 0
-                }
-            }],
+            },
+                //{
+                //    type: 'gauge',
+                //    data: [persenBelanja <= 0 ? 0 : persenBelanja],
+                //    dial: {
+                //        rearLength: 0
+                //    }
+                //}
+            ],
         });
     }
 
     function mpvsbelanjaNonOps(persenMp, persenBelanja) {
         //Chart Spedometer MP VS Belanja
+
+        console.log('mpvsbelanjaNonOps === > ', persenMp, persenBelanja);
 
         Highcharts.chart('belanjanonops', {
             chart: {
@@ -652,7 +661,7 @@
                 pointFormat: '{series.data[0]}: <b>{point.y}</b>'
             },
             pane: {
-                center: ['50%', '77%'],
+                center: ['50%', '70%'],
                 size: '50%',
                 startAngle: -90,
                 endAngle: 90,
@@ -699,7 +708,7 @@
                 pie: {
                     dataLabels: {
                         enabled: true,
-                        distance: -10,
+                        distance: -50,
                         style: {
                             fontWeight: 'bold',
                             color: 'white',
@@ -710,32 +719,34 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                gauge: {
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '100%'
-                    }
-                }
+                //gauge: {
+                //    dataLabels: {
+                //        enabled: false
+                //    },
+                //    dial: {
+                //        radius: '100%'
+                //    }
+                //}
             },
 
             series: [{
                 type: 'pie',
-                name: 'Browser share',
+                name: 'Data',
                 innerSize: '55%',
                 data: [
                     ['Belanja', persenBelanja],
                     ['MP', persenMp],
 
                 ]
-            }, {
-                type: 'gauge',
-                data: [persenBelanja <= 0 ? 0 : (persenBelanja - 5)],
-                dial: {
-                    rearLength: 0
-                }
-            }],
+            },
+                //{
+                //    type: 'gauge',
+                //    data: [persenBelanja <= 0 ? 0 : persenBelanja],
+                //    dial: {
+                //        rearLength: 0
+                //    }
+                //}
+            ],
         });
     }
 

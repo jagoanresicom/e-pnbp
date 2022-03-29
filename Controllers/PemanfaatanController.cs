@@ -871,10 +871,28 @@ namespace Pnbp.Controllers
             ViewData["datasatker"] = result;
 
             //new query
-            var get_data = ctx.Database.SqlQuery<Entities.Total>("SELECT NVL(SUM( AMOUNT ), 0) AS TOTALPAGU FROM SPAN_BELANJA WHERE SUMBER_DANA = 'D' AND KDSATKER <> '524465'").FirstOrDefault();
-            var get_total_realisasi = ctx.Database.SqlQuery<Entities.Total>("SELECT NVL(SUM( AMOUNT ), 0) AS TOTALREALISASI FROM SPAN_REALISASI WHERE SUMBERDANA = 'D' AND KDSATKER <> '524465'").FirstOrDefault();
+            var get_data = ctx
+                .Database
+                .SqlQuery<Entities.Total>($@"
+                    SELECT NVL(SUM( AMOUNT ), 0) AS TOTALPAGU 
+                    FROM SPAN_BELANJA 
+                    WHERE SUMBER_DANA = 'D' AND KDSATKER <> '524465' AND TAHUN = {currentYear}")
+                .FirstOrDefault();
+            var get_total_realisasi = ctx
+                .Database
+                .SqlQuery<Entities.Total>($@"
+                    SELECT NVL(SUM( AMOUNT ), 0) AS TOTALREALISASI 
+                    FROM SPAN_REALISASI 
+                    WHERE SUMBERDANA = 'D' AND KDSATKER <> '524465' AND TAHUN = {currentYear}")
+                .FirstOrDefault();
             //var get_total_alokasi = ctx.Database.SqlQuery<Entities.Total>("SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR + ANGGAPR + ANGGMEI + ANGGJUN + ANGGJUL + ANGGAGT) + SUM( NILAIALOKASI ) AS ALOKASI  FROM MANFAAT WHERE TAHUN = ( SELECT (to_char( SYSDATE, 'YYYY' )) AS Y FROM dual )").FirstOrDefault();
-            var get_total_alokasi = ctx.Database.SqlQuery<Entities.Total>("SELECT NVL(SUM(TERALOKASI), 0) AS ALOKASI FROM REKAPALOKASI WHERE TAHUN = '" + currentYear +"'").FirstOrDefault();
+            var get_total_alokasi = ctx
+                .Database
+                .SqlQuery<Entities.Total>($@"
+                    SELECT NVL(SUM(TERALOKASI), 0) AS ALOKASI 
+                    FROM REKAPALOKASI 
+                    WHERE TAHUN = '" + currentYear +"'")
+                .FirstOrDefault();
 
             ViewData["get_data"] = get_data;
             ViewData["get_total_realisasi"] = get_total_realisasi;
@@ -911,6 +929,7 @@ namespace Pnbp.Controllers
 
         public ActionResult RincianAlokasiDetailOutput(string programid)
         {
+            string currentYear = DateTime.Now.Year.ToString();
             var ctx = new PnbpContext();
             //return Json(programid, JsonRequestBehavior.AllowGet);
             Entities.CariRincianAlokasiSatker find = new Entities.CariRincianAlokasiSatker();
@@ -921,8 +940,22 @@ namespace Pnbp.Controllers
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantorid = _manfaatanModel.GetTipeKantor(kantoriduser);
             //manfaat = _manfaatanModel.GetLayananById(programid);
-            var get_data = ctx.Database.SqlQuery<Entities.Total>("SELECT SUM( AMOUNT ) AS TOTALPAGU FROM SPAN_BELANJA").FirstOrDefault();
-            var get_total_realisasi = ctx.Database.SqlQuery<Entities.Total>("SELECT SUM( AMOUNT ) AS TOTALREALISASI FROM SPAN_REALISASI").FirstOrDefault();
+            
+            var get_data = ctx
+                .Database
+                .SqlQuery<Entities.Total>($@"
+                    SELECT SUM( AMOUNT ) AS TOTALPAGU 
+                    FROM SPAN_BELANJA 
+                    WHERE TAHUN = {currentYear}")
+                .FirstOrDefault();
+            var get_total_realisasi = ctx
+                .Database
+                .SqlQuery<Entities.Total>($@"
+                    SELECT SUM( AMOUNT ) AS TOTALREALISASI 
+                    FROM SPAN_REALISASI 
+                    WHERE TAHUN = {currentYear}")
+                .FirstOrDefault();
+
             ViewData["get_data"] = get_data;
             ViewData["get_total_realisasi"] = get_total_realisasi;
 
@@ -1189,7 +1222,13 @@ namespace Pnbp.Controllers
             string currentYear = DateTime.Now.Year.ToString();
             //return Json(kantorid, JsonRequestBehavior.AllowGet);
             
-            var get_data = ctx.Database.SqlQuery<Entities.Total>("SELECT SUM( AMOUNT ) AS TOTALPAGU FROM SPAN_BELANJA").ToList();
+            var get_data = ctx
+                .Database
+                .SqlQuery<Entities.Total>($@"
+                    SELECT SUM( AMOUNT ) AS TOTALPAGU 
+                    FROM SPAN_BELANJA
+                    WHERE TAHUN = {currentYear}")
+                .ToList();
             ViewData["get_data"] = get_data;
 
             return View();

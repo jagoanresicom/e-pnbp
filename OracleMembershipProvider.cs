@@ -381,45 +381,46 @@ namespace Pnbp
             return null;
         }
 
+        // TODO comment Revy
         public override bool DeleteUser(string username, bool deleteAllRelatedData)
         {
-            int rowsAffected = 0;
+            //int rowsAffected = 0;
 
-            try
-            {
-                if (deleteAllRelatedData)
-                {
-                    // Process commands to delete all data for the user in the database.
-                }
+            //try
+            //{
+            //    if (deleteAllRelatedData)
+            //    {
+            //        // Process commands to delete all data for the user in the database.
+            //    }
 
-                Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", username);
-                object[] myParams = new object[1] { p1 };
+            //    Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", username);
+            //    object[] myParams = new object[1] { p1 };
 
-                using (var ctx = new PnbpContext())
-                {
-                    string sql = "DELETE FROM " + tableName + " WHERE Username = :param1";
-                    rowsAffected = ctx.Database.ExecuteSqlCommand(sql, myParams);
-                }
+            //    using (var ctx = new PnbpContext())
+            //    {
+            //        string sql = "DELETE FROM " + tableName + " WHERE Username = :param1";
+            //        rowsAffected = ctx.Database.ExecuteSqlCommand(sql, myParams);
+            //    }
 
-                if (deleteAllRelatedData)
-                {
-                    // Process commands to delete all data for the user in the database.
-                }
-            }
-            catch (OracleException e)
-            {
-                if (WriteExceptionsToEventLog)
-                {
-                    throw new ProviderException(exceptionMessage);
-                }
-                else
-                {
-                    throw e;
-                }
-            }
+            //    if (deleteAllRelatedData)
+            //    {
+            //        // Process commands to delete all data for the user in the database.
+            //    }
+            //}
+            //catch (OracleException e)
+            //{
+            //    if (WriteExceptionsToEventLog)
+            //    {
+            //        throw new ProviderException(exceptionMessage);
+            //    }
+            //    else
+            //    {
+            //        throw e;
+            //    }
+            //}
 
-            if (rowsAffected > 0)
-                return true;
+            //if (rowsAffected > 0)
+            //    return true;
 
             return false;
         }

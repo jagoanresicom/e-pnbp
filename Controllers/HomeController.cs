@@ -114,7 +114,20 @@ namespace Pnbp.Controllers
             var ctx = new PnbpContext();
             string currentYear = DateTime.Now.Year.ToString();
 
-            var total_penerimaan = ctx.Database.SqlQuery<Entities.TotalPenerimaan>("SELECT SUM (jumlah) as jumlah FROM rekappenerimaandetail where tahun = " + currentYear + " ").FirstOrDefault();
+            //var query = $@"
+            //            SELECT 
+            //                SUM (jumlah) as jumlah 
+            //            FROM rekappenerimaandetail 
+            //            where tahun = {currentYear}";
+            var query = $@"
+                        SELECT 
+                            TO_NUMBER(VALUE) as jumlah 
+                        FROM DASHBOARD_SUMMARY  
+                        where kode = 'TOTAL_PENERIMAAN'";
+            var total_penerimaan = ctx
+                .Database
+                .SqlQuery<Entities.TotalPenerimaan>(query)
+                .FirstOrDefault();
             total_penerimaan.jumlah = (total_penerimaan.jumlah == null ? 0 : total_penerimaan.jumlah);
             var totalPenerimaan = total_penerimaan.jumlah?.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
@@ -125,7 +138,20 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
             string currentYear = DateTime.Now.Year.ToString();
-            var total_belanja = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_BELANJA where SUMBER_DANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
+            var total_belanja = ctx
+                .Database
+                .SqlQuery<Entities.TotalBelanja>(
+                //$@"
+                //    SELECT SUM (Amount) as jumlah 
+                //    FROM SPAN_REALISASI 
+                //    WHERE SUMBERDANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}"
+                    $@" 
+                        SELECT 
+                            TO_NUMBER(VALUE) as jumlah 
+                        FROM DASHBOARD_SUMMARY  
+                        WHERE kode = 'TOTAL_BELANJA'"
+                    )
+                .FirstOrDefault();
             total_belanja.jumlah = (total_belanja.jumlah == null ? 0 : total_belanja.jumlah);
             var totalBelanja = total_belanja.jumlah?.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
@@ -136,7 +162,19 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
             string currentYear = DateTime.Now.Year.ToString();
-            var persentase_penerimaan = ctx.Database.SqlQuery<Entities.TotalPenerimaan>("SELECT ROUND ( sum(JUMLAH) / 2414400030000, 3 ) * 100 AS persentase FROM rekappenerimaandetail where tahun = " + currentYear + " ").FirstOrDefault();
+            //string query = $@"
+            //                SELECT ROUND ( sum(JUMLAH) / 2414400030000, 3 ) * 100 AS persentase 
+            //                FROM rekappenerimaandetail 
+            //                where tahun = {currentYear}";
+
+            string query = @"SELECT 
+                            ROUND ( TO_NUMBER(VALUE) / 2414400030000, 3 ) * 100 AS persentase 
+                        FROM DASHBOARD_SUMMARY  
+                        where kode = 'TOTAL_PENERIMAAN'";
+            var persentase_penerimaan = ctx
+                .Database
+                .SqlQuery<Entities.TotalPenerimaan>(query)
+                .FirstOrDefault();
             persentase_penerimaan.persentase = (persentase_penerimaan.persentase == null ? 0 : persentase_penerimaan.persentase);
             var persentasePenerimaan = persentase_penerimaan.persentase?.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
@@ -148,10 +186,23 @@ namespace Pnbp.Controllers
             var ctx = new PnbpContext();
             string currentYear = DateTime.Now.Year.ToString();
 
-            var total_belanja = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_BELANJA where SUMBER_DANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
+            var total_belanja = ctx
+                .Database
+                .SqlQuery<Entities.TotalBelanja>($@"
+                    SELECT SUM (Amount) as jumlah 
+                    FROM SPAN_BELANJA 
+                    where SUMBER_DANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}")
+                .FirstOrDefault();
             total_belanja.jumlah = (total_belanja.jumlah == null ? 0 : total_belanja.jumlah);
 
-            var total_realisasi = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_REALISASI where SUMBERDANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
+            var total_realisasi = ctx
+                .Database
+                .SqlQuery<Entities
+                .TotalBelanja>($@"
+                    SELECT SUM (Amount) as jumlah 
+                    FROM SPAN_REALISASI 
+                    where SUMBERDANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}")
+                .FirstOrDefault();
             total_realisasi.jumlah = (total_realisasi.jumlah == null ? 0 : total_realisasi.jumlah);
 
             var persentase_belanja = (total_realisasi.jumlah == 0 && total_belanja.jumlah == 0) ? 0 : (total_realisasi.jumlah / total_belanja.jumlah * 100);
@@ -164,7 +215,15 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
             string currentYear = DateTime.Now.Year.ToString();
-            var total_realisasi = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_REALISASI where SUMBERDANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
+            var query = $@"
+                        SELECT SUM (Amount) as jumlah 
+                        FROM SPAN_REALISASI 
+                        where SUMBERDANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}";
+            var total_realisasi = ctx
+                .Database
+                .SqlQuery<Entities
+                .TotalBelanja>(query)
+                .FirstOrDefault();
             total_realisasi.jumlah = (total_realisasi.jumlah == null ? 0 : total_realisasi.jumlah);
 
             return Json(total_realisasi, JsonRequestBehavior.AllowGet);
@@ -174,37 +233,134 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
             string currentYear = DateTime.Now.Year.ToString();
-            var get_mp = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (TERALOKASI),0) AS TERALOKASI FROM REKAPALOKASI WHERE STATUSALOKASI = 1 AND TAHUN = " + currentYear + " ").FirstOrDefault();
-            var get_pagu = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM(NILAIANGGARAN),0) FROM MANFAAT WHERE TAHUN = " + currentYear + "").FirstOrDefault();
-            
-            var total_realisasi = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_REALISASI where SUMBERDANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
+            var query = $@"
+                        SELECT 
+                            NVL(SUM (TERALOKASI),0) AS TERALOKASI 
+                        FROM REKAPALOKASI 
+                        WHERE STATUSALOKASI = 1 AND TAHUN = {currentYear}";
+            // 
+            var get_mp = ctx
+                .Database
+                .SqlQuery<Decimal>(query)
+                .FirstOrDefault();
+
+            query = $@"
+                        SELECT 
+                            NVL(SUM(NILAIANGGARAN),0) 
+                        FROM MANFAAT 
+                        WHERE TAHUN = {currentYear}";
+            // pagu diambil dari span_belanja dengan tipe D
+
+            var get_pagu = ctx
+                .Database
+                .SqlQuery<Decimal>(query).FirstOrDefault();
+
+            query = $@"
+                    SELECT 
+                        SUM (Amount) as jumlah 
+                    FROM SPAN_REALISASI 
+                    WHERE SUMBERDANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear} ";
+            var total_realisasi = ctx
+                .Database
+                .SqlQuery<Entities.TotalBelanja>(query)
+                .FirstOrDefault();
             total_realisasi.jumlah = (total_realisasi.jumlah == null ? 0 : total_realisasi.jumlah);
+            // span realisasi = belanja
 
-            var total_belanja = ctx.Database.SqlQuery<Entities.TotalBelanja>("SELECT SUM (Amount) as jumlah FROM SPAN_BELANJA where SUMBER_DANA = 'D' and KDSATKER != '524465' ").FirstOrDefault();
+
+            query = $@"
+                    SELECT 
+                        SUM (Amount) as jumlah 
+                    FROM SPAN_BELANJA 
+                    WHERE SUMBER_DANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}";
+            var total_belanja = ctx
+                .Database
+                .SqlQuery<Entities.TotalBelanja>(query)
+                .FirstOrDefault();
             total_belanja.jumlah = (total_belanja.jumlah == null ? 0 : total_belanja.jumlah);
+            // span belanja = belanja
 
-            var getmpops = ctx.Database.SqlQuery<Decimal>("select NVL(sum(TERALOKASI), 0) AS MP from REKAPALOKASI where tahun = " + currentYear + " AND TIPEMANFAAT = 'OPS'").FirstOrDefault();
-            var getbelanjaops = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (a.amount), 0) AS REALISASI FROM SPAN_REALISASI a LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN WHERE b.TIPE = 'OPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21").FirstOrDefault();
+            query = $@"
+                    select 
+                        NVL(sum(TERALOKASI), 0) AS MP 
+                    from REKAPALOKASI 
+                    where tahun = {currentYear} AND TIPEMANFAAT = 'OPS'";
+            var getmpops = ctx
+                .Database
+                .SqlQuery<Decimal>(query)
+                .FirstOrDefault();
 
-            var getmpnonops = ctx.Database.SqlQuery<Decimal>("select NVL(sum(TERALOKASI), 0) AS MP from REKAPALOKASI where tahun = " + currentYear + " AND TIPEMANFAAT = 'NONOPS'").FirstOrDefault();
-            var getbelanjanonops = ctx.Database.SqlQuery<Decimal>("SELECT NVL(SUM (a.amount), 0) AS REALISASI FROM SPAN_REALISASI a LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN WHERE b.TIPE = 'NONOPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21").FirstOrDefault();
+            query = $@"
+                    SELECT 
+                        NVL(SUM (a.amount), 0) AS REALISASI 
+                    FROM SPAN_REALISASI a 
+                    LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN 
+                    WHERE b.TIPE = 'OPS' AND a. SUMBERDANA = 'D' AND SUBSTR(TANGGAL, 8, 2) = 21 AND TAHUN = {currentYear}";
+            var getbelanjaops = ctx
+                .Database
+                .SqlQuery<Decimal>(query)
+                .FirstOrDefault();
 
+            query = $@"
+                    select 
+                        NVL(sum(TERALOKASI), 0) AS MP 
+                    from REKAPALOKASI 
+                    where tahun = {currentYear} AND TIPEMANFAAT = 'NONOPS'";
+            var getmpnonops = ctx
+                .Database
+                .SqlQuery<Decimal>(query)
+                .FirstOrDefault();
+
+            query = $@"
+                    SELECT 
+                        NVL(SUM (a.amount), 0) AS REALISASI 
+                    FROM SPAN_REALISASI a 
+                    LEFT JOIN KODESPAN b ON a.KEGIATAN = b.KODE AND a.OUTPUT = b.KEGIATAN 
+                    WHERE b.TIPE = 'NONOPS' AND a. SUMBERDANA = 'D' AND TAHUN = {currentYear}";
+            var getbelanjanonops = ctx.Database.SqlQuery<Decimal>(query).FirstOrDefault();
 
             decimal persenMp = 0;
             decimal persenPagu = 0;
             decimal persenMpVsBelanja = 0;
             decimal persenMpVsBelanjaOps = 0;
             decimal persenMpVsBelanjaNonOps = 0;
+
+            decimal mpVsBelanjaNonOps_MP = 0;
+            decimal mpVsBelanjaNonOps_BELANJA = 0;
+
             try
             {
                 //persenMp = get_mp * 100 / (get_pagu + get_mp);
                 //persenPagu = (get_pagu * 100 / (get_pagu + get_mp))
-                persenMp = (get_mp / get_pagu) * 100;
+                persenMp = (get_mp == 0 && get_pagu == 0) ? 0 : (get_mp / get_pagu) * 100;
                 persenPagu = 100 - persenMp;
-                persenMpVsBelanja = ((decimal)total_realisasi.jumlah / get_mp) * 100;
-                persenMpVsBelanjaOps = (getbelanjaops / getmpops) * 100;
-                persenMpVsBelanjaNonOps = (getbelanjanonops / getmpnonops) * 100;
-            } catch (Exception e)
+                persenMpVsBelanja = get_mp == 0 ? 0 : ((decimal)total_realisasi.jumlah / get_mp) * 100;
+                persenMpVsBelanjaOps = getmpops == 0 ? 0 : (getbelanjaops / getmpops) * 100;
+                persenMpVsBelanjaNonOps = getmpnonops == 0 ? 0 : (getbelanjanonops / getmpnonops) * 100;
+
+                
+
+                if (getmpnonops == 0 && getbelanjanonops != 0)
+                {
+                    mpVsBelanjaNonOps_MP = 0;
+                    mpVsBelanjaNonOps_BELANJA = 100;
+                } 
+                else if (getmpnonops == 0 && getbelanjanonops == 0)
+                {
+                    mpVsBelanjaNonOps_MP = 0;
+                    mpVsBelanjaNonOps_BELANJA = 0;
+                } 
+                else if (getmpnonops != 0 && getbelanjanonops == 0)
+                {
+                    mpVsBelanjaNonOps_MP = 100;
+                    mpVsBelanjaNonOps_BELANJA = 0;
+                } else
+                {
+                    mpVsBelanjaNonOps_BELANJA = (getbelanjanonops / getmpnonops) * 100;
+                    mpVsBelanjaNonOps_MP = 100 - mpVsBelanjaNonOps_MP;
+                }
+            } 
+            catch (Exception e)
             {
                 _ = e.StackTrace;
             }
@@ -229,8 +385,8 @@ namespace Pnbp.Controllers
                 },
                 mpVsBelanjaNonOps = new
                 {
-                    mp = 100 - persenMpVsBelanjaNonOps,
-                    belanja = persenMpVsBelanjaNonOps
+                    mp = mpVsBelanjaNonOps_MP,
+                    belanja = mpVsBelanjaNonOps_BELANJA
                 }
             };
 

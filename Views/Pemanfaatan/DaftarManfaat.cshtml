@@ -116,6 +116,7 @@
     function showsatker(id, namasatker) {
         $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         var pdata = { kantorid: id, namakantor: namasatker };
+        console.log('data', pdata);
         $.pjax({
             container: "#dynamic_content",
             type: 'POST',
