@@ -1,4 +1,6 @@
 ﻿using ClosedXML.Excel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.Streaming;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -553,6 +555,187 @@ namespace Pnbp.Controllers
                 //return Json(result, JsonRequestBehavior.AllowGet);
             }
         }
+
+         [Authorize]
+        public ActionResult ExportntpnV2(string pTahun, string pBulan)
+        {
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+            PnbpContext db = new PnbpContext();
+            string query =
+               $@"
+                WITH d AS (
+	                SELECT 
+	                TANGGAL,
+                    KODESATKER,
+                    NAMAKANTOR,
+                    NAMAPROSEDUR,
+                    NOMORBERKAS,
+                    TAHUNBERKAS,
+                    JENISPENERIMAAN,
+                    KODEPENERIMAAN,
+                    BANKPERSEPSIID,
+                    TAHUN,
+                    BULAN,
+                    KODEBILLING,
+                    NTPN,
+                    JUMLAH,
+                    PENERIMAAN,
+                    OPERASIONAL 
+	                FROM REKAPPENERIMAANDETAIL
+	                WHERE TAHUN = '{pTahun}' AND BULAN = '{pBulan}'
+                )
+                SELECT DISTINCT TANGGAL,
+                    KODESATKER,
+                    NAMAKANTOR,
+                    NAMAPROSEDUR,
+                    NOMORBERKAS,
+                    TAHUNBERKAS,
+                    JENISPENERIMAAN,
+                    KODEPENERIMAAN,
+                    BANKPERSEPSIID,
+                    TAHUN,
+                    BULAN,
+                    KODEBILLING,
+                    NTPN,
+                    JUMLAH,
+                    PENERIMAAN,
+                    OPERASIONAL
+                FROM d";
+
+            var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query).ToList();
+
+            int tSheet;
+            var value = get.Count;
+            var maxRow = 1048575;
+            var md = 0;
+            if (value < maxRow)
+            {
+                tSheet = 1;
+            }
+            else
+            {
+                md = value % maxRow;
+                tSheet = (value / maxRow) + (md != 0 ? 1 : 0);
+            }
+
+            int numb = 1;
+            IWorkbook workbook = new SXSSFWorkbook();
+            for (int x = 0; x < tSheet; x++)
+            {
+                ISheet sheet = workbook.CreateSheet($"Sheet {x}");
+                #region HEADER
+                IRow row = sheet.CreateRow(0);
+                ICell cell = row.CreateCell(0);
+                cell.SetCellValue("No");
+                cell = row.CreateCell(1);
+                cell.SetCellValue("Kode_Satker");
+                cell = row.CreateCell(2);
+                cell.SetCellValue("Nama_Kantor");
+                cell = row.CreateCell(3);
+                cell.SetCellValue("Nama_Prosedur");
+                cell = row.CreateCell(4);
+                cell.SetCellValue("Nomor_Berkas");
+                cell = row.CreateCell(5);
+                cell.SetCellValue("Tahun_Berkas");
+                cell = row.CreateCell(6);
+                cell.SetCellValue("Jenis_Penerimaan");
+                cell = row.CreateCell(7);
+                cell.SetCellValue("Tanggal");
+                cell = row.CreateCell(8);
+                cell.SetCellValue("Kode_Penerimaan");
+                cell = row.CreateCell(9);
+                cell.SetCellValue("Bank_Persepsi_ID");
+                cell = row.CreateCell(10);
+                cell.SetCellValue("Tahun");
+                cell = row.CreateCell(11);
+                cell.SetCellValue("Bulan");
+                cell = row.CreateCell(12);
+                cell.SetCellValue("Kode_Billing");
+                cell = row.CreateCell(13);
+                cell.SetCellValue("NTPN");
+                cell = row.CreateCell(14);
+                cell.SetCellValue("Jumlah");
+                cell = row.CreateCell(15);
+                cell.SetCellValue("Penerimaan");
+                cell = row.CreateCell(16);
+                cell.SetCellValue("Operasional");
+                #endregion
+
+                var myData = get.GetRange((x * maxRow), (get.Count > maxRow ? ((x + 1) == tSheet ? md : maxRow) : get.Count));
+
+                var index = 1;
+                foreach (var rw in myData)
+                {
+                    var rowBody = sheet.CreateRow(index);
+                    cell = rowBody.CreateCell(0);
+                    cell.SetCellValue(numb);
+                    cell = rowBody.CreateCell(1);
+                    cell.SetCellValue(rw.kodesatker);
+                    cell = rowBody.CreateCell(2);
+                    cell.SetCellValue(rw.namakantor);
+                    cell = rowBody.CreateCell(3);
+                    cell.SetCellValue(rw.namaprosedur);
+                    cell = rowBody.CreateCell(4);
+                    cell.SetCellValue(rw.nomorberkas);
+                    cell = rowBody.CreateCell(5);
+                    cell.SetCellValue(rw.tahun);
+                    cell = rowBody.CreateCell(6);
+                    cell.SetCellValue(rw.jenispenerimaan);
+                    cell = rowBody.CreateCell(7);
+                    cell.SetCellValue(rw.tanggal);
+                    cell = rowBody.CreateCell(8);
+                    cell.SetCellValue(rw.kodepenerimaan);
+                    cell = rowBody.CreateCell(9);
+                    cell.SetCellValue(rw.bankpersepsiid);
+                    cell = rowBody.CreateCell(10);
+                    cell.SetCellValue(rw.tahun);
+                    cell = rowBody.CreateCell(11);
+                    cell.SetCellValue(rw.bulan);
+                    cell = rowBody.CreateCell(12);
+                    cell.SetCellValue(rw.kodebilling);
+                    cell = rowBody.CreateCell(13);
+                    cell.SetCellValue(rw.ntpn);
+                    cell = rowBody.CreateCell(14);
+                    cell.SetCellValue(Decimal.ToDouble(rw.jumlah));
+                    cell = rowBody.CreateCell(15);
+                    cell.SetCellValue(Decimal.ToDouble(rw.penerimaan));
+                    cell = rowBody.CreateCell(16);
+                    cell.SetCellValue(Decimal.ToDouble(rw.operasional));
+                    numb++;
+                    index++;
+                }
+                ((SXSSFSheet)sheet).FlushRows();
+            }
+
+            byte[] byteArray = null;
+            try
+            {
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    workbook.Write(stream);
+                    workbook.Close();
+
+                    byteArray = stream.ToArray();
+                }
+            }
+            catch(Exception e)
+            {
+                _ = e.StackTrace;
+                workbook.Close();
+            }
+
+            if (byteArray != null && byteArray.Length > 0)
+            {
+                return File(byteArray, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"NTPN ({pTahun}/{pBulan}).xlsx");
+            }
+            else
+            {
+                return new HttpStatusCodeResult(500, "Berkas gagal dibuat.");
+            }
+        }
+
 
 
         public ActionResult ManajemenData()

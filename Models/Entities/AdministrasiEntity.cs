@@ -600,7 +600,7 @@ namespace Pnbp.Entities
         public int bulan { get; set; }
         public string kodebilling { get; set; }
         public string ntpn { get; set; }
-        public int jumlah { get; set; }
+        public decimal jumlah { get; set; }
         public decimal penerimaan { get; set; }
         public decimal operasional { get; set; }
         public int urutan { get; set; }

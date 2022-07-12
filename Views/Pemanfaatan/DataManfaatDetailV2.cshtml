@@ -1,0 +1,397 @@
+﻿@model Pnbp.Entities.DataPrioritas
+@{
+    ViewBag.Judul = "Daftar Prioritas Non Operasional";
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+    .editors {
+        display: none;
+    }
+</style>
+
+<div class="" id="dynamic_content">
+    <div class="clearfix"></div>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_title">
+            <h2> @Model.NamaSatKer</h2>
+            <div class="title_right">
+                <div class="pull-right">
+                    <button id="Tambah-btn" type="button" class="btn btn-success">Tambah</button>
+                    @*<button id="btnUploadRenaksi" type="button" class="btn btn-success">Upload Renaksi</button>*@
+                    <span class="btn btn-success btn-file"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;Upload Renaksi<input type="file" name="UploadFromFile" id="txtUploadFile" class="btn btn-success" accept=".pdf" /></span>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="table-responsive" style="border:none">
+                    <section id="flip-scroll">
+                        <table class="table table-striped hover dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th class="centertaligncolumn">Aktif?</th>
+                                    <th>Kode Output</th>
+                                    <th>Satuan Kerja / Kode / Program </th>
+                                    <th>Tipe</th>
+                                    <th class="numeric">Anggaran (Rp)</th>
+                                    <th class="numeric">Alokasi (Rp)</th>
+                                    <th class="numeric">Persentase (%)</th>
+                                    @*<th class="numeric">Rencana <br />Alokasi (Rp)</th>*@
+                                    <th style="text-align:center; width:5%;">Lihat File</th>
+                                    <th style="text-align:center; width:5%;">Entri</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listmanfaatholder">
+                                @foreach (var item in Model.dataPrioritas)
+                                {
+                                    <tr id="@item.Manfaatid">
+                                        <td class="centertaligncolumn">
+                                            @if (@item.Statusaktif == "Aktif")
+                                            {
+                                                if (@Model.UserAdmin)
+                                                {
+                                                <input type="checkbox" checked="checked" disabled="disabled" name="table_records">
+                                                }
+                                                else
+                                                {
+                                                <input type="checkbox" checked="checked" disabled="disabled" name="table_records">
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (@Model.UserAdmin)
+                                                {
+                                                <input type="checkbox" name="table_records">
+                                                }
+                                                else
+                                                {
+                                                <input type="checkbox" disabled="disabled" name="table_records">
+                                                }
+                                            }
+                                        </td>
+                                        <td>@item.Kode</td>
+                                        <td>@item.Namaprogram</td>
+                                        <td>@item.Tipe</td>
+                                        <td class="numeric">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        @if (@item.Tipe == "NONOPS")
+                                        {
+                                            <td class="numeric">@item.JUMLAHALOKASI.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                            if (@item.Nilaianggaran != 0)
+                                            {
+                                                <td class="numeric">@Math.Round((item.JUMLAHALOKASI / item.Nilaianggaran * 100), 2)</td>
+                                            }
+                                            else
+                                            {
+                                                <td>0</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td class="numeric">@item.Teralokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                            <td class="numeric">@item.Teralokasi == 0 || item.Nilaianggaran == 0 ? 0 : Math.Round((item.Teralokasi / item.Nilaianggaran * 100), 2)</td>
+                                        }
+                                        @*@if (@item.Nilaianggaran == 0)
+                                        {
+                                            <td class="numeric">0</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="numeric">@Math.Round((item.Teralokasi / item.Nilaianggaran * 100), 2)</td>
+                                        }*@
+                                        @*<td class="numeric">@Math.Round((item.Teralokasi / item.Nilaianggaran * 100), 2)</td>*@
+                                        @*<td class="numeric">@item.Alokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>*@
+                                        <td style="text-align:center;cursor: pointer;" onclick="showFile('@item.Manfaatid','@item.StatusRevisi');">
+                                            @if (@item.StatusRevisi == 1)
+                                            {
+                                                <i class="fa fa-eye"></i>
+                                            }
+                                        </td>
+                                        <td style="text-align:center;cursor: pointer;" onclick="editDataManfaat('@item.Manfaatid');">
+                                            @if (item.Tipe == "NONOPS")
+                                            {
+                                                <i class="fa fa-pencil"></i>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td colspan="4" class="numeric">Total</td>
+                                    <td class="myLabelContentRight">@Model.dataPrioritas.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    <td class="myLabelContentRight">@Model.dataPrioritas.Sum(a => a.JUMLAHALOKASI + a.TOTALALOKASI).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    
+                                    @if (@Model.dataPrioritas.Sum(a => a.Nilaianggaran) == 0)
+                                    {
+                                        <td class="myLabelContentRight">0</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="myLabelContentRight">@Math.Round((Model.dataPrioritas.Sum(a => a.Teralokasi) / Model.dataPrioritas.Sum(a => a.Nilaianggaran) * 100), 2)</td>
+                                    }
+                                    @*<td class="myLabelContentRight">@Math.Round((Model.dataPrioritas.Sum(a => a.Teralokasi) / Model.dataPrioritas.Sum(a => a.Nilaianggaran) * 100), 2)</td>*@
+                                    @*<td class="myLabelContentRight">@Model.dataPrioritas.Sum(a => a.Alokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>*@
+                                    <td colspan="4"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id='myModalDocViewer' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+<div id='myModalMessViewer' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalMessContent'>
+
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel" style="padding-top:20px">
+                        <div class="x_title">
+                            <h2 id="popuptitlemess">Informasi</h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="closeModalMessButton"><i class="fa fa-times"></i></button>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="" id="messpanel"></div>
+                        </div>
+                        <div class="pull-right" style="text-align:right;">
+                            <button type="button" class="btn btn-dark" id="btnCloseMessModal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    var objpdf = null;
+
+    $(document).ready(function () {
+        $.unblockUI();
+
+        $('#myModalDocViewer').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '98%',
+                height: '98 %',
+                'max-height': '98%'
+            });
+        });
+    });
+
+    $("#btnCloseMessModal").click(function (e) {
+        $('#popuptitlemess').text('Informasi');
+        $('#messpanel').html("");
+        $('#myModalMessViewer').modal('hide');
+        $.unblockUI();
+        e.preventDefault();
+        return false;
+    });
+
+    $("#closeModalButton").click(function (e) {
+        $('#popuptitle').text('Edit Data Manfaat');
+        $('#dataholder').html("");
+        $('#myModalDocViewer').modal('hide');
+        $.unblockUI();
+        e.preventDefault();
+        return false;
+    });
+
+    @*$("#Tambah-btn").click(function (e) {
+        if ('@Model.UserAdmin' == 'True') {
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            var pdata = { s: '', m: 'New' };
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditDataManfaat", "Pemanfaatan")',
+                data: pdata,
+                success: function (data, textStatus, XMLHttpRequest) {
+                    $('#popuptitle').text('Tambah Data Manfaat');
+                    $('#dataholder').html(data);
+
+                    var options = { "backdrop": "static", keyboard: true };
+                    $('#myModalDocViewer').modal(options);
+                    $('#myModalDocViewer').modal('show');
+
+                    $.unblockUI();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) { console.log(textStatus); $.unblockUI(); }
+            });
+        }
+        else {
+            showmsg('Informasi', "Anda tidak mempunyai akses untuk menambah data!");
+        }
+    });*@
+    $("#Tambah-btn").click(function (e) {
+        //if ('@Model.UserAdmin' == 'True') {
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            $.pjax({
+                container: '#dynamic_content',
+                type: "POST",
+                url: '@Url.Action("EntriDataManfaatV2", "Pemanfaatan")',
+                data: JSON.stringify({ 'manfaatid': '', 'm': 'Tambah Data Manfaat' }),
+                dataType: 'html',
+                contentType: "application/json; charset=utf-8"
+            });
+        //}
+        //else {
+        //    showmsg('Informasi', "Anda tidak mempunyai akses untuk menambah data!");
+        //}
+    });
+
+    $("#btnUploadRenaksi").click(function (e) {
+        if ('@Model.UserAdmin' == 'True') {
+            @*$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            $.pjax({
+                container: '#dynamic_content',
+                type: "POST",
+                url: '@Url.Action("EntriDataManfaat", "Pemanfaatan")',
+                data: JSON.stringify({ 'manfaatid': '', 'm': 'Tambah Data Manfaat' }),
+                dataType: 'html',
+                contentType: "application/json; charset=utf-8"
+            });*@
+        }
+        else {
+            showmsg('Informasi', "Anda tidak mempunyai akses untuk menambah data!");
+        }
+    });
+
+
+    @*function showprioritas(id) {
+        if ('@Model.UserAdmin' == 'True') {
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            var pdata = { s: id, m: 'Update' };
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditDataManfaat", "Pemanfaatan")',
+                data: pdata,
+                success: function (data, textStatus, XMLHttpRequest) {
+                    $('#popuptitle').text('Edit Data Manfaat');
+                    $('#dataholder').html(data);
+
+                    var options = { "backdrop": "static", keyboard: true };
+                    $('#myModalDocViewer').modal(options);
+                    $('#myModalDocViewer').modal('show');
+
+                    $.unblockUI();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) { console.log(textStatus); $.unblockUI(); }
+            });
+        }
+        else {
+            showmsg('Informasi', "Anda tidak mempunyai akses untuk merubah data!");
+        }
+    };*@
+
+
+    function editDataManfaat(id) {
+        @*if ('@Model.UserAdmin' == 'True') {*@
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            $.pjax({
+                container: '#dynamic_content',
+                type: "POST",
+                url: '@Url.Action("EntriDataManfaat", "Pemanfaatan")?tahun=' + @Model.tahun + '',
+                data: JSON.stringify({ 'manfaatid': id, 'm': 'Edit Data Manfaat' }),
+                dataType: 'html',
+                contentType: "application/json; charset=utf-8"
+            });
+        //}
+        //else {
+        //    showmsg('Informasi', "Anda tidak mempunyai akses untuk merubah data!");
+        //}
+    };
+
+
+    function showFile(id, statusrevisi) {
+        if (statusrevisi == '1') {
+            if (id !== null && id !== '') {
+                var objurl = '@Url.Action("GetFileManfaat", "Administrasi")?id=' + id;
+                objpdf = objurl;
+                var options = { "backdrop": "static", keyboard: true };
+                $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DocViewer", "Konten")',
+                    success: function (data) {
+                        console.log(data);
+                        $('#myModalContent').html(data);
+                        $('#myModalDocViewer').modal(options);
+                        $('#myModalDocViewer').modal('show');
+                        $.unblockUI();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $.unblockUI();
+                    }
+                });
+            }
+        }
+    };
+
+    var dfPengumuman = null;
+    $("#txtUploadFile").on("change", function (e) {
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1;
+        if (numFiles > 0) {
+            var file = dfPengumuman = input.get(0).files[0],
+                blob = new Blob([file], { type: "application/pdf;base64" }),
+                objurl = window.URL.createObjectURL(blob);
+
+            objpdf = objurl;
+            var options = { "backdrop": "static", keyboard: true };
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DocViewer", "Konten")',
+                success: function (data) {
+
+                    // Insert RenaksiSatker
+                    var tahun = new Date().getFullYear();
+                    var judul = 'File Renaksi ' + '@Model.NamaSatKer' + ' tahun ' + tahun;
+                    var frm = new FormData();
+                    frm.append("kantorid", '@Model.KantorId');
+                    frm.append("judul", judul);
+                    frm.append("filepdf", dfPengumuman);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("SimpanRenaksiSatker", "Pemanfaatan")',
+                        data: frm,
+                        contentType: false,
+                        processData: false
+                    });
+
+                    $('#myModalContent').html(data);
+                    $('#myModalDocViewer').modal(options);
+                    $('#myModalDocViewer').modal('show');
+                    $.unblockUI();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $.unblockUI();
+                }
+            });
+        }
+    });
+
+</script>
