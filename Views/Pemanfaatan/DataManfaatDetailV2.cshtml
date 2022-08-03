@@ -164,7 +164,7 @@
     });
 
     $("#save-btn").click(function (e) {
-        
+
     });
 
     function editDataManfaat(id) {
@@ -173,7 +173,7 @@
             $.pjax({
                 container: '#dynamic_content',
                 type: "POST",
-                url: '@Url.Action("EntriDataManfaatV2", "Pemanfaatan")?tahun=' + @Model.tahun + '',
+                url: '@Url.Action("EntriDataManfaatV2", "Pemanfaatan")?tahun=' + @Model.tahun + '&kantorId=@Model.KantorId',
                 data: JSON.stringify({ 'manfaatid': id, 'm': 'Edit Data Manfaat' }),
                 dataType: 'html',
                 contentType: "application/json; charset=utf-8"

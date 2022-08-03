@@ -21,6 +21,26 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
+	table.pnbp-total-alokasi td {
+		padding: 8px;
+	}
+	table.pnbp-total-alokasi td > div > div:nth-child(1) {
+		background: #f9f9f9;
+		padding: 8px;
+		text-align: center;
+		font-weight: bold;
+	}
+	table.pnbp-total-alokasi td {
+		padding: 0;
+	}
+	table.pnbp-total-alokasi td > div > div:nth-child(2) {
+		padding: 8px;
+	}
+	table.pnbp-total-alokasi {
+		min-width: 506px;
+		max-width: 100%;
+	}
 </style>
 
 <script src='@Url.Content("~/resources/js/jquery.validate.min.js")' type="text/javascript"></script>
@@ -35,6 +55,34 @@
     <div class="clearfix"></div>
     <div class="x_panel" style="border:0px;">
         <div class="x_content">
+
+            <p>
+                <table class="pnbp-total-alokasi" border="1">
+					<tr>
+						<td>
+							<div>
+								<div>Sisa Alokasi</div>
+								<div><b class="myLabelContentRight">@ViewBag.SisaAlokasi</b></div>
+							</div>
+						</td>
+						<td>
+							<div>
+								<div>Total Anggaran </div>
+								<div><b class="myLabelContentRight">@ViewBag.TotalAnggaran</b></div>
+							</div>
+						</td>
+						<td>
+							<div>
+								<div>Total Alokasi </div>
+                                <div><b class="myLabelContentRight">@ViewBag.TotalAlokasi</b></div>
+							</div>
+						</td>
+					</tr>
+                </table>
+            </p>
+            <br>
+
+
             <form class="form-horizontal form-label-left" id="frmdatamanfaat" role="form">
                 @Html.HiddenFor(model => model.PrioritasOrigin, new { id = "txtOrigin" })
                 @Html.HiddenFor(model => model.Manfaatid, new { id = "Manfaatid" })
@@ -42,76 +90,77 @@
                 @Html.HiddenFor(model => model.KantorId, new { id = "KantorId" })
                 @Html.HiddenFor(model => model.Namasatker, new { id = "Namasatker" })
                 <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="x_content">
-                        @if (Model.Mode == "Tambah Data Manfaat")
-                        {
-                        }
-                        else
-                        {
-                            <div class="form-group">
-                                <label class="control-label col-md-4 col-sm-4 col-xs-12">Kode Satker</label>
-                                <div class="col-md-8 col-sm-8 col-xs-12">
-                                    @Html.TextBoxFor(model => model.Kodesatker, new { @class = "form-control", @id = "txtkdsatker", @readonly = "readonly" })
-                                </div>
-                            </div>
-                        }
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Nama Satker</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                @if (Model.Mode == "Tambah Data Manfaat")
-                                {
-                                    @Html.DropDownListFor(m => m.KantorId, new SelectList(@Model.ListSatKer, "kantorid", "namasatker"), new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "txtsatker" })
-                                    @Html.ValidationMessageFor(m => m.KantorId, "", new { @class = "error" })
-                                    //@Html.TextBoxFor(model => model.Namasatker, new { @class = "form-control", @id = "txtsatker" })
-                                }
-                                else
-                                {
-                                    @Html.TextBoxFor(model => model.Namasatker, new { @class = "form-control", @id = "txtsatker", @readonly = "readonly" })
-                                }
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Program Satker</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                @if (Model.Mode == "Tambah Data Manfaat")
-                                {
-                                    @Html.DropDownListFor(m => m.ProgramId, new SelectList(@Model.ListProgram, "programid", "nama"), new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "txtsatker" })
-                                    @Html.ValidationMessageFor(m => m.ProgramId, "", new { @class = "error" })
-                                    //@Html.TextBoxFor(model => model.Namasatker, new { @class = "form-control", @id = "txtsatker" })
-                                }
-                                else
-                                {
-                                    @Html.TextBoxFor(model => model.Namaprogram, new { @class = "form-control", @id = "txtsatker", @readonly = "readonly" })
-                                }
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Nilai Anggaran</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                @Html.TextBoxFor(model => model.Nilaianggaran, new { @class = "form-control", @id = "txtanggaran", @readonly = "readonly" })
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Total Alokasi</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                @Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
-                                @*@if (Model.Mode == "Tambah Data Manfaat")
-                                {
-                                    @Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
-                                }
-                                else
-                                {
-                                    @Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi", @readonly = "readonly" })
-                                }*@
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Status Aktif</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                @Html.DropDownListFor(model => model.Statusaktif, lsstatus, new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "cmbstatusaktif" })
-                            </div>
-                        </div>
-                    </div>
+					<div class="x_content">
+
+						@if (Model.Mode == "Tambah Data Manfaat")
+						{
+						}
+						else
+						{
+							<div class="form-group">
+								<label class="control-label col-md-4 col-sm-4 col-xs-12">Kode Satker</label>
+								<div class="col-md-8 col-sm-8 col-xs-12">
+									@Html.TextBoxFor(model => model.Kodesatker, new { @class = "form-control", @id = "txtkdsatker", @readonly = "readonly" })
+								</div>
+							</div>
+						}
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4 col-xs-12">Nama Satker</label>
+							<div class="col-md-8 col-sm-8 col-xs-12">
+								@if (Model.Mode == "Tambah Data Manfaat")
+								{
+									@Html.DropDownListFor(m => m.KantorId, new SelectList(@Model.ListSatKer, "kantorid", "namasatker"), new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "txtsatker" })
+									@Html.ValidationMessageFor(m => m.KantorId, "", new { @class = "error" })
+									//@Html.TextBoxFor(model => model.Namasatker, new { @class = "form-control", @id = "txtsatker" })
+								}
+								else
+								{
+									@Html.TextBoxFor(model => model.Namasatker, new { @class = "form-control", @id = "txtsatker", @readonly = "readonly" })
+								}
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4 col-xs-12">Program Satker</label>
+							<div class="col-md-8 col-sm-8 col-xs-12">
+								@if (Model.Mode == "Tambah Data Manfaat")
+								{
+									@Html.DropDownListFor(m => m.ProgramId, new SelectList(@Model.ListProgram, "programid", "nama"), new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "txtsatker" })
+									@Html.ValidationMessageFor(m => m.ProgramId, "", new { @class = "error" })
+									//@Html.TextBoxFor(model => model.Namasatker, new { @class = "form-control", @id = "txtsatker" })
+								}
+								else
+								{
+									@Html.TextBoxFor(model => model.Namaprogram, new { @class = "form-control", @id = "txtsatker", @readonly = "readonly" })
+								}
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4 col-xs-12">Nilai Anggaran</label>
+							<div class="col-md-8 col-sm-8 col-xs-12">
+								@Html.TextBoxFor(model => model.Nilaianggaran, new { @class = "form-control", @id = "txtanggaran", @readonly = "readonly" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4 col-xs-12">Total Alokasi</label>
+							<div class="col-md-8 col-sm-8 col-xs-12">
+								@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
+								@*@if (Model.Mode == "Tambah Data Manfaat")
+				{
+					@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
+				}
+				else
+				{
+					@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi", @readonly = "readonly" })
+				}*@
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4 col-xs-12">Status Aktif</label>
+							<div class="col-md-8 col-sm-8 col-xs-12">
+								@Html.DropDownListFor(model => model.Statusaktif, lsstatus, new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "cmbstatusaktif" })
+							</div>
+						</div>
+					</div>
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">

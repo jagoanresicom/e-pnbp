@@ -865,7 +865,7 @@ namespace Pnbp.Controllers
             return PartialView("EditDataManfaat", _lsSatkerALokasi);
         }
 
-        public ActionResult EntriDataManfaatV2(string manfaatid, string m, string tahun)
+        public ActionResult EntriDataManfaatV2(string manfaatid, string m, string tahun, string kantorId)
         {
             if (tahun == null)
             {
@@ -888,6 +888,20 @@ namespace Pnbp.Controllers
                 _lsSatkerALokasi.Mode = m;
             }
             _lsSatkerALokasi.Tahun = tahun;
+
+
+            List<Entities.PrioritasAlokasi> dataPrioritas = _manfaatanModel.GetManfaatSatkerV2(kantorId, tahun);
+            string sisaAlokasi = "0";
+            string totalAnggaran = dataPrioritas.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+            string totalAlokasi = dataPrioritas.Sum(a => a.JUMLAHALOKASI + a.TOTALALOKASI).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+            if (dataPrioritas.Count > 0) {
+                sisaAlokasi = (dataPrioritas.Sum(a => a.Nilaianggaran) - dataPrioritas.Sum(a => a.JUMLAHALOKASI)).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+            }
+
+            ViewBag.SisaAlokasi = $"Rp. {sisaAlokasi}";
+            ViewBag.TotalAnggaran = $"Rp. {totalAnggaran}";
+            ViewBag.TotalAlokasi = $"Rp. {totalAlokasi}";
+
             //return View(_lsSatkerALokasi);
             return PartialView("EditDataManfaatV2", _lsSatkerALokasi);
         }
