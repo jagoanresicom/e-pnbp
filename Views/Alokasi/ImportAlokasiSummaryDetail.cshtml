@@ -282,10 +282,10 @@
                         title: "Berhasil",
                         text: "Berhasil Reset Alokasi Revisi",
                         type: "success",
-                        allowOutsideClick: true,
-                        allowEscapeKey: true,
+                    }, function () {
+                        window.location.reload();
                     });
-                    getAlokasi();
+                    //getAlokasi();
                 } else {
 					swal({
 						type: "error",
