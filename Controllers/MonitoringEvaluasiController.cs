@@ -15,14 +15,13 @@ namespace Pnbp.Controllers
     public class MonitoringEvaluasiController : Controller
     {
         Models.MonitoringEvaluasiModel monitoringevaluasimodel = new Models.MonitoringEvaluasiModel();
-
+        private string _schemaKKP = OtorisasiUser.NamaSkemaKKP;
         // GET: MonitoringEvaluasi
         //public ActionResult Index()
         //{
 
         //    return View();
         //}
-
 
         struct CountResult
         {
@@ -513,10 +512,25 @@ namespace Pnbp.Controllers
 
         public ActionResult Alokasi()
         {
+            //List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
+            //var ctx = new PnbpContext();
+
+            //var sqlQuery = $"SELECT KODESPOPP, NAMA FROM {_schemaKKP}.PROSEDUR WHERE STATUSHAPUS <> 1";
+            //var pelayanan = ctx.Database.SqlQuery<DataPelayanan>(sqlQuery).ToList();
+
+            //var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
+            //ViewData["get_propinsi"] = get_propinsi;
+            //ViewData["pelayanan"] = pelayanan;
+
+            return View("AlokasiV2");
+        }
+
+        public ActionResult AlokasiSummaryDetail(string id)
+        {
             List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
             var ctx = new PnbpContext();
 
-            var sqlQuery = "SELECT KODESPOPP, NAMA FROM kkpweb.PROSEDUR WHERE STATUSHAPUS <> 1";
+            var sqlQuery = $"SELECT KODESPOPP, NAMA FROM {_schemaKKP}.PROSEDUR WHERE STATUSHAPUS <> 1";
             var pelayanan = ctx.Database.SqlQuery<DataPelayanan>(sqlQuery).ToList();
 
             var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
@@ -526,8 +540,6 @@ namespace Pnbp.Controllers
             return View();
         }
 
-    
 
-     
     }
 }

@@ -86,6 +86,12 @@ namespace Pnbp.Entities
         public string JenisAlokasi { get; set; }
     }
 
+    public class FormAlokasiSummaryDetail
+    {
+        public string id { get; set; }
+        public string satker { get; set; }
+    }
+
     public class AlokasiJob
     {
         public string Namaprosedur { get; set; }

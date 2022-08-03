@@ -3122,6 +3122,9 @@
     <Content Include="Views\Pemanfaatan\DataManfaatDetailV2.cshtml" />
     <Content Include="Views\Pemanfaatan\EditDataManfaatV2.cshtml" />
     <Content Include="Views\Alokasi\ImportAlokasiSummaryDetail.cshtml" />
+    <Content Include="Views\Alokasi\RekapAlokasilsV2.cshtml" />
+    <Content Include="Views\MonitoringEvaluasi\AlokasiV2.cshtml" />
+    <Content Include="Views\MonitoringEvaluasi\AlokasiSummaryDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
