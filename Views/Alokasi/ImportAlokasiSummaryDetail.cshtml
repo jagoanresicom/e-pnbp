@@ -88,14 +88,18 @@
             <div class="form-group" id="group_alokasi" style="margin-top:10px;">
                 <table id="alokasisatker" class="table table-striped table-bordered">
                     <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kode Satker</th>
-                            <th>Nama Satker</th>
-                            <th>Pagu</th>
-                            @*<th>Alokasi Saat Ini</th>*@
-                        </tr>
-                    </thead>
+						<tr id="group_total">
+							<th colspan="3" class="numeric">Total</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th>No</th>
+							<th>Kode Satker</th>
+							<th>Nama Satker</th>
+							<th>Pagu</th>
+							@*<th>Alokasi Saat Ini</th>*@
+						</tr>
+					</thead>
                     <tbody>
                     </tbody>
                 </table>
@@ -370,11 +374,13 @@
             var data = res.data.Data;
             var i = 0;
 
-            var tr = document.getElementById('alokasisatker').tHead.children[0];
+            var trTotal = document.getElementById('alokasisatker').tHead.children[0];
+            var tr = document.getElementById('alokasisatker').tHead.children[1];
             if (data[0].DaftarRevisi != null && data[0].DaftarRevisi.length > 0) {
                 var th = document.createElement('th');
                 th.innerHTML = "Alokasi 1";
                 tr.appendChild(th);
+				trTotal.appendChild(document.createElement('th'));
 
                 $.each(data[0].DaftarRevisi, function (x) {
                     var th = document.createElement('th');
@@ -384,17 +390,20 @@
                         th.innerHTML = "Alokasi " + (x + 2);
                     }
                     tr.appendChild(th);
+					trTotal.appendChild(document.createElement('th'));
                 });
             } else {
                 var th = document.createElement('th');
                 th.innerHTML = "Alokasi Saat Ini";
                 tr.appendChild(th);
+				trTotal.appendChild(document.createElement('th'));
             }
 
             if (data[0].TempAlokasi != null) {
                 var th = document.createElement('th');
                 th.innerHTML = "Revisi Alokasi";
                 tr.appendChild(th);
+				trTotal.appendChild(document.createElement('th'));
             }
 
             $.each(data, function (x) {
@@ -430,6 +439,16 @@
         }
 
         $("#alokasisatker>tbody").html(html);
+
+		showDetailAlokasi(res.data.Total);
+    }
+
+    function showDetailAlokasi(data) {
+        let childIndex = 2; // start column
+		$.each(data, function (index) {
+			$('#group_total>th:nth-child(' + childIndex + ')').html(addCommas(data[index].Alokasi));
+            childIndex++;
+		});
     }
 
     function showDetailAlokasiSummary(id) {

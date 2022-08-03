@@ -1848,6 +1848,12 @@ namespace Pnbp.Controllers
                         totalRevisi = new List<AlokasiSatkerRevisi>();
                     }
 
+                    totalRevisi.Add(new AlokasiSatkerRevisi
+                    {
+                        Revisi = 0,
+                        Alokasi = result.Sum(y => y.Pagu)
+                    });
+
                     if (result != null && result.Count > 0)
                     {
                         var totalAlokasiSaatIni = result.Sum(y => y.Alokasi);
@@ -1927,6 +1933,11 @@ namespace Pnbp.Controllers
                             Alokasi = totalAlokasiSaatIni
                         };
                         response.Total = new List<AlokasiSatkerRevisi>() {
+                            new AlokasiSatkerRevisi
+                            {
+                                Revisi = 0,
+                                Alokasi = result.Sum(y => y.Pagu)
+                            },
                             alokasiSaatIni
                         };
                     }
