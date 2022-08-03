@@ -161,21 +161,47 @@
                 contentType: false,
                 success: function (res) {
                     if (!res.success || res.data.length == 0) {
+						swal({
+							type: "error",
+							html: true,
+							title: "Gagal Memuat Data",
+							confirmButtonColor: "#4CAF50",
+							allowOutsideClick: true,
+							allowEscapeKey: true,
+                        });
                         $('#btn-alokasi').prop('disabled', true);
                         $('#btn-reset-alokasi').prop('disabled', true);
                     } else {
                         $('#btn-alokasi').prop('disabled', false);
                         $('#btn-reset-alokasi').prop('disabled', false);
+						swal({
+							title: "Berhasil",
+							text: "Data Berhasil Dimuat",
+							type: "success",
+                        }, function () {
+						    location.reload();
+                        });
                     }
 
                     //writeDataTable(res);
-                    //$.unblockUI();
+                    $.unblockUI();
                     //getAlokasi();
-                    location.reload();
+                    //location.reload();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $.unblockUI();
-                }
+					swal({
+						type: "error",
+						html: true,
+						title: "Terjadi kesalahan",
+						confirmButtonColor: "#4CAF50",
+						allowOutsideClick: true,
+						allowEscapeKey: true,
+					});
+                },
+				complete: function () {
+					input.val('');
+				}
             });
         }
     });
@@ -252,7 +278,23 @@
             url: '@Url.Action("ResetAlokasiRevisi", "Alokasi")',
             success: function (res) {
                 if (res.success) {
+                    swal({
+                        title: "Berhasil",
+                        text: "Berhasil Reset Alokasi Revisi",
+                        type: "success",
+                        allowOutsideClick: true,
+                        allowEscapeKey: true,
+                    });
                     getAlokasi();
+                } else {
+					swal({
+						type: "error",
+						html: true,
+						title: "Gagal Reset Alokasi Revisi",
+						confirmButtonColor: "#4CAF50",
+						allowOutsideClick: true,
+						allowEscapeKey: true,
+					});
                 }
 
                 $('#btn-alokasi').prop('disabled', res.success);
@@ -262,6 +304,14 @@
                 },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 $.unblockUI();
+				swal({
+					type: "error",
+					html: true,
+					title: "Terjadi Kesalahan",
+					confirmButtonColor: "#4CAF50",
+					allowOutsideClick: true,
+					allowEscapeKey: true,
+				});
             }
         });
     }

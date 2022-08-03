@@ -195,12 +195,28 @@
                 processData: false,
                 contentType: false,
                 success: function (res) {
+
                     if (!res.success || res.data.length == 0) {
                         $('#btn-alokasi').prop('disabled', true);
                         $('#btn-reset-alokasi').prop('disabled', true);
+						swal({
+							type: "error",
+							html: true,
+							title: "Gagal Memuat Data",
+							confirmButtonColor: "#4CAF50",
+                            allowOutsideClick: true,
+							allowEscapeKey: true,
+						});
                     } else {
                         $('#btn-alokasi').prop('disabled', false);
                         $('#btn-reset-alokasi').prop('disabled', false);
+						swal({
+							title: "Berhasil",
+							text: "Data Berhasil Dimuat",
+                            type: "success",
+                            allowOutsideClick: true,
+							allowEscapeKey: true,
+						});
                     }
 
                     writeDataTable(res);
@@ -208,6 +224,17 @@
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $.unblockUI();
+					swal({
+						type: "error",
+						html: true,
+						title: "Terjadi Kesalahan",
+						confirmButtonColor: "#4CAF50",
+						allowOutsideClick: true,
+						allowEscapeKey: true,
+					});
+                },
+                complete: function () {
+                    input.val('');
                 }
             });
         }
@@ -293,7 +320,23 @@
             url: '@Url.Action("ResetAlokasi", "Alokasi")',
             success: function (res) {
                 if (res.success) {
+                    swal({
+                        title: "Berhasil",
+                        text: "Berhasil Reset Alokasi",
+                        type: "success",
+                        allowOutsideClick: true,
+                        allowEscapeKey: true,
+                    });
                     writeDataTable(res);
+                } else {
+					swal({
+						type: "error",
+						html: true,
+						title: "Gagal Reset Alokasi",
+						confirmButtonColor: "#4CAF50",
+						allowOutsideClick: true,
+						allowEscapeKey: true,
+                    });
                 }
 
                 $('#btn-alokasi').prop('disabled', res.success);
@@ -303,6 +346,14 @@
                 },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 $.unblockUI();
+				swal({
+					type: "error",
+					html: true,
+					title: "Terjadi Kesalahan",
+					confirmButtonColor: "#4CAF50",
+					allowOutsideClick: true,
+					allowEscapeKey: true,
+				});
             }
         });
     }
