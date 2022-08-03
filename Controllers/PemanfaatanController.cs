@@ -77,6 +77,15 @@ namespace Pnbp.Controllers
             return View(find);
         }
 
+        public ActionResult ListDataManfaatV2()
+        {
+            Entities.FindManfaat find = new Entities.FindManfaat();
+            find.tahun = _manfaatanModel.GetServerYear().ToString();
+            find.lstahun = _manfaatanModel.ListTahun();
+
+            return View(find);
+        }
+
         //public ActionResult DaftarDataManfaatOld(int? draw, int? start, int? length)
         //{
         //    List<Entities.SatkerAlokasi> result = new List<Entities.SatkerAlokasi>();
@@ -101,6 +110,13 @@ namespace Pnbp.Controllers
         {
             string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             List<Entities.TotalAnggaranAlokasi> listTotalAngAlok = _manfaatanModel.GetTotalAnggaranAlokasi(tahun);
+            return Json(listTotalAngAlok, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetTotalAnggaranAlokasiV2()
+        {
+            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            List<Entities.TotalAnggaranAlokasi> listTotalAngAlok = _manfaatanModel.GetTotalAnggaranAlokasiV2(tahun);
             return Json(listTotalAngAlok, JsonRequestBehavior.AllowGet);
         }
 
@@ -140,6 +156,48 @@ namespace Pnbp.Controllers
                 else
                 {
                     return RedirectToAction("ListDataManfaat", "Pemanfaatan");
+                }
+            }
+            else
+            {
+                return new ContentResult
+                {
+                    ContentType = "text/html",
+                    Content = "noresults",
+                    ContentEncoding = System.Text.Encoding.UTF8
+                };
+            }
+        }
+
+        public ActionResult DaftarDataManfaatV2(int? pageNum, Entities.FindManfaat f)
+        {
+            int pageNumber = pageNum ?? 0;
+            int RecordsPerPage = 10;
+            int from = (pageNumber * RecordsPerPage) + 1;
+            int to = from + RecordsPerPage - 1;
+
+            string namasatker = f.NamaSatker;
+            decimal? nilaianggaran = f.NilaiAnggaran;
+            //string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            string tahun = f.tahun;
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+            List<Entities.SatkerAlokasi> result = _manfaatanModel.GetDataManfaatV2(tahun, namasatker, nilaianggaran, tipekantorid, kantorid, from, to);
+
+            int custIndex = from;
+            Dictionary<int, Entities.SatkerAlokasi> dict = result.ToDictionary(x => custIndex++, x => x);
+
+            if (result.Count > 0)
+            {
+                if (Request.IsAjaxRequest())
+                {
+                    return PartialView("DaftarManfaatV2", dict);
+                }
+                else
+                {
+                    return RedirectToAction("ListDataManfaatV2", "Pemanfaatan");
                 }
             }
             else
@@ -581,6 +639,72 @@ namespace Pnbp.Controllers
             return PartialView("DataManfaatDetail", _data);
         }
 
+        public ActionResult DataManfaatDetailV2(string kantorid, string namakantor, string tahun)
+        {
+            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+
+            string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
+            int indexKaBiroPerencanaan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroPerencanaan"].ToString());
+            int indexKaBiroKeuangan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroKeuangan"].ToString());
+
+            Entities.DataPrioritas _data = new Entities.DataPrioritas();
+            _data.tahun = tahun;
+            //List<Entities.PrioritasAlokasi> _lsSatkerALokasi = _manfaatanModel.GetManfaatSatker(kantorid, ConfigurationManager.AppSettings["TahunAnggaran"].ToString());
+            List<Entities.PrioritasAlokasi> _lsSatkerALokasi = _manfaatanModel.GetManfaatSatkerV2(kantorid, tahun);
+            //return Json(_lsSatkerALokasi, JsonRequestBehavior.AllowGet);
+            _data.dataPrioritas = _lsSatkerALokasi;
+            _data.UserAdmin = _manfaatanModel.UsersInRoles(useridentity.UserId, "Administrator Pusat");
+
+            // DITUTUP LAGI....SEMENTARA :)
+            // Sementara profile2 tsb bisa edit data manfaat (Alfin, 2 September 2019)
+            // ==== dulu cek akses edit manfaat dibuat manual
+
+            // Akses Edit Manfaat (Dari Table KONFIGURASI) - Alfin, 10 Januari 2020
+            // TODO DI COMMMENT REVY
+            string nilaiAkses = _manfaatanModel.GetAksesEditManfaat();
+            if (nilaiAkses == "Y")
+            {
+                int indexKasubagTU = Array.IndexOf(userProfiles, "N10000");
+                int indexKaurRencana = Array.IndexOf(userProfiles, "N10100");
+                int indexKabagTU = Array.IndexOf(userProfiles, "R10000");
+                int indexKasubagKeu = Array.IndexOf(userProfiles, "R10300");
+                int indexKasubagKeuBMNPusat = Array.IndexOf(userProfiles, "C1020104");
+                int indexKasubagPVP = Array.IndexOf(userProfiles, "C1020202");
+                if (indexKasubagTU > -1)
+                {
+                    _data.UserAdmin = true;
+                }
+                if (indexKaurRencana > -1)
+                {
+                    _data.UserAdmin = true;
+                }
+                if (indexKabagTU > -1)
+                {
+                    _data.UserAdmin = true;
+                }
+                if (indexKasubagKeu > -1)
+                {
+                    _data.UserAdmin = true;
+                }
+                if (indexKasubagKeuBMNPusat > -1)
+                {
+                    _data.UserAdmin = true;
+                }
+                if (indexKasubagPVP > -1)
+                {
+                    _data.UserAdmin = true;
+                }
+            }
+            // TODO END COMMMENT REVY
+
+            _data.KantorId = kantorid;
+            _data.NamaSatKer = namakantor;
+            _data.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
+            _data.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+
+            return PartialView("DataManfaatDetailV2", _data);
+        }
+
         public ActionResult SimpanRenaksiSatker(string kantorid, string judul)
         {
             var result = new Pnbp.Entities.TransactionResult() { Status = false, Pesan = "" };
@@ -739,6 +863,33 @@ namespace Pnbp.Controllers
             _lsSatkerALokasi.Tahun = tahun;
             //return View(_lsSatkerALokasi);
             return PartialView("EditDataManfaat", _lsSatkerALokasi);
+        }
+
+        public ActionResult EntriDataManfaatV2(string manfaatid, string m, string tahun)
+        {
+            if (tahun == null)
+            {
+                tahun = DateTime.Now.Year.ToString();
+            }
+            Entities.PrioritasAlokasi _lsSatkerALokasi = new Entities.PrioritasAlokasi();
+            if (!String.IsNullOrEmpty(manfaatid)) _lsSatkerALokasi = _manfaatanModel.GetPrioritasSatker(manfaatid, tahun);
+            if (m == "Tambah Data Manfaat")
+            {
+                _lsSatkerALokasi.ListProgram = _manfaatanModel.getProgramList("NONOPS");
+                _lsSatkerALokasi.ListSatKer = _manfaatanModel.getSatKerList();
+            }
+            if (_lsSatkerALokasi != null)
+            {
+                _lsSatkerALokasi.Anggaransatker = (_lsSatkerALokasi.Nilaianggaran > 0) ? string.Format("{0:#,##0,##}", _lsSatkerALokasi.Nilaianggaran) : "0";
+                _lsSatkerALokasi.Alokasisatker = (_lsSatkerALokasi.Teralokasi > 0) ? string.Format("{0:#,##0,##}", _lsSatkerALokasi.Teralokasi) : "0";
+            }
+            if (_lsSatkerALokasi != null)
+            {
+                _lsSatkerALokasi.Mode = m;
+            }
+            _lsSatkerALokasi.Tahun = tahun;
+            //return View(_lsSatkerALokasi);
+            return PartialView("EditDataManfaatV2", _lsSatkerALokasi);
         }
 
         public ActionResult UpdatePrioritas(Entities.PrioritasAlokasi frm)

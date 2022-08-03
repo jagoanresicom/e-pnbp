@@ -536,6 +536,61 @@ namespace Pnbp.Models
             return tr;
         }
 
+        public Entities.TransactionResult UpdateDataManfaatV2(Entities.PrioritasAlokasi frm)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        Regex sWhitespace = new Regex(@"\s+");
+
+                        ArrayList arrayListParameters = new ArrayList();
+
+                        string sql = @"UPDATE manfaat SET NilaiAlokasi = :JumlahAlokasi";
+                        if (!string.IsNullOrEmpty(frm.Statusaktif))
+                        {
+                            if (frm.Statusaktif == "Aktif")
+                            {
+                                sql += " ,STATUSAKTIF = 1 ";
+                            }
+                            else if (frm.Statusaktif == "Tidak Aktif")
+                            {
+                                sql += " ,STATUSAKTIF = 0 ";
+                            }
+                        }
+                        sql += " WHERE manfaatid = :id";
+
+                        sql = sWhitespace.Replace(sql, " ");
+                        arrayListParameters.Clear();
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("JumlahAlokasi", frm.JUMLAHALOKASI));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("id", frm.Manfaatid));
+                        object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                        ctx.Database.ExecuteSqlCommand(sql, parameters);
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil diubah";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
         public List<Pnbp.Entities.Pengumuman> GetPengumuman(string judulBerita, string isiBerita, string tanggalMulai, string tanggalBerakhir, int from, int to)
         {
             List<Pnbp.Entities.Pengumuman> records = new List<Pnbp.Entities.Pengumuman>();

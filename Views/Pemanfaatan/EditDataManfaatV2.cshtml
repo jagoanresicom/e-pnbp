@@ -111,148 +111,11 @@
                                 @Html.DropDownListFor(model => model.Statusaktif, lsstatus, new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "cmbstatusaktif" })
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">File</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <span class="btn btn-success btn-file"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;Pilih File<input type="file" name="UploadFromFile" id="txtUploadFile" class="btn btn-success" accept=".pdf" /></span>
-                            </div>
-                        </div>
-                        @*<div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Januari</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(model => model.AnggJan, new { @class = "form-control", type = "number", @id = "nilaiangjan", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(model => model.RankJan, new { @class = "form-control", type = "number", @id = "rankjan", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Februari</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(model => model.AnggFeb, new { @class = "form-control", type = "number", @id = "nilaiangfeb", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(model => model.RankFeb, new { @class = "form-control", type = "number", @id = "rankfeb", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Maret</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(model => model.AnggMar, new { @class = "form-control", type = "number", @id = "nilaiangmar", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(model => model.RankMar, new { @class = "form-control", type = "number", @id = "rankmar", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>*@
-                    </div>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="x_content">
-                        @*<div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank April</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(model => model.AnggApr, new { @class = "form-control", type = "number", @id = "nilaiangapr", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(model => model.RankApr, new { @class = "form-control", type = "number", @id = "rankapr", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Mei</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(model => model.AnggMei, new { @class = "form-control", type = "number", @id = "nilaiangmei", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(model => model.RankMei, new { @class = "form-control", type = "number", @id = "rankmei", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Juni</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(model => model.AnggJun, new { @class = "form-control", type = "number", @id = "nilaiangjun", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(model => model.RankJun, new { @class = "form-control", type = "number", @id = "rankjun", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Juli</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(m => m.AnggJul, new { @class = "form-control", type = "number", @id = "nilaiangjul", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(m => m.RankJul, new { @class = "form-control", type = "number", @id = "rankjul", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Agustus</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(m => m.AnggAgt, new { @class = "form-control", type = "number", @id = "nilaiangagt", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(m => m.RankAgt, new { @class = "form-control", type = "number", @id = "rankagt", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank September</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(m => m.AnggSep, new { @class = "form-control", type = "number", @id = "nilaiangsep", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(m => m.RankSep, new { @class = "form-control", type = "number", @id = "ranksep", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Oktober</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(m => m.AnggOkt, new { @class = "form-control", type = "number", @id = "nilaiangokt", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(m => m.RankOkt, new { @class = "form-control", type = "number", @id = "rankokt", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank November</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(m => m.AnggNov, new { @class = "form-control", type = "number", @id = "nilaiangnov", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(m => m.RankNov, new { @class = "form-control", type = "number", @id = "ranknov", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">Ang/Rank Desember</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <div class="input-group" style="margin-right:-5px;">
-                                    @Html.TextBoxFor(m => m.AnggDes, new { @class = "form-control", type = "number", @id = "nilaiangdes", @placeholder = "Anggaran" })
-                                    <span class="input-group-addon" style="width:16px;">/</span>
-                                    @Html.TextBoxFor(m => m.RankDes, new { @class = "form-control", type = "number", @id = "rankdes", @placeholder = "Ranking" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:-10px;">
-                            <label class="control-label col-md-4 col-sm-4 col-xs-12">File</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <span class="btn btn-success btn-file"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;Pilih File<input type="file" name="UploadFromFile" id="txtUploadFile" class="btn btn-success" accept=".pdf" /></span>
-                            </div>
-                        </div>*@
                     </div>
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
                     <button type="submit" id="btnsimpandatamanfaat" class="btn btn-success">Simpan</button>
-                    @*<button type="button" id="btncancelmodal" class="btn btn-warning">Cancel</button>*@
                     <button type="button" id="btnKembali" class="btn btn-success">Kembali</button>
                 </div>
             </form>
@@ -423,43 +286,47 @@
 
     $("#frmdatamanfaat").submit(function (e) {
         var frm = new FormData(this);
-        frm.append("filepdf", dfPengumuman);
 
-        if (somethingChanged == true) {
-            //$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>', baseZ: 2000 });
-            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("UpdateDataManfaat", "Administrasi")',
-                data: frm,
-                contentType: false,
-                processData: false,
-                success: function (data, textStatus, XMLHttpRequest) {
-                    if (!data.Status) {
-                        $.unblockUI();
-                        showmsg('Error', 'Gagal Update - ' + data.Pesan);
-                    }
-                    else {
-                        //$('#messpanel').html(data.Pesan);
+        //if (somethingChanged == true) {
+        //    //$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>', baseZ: 2000 });
+            
+        //}
+        
 
-                        //var options = { "backdrop": "static", keyboard: true };
-                        //$('#myModalMessViewer').modal(options);
-                        //$('#myModalMessViewer').modal('show');
-
-                        BackToDataManfaatDetail();
-                        //closemodel();
-                        //$.unblockUI();
-                        //showmsg('Informasi', data.Pesan);
-                    }
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(errorThrown);
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UpdateDataManfaatV2", "Administrasi")',
+            data: frm,
+            contentType: false,
+            processData: false,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (!data.Status) {
                     $.unblockUI();
+                    showmsg('Error', 'Gagal Update - ' + data.Pesan);
                 }
-            });
-        }
+                else {
+                    //$('#messpanel').html(data.Pesan);
+
+                    //var options = { "backdrop": "static", keyboard: true };
+                    //$('#myModalMessViewer').modal(options);
+                    //$('#myModalMessViewer').modal('show');
+
+                    BackToDataManfaatDetail();
+                    //closemodel();
+                    //$.unblockUI();
+                    //showmsg('Informasi', data.Pesan);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(errorThrown);
+                $.unblockUI();
+            }
+        });
+
         e.preventDefault();
         return false;
+
     });
 
     ////format masking input a

@@ -1009,7 +1009,8 @@ namespace Pnbp
                     Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", username);
                     object[] parameters = new object[1] { p1 };
 
-                    string sql = "SELECT UserId, Username, Email, Password, PasswordQuestion, Commentar, IsApproved, IsLockedOut, NVL(CreationDate,SYSDATE) CreationDate, NVL(LastLoginDate,SYSDATE) LastLoginDate, NVL(LastActivityDate,SYSDATE) LastActivityDate, NVL(LastPasswordChangedDate,SYSDATE) LastPasswordChangedDate, NVL(LastLockedOutDate,SYSDATE) LastLockedOutDate FROM " + tableName + " WHERE Username = :param1 AND IsLockedOut = 0";
+                    string sql = "SELECT UserId, Username, Email, Password, PasswordQuestion, Commentar, IsApproved, IsLockedOut, NVL(CreationDate,SYSDATE) CreationDate, NVL(LastLoginDate,SYSDATE) LastLoginDate, NVL(LastActivityDate,SYSDATE) LastActivityDate, NVL(LastPasswordChangedDate,SYSDATE) LastPasswordChangedDate, NVL(LastLockedOutDate,SYSDATE) LastLockedOutDate " +
+                        "FROM SIMPEG." + tableName + " WHERE Username = :param1 AND IsLockedOut = 0";
                         m = ctx.MembershipData.SqlQuery(sql, parameters).FirstOrDefault();
                 }
 

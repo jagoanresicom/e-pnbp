@@ -18,16 +18,16 @@ namespace Pnbp.Models
                 {
                     string query =
                      @"SELECT 
-                    k.* 
-                    FROM KODESPAN k 
-                    JOIN (
-	                    SELECT kegiatan, OUTPUT
-	                    FROM SPAN_BELANJA sb 
-	                    WHERE 
-	                    sb.TAHUN = EXTRACT (YEAR FROM sysdate) AND 
-	                    sb.SUMBER_DANA = 'D'
-	                    GROUP BY kegiatan, output
-                    ) sb ON k.KODEOUTPUT = (sb.KEGIATAN || '.' || sb.OUTPUT)
+                        k.* 
+                        FROM KODESPAN k 
+                        JOIN (
+	                        SELECT kegiatan, OUTPUT
+	                        FROM SPAN_BELANJA sb 
+	                        WHERE 
+	                        sb.TAHUN = EXTRACT (YEAR FROM sysdate) AND 
+	                        sb.SUMBER_DANA = 'D'
+	                        GROUP BY kegiatan, output
+                        ) sb ON k.KODEOUTPUT = (sb.KEGIATAN || '.' || sb.OUTPUT)
                      ";
 
                     //{ id: 1, label: "Semua"}

@@ -234,6 +234,53 @@ namespace Pnbp.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult UpdateDataManfaatV2(Entities.PrioritasAlokasi frm)
+        {
+            var result = new Pnbp.Entities.TransactionResult() { Status = false, Pesan = "" };
+            List<Entities.PrioritasAlokasi> _lsSatkerALokasi = new List<Entities.PrioritasAlokasi>();
+            Models.AdmModel _adm = new Models.AdmModel();
+            try
+            {
+                if (!Pnbp.Models.AdmModel.GetStatusKantorbyManfaat(frm.Manfaatid))
+                {
+                    throw new Exception("Satker tidak aktif!");
+                }
+
+                #region Validasi Jumlah Anggaran
+
+                //decimal totalAnggaran = Convert.ToDecimal(frm.Anggaransatker.Replace(".", ""));
+                decimal totalAnggaran = frm.Nilaianggaran;
+                decimal jumlahAlokasi = frm.JUMLAHALOKASI;
+                if (frm.JUMLAHALOKASI > totalAnggaran)
+                {
+                    throw new Exception("Jumlah Anggaran yang diinput tidak valid, yaitu: " + string.Format("{0:#,##0}", totalAnggaran) + " <> " + string.Format("{0:#,##0}", jumlahAlokasi));
+                }
+                //decimal checkTotalAnggaran = Convert.ToDecimal(frm.AnggJan + frm.AnggFeb + frm.AnggMar + frm.AnggApr + frm.AnggMei + frm.AnggJun + frm.AnggJul + frm.AnggAgt + frm.AnggSep + frm.AnggOkt + frm.AnggNov + frm.AnggDes);
+                //if (totalAnggaran != checkTotalAnggaran)
+                //{
+                //    throw new Exception("Jumlah Anggaran yang diinput tidak valid, yaitu: " + string.Format("{0:#,##0}", totalAnggaran) + " <> " + string.Format("{0:#,##0}", checkTotalAnggaran));
+                //}
+
+                #endregion
+
+                result = _adm.UpdateDataManfaatV2(frm);
+
+                //_lsSatkerALokasi = _adm.GetPrioritasManfaat(frm.PrioritasOrigin);
+                //if (!result.Status)
+                //{
+                //    string _strlist = ConstructViewString("PrioritasDetail", _lsSatkerALokasi, null);
+                //    result.Pesan = _strlist;
+                //}
+            }
+            catch (Exception ex)
+            {
+                result.Status = false;
+                result.Pesan = ex.Message;
+            }
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         public async Task<ActionResult> GetFileManfaat(string id)
         {
             var result = new { Status = false, Message = "" };

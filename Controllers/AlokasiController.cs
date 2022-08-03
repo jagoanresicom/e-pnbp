@@ -7,6 +7,8 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Threading.Tasks;
 using System.Configuration;
+using NPOI.XSSF.UserModel;
+using NPOI.SS.UserModel;
 
 namespace Pnbp.Controllers
 {
@@ -1147,6 +1149,982 @@ namespace Pnbp.Controllers
             ctx.Database.ExecuteSqlCommand(insert_rekapalokasi);
 
             return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ReadAlokasi()
+        {
+            var fileContent = Request.Files["FileUpload"];
+
+            List<TempAlokasi> result = new List<TempAlokasi>();
+            var isSuccess = true;
+            var message = "";
+
+            if (fileContent.ContentLength > 0)
+            {
+                var stream = fileContent.InputStream;
+                stream.Position = 0;
+
+                PnbpContext db = new PnbpContext();
+                var trx = db.Database.BeginTransaction();
+                try
+                {
+                    XSSFWorkbook xssWorkbook = new XSSFWorkbook(stream);
+                    var sheet = xssWorkbook.GetSheetAt(0);
+
+
+                    var tempCount = db.Database.SqlQuery<int>("select count(*) from temp_alokasi").FirstOrDefault();
+                    if (tempCount > 0)
+                    {
+                        var deleteCount = db.Database.ExecuteSqlCommand("delete from temp_alokasi");
+                        if (deleteCount <= 0)
+                        {
+                            trx.Rollback();
+                            return Json(new { success = false, message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator." }, JsonRequestBehavior.DenyGet);
+                        }
+                    }
+
+                    for (var i = 1; i <= sheet.LastRowNum; i++)
+                    {
+                        IRow bodyRow = sheet.GetRow(i);
+                        var cKodeSatker = bodyRow.GetCell(1);
+                        var cPagu = bodyRow.GetCell(2);
+                        var cAlokasi = bodyRow.GetCell(3);
+
+                        var valueKodeSatker = cKodeSatker.CellType == CellType.Numeric ? cKodeSatker.NumericCellValue.ToString() : cKodeSatker.StringCellValue;
+                        var valuePagu = cPagu.CellType == CellType.Numeric ? 
+                            cPagu.NumericCellValue.ToString() : cPagu.StringCellValue;
+                        var valueAlokasi = cAlokasi.CellType == CellType.Numeric ? 
+                            cAlokasi.NumericCellValue.ToString() : 
+                            (string.IsNullOrEmpty(cAlokasi.StringCellValue) ? "0" : cAlokasi.StringCellValue);
+
+                        if (!string.IsNullOrEmpty(valueKodeSatker) &&
+                            !string.IsNullOrEmpty(valuePagu) &&
+                            !string.IsNullOrEmpty(valueAlokasi))
+                        {
+                            List<object> param = new List<object>();
+                            param.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kdsatker", valueKodeSatker));
+                            param.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("pagu", Convert.ToDouble(valuePagu)));
+                            param.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("alokasi", Convert.ToDouble(valueAlokasi)));
+                            var query = "INSERT INTO TEMP_ALOKASI(kdsatker, pagu, alokasi, status) VALUES(:kdsatker, :pagu, :alokasi, 1)";
+
+                            var row = db.Database.ExecuteSqlCommand(query, param.ToArray());
+                            isSuccess = row > 0;
+                        }
+                        else
+                        {
+                            isSuccess = false;
+                        }
+
+                        if (!isSuccess)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (!isSuccess)
+                    {
+                        isSuccess = false;
+                        message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator.";
+                        return Json(new { success = false, message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator." }, JsonRequestBehavior.DenyGet);
+                    } 
+                    //else
+                    //{
+                    //    //var query = "select kdsatker, to_char(pagu), to_char(alokasi) from temp_alokasi";
+                    //    //result = db.Database.SqlQuery<TempAlokasi>(query).ToList();
+                    //}
+                }
+                catch(Exception e)
+                {
+                    _ = e.StackTrace;
+                    trx.Rollback();
+                    isSuccess = false;
+                    message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator.";
+                }
+                finally
+                {
+                    if (isSuccess)
+                    {
+                        trx.Commit();
+                    } 
+                    else
+                    {
+                        trx.Rollback();
+                    }
+                }
+
+                if (isSuccess)
+                {
+                    return AlokasiSaatIni();
+                }
+            }
+            else
+            {
+                isSuccess = false;
+                message = "Proses Import Alokasi bermasalah, file yang anda upload tidak sesuai.";
+            }
+            return Json(new { success = isSuccess, data = result, message = message }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ReadAlokasiRevisi()
+        {
+            var fileContent = Request.Files["FileUpload"];
+
+            List<TempAlokasi> result = new List<TempAlokasi>();
+            var isSuccess = true;
+            var message = "";
+
+            if (fileContent.ContentLength > 0)
+            {
+                var stream = fileContent.InputStream;
+                stream.Position = 0;
+
+                PnbpContext db = new PnbpContext();
+                var trx = db.Database.BeginTransaction();
+                try
+                {
+                    XSSFWorkbook xssWorkbook = new XSSFWorkbook(stream);
+                    var sheet = xssWorkbook.GetSheetAt(0);
+
+
+                    var tempCount = db.Database.SqlQuery<int>("select count(*) from temp_alokasi_revisi").FirstOrDefault();
+                    if (tempCount > 0)
+                    {
+                        var deleteCount = db.Database.ExecuteSqlCommand("delete from temp_alokasi_revisi");
+                        if (deleteCount <= 0)
+                        {
+                            trx.Rollback();
+                            return Json(new { success = false, message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator." }, JsonRequestBehavior.DenyGet);
+                        }
+                    }
+
+                    for (var i = 1; i <= sheet.LastRowNum; i++)
+                    {
+                        IRow bodyRow = sheet.GetRow(i);
+                        var cKodeSatker = bodyRow.GetCell(1);
+                        var cPagu = bodyRow.GetCell(2);
+                        var cAlokasi = bodyRow.GetCell(3);
+
+                        var valueKodeSatker = cKodeSatker.CellType == CellType.Numeric ? cKodeSatker.NumericCellValue.ToString() : cKodeSatker.StringCellValue;
+                        var valuePagu = cPagu.CellType == CellType.Numeric ?
+                            cPagu.NumericCellValue.ToString() : cPagu.StringCellValue;
+                        var valueAlokasi = cAlokasi.CellType == CellType.Numeric ?
+                            cAlokasi.NumericCellValue.ToString() :
+                            (string.IsNullOrEmpty(cAlokasi.StringCellValue) ? "0" : cAlokasi.StringCellValue);
+
+                        if (!string.IsNullOrEmpty(valueKodeSatker) &&
+                            !string.IsNullOrEmpty(valuePagu) &&
+                            !string.IsNullOrEmpty(valueAlokasi))
+                        {
+                            List<object> param = new List<object>();
+                            param.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kdsatker", valueKodeSatker));
+                            param.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("pagu", Convert.ToDouble(valuePagu)));
+                            param.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("alokasi", Convert.ToDouble(valueAlokasi)));
+                            var query = "INSERT INTO temp_alokasi_revisi(kdsatker, pagu, alokasi, status) VALUES(:kdsatker, :pagu, :alokasi, 1)";
+
+                            var row = db.Database.ExecuteSqlCommand(query, param.ToArray());
+                            isSuccess = row > 0;
+                        }
+                        else
+                        {
+                            isSuccess = false;
+                        }
+
+                        if (!isSuccess)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (!isSuccess)
+                    {
+                        isSuccess = false;
+                        message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator.";
+                        return Json(new { success = false, message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator." }, JsonRequestBehavior.DenyGet);
+                    }
+                    //else
+                    //{
+                    //    //var query = "select kdsatker, to_char(pagu), to_char(alokasi) from temp_alokasi";
+                    //    //result = db.Database.SqlQuery<TempAlokasi>(query).ToList();
+                    //}
+                }
+                catch (Exception e)
+                {
+                    _ = e.StackTrace;
+                    trx.Rollback();
+                    isSuccess = false;
+                    message = "Proses Import Alokasi bermasalah, silakan hubungi Administrator.";
+                }
+                finally
+                {
+                    if (isSuccess)
+                    {
+                        trx.Commit();
+                    }
+                    else
+                    {
+                        trx.Rollback();
+                    }
+                }
+
+                if (isSuccess)
+                {
+                    return AlokasiSaatIni();
+                }
+            }
+            else
+            {
+                isSuccess = false;
+                message = "Proses Import Alokasi bermasalah, file yang anda upload tidak sesuai.";
+            }
+            return Json(new { success = isSuccess, data = result, message = message }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult IsKodeSpanValid()
+        {
+
+            PnbpContext db = new PnbpContext();
+            var result = true;
+            try
+            {
+                var query = @"
+                select count(*) from (
+                    WITH sb AS (
+	                    SELECT (KEGIATAN || '.' || OUTPUT) AS kodeoutput
+                        FROM SPAN_BELANJA sb
+                        WHERE sb.SUMBER_DANA = 'D' AND
+                        TAHUN = EXTRACT(YEAR FROM sysdate)
+
+                        GROUP BY KEGIATAN, OUTPUT
+                    ),
+                    k AS(
+                        SELECT* FROM KODESPAN k
+                    )
+                    SELECT sb.kodeoutput, k.KODEOUTPUT, p.KODE
+                    FROM sb
+                    LEFT JOIN k ON sb.kodeoutput = k.KODEOUTPUT
+                    LEFT JOIN program p ON sb.KODEOUTPUT = p.KODE
+                    WHERE k.KODEOUTPUT IS NULL
+                )
+                ";
+
+                var dataCount = db.Database.SqlQuery<int>(query).FirstOrDefault();
+                result = dataCount == 0;
+            }
+            catch(Exception e)
+            {
+                _ = e.StackTrace;
+                result = false;
+            }
+
+            return Json(new { success = result, data = result }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ResetAlokasi()
+        {
+            PnbpContext db = new PnbpContext();
+            var trx = db.Database.BeginTransaction();
+            var isError = false;
+            try
+            {
+                var query = "DELETE FROM TEMP_ALOKASI";
+                db.Database.ExecuteSqlCommand(query);
+            }
+            catch(Exception e)
+            {
+                isError = true;
+                _ = e.StackTrace;
+            } 
+            finally
+            {
+                if (!isError)
+                {
+                    trx.Commit();
+                } 
+                else
+                {
+                    trx.Rollback();
+                }
+            }
+            return Json(new { success = !isError }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ResetAlokasiRevisi()
+        {
+            PnbpContext db = new PnbpContext();
+            var trx = db.Database.BeginTransaction();
+            var isError = false;
+            try
+            {
+                var query = "DELETE FROM TEMP_ALOKASI_REVISI";
+                db.Database.ExecuteSqlCommand(query);
+            }
+            catch (Exception e)
+            {
+                isError = true;
+                _ = e.StackTrace;
+            }
+            finally
+            {
+                if (!isError)
+                {
+                    trx.Commit();
+                }
+                else
+                {
+                    trx.Rollback();
+                }
+            }
+            return Json(new { success = !isError }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult ProsesAlokasi()
+        {
+            var db = new PnbpContext();
+            var trx = db.Database.BeginTransaction();
+            List<DataProsesAlokasi> result = new List<DataProsesAlokasi>();
+            var isProcessAlokasiSuccess = true;
+
+            var idTrx = NewGuID();
+
+            try
+            {
+                var user = (HttpContext.User.Identity as Entities.InternalUserIdentity);
+
+                string query = @"
+                SELECT * FROM (
+	                select 
+	                    s.KANTORID as kantorid, 
+	                    k.TIPE AS tipe, 
+	                    p.PROGRAMID as programid, 
+	                    p.nama AS programnama,
+	                    s.NAMA_SATKER as namasatker, 
+	                    sb.KDSATKER as kodesatker, sb.kegiatan as kegiatan, sb.OUTPUT as output, sum(sb.amount) as amount
+	                from span_belanja sb
+	                left JOIN satker s ON sb.KDSATKER = s.KODESATKER 
+	                LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
+	                LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
+	                WHERE
+	                    sb.KDSATKER = '022209' AND
+	                    sb.KDSATKER != '524465' 
+	                GROUP BY
+	                    s.KANTORID, 
+	                    k.tipe,
+	                    s.NAMA_SATKER, 
+	                    sb.kdsatker, 
+	                    sb.kegiatan, 
+	                    sb.OUTPUT, 
+	                    p.PROGRAMID,
+	                    p.NAMA
+	                ORDER BY sb.kdsatker
+                )
+                WHERE programid IS NOT NULL
+                ";
+
+                result = db.Database.SqlQuery<DataProsesAlokasi>(query).ToList();
+                bool successInsert = true;
+                foreach(var item in result)
+                {
+                    // insert data ke manfaat
+                    var queryInsert = BuildQuery(
+                        item.KantorId, 
+                        item.NamaSatker, 
+                        item.ProgramId, 
+                        item.ProgramNama, 
+                        item.Tipe, 
+                        item.Amount,
+                        $"{item.Kegiatan}.{item.Output}",
+                        item.KodeSatker);
+                    if (string.IsNullOrEmpty(queryInsert))
+                    {
+                        successInsert = false;
+                        break;
+                    }
+
+                    var row = db.Database.ExecuteSqlCommand(queryInsert);
+                    if (row <= 0)
+                    {
+                        successInsert = false;
+                        break;
+                    }
+                }
+
+                if (successInsert)
+                {
+                    var queryLastAlokasiSummary = @"SELECT 
+                            ALOKASISATKERSUMMARYID, 
+                            PAGU, 
+                            ALOKASI, 
+                            TO_CHAR(TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                            TO_CHAR(TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                            MP 
+                        FROM ALOKASISATKERSUMMARY a 
+                        WHERE tahun = extract(year from sysdate) AND MP = (SELECT * FROM (
+                            SELECT a2.mp FROM ALOKASISATKERSUMMARY a2 WHERE a2.tahun = extract(year from sysdate) ORDER BY a2.MP DESC
+                        ) WHERE rownum = 1)";
+
+                    var getLastAlokasiSummary = db.Database.SqlQuery<AlokasiSatkerSummary>(queryLastAlokasiSummary).FirstOrDefault();
+                    var mp = getLastAlokasiSummary == null ? 1 : (getLastAlokasiSummary.Mp + 1);
+
+                    var isSuccessProccessMove = true;
+                    var queryAlokasiSatkerSummary = $@"
+                        INSERT INTO ALOKASISATKERSUMMARY(ALOKASISATKERSUMMARYID, PAGU, ALOKASI, MP)
+                        SELECT '{idTrx}', sum(pagu), sum(alokasi), {mp} ALOKASI FROM TEMP_ALOKASI
+                        ";
+                    var rowSummary = db.Database.ExecuteSqlCommand(queryAlokasiSatkerSummary);
+                    if (rowSummary <= 0)
+                    {
+                        isSuccessProccessMove = false;
+                    }
+                    else
+                    {
+                        var queryMoveAlokasi = $@"
+                            INSERT INTO ALOKASISATKER(ALOKASISATKERID, KDSATKER, PAGU, ALOKASI, ALOKASISATKERSUMMARYID)
+                            SELECT sys_guid(), KDSATKER, PAGU, ALOKASI, '{idTrx}' FROM TEMP_ALOKASI
+                            ";
+                        var rowMoveAlokasi = db.Database.ExecuteSqlCommand(queryMoveAlokasi);
+                        if (rowMoveAlokasi <= 0)
+                        {
+                            isSuccessProccessMove = false;
+                        }
+                    }
+
+                    if (isSuccessProccessMove)
+                    {
+                        // clear
+                        var queryDelete = @"delete from TEMP_ALOKASI";
+                        var rowDelete = db.Database.ExecuteSqlCommand(queryDelete);
+                        if (rowDelete <= 0)
+                        {
+                            isProcessAlokasiSuccess = false;
+                            trx.Rollback();
+                        }
+                        else
+                        {
+                            trx.Commit();
+                        }
+                    } 
+                    else
+                    {
+                        isProcessAlokasiSuccess = false;
+                        trx.Rollback();
+                    }
+                } 
+                else
+                {
+                    isProcessAlokasiSuccess = false;
+                    trx.Rollback();
+                }
+            }
+            catch(Exception e)
+            {
+                isProcessAlokasiSuccess = false;
+                _ = e.StackTrace;
+                trx.Rollback();
+            }
+            
+            return Json(new { success = isProcessAlokasiSuccess }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult ProsesRevisiAlokasi()
+        {
+            var db = new PnbpContext();
+            var trx = db.Database.BeginTransaction();
+            List<DataProsesAlokasi> result = new List<DataProsesAlokasi>();
+            var isProcessAlokasiSuccess = true;
+
+            var idTrx = NewGuID();
+
+            try
+            {
+                var user = (HttpContext.User.Identity as Entities.InternalUserIdentity);
+                var successInsert = true;
+                if (successInsert)
+                {
+                    var queryLastAlokasiSummary = @"SELECT 
+                            ALOKASISATKERSUMMARYID, 
+                            PAGU, 
+                            ALOKASI, 
+                            TO_CHAR(TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                            TO_CHAR(TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                            MP,
+                            REVISI
+                        FROM ALOKASISATKERSUMMARY a 
+                        WHERE tahun = extract(year from sysdate) AND MP = (SELECT * FROM (
+                            SELECT a2.mp FROM ALOKASISATKERSUMMARY a2 WHERE a2.tahun = extract(year from sysdate) ORDER BY a2.MP DESC
+                        ) WHERE rownum = 1)";
+
+                    var getLastAlokasiSummary = db.Database.SqlQuery<AlokasiSatkerSummary>(queryLastAlokasiSummary).FirstOrDefault();
+                    if (getLastAlokasiSummary != null)
+                    {
+                        var mp = getLastAlokasiSummary.Mp;
+                        var revisi = getLastAlokasiSummary.Revisi + 1;
+
+                        var isSuccessProccessMove = true;
+                        var queryAlokasiSatkerSummary = $@"
+                        INSERT INTO ALOKASISATKERSUMMARY(ALOKASISATKERSUMMARYID, PAGU, ALOKASI, MP, REVISI)
+                        SELECT '{idTrx}', sum(pagu), sum(alokasi), {mp}, {revisi} ALOKASI FROM TEMP_ALOKASI_REVISI
+                        ";
+                        var rowSummary = db.Database.ExecuteSqlCommand(queryAlokasiSatkerSummary);
+                        if (rowSummary <= 0)
+                        {
+                            isSuccessProccessMove = false;
+                        }
+                        else
+                        {
+                            var queryMoveAlokasi = $@"
+                            INSERT INTO ALOKASISATKER(ALOKASISATKERID, KDSATKER, PAGU, ALOKASI, ALOKASISATKERSUMMARYID)
+                            SELECT sys_guid(), KDSATKER, PAGU, ALOKASI, '{idTrx}' FROM TEMP_ALOKASI_REVISI
+                            ";
+                            var rowMoveAlokasi = db.Database.ExecuteSqlCommand(queryMoveAlokasi);
+                            if (rowMoveAlokasi <= 0)
+                            {
+                                isSuccessProccessMove = false;
+                            }
+                        }
+
+                        if (isSuccessProccessMove)
+                        {
+                            // clear
+                            var queryDelete = @"delete from TEMP_ALOKASI_REVISI";
+                            var rowDelete = db.Database.ExecuteSqlCommand(queryDelete);
+                            if (rowDelete <= 0)
+                            {
+                                isProcessAlokasiSuccess = false;
+                                trx.Rollback();
+                            }
+                            else
+                            {
+                                trx.Commit();
+                            }
+                        }
+                        else
+                        {
+                            isProcessAlokasiSuccess = false;
+                            trx.Rollback();
+                        }
+                    } 
+                    else
+                    {
+                        isProcessAlokasiSuccess = false;
+                        trx.Rollback();
+                    }
+                }
+                else
+                {
+                    isProcessAlokasiSuccess = false;
+                    trx.Rollback();
+                }
+            }
+            catch (Exception e)
+            {
+                isProcessAlokasiSuccess = false;
+                _ = e.StackTrace;
+                trx.Rollback();
+            }
+
+            return Json(new { success = isProcessAlokasiSuccess }, JsonRequestBehavior.AllowGet);
+        }
+
+        private string BuildQuery(string kantorId, string namaKantor, string programId, 
+            string namaProgram, string tipe, double nilaiAnggaran, string kodeoutput, string kodesatker)
+        {
+            string query = "";
+            try
+            {
+                query = $@"
+                INSERT INTO PNBP.MANFAAT
+                (
+	                MANFAATID, 
+	                TAHUN, 
+	                KANTORID, 
+	                NAMAKANTOR, 
+	                PROGRAMID, 
+	                NAMAPROGRAM, 
+	                TIPE, 
+	                NILAIANGGARAN,
+                    KODE,
+                    KODESATKER
+                )
+                VALUES(
+                    sys_guid() , 
+                    (extract(year from sysdate)), 
+                    '{kantorId}', 
+                    '{namaKantor}', 
+                    '{programId}', 
+                    '{namaProgram}', 
+                    '{tipe}', 
+                    {nilaiAnggaran},
+                    '{kodeoutput}',
+                    '{kodesatker}'
+                )
+            ";
+            } 
+            catch(Exception e)
+            {
+                query = "";
+                _ = e.StackTrace;
+            }
+
+            return query;
+        }
+
+        public ActionResult ImportAlokasi()
+        {
+            return View();
+        }
+
+        public ActionResult ImportAlokasiSummaryDetail(string id)
+        {
+            return View();
+        }
+
+        public ActionResult GetAlokasiBySummaryId(string id)
+        {
+            List<AlokasiSatker> result = new List<AlokasiSatker>();
+            var db = new PnbpContext();
+            try
+            {
+                string query = $@"SELECT 
+                        a.ALOKASISATKERID,
+                        a.KDSATKER as KodeSatker,
+                        s.NAMA_SATKER as NamaSatker, 
+                        a.PAGU,
+                        a.ALOKASI,
+                        a.TAHUN,
+                        TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                        TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH 
+                    FROM ALOKASISATKER a 
+                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER 
+                    WHERE ALOKASISATKERSUMMARYID = '{id}'";
+                result = db.Database.SqlQuery<AlokasiSatker>(query).ToList();
+
+                string queryGetRevisi = $@"
+                    SELECT ass.REVISI, a.kdsatker as KodeSatker, a.pagu, a.alokasi
+                    FROM alokasisatker a
+                    JOIN ALOKASISATKERSUMMARY ass ON a.ALOKASISATKERSUMMARYID = ass.ALOKASISATKERSUMMARYID 
+                    WHERE a.ALOKASISATKERSUMMARYID IN (
+	                    SELECT ALOKASISATKERSUMMARYID  
+	                    FROM alokasisatkersummary
+	                    WHERE tahun = EXTRACT (YEAR FROM sysdate)
+                        AND mp = (select mp from ALOKASISATKERSUMMARY where alokasisatkersummaryid = '{id}') 
+	                    AND revisi > 0
+                    )
+                    ORDER BY kdsatker, revisi asc
+                ";
+                var listRevisi = db.Database.SqlQuery<AlokasiSatker>(queryGetRevisi).ToList();
+
+                string queryTempRevisi = $@"
+                    SELECT 
+                        (row_number() OVER (ORDER BY s.KODESATKER)) no,
+                        s.KODESATKER AS kodesatker, 
+                        s.NAMA_SATKER AS NamaSatker, 
+                        to_char(ta.PAGU) AS pagu, 
+                        to_char(ta.alokasi) AS alokasi 
+                    FROM TEMP_ALOKASI_REVISI ta
+                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER 
+                    WHERE ta.KDSATKER != '524465'
+                ";
+                var listTempRevisi = db.Database.SqlQuery<TempAlokasi>(queryTempRevisi).ToList();
+
+                if (listRevisi.Count != 0 || listTempRevisi.Count > 0)
+                {
+                    bool addRevisi = listRevisi.Count > 0;
+                    bool addTemp = listTempRevisi.Count > 0;
+                    int index = 0;
+                    foreach (var item in result)
+                    {
+                        decimal beforeValue = item.Alokasi;
+                        if (addRevisi)
+                        {
+                            var data = new List<AlokasiSatkerRevisi>();
+                            var lRevisi = listRevisi.FindAll(x => x.KodeSatker == item.KodeSatker).ToList();
+                            
+                            var lastRevisi = listRevisi.OrderByDescending(x => x.Revisi).FirstOrDefault();
+                            if (lastRevisi != null)
+                            {
+                                beforeValue = lastRevisi.Alokasi;
+                            }
+
+                            foreach (var itemRevisi in lRevisi)
+                            {
+                                data.Add(new AlokasiSatkerRevisi()
+                                {
+                                    Revisi = itemRevisi.Revisi,
+                                    Alokasi = itemRevisi.Alokasi
+                                });
+                            }
+                            result[index].DaftarRevisi = data;
+                        }
+
+                        if (addTemp)
+                        {
+                            var tRevisi = listTempRevisi.FindAll(x => x.KodeSatker == item.KodeSatker).FirstOrDefault();
+                            if (tRevisi != null)
+                            {
+                                result[index].TempAlokasi = tRevisi.Alokasi;
+                            }
+
+                            if (beforeValue.ToString() !=  tRevisi.Alokasi)
+                            {
+                                result[index].IsNilaiBaru = true;
+                            }
+                        }
+                        index++;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                _ = e.StackTrace;
+            }
+            
+            return Json(new { success = true, data = result.OrderBy(x => x.KodeSatker).OrderByDescending(x => x.IsNilaiBaru) }, JsonRequestBehavior.AllowGet);
+        }
+
+        public FileContentResult DownloadTemplateAlokasi()
+        {
+            PnbpContext db = new PnbpContext();
+
+            DataTable dt = new DataTable($"{DateTime.Now.Year}");
+            dt.Columns.AddRange(new DataColumn[4] {
+                new DataColumn("No",typeof(int)),
+                new DataColumn("Kode Satker"),
+                new DataColumn("Pagu"),
+                new DataColumn("Alokasi Saat Ini")
+            });
+
+            //string query = @"
+            //WITH sb as ( 
+            // SELECT sb.kdsatker, sum(sb.amount)  AS amount
+            // FROM SPAN_BELANJA sb 
+            // WHERE sb.TAHUN = EXTRACT (YEAR FROM SYSDATE) and sb.SUMBER_DANA = 'D'
+            // AND kdsatker != '524465' 
+            // GROUP BY sb.kdsatker
+            //)
+            //SELECT s.KODESATKER AS kodesatker, TO_CHAR(sb.AMOUNT) AS amount
+            //FROM satker s
+            //LEFT JOIN sb ON s.KODESATKER = sb.kdsatker
+            //WHERE s.STATUSAKTIF = 1 AND s.KODESATKER != '524465'
+            //";
+
+            string query = @"
+                WITH sb as ( 
+                    SELECT sb.kdsatker, sum(sb.amount)  AS amount
+                    FROM SPAN_BELANJA sb 
+                    WHERE sb.TAHUN = EXTRACT (YEAR FROM SYSDATE) and sb.SUMBER_DANA = 'D'
+                    AND kdsatker != '524465' 
+                    GROUP BY sb.kdsatker
+                )
+                SELECT 
+	                sb.KDSATKER  AS kodesatker, 
+	                TO_CHAR(sb.AMOUNT) AS amount
+                FROM sb
+                LEFT JOIN satker s ON sb.kdsatker = s.KODESATKER 
+                WHERE 
+	                sb.KDSATKER != '524465' AND sb.kdsatker IS NOT NULL 
+                GROUP BY sb.KDSATKER, sb.AMOUNT 
+                ORDER BY sb.KDSATKER 
+            ";
+
+
+            var get = db.Database.SqlQuery<TemplateAlokasi>(query).ToList();
+            var index = 0;
+            foreach (var rw in get)
+            {
+                dt.Rows.Add(index, rw.KodeSatker, rw.Amount);
+            }
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Template Alokasi.xlsx");
+                }
+            }
+        }
+
+        public ActionResult SummaryAlokasi()
+        {
+            PnbpContext db = new PnbpContext();
+            List<AlokasiSatkerSummary> result = new List<AlokasiSatkerSummary>();
+
+            try
+            {
+                //string query = @"
+                //SELECT 
+                //    (row_number() OVER (ORDER BY a.MP)) no,
+                //    a.ALOKASISATKERSUMMARYID, 
+                //    a.PAGU, 
+                //    a.ALOKASI, 
+                //    TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                //    TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                //    a.MP 
+                //FROM ALOKASISATKERSUMMARY a 
+                //WHERE a.tahun = extract(year from sysdate) 
+                //ORDER BY MP ASC
+                //";
+
+                string query = @"
+                    WITH grp AS (
+	                    SELECT a.mp, max(a.revisi) revisi, a.tahun  
+	                    FROM ALOKASISATKERSUMMARY a 
+	                    GROUP BY a.mp, a.tahun
+                    )
+                    SELECT 
+                        (row_number() OVER (ORDER BY ass.MP)) no,
+                        ass.ALOKASISATKERSUMMARYID, 
+                        ass.PAGU, 
+                        ass.ALOKASI, 
+                        TO_CHAR(ass.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                        TO_CHAR(ass.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                        ass.MP 
+                    FROM grp 
+                    LEFT JOIN AlokasiSatkerSummary ass ON 
+                    grp.mp = ass.MP AND 
+                    grp.revisi = ass.revisi AND 
+                    grp.tahun = ass.tahun
+                    ORDER BY ass.MP
+                ";
+
+                result = db.Database.SqlQuery<AlokasiSatkerSummary>(query).ToList();
+            }
+            catch (Exception e)
+            {
+                _ = e.StackTrace;
+            }
+
+            return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult SummaryAlokasiRevisi()
+        {
+            PnbpContext db = new PnbpContext();
+            List<AlokasiSatkerSummary> result = new List<AlokasiSatkerSummary>();
+
+            try
+            {
+                string query = @"
+                SELECT 
+                    (row_number() OVER (ORDER BY a.MP)) no,
+                    a.ALOKASISATKERSUMMARYID, 
+                    a.PAGU, 
+                    a.ALOKASI, 
+                    TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                    TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                    a.MP 
+                FROM ALOKASISATKERSUMMARY a 
+                WHERE a.tahun = extract(year from sysdate) 
+                ORDER BY MP ASC
+                ";
+
+                result = db.Database.SqlQuery<AlokasiSatkerSummary>(query).ToList();
+            }
+            catch (Exception e)
+            {
+                _ = e.StackTrace;
+            }
+
+            return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult AlokasiSaatIni()
+        {
+            PnbpContext db = new PnbpContext();
+            List<TempAlokasi> result = new List<TempAlokasi>();
+
+            try
+            {
+                string query = @"
+                SELECT 
+                    (row_number() OVER (ORDER BY s.KODESATKER)) no,
+                    s.KODESATKER AS kodesatker, 
+                    s.NAMA_SATKER AS NamaSatker, 
+                    to_char(ta.PAGU) AS pagu, 
+                    to_char(ta.alokasi) AS alokasi 
+                FROM TEMP_ALOKASI ta
+                LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER 
+                WHERE ta.KDSATKER != '524465'
+                ";
+
+                result = db.Database.SqlQuery<TempAlokasi>(query).ToList();
+            } 
+            catch(Exception e)
+            {
+                _ = e.StackTrace;   
+            }
+
+            return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+        }
+
+        class TemplateAlokasi
+        {
+            public string KodeSatker { get; set; }
+            public string Amount { get; set; }
+        }
+
+        class TempAlokasi
+        {
+            public decimal No { get; set; }
+            public string KodeSatker { get; set; }
+            public string NamaSatker { get; set; }
+            public string Pagu { get; set; }
+            public string Alokasi { get; set; }
+        }
+
+        class AlokasiSatker
+        {
+            public decimal No { get; set; }
+            public string AlokasiSatkerId { get; set; }
+            public string KodeSatker { get; set; }
+            public string NamaSatker { get; set; }
+            public Decimal Pagu { get; set; }
+            public Decimal Alokasi { get; set; }
+            public Decimal Tahun { get; set; }
+            public string TanggalBuat { get; set; }
+            public string TanggalUbah { get; set; }
+            public decimal Revisi { get; set; }
+            public List<AlokasiSatkerRevisi> DaftarRevisi { get; set; }
+            public string TempAlokasi { get; set; }
+            public bool IsNilaiBaru { get; set; }
+            
+        }
+
+        class AlokasiSatkerRevisi
+        {
+            public decimal Revisi { get; set; }
+            public decimal Alokasi { get; set; }
+        }
+
+        class AlokasiSatkerSummary
+        {
+            public decimal No { get; set; }
+            public string AlokasiSatkerSummaryId { get; set; }
+            public Decimal Mp { get; set; }
+            public Decimal Pagu { get; set; }
+            public Decimal Alokasi { get; set; }
+            public Decimal Tahun { get; set; }
+            public string TanggalBuat { get; set; }
+            public string TanggalUbah { get; set; }
+            public Decimal Revisi { get; set; }
+        }
+
+        class DataProsesAlokasi
+        {
+            public string KantorId { get; set; }
+            public string Tipe { get; set; }
+            public string ProgramId { get; set; }
+            public string ProgramNama { get; set; }
+            public string NamaSatker { get; set; }
+            public string KodeSatker { get; set; }
+            public string Kegiatan { get; set; }
+            public string Output { get; set; }
+            public string Akun { get; set; }
+            public double Amount { get; set; }
+
         }
     }
 }

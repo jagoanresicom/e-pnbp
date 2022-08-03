@@ -33,13 +33,13 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>Import Alokasi</h2>
+                    <h2>Detail Import Alokasi</h2>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
                     <form class="form-horizontal form-label-left" id="frmimportalok" method="post">
                         <div class="form-group">
-                            <label class="control-label col-md-2 col-sm-2 col-xs-12">Import File Alokasi</label>
+                            <label class="control-label col-md-2 col-sm-2 col-xs-12">Import File Revisi Alokasi</label>
                             <div class="col-md-6 col-sm-6 col-xs-12 hide-inputbtns">
                                 <button type="button" id="btn-upload" disabled="true" class="btn btn-success btn-file"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;Pilih File<input type="file" disabled="true" name="UploadFromFile" id="fileAlokasi" class="btn btn-success" accept=".xls,.xlsx" /></button>
                             </div>
@@ -53,7 +53,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2 col-sm-2 col-xs-12"></label>
                             <div class="col-md-6 col-sm-6 col-xs-12 hide-inputbtns">
-                                <button id="btn-alokasi" type="button" class="btn btn-success" disabled="true" style="margin-top:10px;"><i class="fa fa-paper-plane"></i>&nbsp;&nbsp;Proses Alokasi</button>
+                                <button id="btn-alokasi" type="button" class="btn btn-success" disabled="true" style="margin-top:10px;"><i class="fa fa-paper-plane"></i>&nbsp;&nbsp;Proses Revisi Alokasi</button>
                                 <button id="btn-reset-alokasi" type="button" class="btn btn-warning btn-group-crop" style="margin-top:10px;"><i class="fa fa-arrow-circle-o-right"></i>&nbsp;&nbsp;Reset Alokasi</button>
                                 <button id="btn-kode-span" type="button" class="btn btn-danger btn-group-crop" style="display: none; margin-top: 10px;"><i class="fa fa-book"></i>&nbsp;&nbsp;Kode Span</button>
                                 <button id="btn-kode-program" type="button" class="btn btn-danger btn-group-crop" style="display: none; margin-top: 10px;"><i class="fa fa-book"></i>&nbsp;&nbsp;Program</button>
@@ -85,33 +85,7 @@
     <div class="x_panel">
 
         <form class="form-horizontal form-label-left pnbp-group-table" id="frmdatasatker" method="post" data-name="alokasi">
-            <div class="form-group" id="group_alokasi">
-                <div class="row text-center">
-                    <label class="control-label"><h2><b>Riwayat MP</b></h2></label>
-                </div>
-                <table id="summaryalokasisatker" class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>MP</th>
-                            <th>Total Pagu</th>
-                            <th>Total Alokasi</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-            <div>
-                <br/>
-            </div>
-
             <div class="form-group" id="group_alokasi" style="margin-top:10px;">
-                <div class="row text-center">
-                    <label class="control-label"><h2><b>Data yang Akan DiAlokasikan</b></h2></label>
-                </div>
                 <table id="alokasisatker" class="table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -119,14 +93,7 @@
                             <th>Kode Satker</th>
                             <th>Nama Satker</th>
                             <th>Pagu</th>
-                            <th>Alokasi Saat Ini</th>
-                            <th>Persentase</th>
-                            @*<th class="text-center">
-                        Y/N
-                        <span>
-                            <input type="checkbox" class="checkbox-inline checkall" onchange="tableCheckAll(this, '#group_alokasi')" />
-                        </span>
-                    </th>*@
+                            @*<th>Alokasi Saat Ini</th>*@
                         </tr>
                     </thead>
                     <tbody>
@@ -134,7 +101,6 @@
                 </table>
             </div>
         </form>
-
     </div>
 </div>
 
@@ -162,7 +128,6 @@
         $('#back-to-top').tooltip('show');
 
         getValidateKodeSpan();
-        getSummaryAlokasi();
         getAlokasi();
     });
 
@@ -190,7 +155,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("ReadAlokasi", "Alokasi")',
+                url: '@Url.Action("ReadAlokasiRevisi", "Alokasi")',
                 data: frm,
                 processData: false,
                 contentType: false,
@@ -203,8 +168,10 @@
                         $('#btn-reset-alokasi').prop('disabled', false);
                     }
 
-                    writeDataTable(res);
-                    $.unblockUI();
+                    //writeDataTable(res);
+                    //$.unblockUI();
+                    //getAlokasi();
+                    location.reload();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $.unblockUI();
@@ -213,21 +180,13 @@
         }
     });
 
-    function getSummaryAlokasi() {
-        $.ajax({
-            type: "GET",
-            url: '@Url.Action("SummaryAlokasi", "Alokasi")',
-            success: function (res) {
-                writeDataTableSummary(res);
-            }, error: function (XMLHttpRequest, textStatus, errorThrown) {
-            }
-            });
-    }
-
     function getAlokasi() {
+        var urlObject = new URL(document.location.href);
+        var params = urlObject.searchParams;
+        var id = params.get("id");
         $.ajax({
             type: "GET",
-            url: '@Url.Action("AlokasiSaatIni", "Alokasi")',
+            url: '@Url.Action("GetAlokasiBySummaryId", "Alokasi")?id='+id,
             success: function (res) {
                 if (!res.success || res.data.length == 0) {
                     $('#btn-alokasi').prop('disabled', true);
@@ -290,10 +249,10 @@
     function resetAlokasi() {
         $.ajax({
             type: "GET",
-            url: '@Url.Action("ResetAlokasi", "Alokasi")',
+            url: '@Url.Action("ResetAlokasiRevisi", "Alokasi")',
             success: function (res) {
                 if (res.success) {
-                    writeDataTable(res);
+                    getAlokasi();
                 }
 
                 $('#btn-alokasi').prop('disabled', res.success);
@@ -310,10 +269,11 @@
     function prosesAlokasi() {
         $.ajax({
             type: "POST",
-            url: '@Url.Action("ProsesAlokasi", "Alokasi")',
+            url: '@Url.Action("ProsesRevisiAlokasi", "Alokasi")',
             success: function (res) {
                 if (res.success) {
-                    writeDataTable(res);
+                    //writeDataTable(res);
+                    location.reload();
                 }
 
                 $('#btn-alokasi').prop('disabled', res.success);
@@ -332,18 +292,60 @@
         if (res.data != null && res.data != undefined && res.data.length > 0) {
             var data = res.data;
             var i = 0;
+
+            var tr = document.getElementById('alokasisatker').tHead.children[0];
+            if (data[0].DaftarRevisi != null && data[0].DaftarRevisi.length > 0) {
+                var th = document.createElement('th');
+                th.innerHTML = "Alokasi 1";
+                tr.appendChild(th);
+
+                $.each(data[0].DaftarRevisi, function (x) {
+                    var th = document.createElement('th');
+                    if ((x + 1) == data[0].DaftarRevisi.length) {
+                        th.innerHTML = "Alokasi Saat Ini";
+                    } else {
+                        th.innerHTML = "Alokasi " + (x + 2);
+                    }
+                    tr.appendChild(th);
+                });
+            } else {
+                var th = document.createElement('th');
+                th.innerHTML = "Alokasi Saat Ini";
+                tr.appendChild(th);
+            }
+
+            if (data[0].TempAlokasi != null) {
+                var th = document.createElement('th');
+                th.innerHTML = "Revisi Alokasi";
+                tr.appendChild(th);
+            }
+
             $.each(data, function (x) {
                 i = x + 1;
                 html += ""
                     + "<tr>"
                     + "<td class='text-center'>" + i + "</td>"
-                    + "<td class='text-left'>" + data[x].KodeSatker + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
-                    + "<td class='text-left'>" + data[x].NamaSatker + " <input type='hidden' id='namasatker' name='namasatker' value='" + data[x].namakantor + "'></td>"
-                    + "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
-                    + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-                    + "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-                    //+ "<td class='text-right'><input type='hidden' id='check_" + [x] + "' name='check[]' class='check' value='false'/> </td>"
-                    + "</tr>";
+                    + "<td class='text-left'>" + data[x].KodeSatker + " </td>"
+                    + "<td class='text-left'>" + data[x].NamaSatker + " </td>"
+                    + "<td class='text-right'>" + addCommas(data[x].Pagu) + "</td>"
+                    + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "</td>"
+                    ;
+
+                if (data[x].DaftarRevisi != null && data[x].DaftarRevisi.length > 0) {
+                    for (var index = 0; index < data[x].DaftarRevisi.length; index++) {
+                        html += ""
+                            + "<td class='text-right'>" + addCommas(data[x].DaftarRevisi[index].Alokasi) + "</td>";
+                    }
+                }
+
+                if (data[x].TempAlokasi != null) {
+                    html += ""
+                        + "<td class='text-right' " 
+                        + (data[x].IsNilaiBaru ? "style='color: red; font-weight: bold;'" : "")
+                        + ">" + addCommas(data[x].TempAlokasi) + "</td>";
+                }
+
+                html += "</tr>"
             });
             $("#index").val(i);
         } else {
@@ -353,42 +355,8 @@
         $("#alokasisatker>tbody").html(html);
     }
 
-    function writeDataTableSummary(res) {
-        var html = "";
-        if (res.data != null && res.data != undefined && res.data.length > 0) {
-            var data = res.data;
-            var i = 0;
-            $.each(data, function (x) {
-                i = x + 1;
-                html += ""
-                    + "<tr>"
-                    + "<td class='text-center'>" + i + "</td>"
-                    + "<td class='text-left'>MP " + data[x].Mp + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
-                    + "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
-                    + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-                    //+ "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-                    + "<td class='text-center' onclick='showDetailAlokasiSummary("
-                    + "\"" + data[x].AlokasiSatkerSummaryId + "\""
-                    + ");'> <i class='fa fa-eye'></i> </td>"
-                    + "</tr>";
-            });
-            $("#index").val(i);
-        } else {
-            html = "<tr><td colspan='9' class='text-center'>Data Tidak Tersedia</td></tr>";
-        }
-
-        $("#summaryalokasisatker>tbody").html(html);
-    }
-
     function showDetailAlokasiSummary(id) {
-        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-        $.pjax({
-            container: '#dynamic_content',
-            type: "GET",
-            url: '@Url.Action("ImportAlokasiSummaryDetail", "Alokasi")?id=' + id + '',
-            dataType: 'html',
-            contentType: "application/json; charset=utf-8"
-        });
+
     }
 
 </script>

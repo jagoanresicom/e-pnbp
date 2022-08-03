@@ -81,7 +81,7 @@
                                     <th style="text-align:center; width:5%;">Renaksi</th>
                                 </tr>
                             </thead>
-                            <thead>
+                            @*<thead>
                                 <tr>
                                     <th class="centertaligncolumn"></th>
                                     <th class="centertaligncolumn"></th>
@@ -92,9 +92,9 @@
                                     <th style="text-align:center; width:5%;"></th>
                                     <th style="text-align:center; width:5%;"></th>
                                 </tr>
-                            </thead>
+                            </thead>*@
                             <tbody id="dataplaceholder"></tbody>
-                            <tfoot>
+                            @*<tfoot>
                                 <tr>
                                     <th class="centertaligncolumn"></th>
                                     <th class="centertaligncolumn"></th>
@@ -105,7 +105,7 @@
                                     <th style="text-align:center; width:5%;"></th>
                                     <th style="text-align:center; width:5%;"></th>
                                 </tr>
-                            </tfoot>
+                            </tfoot>*@
                         </table>
                     </div>
                     @Html.Partial("_Loading")
@@ -231,7 +231,7 @@
         $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.ajax({
             type: 'POST',
-            url: '@Url.Action("DaftarDataManfaat", "Pemanfaatan")',
+            url: '@Url.Action("DaftarDataManfaatV2", "Pemanfaatan")',
             data: $('#frmCariManfaat').serialize(),
             success: function (data, textStatus, XMLHttpRequest) {
 
@@ -250,29 +250,7 @@
         return false;
     });
 
-    function showrenaksi(id) {
-        if (id !== null && id !== '') {
-                var objurl = '@Url.Action("GetFileRenaksiSatker", "Pemanfaatan")?id=' + id;
-                objpdf = objurl;
-                var options = { "backdrop": "static", keyboard: true };
-                $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-                $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("DocViewer", "Konten")',
-                    success: function (data) {
-                        $('#myModalContent').html(data);
-                        $('#myModalDocViewer').modal(options);
-                        $('#myModalDocViewer').modal('show');
-                        $.unblockUI();
-                    },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        $.unblockUI();
-                    }
-                });
-            }
-    };
-
-    moreRowsUrl = '@Url.Action("DaftarDataManfaat", "Pemanfaatan")';
+    moreRowsUrl = '@Url.Action("DaftarDataManfaatV2", "Pemanfaatan")';
     $(window).scroll(scrollHandler);
 
 </script>

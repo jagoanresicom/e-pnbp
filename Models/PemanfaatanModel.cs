@@ -142,7 +142,7 @@ namespace Pnbp.Models
                 Oracle.ManagedDataAccess.Client.OracleParameter p0 = new Oracle.ManagedDataAccess.Client.OracleParameter("param0", username);
                 Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", rolename);
                 object[] parameters = new object[2] { p0, p1 };
-                string sql = "SELECT count(*) FROM UsersInRoles a join users b on a.username = b.username WHERE b.userid = :param0 AND a.Rolename =:param1 ";
+                string sql = "SELECT count(*) FROM simpeg.UsersInRoles a join users b on a.username = b.username WHERE b.userid = :param0 AND a.Rolename =:param1 ";
                 int hasil = ctx.Database.SqlQuery<int>(sql, parameters).FirstOrDefault();
 
                 bolvalue = hasil > 0;
@@ -247,35 +247,64 @@ namespace Pnbp.Models
             List<Entities.TotalAnggaranAlokasi> satkerAlokasi = new List<Entities.TotalAnggaranAlokasi>();
 
             ArrayList arrayListParameters = new ArrayList();
+            try {
+                using (var ctx = new PnbpContext())
+                {
+                    //string sql = @"SELECT sum(nilaianggaran) TotalNilaiAnggaran, sum(nilaialokasi) TotalNilaiAlokasi FROM (
+                    //                  select
+                    //                     r1.kantorid, r1.kode as kodekantor, r1.kodesatker, r1.nama_satker as namasatker,
+                    //                     nvl(sum(r2.nilaianggaran),0) as nilaianggaran, nvl(sum(r3.nilaialokasi),0) as nilaialokasi, case when r1.statusaktif = 1 then 'Aktif' else 'Tidak Aktif' end as statusaktif
+                    //                  from
+                    //                     satker r1
+                    //                     join manfaat r2 on
+                    //                        r1.kantorid = r2.kantorid and r2.tipe='NONOPS'
+                    //                     left join (select manfaatid, sum(nilaialokasi) as nilaialokasi from manfaatalokasi where statusedit = 0 and statusaktif = 1 group by manfaatid) r3 on
+                    //                        r2.manfaatid = r3.manfaatid
+                    //                  where
+                    //                     r2.tahun = :Tahun
+                    //                  group by
+                    //                     r1.kode, r1.kantorid, r1.kodesatker, r1.nama_satker, r1.statusaktif
+                    //               ) ";
 
-            using (var ctx = new PnbpContext())
+                    string sql = @"SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR) + SUM( NILAIALOKASI ) TotalNilaiAlokasi FROM MANFAAT WHERE TAHUN = 2021 ";
+                    //string sql = @"SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR) + SUM( NILAIALOKASI ) AS ALOKASI  FROM MANFAAT WHERE TAHUN = :Tahun ";
+                    //SELECT SUM(ANGGJAN + ANGGFEB + ANGGMAR) + SUM(NILAIALOKASI) AS ALOKASI  FROM MANFAAT WHERE TAHUN = (SELECT(to_char(SYSDATE, 'YYYY')) AS Y FROM dual
+
+                    arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+
+                    sql = sWhitespace.Replace(sql, " ");
+
+                    object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                    satkerAlokasi = ctx.Database.SqlQuery<Entities.TotalAnggaranAlokasi>(sql, parameters).ToList<Entities.TotalAnggaranAlokasi>();
+                }
+            } 
+            catch (Exception e)
             {
-                //string sql = @"SELECT sum(nilaianggaran) TotalNilaiAnggaran, sum(nilaialokasi) TotalNilaiAlokasi FROM (
-                //                  select
-                //                     r1.kantorid, r1.kode as kodekantor, r1.kodesatker, r1.nama_satker as namasatker,
-                //                     nvl(sum(r2.nilaianggaran),0) as nilaianggaran, nvl(sum(r3.nilaialokasi),0) as nilaialokasi, case when r1.statusaktif = 1 then 'Aktif' else 'Tidak Aktif' end as statusaktif
-                //                  from
-                //                     satker r1
-                //                     join manfaat r2 on
-                //                        r1.kantorid = r2.kantorid and r2.tipe='NONOPS'
-                //                     left join (select manfaatid, sum(nilaialokasi) as nilaialokasi from manfaatalokasi where statusedit = 0 and statusaktif = 1 group by manfaatid) r3 on
-                //                        r2.manfaatid = r3.manfaatid
-                //                  where
-                //                     r2.tahun = :Tahun
-                //                  group by
-                //                     r1.kode, r1.kantorid, r1.kodesatker, r1.nama_satker, r1.statusaktif
-                //               ) ";
+                _ = e.StackTrace;
+            }
 
-                string sql = @"SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR) + SUM( NILAIALOKASI ) TotalNilaiAlokasi FROM MANFAAT WHERE TAHUN = 2021 ";
-                //string sql = @"SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR) + SUM( NILAIALOKASI ) AS ALOKASI  FROM MANFAAT WHERE TAHUN = :Tahun ";
-                //SELECT SUM(ANGGJAN + ANGGFEB + ANGGMAR) + SUM(NILAIALOKASI) AS ALOKASI  FROM MANFAAT WHERE TAHUN = (SELECT(to_char(SYSDATE, 'YYYY')) AS Y FROM dual
+            return satkerAlokasi;
+        }
 
-                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+        public List<Entities.TotalAnggaranAlokasi> GetTotalAnggaranAlokasiV2(string tahun)
+        {
+            List<Entities.TotalAnggaranAlokasi> satkerAlokasi = new List<Entities.TotalAnggaranAlokasi>();
 
-                sql = sWhitespace.Replace(sql, " ");
-
-                object[] parameters = arrayListParameters.OfType<object>().ToArray();
-                satkerAlokasi = ctx.Database.SqlQuery<Entities.TotalAnggaranAlokasi>(sql, parameters).ToList<Entities.TotalAnggaranAlokasi>();
+            ArrayList arrayListParameters = new ArrayList();
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    string sql = @"SELECT SUM( NILAIALOKASI ) TotalNilaiAlokasi FROM MANFAAT WHERE TAHUN = 2021 ";
+                    arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+                    sql = sWhitespace.Replace(sql, " ");
+                    object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                    satkerAlokasi = ctx.Database.SqlQuery<Entities.TotalAnggaranAlokasi>(sql, parameters).ToList<Entities.TotalAnggaranAlokasi>();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.StackTrace;
             }
 
             return satkerAlokasi;
@@ -309,7 +338,15 @@ namespace Pnbp.Models
                 {
                     tahun = DateTime.Now.Year.ToString();
                 }
-                string sql = $@"SELECT SUM( AMOUNT ) AS TOTALPAGU FROM SPAN_BELANJA WHERE SUMBER_DANA = 'D' AND KDSATKER <> '524465' AND TAHUN = {tahun}";
+                string sql = $@"
+                SELECT 
+	                CASE 
+	                WHEN totalpagu IS NULL THEN 0
+	                ELSE totalpagu
+	                END
+                FROM (
+                    SELECT SUM( AMOUNT ) AS TOTALPAGU FROM SPAN_BELANJA WHERE SUMBER_DANA = 'D' AND KDSATKER <> '524465' AND TAHUN = {tahun}
+                )";
                 //string sql = @"SELECT SUM( ANGGJAN + ANGGFEB + ANGGMAR) + SUM( NILAIALOKASI ) AS ALOKASI  FROM MANFAAT WHERE TAHUN = :Tahun ";
                 //SELECT SUM(ANGGJAN + ANGGFEB + ANGGMAR) + SUM(NILAIALOKASI) AS ALOKASI  FROM MANFAAT WHERE TAHUN = (SELECT(to_char(SYSDATE, 'YYYY')) AS Y FROM dual
 
@@ -396,6 +433,38 @@ namespace Pnbp.Models
                                      r1.kode, r1.kantorid, r1.kodesatker, r1.nama_satker, r1.statusaktif, r4.renaksisatkerid
                                      ORDER BY r1.kodesatker ASC
                                ) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
+
+                sql = sWhitespace.Replace(sql, " ");
+
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                satkerAlokasi = ctx.Database.SqlQuery<Entities.SatkerAlokasi>(sql, parameters).ToList<Entities.SatkerAlokasi>();
+            }
+
+            return satkerAlokasi;
+        }
+
+        public List<Entities.SatkerAlokasi> GetDataManfaatV2(string tahun, string namasatker, decimal? nilaianggaran, string tipekantorid, string kantorid, int from, int to)
+        {
+            List<Entities.SatkerAlokasi> satkerAlokasi = new List<Entities.SatkerAlokasi>();
+
+            ArrayList arrayListParameters = new ArrayList();
+            using (var ctx = new PnbpContext())
+            {
+                string sql = @"
+                    SELECT * FROM ( 
+                        SELECT 
+	                        row_number() over (order by s.kodesatker asc) as RNumber, 
+	                        s.KODESATKER as Kodesatker, s.kantorid, s.NAMA_SATKER as Namasatker, ta.pagu as Nilaianggaran, ta.alokasi as JUMLAHALOKASI
+	                        FROM satker s
+	                        JOIN (
+	                         SELECT t.kdsatker, t.pagu, t.alokasi
+	                         FROM ALOKASISATKER t
+	                        ) ta ON s.KODESATKER = ta.kdsatker
+                    ) WHERE RNumber BETWEEN :startCnt AND :limitCnt
+                ";
 
                 sql = sWhitespace.Replace(sql, " ");
 
@@ -861,6 +930,52 @@ namespace Pnbp.Models
             return prioritasManfaat;
         }
 
+        public List<Entities.PrioritasAlokasi> GetManfaatSatkerV2(string kantorid, string tahun)
+        {
+            List<Entities.PrioritasAlokasi> prioritasManfaat = new List<Entities.PrioritasAlokasi>();
+            using (var ctx = new PnbpContext())
+            {
+                string currentMonth = DateTime.Now.Month.ToString();
+
+                List<object> lstparams = new List<object>();
+                string sql = @"select   r1.kode, r1.tipe, r1.manfaatid, 
+                                        to_char(r1.prioritaskegiatan) as prioritaskegiatan, 
+                                        r1.kodesatker, 
+                                        r1.namakantor as namasatker, 
+                                        r1.namaprogram, r1.nilaianggaran as nilaianggaran, 
+                                        nvl(r2.sudahalokasi,0) as teralokasi, nvl(r2.nilaialokasi,0) as alokasi,
+                                        r1.STATUSREVISI, r1.PERSETUJUAN1, r1.PERSETUJUAN2,
+                                        case when r1.statusaktif = 1 then 'Aktif' 
+                                        else 
+                                        'Tidak Aktif' end as statusaktif, 
+                                        NVL(sum(r1.NILAIALOKASI),0) AS JUMLAHALOKASI,
+                                        NVL(sum(r1.NILAIALOKASI),0) AS NILAIALOKASI
+                                from manfaat r1
+                                LEFT JOIN (SELECT MANFAATID, SUM(CASE WHEN STATUSEDIT = 0 THEN NILAIALOKASI ELSE NULL END) AS SUDAHALOKASI,
+                                SUM(CASE WHEN STATUSEDIT = 1 THEN NILAIALOKASI ELSE NULL END) AS NILAIALOKASI FROM MANFAATALOKASI WHERE STATUSAKTIF = 1 GROUP BY MANFAATID) r2 on
+                                    r1.manfaatid = r2.manfaatid
+                               where
+                                    r1.tahun = :tahunanggaran
+                                    and r1.kantorid = :kdsatker ";
+
+                sql += @"group by r1.manfaatid, r1.kode, r1.tipe, r1.prioritaskegiatan, r1.kodesatker, r1.namakantor, r1.namaprogram, r1.nilaianggaran, sudahalokasi, r2.nilaialokasi, r1.STATUSREVISI, r1.PERSETUJUAN1, r1.PERSETUJUAN2, r1.statusaktif
+                       ORDER BY R1.KODE ASC ";
+
+                //sql += @"ORDER BY R1.KODE ASC";
+
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahunanggaran", tahun));
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kdsatker", kantorid));
+                //sql = sWhitespace.Replace(String.Format(sql, ConfigurationManager.AppSettings["TahunAnggaran"].ToString()), " ");
+                sql = sWhitespace.Replace(sql, " ");
+
+                var parameters = lstparams.ToArray();
+
+                prioritasManfaat = ctx.Database.SqlQuery<Entities.PrioritasAlokasi>(sql, parameters).ToList<Entities.PrioritasAlokasi>();
+            }
+
+            return prioritasManfaat;
+        }
+
         public Entities.PrioritasAlokasi GetPrioritasSatker(string pManfaatId, string tahun)
         {
             if (string.IsNullOrEmpty(tahun))
@@ -896,9 +1011,9 @@ namespace Pnbp.Models
                                r1.manfaatid = r2.manfaatid
                       where
                           r1.tahun = ({0})
-                          and r1.tipe = 'NONOPS'
                           and r1.manfaatid = :manfaatid";
 
+                //and r1.tipe = 'NONOPS'
                 sql += @"
                             GROUP BY
                             r1.manfaatid,
@@ -1060,6 +1175,107 @@ namespace Pnbp.Models
 	               //     r2.sudahalokasi,
 	               //     r2.nilaialokasi,
 	               //     r1.statusaktif"; 
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("manfaatid", pManfaatId));
+                //sql = sWhitespace.Replace(String.Format(sql, ConfigurationManager.AppSettings["TahunAnggaran"].ToString()), " ");
+                sql = sWhitespace.Replace(String.Format(sql, tahun), " ");
+                var parameters = lstparams.ToArray();
+
+                satkerAlokasi = ctx.Database.SqlQuery<Entities.PrioritasAlokasi>(sql, parameters).FirstOrDefault();
+            }
+
+            return satkerAlokasi;
+        }
+
+        public Entities.PrioritasAlokasi GetPrioritasSatkerV2(string pManfaatId, string tahun)
+        {
+            if (string.IsNullOrEmpty(tahun))
+            {
+                tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            }
+
+            Entities.PrioritasAlokasi satkerAlokasi = new Entities.PrioritasAlokasi();
+            using (var ctx = new PnbpContext())
+            {
+                string currentMonth = DateTime.Now.Month.ToString();
+                List<object> lstparams = new List<object>();
+
+                string sql =
+                    @"select 
+                          r1.manfaatid, to_char(r1.prioritaskegiatan) as prioritaskegiatan, r1.kodesatker, 
+                          r1.KantorId, r1.namakantor as namasatker, r1.namaprogram, r1.nilaianggaran as nilaianggaran, 
+                          r1.ANGGJAN, r1.ANGGFEB, r1.ANGGMAR, r1.ANGGAPR, r1.ANGGMEI, r1.ANGGJUN, 
+                          r1.ANGGJUL, r1.ANGGAGT, r1.ANGGSEP, r1.ANGGOKT, r1.ANGGNOV, r1.ANGGDES,
+                          r1.RANKJAN, r1.RANKFEB, r1.RANKMAR, r1.RANKAPR, r1.RANKMEI, r1.RANKJUN, 
+                          r1.RANKJUL, r1.RANKAGT, r1.RANKSEP, r1.RANKOKT, r1.RANKNOV, r1.RANKDES,
+                          r1.ALOKJAN, r1.ALOKFEB, r1.ALOKMAR, r1.ALOKAPR, r1.ALOKMEI, r1.ALOKJUN, 
+                          r1.ALOKJUL, r1.ALOKAGT, r1.ALOKSEP, r1.ALOKOKT, r1.ALOKNOV, r1.ALOKDES,
+                          r1.STATUSREVISI, r1.PERSETUJUAN1, r1.PERSETUJUAN2,
+                          nvl(r2.sudahalokasi,0) as teralokasi, nvl(r2.nilaialokasi,0) as alokasi,
+                          case when r1.statusaktif = 1 then 'Aktif' else 'Tidak Aktif' end as statusaktif,
+                          sum(ANGGJAN + ANGGFEB) AS JUMLAHALOKASI
+                      from manfaat r1
+	                       LEFT JOIN (
+                               SELECT MANFAATID, SUM(CASE WHEN STATUSEDIT = 0 THEN NILAIALOKASI ELSE NULL END) AS SUDAHALOKASI,
+                                      SUM(CASE WHEN STATUSEDIT = 1 THEN NILAIALOKASI ELSE NULL END) AS NILAIALOKASI 
+                               FROM MANFAATALOKASI WHERE STATUSAKTIF = 1 GROUP BY MANFAATID) r2 on
+                               r1.manfaatid = r2.manfaatid
+                      where
+                          r1.tahun = ({0})
+                          and r1.tipe = 'NONOPS'
+                          and r1.manfaatid = :manfaatid";
+
+                sql += @"
+                            GROUP BY
+                            r1.manfaatid,
+	                        r1.prioritaskegiatan,
+	                        r1.kodesatker,
+	                        r1.KantorId,
+	                        r1.namakantor,
+	                        r1.namaprogram,
+	                        r1.nilaianggaran,
+	                        r1.ANGGJAN,
+	                        r1.ANGGFEB,
+	                        r1.ANGGMAR,
+	                        r1.ANGGAPR,
+	                        r1.ANGGMEI,
+	                        r1.ANGGJUN,
+	                        r1.ANGGJUL,
+	                        r1.ANGGAGT,
+	                        r1.ANGGSEP,
+	                        r1.ANGGOKT,
+	                        r1.ANGGNOV,
+	                        r1.ANGGDES,
+	                        r1.RANKJAN,
+	                        r1.RANKFEB,
+	                        r1.RANKMAR,
+	                        r1.RANKAPR,
+	                        r1.RANKMEI,
+	                        r1.RANKJUN,
+	                        r1.RANKJUL,
+	                        r1.RANKAGT,
+	                        r1.RANKSEP,
+	                        r1.RANKOKT,
+	                        r1.RANKNOV,
+	                        r1.RANKDES,
+	                        r1.ALOKJAN,
+	                        r1.ALOKFEB,
+	                        r1.ALOKMAR,
+	                        r1.ALOKAPR,
+	                        r1.ALOKMEI,
+	                        r1.ALOKJUN,
+	                        r1.ALOKJUL,
+	                        r1.ALOKAGT,
+	                        r1.ALOKSEP,
+	                        r1.ALOKOKT,
+	                        r1.ALOKNOV,
+	                        r1.ALOKDES,
+	                        r1.STATUSREVISI,
+	                        r1.PERSETUJUAN1,
+	                        r1.PERSETUJUAN2,
+	                        r2.sudahalokasi,
+	                        r2.nilaialokasi,
+	                        r1.statusaktif
+                        ";
                 lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("manfaatid", pManfaatId));
                 //sql = sWhitespace.Replace(String.Format(sql, ConfigurationManager.AppSettings["TahunAnggaran"].ToString()), " ");
                 sql = sWhitespace.Replace(String.Format(sql, tahun), " ");

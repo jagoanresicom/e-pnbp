@@ -182,6 +182,8 @@
     <Compile Include="Controllers\BerandaPenerimaanController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\KodeSpanController.cs" />
+    <Compile Include="Controllers\ProgramController.cs" />
     <Compile Include="Controllers\SatkernomenklaturController.cs" />
     <Compile Include="Controllers\KontenController.cs" />
     <Compile Include="Controllers\MonitoringEvaluasiController.cs" />
@@ -192,6 +194,7 @@
     <Compile Include="Controllers\PenerimaanController.cs" />
     <Compile Include="Controllers\PengembalianController.cs" />
     <Compile Include="Controllers\TargetController.cs" />
+    <Compile Include="Controllers\TipeManfaatController.cs" />
     <Compile Include="DomainModel\PnbpContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -199,8 +202,12 @@
     <Compile Include="Models\BerandaPenerimaanModel.cs" />
     <Compile Include="Models\Entities\ApiEntity.cs" />
     <Compile Include="Models\Entities\AuditTrailEntity.cs" />
+    <Compile Include="Models\Entities\KodeSpan.cs" />
+    <Compile Include="Models\Entities\Programs.cs" />
     <Compile Include="Models\Entities\Satkernomenklatur.cs" />
     <Compile Include="Models\Entities\TargetEntity.cs" />
+    <Compile Include="Models\Entities\TipeManfaat.cs" />
+    <Compile Include="Models\KodeSpanModel.cs" />
     <Compile Include="Models\KontentModel.cs" />
     <Compile Include="Models\MonitoringEvaluasiModel.cs" />
     <Compile Include="Models\OtorisasiUser.cs" />
@@ -221,6 +228,8 @@
     <Compile Include="Models\PenerimaanModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PengembalianModel.cs" />
+    <Compile Include="Models\ProgramModel.cs" />
+    <Compile Include="Models\TipeManfaatModel .cs" />
     <Compile Include="OracleMembershipProvider.cs" />
     <Compile Include="OracleRoleProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -3101,6 +3110,18 @@
     <Content Include="Views\Penerimaan\RealisasiPenerimaanPerbandingan.cshtml" />
     <Content Include="Views\Penerimaan\RealisasiPenerimaanPerbandinganSatker.cshtml" />
     <Content Include="Views\MonitoringEvaluasi\Alokasi.cshtml" />
+    <Content Include="Views\Alokasi\ImportAlokasi.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\KodeSpan\Detail.cshtml" />
+    <Content Include="Views\KodeSpan\Index.cshtml" />
+    <Content Include="Views\Program\Create.cshtml" />
+    <Content Include="Views\Program\Edit.cshtml" />
+    <Content Include="Views\Program\Index.cshtml" />
+    <Content Include="Views\Pemanfaatan\ListDataManfaatV2.cshtml" />
+    <Content Include="Views\Pemanfaatan\DaftarManfaatV2.cshtml" />
+    <Content Include="Views\Pemanfaatan\DataManfaatDetailV2.cshtml" />
+    <Content Include="Views\Pemanfaatan\EditDataManfaatV2.cshtml" />
+    <Content Include="Views\Alokasi\ImportAlokasiSummaryDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -3126,7 +3147,7 @@
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\ListKantor.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_Layout_old.cshtml" />
     <Content Include="Views\Shared\_Loading.cshtml" />
     <Content Include="Views\_Viewstart.cshtml" />
   </ItemGroup>
