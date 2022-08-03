@@ -366,8 +366,8 @@
 
     function writeDataTable(res) {
         var html = "";
-        if (res.data != null && res.data != undefined && res.data.length > 0) {
-            var data = res.data;
+        if (res.data.Data != null && res.data.Data != undefined && res.data.Data.length > 0) {
+            var data = res.data.Data;
             var i = 0;
 
             var tr = document.getElementById('alokasisatker').tHead.children[0];

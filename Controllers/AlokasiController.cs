@@ -1502,12 +1502,12 @@ namespace Pnbp.Controllers
 	                    s.NAMA_SATKER as namasatker, 
 	                    sb.KDSATKER as kodesatker, sb.kegiatan as kegiatan, sb.OUTPUT as output, sum(sb.amount) as amount
 	                from span_belanja sb
-	                left JOIN satker s ON sb.KDSATKER = s.KODESATKER 
+	                left JOIN satker s ON sb.KDSATKER = s.KODESATKER and s.statusaktif = 1 
 	                LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
 	                LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
 	                WHERE
 	                    sb.KDSATKER = '022209' AND
-	                    sb.KDSATKER != '524465' 
+	                    sb.KDSATKER != '524465'  AND sb.SUMBER_DANA = 'D'
 	                GROUP BY
 	                    s.KANTORID, 
 	                    k.tipe,
@@ -1784,6 +1784,7 @@ namespace Pnbp.Controllers
         public ActionResult GetAlokasiBySummaryId(string id)
         {
             List<AlokasiSatker> result = new List<AlokasiSatker>();
+            AlokasiSatkerDetail response = new AlokasiSatkerDetail();
             var db = new PnbpContext();
             try
             {
@@ -1797,7 +1798,7 @@ namespace Pnbp.Controllers
                         TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH 
                     FROM ALOKASISATKER a 
-                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER 
+                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER and s.statusaktif = 1 
                     WHERE ALOKASISATKERSUMMARYID = '{id}'";
                 result = db.Database.SqlQuery<AlokasiSatker>(query).ToList();
 
@@ -1824,7 +1825,7 @@ namespace Pnbp.Controllers
                         to_char(ta.PAGU) AS pagu, 
                         to_char(ta.alokasi) AS alokasi 
                     FROM TEMP_ALOKASI_REVISI ta
-                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER 
+                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
                     WHERE ta.KDSATKER != '524465'
                 ";
                 var listTempRevisi = db.Database.SqlQuery<TempAlokasi>(queryTempRevisi).ToList();
@@ -1834,6 +1835,46 @@ namespace Pnbp.Controllers
                     bool addRevisi = listRevisi.Count > 0;
                     bool addTemp = listTempRevisi.Count > 0;
                     int index = 0;
+
+                    var totalRevisi = listRevisi
+                        .GroupBy(y => y.Revisi)
+                        .Select(cl => new AlokasiSatkerRevisi {
+                            Alokasi = cl.Sum(y => y.Alokasi),
+                            Revisi = cl.Select(y => y.Revisi).FirstOrDefault()
+                        }).ToList();
+
+                    if (totalRevisi == null)
+                    {
+                        totalRevisi = new List<AlokasiSatkerRevisi>();
+                    }
+
+                    if (result != null && result.Count > 0)
+                    {
+                        var totalAlokasiSaatIni = result.Sum(y => y.Alokasi);
+                        var alokasiSaatIni = new AlokasiSatkerRevisi
+                        {
+                            Revisi = (totalRevisi.Count + 1),
+                            Alokasi = totalAlokasiSaatIni
+                        };
+                        totalRevisi.Add(alokasiSaatIni);
+                    }
+
+                    if (listTempRevisi != null && listTempRevisi.Count > 0)
+                    {
+                        var ltr = listTempRevisi
+                        .Sum(y => Decimal.Parse(y.Alokasi));
+
+                        var tempRevisi = new AlokasiSatkerRevisi
+                        {
+                            Revisi = (totalRevisi.Count + 1),
+                            Alokasi = ltr
+                        };
+
+                        totalRevisi.Add(tempRevisi);
+                    }
+
+                    response.Total = totalRevisi;
+
                     foreach (var item in result)
                     {
                         decimal beforeValue = item.Alokasi;
@@ -1842,7 +1883,7 @@ namespace Pnbp.Controllers
                             var data = new List<AlokasiSatkerRevisi>();
                             var lRevisi = listRevisi.FindAll(x => x.KodeSatker == item.KodeSatker).ToList();
                             
-                            var lastRevisi = listRevisi.OrderByDescending(x => x.Revisi).FirstOrDefault();
+                            var lastRevisi = lRevisi.OrderByDescending(x => x.Revisi).FirstOrDefault();
                             if (lastRevisi != null)
                             {
                                 beforeValue = lastRevisi.Alokasi;
@@ -1875,13 +1916,29 @@ namespace Pnbp.Controllers
                         index++;
                     }
                 }
+                else
+                {
+                    if (result != null && result.Count > 0)
+                    {
+                        var totalAlokasiSaatIni = result.Sum(y => y.Alokasi);
+                        var alokasiSaatIni = new AlokasiSatkerRevisi
+                        {
+                            Revisi = 1,
+                            Alokasi = totalAlokasiSaatIni
+                        };
+                        response.Total = new List<AlokasiSatkerRevisi>() {
+                            alokasiSaatIni
+                        };
+                    }
+                }
             }
             catch(Exception e)
             {
                 _ = e.StackTrace;
             }
-            
-            return Json(new { success = true, data = result.OrderBy(x => x.KodeSatker).OrderByDescending(x => x.IsNilaiBaru) }, JsonRequestBehavior.AllowGet);
+
+            response.Data = result.OrderBy(x => x.KodeSatker).OrderByDescending(x => x.IsNilaiBaru).ToList();
+            return Json(new { success = true, data = response}, JsonRequestBehavior.AllowGet);
         }
 
         public FileContentResult DownloadTemplateAlokasi()
@@ -1922,7 +1979,7 @@ namespace Pnbp.Controllers
 	                sb.KDSATKER  AS kodesatker, 
 	                TO_CHAR(sb.AMOUNT) AS amount
                 FROM sb
-                LEFT JOIN satker s ON sb.kdsatker = s.KODESATKER 
+                LEFT JOIN satker s ON sb.kdsatker = s.KODESATKER and s.statusaktif = 1 
                 WHERE 
 	                sb.KDSATKER != '524465' AND sb.kdsatker IS NOT NULL 
                 GROUP BY sb.KDSATKER, sb.AMOUNT 
@@ -2048,7 +2105,7 @@ namespace Pnbp.Controllers
                     to_char(ta.PAGU) AS pagu, 
                     to_char(ta.alokasi) AS alokasi 
                 FROM {tableName} ta
-                LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER 
+                LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
                 WHERE ta.KDSATKER != '524465'
                 ";
 
@@ -2090,9 +2147,16 @@ namespace Pnbp.Controllers
             public string TanggalUbah { get; set; }
             public decimal Revisi { get; set; }
             public List<AlokasiSatkerRevisi> DaftarRevisi { get; set; }
+            public List<AlokasiSatkerRevisi> DaftarTotalRevisiAlokasi { get; set; }
             public string TempAlokasi { get; set; }
             public bool IsNilaiBaru { get; set; }
             
+        }
+
+        class AlokasiSatkerDetail
+        {
+            public List<AlokasiSatker> Data { get; set; }
+            public List<AlokasiSatkerRevisi> Total { get; set; }
         }
 
         class AlokasiSatkerRevisi
