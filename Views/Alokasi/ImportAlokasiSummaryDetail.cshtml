@@ -273,6 +273,7 @@
     });
 
     function resetAlokasi() {
+		$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.ajax({
             type: "GET",
             url: '@Url.Action("ResetAlokasiRevisi", "Alokasi")',
@@ -300,10 +301,8 @@
                 $('#btn-alokasi').prop('disabled', res.success);
                 $('#btn-reset-alokasi').prop('disabled', res.success);
 
-                 $.unblockUI();
-                },
+            },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
-                $.unblockUI();
 				swal({
 					type: "error",
 					html: true,
@@ -312,27 +311,55 @@
 					allowOutsideClick: true,
 					allowEscapeKey: true,
 				});
-            }
+            },
+			complete: function () {
+				$.unblockUI();
+			}
         });
     }
 
     function prosesAlokasi() {
+		$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.ajax({
             type: "POST",
             url: '@Url.Action("ProsesRevisiAlokasi", "Alokasi")',
             success: function (res) {
                 if (res.success) {
                     //writeDataTable(res);
-                    location.reload();
+					swal({
+						title: "Berhasil",
+						text: "Data Berhasil Disimpan",
+						type: "success",
+                    }, function () {
+                        location.reload();
+                    });
+                } else {
+					swal({
+						type: "error",
+						html: true,
+						title: "Gagal Menyimpan Data",
+						confirmButtonColor: "#4CAF50",
+						allowOutsideClick: true,
+						allowEscapeKey: true,
+					});
                 }
 
                 $('#btn-alokasi').prop('disabled', res.success);
                 $('#btn-reset-alokasi').prop('disabled', res.success);
 
-                 $.unblockUI();
-                },
+            },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
-                $.unblockUI();
+				swal({
+					type: "error",
+					html: true,
+					title: "Terjadi kesalahan",
+					confirmButtonColor: "#4CAF50",
+					allowOutsideClick: true,
+					allowEscapeKey: true,
+				});
+            },
+            complete: function () {
+				$.unblockUI();
             }
         });
     }

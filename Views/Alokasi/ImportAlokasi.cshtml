@@ -315,6 +315,8 @@
     });
 
     function resetAlokasi() {
+		$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
         $.ajax({
             type: "GET",
             url: '@Url.Action("ResetAlokasi", "Alokasi")',
@@ -342,8 +344,7 @@
                 $('#btn-alokasi').prop('disabled', res.success);
                 $('#btn-reset-alokasi').prop('disabled', res.success);
 
-                 $.unblockUI();
-                },
+            },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 $.unblockUI();
 				swal({
@@ -354,26 +355,56 @@
 					allowOutsideClick: true,
 					allowEscapeKey: true,
 				});
+            },
+            complete: function () {
+				$.unblockUI();
             }
         });
     }
 
     function prosesAlokasi() {
+		$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
         $.ajax({
             type: "POST",
             url: '@Url.Action("ProsesAlokasi", "Alokasi")',
             success: function (res) {
                 if (res.success) {
+					swal({
+						title: "Berhasil",
+						text: "Data Berhasil Disimpan",
+						type: "success",
+                    }, function () {
+                        window.location.reload();
+                    });
                     writeDataTable(res);
+                } else {
+					swal({
+						type: "error",
+						html: true,
+						title: "Gagal Menyimpan Data",
+						confirmButtonColor: "#4CAF50",
+						allowOutsideClick: true,
+						allowEscapeKey: true,
+					});
                 }
 
                 $('#btn-alokasi').prop('disabled', res.success);
                 $('#btn-reset-alokasi').prop('disabled', res.success);
 
-                 $.unblockUI();
                 },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
-                $.unblockUI();
+				swal({
+					type: "error",
+					html: true,
+					title: "Terjadi kesalahan",
+					confirmButtonColor: "#4CAF50",
+					allowOutsideClick: true,
+					allowEscapeKey: true,
+				});
+            },
+            complete: function () {
+				$.unblockUI();
             }
         });
     }
