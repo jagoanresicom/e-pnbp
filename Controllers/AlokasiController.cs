@@ -1368,7 +1368,8 @@ namespace Pnbp.Controllers
 
                 if (isSuccess)
                 {
-                    return AlokasiSaatIni();
+                    bool isRevisi = true;
+                    return AlokasiSaatIni(isRevisi);
                 }
             }
             else
@@ -2031,21 +2032,22 @@ namespace Pnbp.Controllers
             return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult AlokasiSaatIni()
+        public ActionResult AlokasiSaatIni(bool isRevisi = false)
         {
             PnbpContext db = new PnbpContext();
             List<TempAlokasi> result = new List<TempAlokasi>();
+            string tableName = isRevisi ? "temp_alokasi_revisi" : "TEMP_ALOKASI";
 
             try
             {
-                string query = @"
+                string query = $@"
                 SELECT 
                     (row_number() OVER (ORDER BY s.KODESATKER)) no,
                     s.KODESATKER AS kodesatker, 
                     s.NAMA_SATKER AS NamaSatker, 
                     to_char(ta.PAGU) AS pagu, 
                     to_char(ta.alokasi) AS alokasi 
-                FROM TEMP_ALOKASI ta
+                FROM {tableName} ta
                 LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER 
                 WHERE ta.KDSATKER != '524465'
                 ";
