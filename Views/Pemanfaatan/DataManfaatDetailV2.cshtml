@@ -10,6 +10,9 @@
     .editors {
         display: none;
     }
+    #listmanfaatholder td.disabled {
+		opacity: 0.6;
+	}
 </style>
 
 <div class="" id="dynamic_content">
@@ -18,9 +21,16 @@
         <div class="x_title">
             <h2> @Model.NamaSatKer</h2>
             <div class="title_right">
-                <div class="pull-right">
-                    <button id="save-btn" type="button" class="btn btn-success">Simpan</button>
-                </div>
+				<div class="pull-right">
+					@if (ViewBag.IsAksesEdit == "Y" && ViewBag.IsAksesSimpan == "Y")
+					{
+						<button id="save-btn" type="button" class="btn btn-success">Simpan</button>
+					}
+					else
+					{
+						<button type="button" class="btn btn-success" disabled>Simpan</button>
+					}
+				</div>
             </div>
             <div class="clearfix"></div>
         </div>
@@ -73,9 +83,18 @@
                                         <td>@item.Tipe</td>
                                         <td class="numeric">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
                                         <td class="numeric">@item.JUMLAHALOKASI.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                                        <td style="text-align:center;cursor: pointer;" onclick="editDataManfaat('@item.Manfaatid');">
-                                            <i class="fa fa-pencil"></i>
-                                        </td>
+                                        @if (ViewBag.IsAksesEdit == "Y")
+                                        {
+									        <td style="text-align:center;cursor: pointer;" onclick="editDataManfaat('@item.Manfaatid');">
+										        <i class="fa fa-pencil"></i>
+									        </td>
+										}
+										else
+										{ 
+                                            <td style="text-align:center;cursor: not-allowed;" class="disabled">
+                                                <i class="fa fa-pencil"></i>
+                                            </td>
+                                        }
                                     </tr>
                                 }
 
