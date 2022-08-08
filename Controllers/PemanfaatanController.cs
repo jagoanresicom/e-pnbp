@@ -912,6 +912,8 @@ namespace Pnbp.Controllers
             ViewBag.TotalAnggaran = $"Rp. {totalAnggaran}";
             ViewBag.TotalAlokasi = $"Rp. {totalAlokasi}";
 
+            _lsSatkerALokasi.NilaianggaranView = "Rp. " + _lsSatkerALokasi.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+
             //return View(_lsSatkerALokasi);
             return PartialView("EditDataManfaatV2", _lsSatkerALokasi);
         }

@@ -117,13 +117,15 @@
 						<div class="form-group">
 							<label class="control-label col-md-4 col-sm-4 col-xs-12">Nilai Anggaran</label>
 							<div class="col-md-8 col-sm-8 col-xs-12">
-								@Html.TextBoxFor(model => model.Nilaianggaran, new { @class = "form-control", @id = "txtanggaran", @readonly = "readonly" })
+								@Html.TextBoxFor(model => model.NilaianggaranView, new { @class = "form-control", @readonly = "readonly" })
+								@Html.HiddenFor(model => model.Nilaianggaran, new { @id = "txtanggaran" })
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-md-4 col-sm-4 col-xs-12">Total Alokasi</label>
 							<div class="col-md-8 col-sm-8 col-xs-12">
-								@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
+								@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @Name="jumlahAlokasiView", @class = "form-control", @id = "txtalokasi" })
+								@Html.HiddenFor(model => model.JUMLAHALOKASI, new { @id = "txtvaluealokasi" })
 								@*@if (Model.Mode == "Tambah Data Manfaat")
 						        {
 							        @Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
@@ -388,6 +390,32 @@
         return false;
 
     });
+
+	/* Dengan Rupiah */
+	var dengan_rupiah = document.getElementById('txtalokasi');
+	dengan_rupiah.addEventListener('keyup', function (e) {
+      dengan_rupiah.value = formatRupiah(this.value, 'Rp. ');
+        
+	});
+
+	/* Fungsi */
+	function formatRupiah(angka, prefix) {
+		var number_string = angka.replace(/[^,\d]/g, '').toString(),
+			split = number_string.split(','),
+			sisa = split[0].length % 3,
+			rupiah = split[0].substr(0, sisa),
+			ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+		$('#txtvaluealokasi').val(number_string);
+
+		if (ribuan) {
+			separator = sisa ? '.' : '';
+			rupiah += separator + ribuan.join('.');
+		}
+
+		rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+		return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+	}
 
     ////format masking input a
     //webshims.setOptions('forms-ext', {

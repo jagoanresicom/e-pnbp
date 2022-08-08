@@ -112,6 +112,7 @@ namespace Pnbp.Entities
         public string Namasatker { get; set; }
         public string Namaprogram { get; set; }
         public decimal Nilaianggaran { get; set; }
+        public string NilaianggaranView { get; set; }
         public decimal NilaiAlokasi { get; set; }
         public decimal Teralokasi { get; set; }
         public decimal Alokasi { get; set; }
