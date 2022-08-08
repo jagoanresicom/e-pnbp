@@ -712,6 +712,10 @@ namespace Pnbp.Controllers
             _data.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             _data.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
 
+            decimal totalAnggaran = _data.dataPrioritas.Sum(a => a.Alokasi);
+            ViewBag.IsAksesEdit = _manfaatanModel.GetAksesEditPagu();
+            ViewBag.IsAksesSimpan = (_data.TotalAlokasi - _data.TotalTerAlokasi > 0 ? "Y" : "N");
+
             return PartialView("DataManfaatDetailV2", _data);
         }
 
@@ -904,8 +908,12 @@ namespace Pnbp.Controllers
             string sisaAlokasi = "0";
             string totalAnggaran = dataPrioritas.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
             string totalAlokasi = dataPrioritas.Sum(a => a.JUMLAHALOKASI + a.TOTALALOKASI).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+            decimal totalTerAlokasi = dataPrioritas.Select(x => x.JUMLAHALOKASI).Sum();
+
             if (dataPrioritas.Count > 0) {
-                sisaAlokasi = (dataPrioritas.Sum(a => a.Nilaianggaran) - dataPrioritas.Sum(a => a.JUMLAHALOKASI)).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                //sisaAlokasi = (dataPrioritas.Sum(a => a.Nilaianggaran) - dataPrioritas.Sum(a => a.JUMLAHALOKASI)).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                decimal totalAlokasiSatker = _manfaatanModel.GetTotalAlokasiSatkerV2(kantorId);
+                sisaAlokasi = (totalAlokasiSatker - totalTerAlokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
             }
 
             ViewBag.SisaAlokasi = $"Rp. {sisaAlokasi}";
