@@ -196,9 +196,9 @@
                 contentType: false,
                 success: function (res) {
 
-                    if (!res.success || res.data.length == 0) {
-                        $('#btn-alokasi').prop('disabled', true);
-                        $('#btn-reset-alokasi').prop('disabled', true);
+                    var disable = false;
+                    if (!res.success || res.data.data.length == 0) {
+                        disable = true;
 						swal({
 							type: "error",
 							html: true,
@@ -208,8 +208,12 @@
 							allowEscapeKey: true,
 						});
                     } else {
-                        $('#btn-alokasi').prop('disabled', false);
-                        $('#btn-reset-alokasi').prop('disabled', false);
+                        if (res.success && res.data.valid) {
+                            disable = false;
+                        } else {
+                            disable = true;
+                        }
+
 						swal({
 							title: "Berhasil",
 							text: "Data Berhasil Dimuat",
@@ -218,6 +222,9 @@
 							allowEscapeKey: true,
 						});
                     }
+
+                    $('#btn-alokasi').prop('disabled', disable);
+                    $('#btn-reset-alokasi').prop('disabled', disable);
 
                     writeDataTable(res);
                     $.unblockUI();
@@ -256,13 +263,19 @@
             type: "GET",
             url: '@Url.Action("AlokasiSaatIni", "Alokasi")',
             success: function (res) {
-                if (!res.success || res.data.length == 0) {
-                    $('#btn-alokasi').prop('disabled', true);
-                    $('#btn-reset-alokasi').prop('disabled', true);
+                var disable = false;
+                if (!res.success || res.data.data.length == 0) {
+                    disable = true;
                 } else {
-                    $('#btn-alokasi').prop('disabled', false);
-                    $('#btn-reset-alokasi').prop('disabled', false);
+                    if (res.success && res.data.valid) {
+                        disable = false;
+                    } else {
+                        disable = true;
+                    }
                 }
+
+                $('#btn-alokasi').prop('disabled', disable);
+                $('#btn-reset-alokasi').prop('disabled', disable);
 
                 writeDataTable(res);
                 $.unblockUI();
@@ -329,7 +342,8 @@
                         allowOutsideClick: true,
                         allowEscapeKey: true,
                     });
-                    writeDataTable(res);
+                    //writeDataTable(res);
+                    getAlokasi();
                 } else {
 					swal({
 						type: "error",
@@ -411,8 +425,8 @@
 
     function writeDataTable(res) {
         var html = "";
-        if (res.data != null && res.data != undefined && res.data.length > 0) {
-            var data = res.data;
+        if (res.data.data != null && res.data.data != undefined && res.data.data.length > 0) {
+            var data = res.data.data;
             var i = 0;
             $.each(data, function (x) {
                 i = x + 1;
@@ -422,9 +436,10 @@
                     + "<td class='text-left'>" + data[x].KodeSatker + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
                     + "<td class='text-left'>" + data[x].NamaSatker + " <input type='hidden' id='namasatker' name='namasatker' value='" + data[x].namakantor + "'></td>"
                     + "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
-                    + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
+                    + "<td class='text-right' "
+                    + (data[x].Valid == 0 ? "style='color:red; font-weight: bold;'" : "")
+                    + ">" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
                     + "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-                    //+ "<td class='text-right'><input type='hidden' id='check_" + [x] + "' name='check[]' class='check' value='false'/> </td>"
                     + "</tr>";
             });
             $("#index").val(i);
@@ -448,7 +463,6 @@
                     + "<td class='text-left'>MP " + data[x].Mp + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
                     + "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
                     + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-                    //+ "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
                     + "<td class='text-center' onclick='showDetailAlokasiSummary("
                     + "\"" + data[x].AlokasiSatkerSummaryId + "\""
                     + ");'> <i class='fa fa-eye'></i> </td>"

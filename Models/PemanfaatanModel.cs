@@ -295,11 +295,50 @@ namespace Pnbp.Models
             {
                 using (var ctx = new PnbpContext())
                 {
-                    string sql = @"SELECT SUM( NILAIALOKASI ) TotalNilaiAlokasi FROM MANFAAT WHERE TAHUN = 2021 ";
+                    string sql = @"SELECT SUM( NILAIALOKASI ) TotalNilaiAlokasi FROM MANFAAT WHERE TAHUN = :Tahun ";
                     arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
                     sql = sWhitespace.Replace(sql, " ");
                     object[] parameters = arrayListParameters.OfType<object>().ToArray();
                     satkerAlokasi = ctx.Database.SqlQuery<Entities.TotalAnggaranAlokasi>(sql, parameters).ToList<Entities.TotalAnggaranAlokasi>();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.StackTrace;
+            }
+
+            return satkerAlokasi;
+        }
+
+        public decimal GetTotalAlokasiSatkerV2(string kantoriid)
+        {
+            decimal satkerAlokasi = 0;
+
+            ArrayList arrayListParameters = new ArrayList();
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    string sql = @"SELECT alokasi FROM alokasisatker b 
+                                JOIN SATKER s ON b.KDSATKER = s.KODESATKER 
+                                WHERE ALOKASISATKERSUMMARYID  = (
+	                                SELECT ALOKASISATKERSUMMARYID  
+	                                FROM alokasisatkersummary a
+	                                JOIN (
+		                                SELECT * FROM (
+			                                SELECT max(mp) mp, max(revisi) revisi 
+			                                FROM ALOKASISATKERSUMMARY a
+			                                WHERE tahun = EXTRACT(YEAR FROM sysdate)
+			                                GROUP BY mp
+			                                ORDER BY mp desc, revisi desc
+		                                ) WHERE rownum = 1
+	                                ) b ON a.mp = b.mp AND a.revisi = b.revisi
+	                                WHERE a.tahun = EXTRACT(YEAR FROM sysdate)
+                                ) AND s.KANTORID  = :kantoriid";
+                    arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantoriid", kantoriid));
+                    //sql = sWhitespace.Replace(sql, " ");
+                    object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                    satkerAlokasi = ctx.Database.SqlQuery<decimal>(sql, parameters).FirstOrDefault();
                 }
             }
             catch (Exception e)
@@ -453,16 +492,44 @@ namespace Pnbp.Models
             ArrayList arrayListParameters = new ArrayList();
             using (var ctx = new PnbpContext())
             {
+                //string sql = @"
+                //    SELECT * FROM ( 
+                //        SELECT 
+                //         row_number() over (order by s.kodesatker asc) as RNumber, 
+                //         s.KODESATKER as Kodesatker, s.kantorid, s.NAMA_SATKER as Namasatker, ta.pagu as Nilaianggaran, ta.alokasi as JUMLAHALOKASI
+                //         FROM satker s
+                //         JOIN (
+                //          SELECT t.kdsatker, t.pagu, t.alokasi
+                //          FROM ALOKASISATKER t
+                //         ) ta ON s.KODESATKER = ta.kdsatker
+                //    ) WHERE RNumber BETWEEN :startCnt AND :limitCnt
+                //";
+
                 string sql = @"
                     SELECT * FROM ( 
                         SELECT 
-	                        row_number() over (order by s.kodesatker asc) as RNumber, 
-	                        s.KODESATKER as Kodesatker, s.kantorid, s.NAMA_SATKER as Namasatker, ta.pagu as Nilaianggaran, ta.alokasi as JUMLAHALOKASI
-	                        FROM satker s
-	                        JOIN (
-	                         SELECT t.kdsatker, t.pagu, t.alokasi
-	                         FROM ALOKASISATKER t
-	                        ) ta ON s.KODESATKER = ta.kdsatker
+                            row_number() over (order by s.kodesatker asc) as RNumber, 
+                            s.KODESATKER as Kodesatker, s.kantorid, s.NAMA_SATKER as Namasatker, ta.pagu as Nilaianggaran, ta.alokasi as JUMLAHALOKASI
+                            FROM satker s
+                            JOIN (
+                             SELECT t.kdsatker, t.pagu, t.alokasi
+                             FROM ALOKASISATKER t 
+                             WHERE t.ALOKASISATKERSUMMARYID = (
+                                SELECT ALOKASISATKERSUMMARYID  
+			                    FROM alokasisatkersummary a
+			                    JOIN (
+				                    SELECT * FROM (
+					                    SELECT max(mp) mp, max(revisi) revisi 
+					                    FROM ALOKASISATKERSUMMARY a
+					                    WHERE tahun = EXTRACT(YEAR FROM sysdate)
+					                    GROUP BY mp
+					                    ORDER BY mp desc, revisi desc
+				                    ) WHERE rownum = 1
+			                    ) b ON a.mp = b.mp AND a.revisi = b.revisi
+			                    WHERE a.tahun = EXTRACT(YEAR FROM sysdate)
+                             )
+                            ) ta ON s.KODESATKER = ta.kdsatker
+                            ORDER BY s.KODESATKER asc
                     ) WHERE RNumber BETWEEN :startCnt AND :limitCnt
                 ";
 

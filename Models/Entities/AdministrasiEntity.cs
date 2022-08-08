@@ -80,6 +80,9 @@ namespace Pnbp.Entities
         public bool UserKaBiroKeuangan { get; set; }
         public List<PrioritasAlokasi> dataPrioritas { get; set; }
         public string tahun { get; set; }
+        public decimal TotalAnggaran { get; set; }
+        public decimal TotalAlokasi { get; set; }
+        public decimal TotalTerAlokasi { get; set; }
     }
 
     public class FindManfaat

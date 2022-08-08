@@ -120,6 +120,12 @@ namespace Pnbp.Controllers
             return Json(listTotalAngAlok, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetTotalAlokasiSatkerV2(string kodesatker)
+        {
+            decimal item = _manfaatanModel.GetTotalAlokasiSatkerV2(kodesatker);
+            return Json(new { success = true, data = item }, JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetTotalAnggaranDipa()
         {
             string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
@@ -654,6 +660,10 @@ namespace Pnbp.Controllers
             //return Json(_lsSatkerALokasi, JsonRequestBehavior.AllowGet);
             _data.dataPrioritas = _lsSatkerALokasi;
             _data.UserAdmin = _manfaatanModel.UsersInRoles(useridentity.UserId, "Administrator Pusat");
+
+            _data.TotalAnggaran = _lsSatkerALokasi.Select(x => x.Nilaianggaran).Sum();
+            _data.TotalAlokasi = _manfaatanModel.GetTotalAlokasiSatkerV2(kantorid);
+            _data.TotalTerAlokasi = _lsSatkerALokasi.Select(x => x.JUMLAHALOKASI).Sum();
 
             // DITUTUP LAGI....SEMENTARA :)
             // Sementara profile2 tsb bisa edit data manfaat (Alfin, 2 September 2019)

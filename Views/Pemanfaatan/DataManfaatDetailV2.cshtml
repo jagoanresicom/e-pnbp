@@ -34,7 +34,8 @@
                     @{
                         if (Model.dataPrioritas.Count > 0)
                         {
-                            <label style="color:darkred"><h2><b>Rp @((Model.dataPrioritas.Sum(a => a.Nilaianggaran) - Model.dataPrioritas.Sum(a => a.JUMLAHALOKASI)).ToString("N0", new System.Globalization.CultureInfo("id-ID")))</b></h2></label>
+                            @*<label style="color:darkred"><h2><b>Rp @((Model.dataPrioritas.Sum(a => a.Nilaianggaran) - Model.dataPrioritas.Sum(a => a.JUMLAHALOKASI)).ToString("N0", new System.Globalization.CultureInfo("id-ID")))</b></h2></label>*@
+                            <label style="color:darkred"><h2><b>Rp @((Model.TotalAlokasi - Model.TotalTerAlokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID")))</b></h2></label>
                         }
                         else
                         {

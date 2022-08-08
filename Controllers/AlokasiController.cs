@@ -1523,26 +1523,43 @@ namespace Pnbp.Controllers
                 ";
 
                 result = db.Database.SqlQuery<DataProsesAlokasi>(query).ToList();
+
+                var queryCheckSummary = "select count(*) from alokasisatkersummary where tahun = extract(year from sysdate)";
+                var countSummary = db.Database.SqlQuery<int>(queryCheckSummary).FirstOrDefault();
+
                 bool successInsert = true;
                 foreach(var item in result)
                 {
-                    // insert data ke manfaat
-                    var queryInsert = BuildQuery(
-                        item.KantorId, 
-                        item.NamaSatker, 
-                        item.ProgramId, 
-                        item.ProgramNama, 
-                        item.Tipe, 
-                        item.Amount,
-                        $"{item.Kegiatan}.{item.Output}",
-                        item.KodeSatker);
-                    if (string.IsNullOrEmpty(queryInsert))
+                    var qInsertOrUpdate = "";
+                    if (countSummary > 0)
+                    {
+                        // update data ke manfaat
+                        qInsertOrUpdate = $@"update manfaat set NILAIANGGARAN = {item.Amount} 
+                            where tahun = extract(year from sysdate) and kantorid = '{item.KantorId}' 
+                            and programid = '{item.ProgramId}' and tipe = '{item.Tipe}' and kode = '{item.Kegiatan+"."+ item.Output}'";
+                        
+                    } 
+                    else
+                    {
+                        // insert data ke manfaat
+                        qInsertOrUpdate = BuildQuery(
+                            item.KantorId,
+                            item.NamaSatker,
+                            item.ProgramId,
+                            item.ProgramNama,
+                            item.Tipe,
+                            item.Amount,
+                            $"{item.Kegiatan}.{item.Output}",
+                            item.KodeSatker);
+                        
+                    }
+                    if (string.IsNullOrEmpty(qInsertOrUpdate))
                     {
                         successInsert = false;
                         break;
                     }
 
-                    var row = db.Database.ExecuteSqlCommand(queryInsert);
+                    var row = db.Database.ExecuteSqlCommand(qInsertOrUpdate);
                     if (row <= 0)
                     {
                         successInsert = false;
@@ -1746,7 +1763,9 @@ namespace Pnbp.Controllers
 	                TIPE, 
 	                NILAIANGGARAN,
                     KODE,
-                    KODESATKER
+                    KODESATKER,
+                    USERINSERT,
+                    INSERTDATE
                 )
                 VALUES(
                     sys_guid() , 
@@ -1758,7 +1777,9 @@ namespace Pnbp.Controllers
                     '{tipe}', 
                     {nilaiAnggaran},
                     '{kodeoutput}',
-                    '{kodesatker}'
+                    '{kodesatker}',
+                    'SYSTEM_PNBP',
+                    sysdate
                 )
             ";
             } 
@@ -1879,7 +1900,9 @@ namespace Pnbp.Controllers
                         totalRevisi.Add(tempRevisi);
                     }
 
-                    response.Total = totalRevisi;
+                    response.Total = totalRevisi
+                        .OrderBy(x => x.Revisi)
+                        .ToList();
 
                     foreach (var item in result)
                     {
@@ -1974,7 +1997,7 @@ namespace Pnbp.Controllers
                     JOIN SATKER s ON a.KDSATKER = s.KODESATKER";
 
                 List<object> lstparams = new List<object>();
-                if (!String.IsNullOrEmpty(search.satker))
+                if (!String.IsNullOrEmpty(search.satker) && search.satker != "--Pilih Satker--")
                 {
                     query += " WHERE s.kantorid = :kantorId ";
                     lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorId", search.satker));
@@ -2233,6 +2256,7 @@ namespace Pnbp.Controllers
             PnbpContext db = new PnbpContext();
             List<TempAlokasi> result = new List<TempAlokasi>();
             string tableName = isRevisi ? "temp_alokasi_revisi" : "TEMP_ALOKASI";
+            var valid = false;
 
             try
             {
@@ -2242,7 +2266,8 @@ namespace Pnbp.Controllers
                     s.KODESATKER AS kodesatker, 
                     s.NAMA_SATKER AS NamaSatker, 
                     to_char(ta.PAGU) AS pagu, 
-                    to_char(ta.alokasi) AS alokasi 
+                    to_char(ta.alokasi) AS alokasi, 
+                    (CASE WHEN pagu > alokasi THEN 1 ELSE 0 end) valid
                 FROM {tableName} ta
                 LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
                 WHERE ta.KDSATKER != '524465'
@@ -2254,8 +2279,18 @@ namespace Pnbp.Controllers
             {
                 _ = e.StackTrace;   
             }
+            finally
+            {
+                if (result != null && result.Count > 0)
+                {
+                    if (result.Find(x => x.Valid == 0) == null)
+                    {
+                        valid = true;
+                    }
+                }
+            }
 
-            return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+            return Json(new { success = true, data = new { valid = valid, data = result } }, JsonRequestBehavior.AllowGet);
         }
 
         class TemplateAlokasi
@@ -2271,6 +2306,7 @@ namespace Pnbp.Controllers
             public string NamaSatker { get; set; }
             public string Pagu { get; set; }
             public string Alokasi { get; set; }
+            public decimal Valid { get; set; }
         }
 
         class AlokasiSatker

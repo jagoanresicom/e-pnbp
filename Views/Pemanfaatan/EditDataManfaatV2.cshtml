@@ -125,13 +125,13 @@
 							<div class="col-md-8 col-sm-8 col-xs-12">
 								@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
 								@*@if (Model.Mode == "Tambah Data Manfaat")
-						{
-							@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
-						}
-						else
-						{
-							@Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi", @readonly = "readonly" })
-						}*@
+						        {
+							        @Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi" })
+						        }
+						        else
+						        {
+							        @Html.TextBoxFor(model => model.JUMLAHALOKASI, new { @class = "form-control", @id = "txtalokasi", @readonly = "readonly" })
+						        }*@
 							</div>
 						</div>
 						<div class="form-group">
@@ -191,12 +191,16 @@
         var namasatker = $('#Namasatker').val();
 
         //$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+        var urlObject = new URL(document.location.href);
+        var params = urlObject.searchParams;
+        var tahun = params.get("tahun");
+
         var pdata = { kantorid: id, namakantor: namasatker };
         $.pjax({
             container: "#dynamic_content",
             type: 'POST',
-            @*url: '@Url.Action("DetilSatkerManfaat", "Pemanfaatan")',*@
-            url: '@Url.Action("DataManfaatDetail", "Pemanfaatan")',
+            url: '@Url.Action("DataManfaatDetailV2", "Pemanfaatan")' + "?tahun=" + tahun,
             data: pdata,
             success: function (data, textStatus, XMLHttpRequest) {
                 $('#dynamic_content').html(data);
