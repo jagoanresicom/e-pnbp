@@ -1,0 +1,223 @@
+﻿@{
+    ViewBag.Judul = "Tambah Data Target";
+    var jenislayanan = ViewBag.get_penerimaan;
+    var program = ViewBag.get_program;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 ">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2 class="sub-header" style="padding:10px">@(ViewBag.Judul)</h2>
+                    @*@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))*@
+                    @*<h2 style="padding:10px">Form Design <small>different form elements</small></h2>*@
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li class="text-right" style="padding:10px">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>                       
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="x_content">
+                    <br />
+                    <form class="form-horizontal form-label-left" id="target" name="target" method="post">
+                        <div class="form-group row">
+                            <label class="col-sm-2" style="margin-left:40px">Nama Kantor</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control wajib" id="namakantor" name="namakantor" onkeyup="validate()" value=" @((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" readonly>
+                                <input type="hidden" class="form-control wajib" id="idkantor" name="idkantor" onkeyup="validate()" value=" @((User as Pnbp.Entities.InternalUserIdentity).KantorId.Replace("Kantor Pertanahan", ""))" readonly>
+                                @*<span id="validate" class="text-danger" style="display: none;">* Data tidak boleh kosong</span>*@
+                            </div>
+                        </div>
+
+                        @*<div class="form-group row">
+                            <label class="col-sm-2" style="margin-left:40px">Nama Layanan</label>
+                            <div class="col-sm-5">
+                                <select name="jenislayanan" id="jenislayanan" class="select2_single form-control input-md" onchange="FillProgram()" required>
+                                    <option value="">-- Pilih Layanan --</option>
+                                    @if (jenislayanan.Count > 0)
+                                    {
+                                        foreach (var row in jenislayanan)
+                                        {
+                                            <option value="@row.JenisPenerimaan">@row.JenisPenerimaan</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>*@
+
+                        <div class="form-group row">
+                            <label class="col-sm-2" style="margin-left:40px">Nama Program</label>
+                            <div class="col-sm-5">
+                                <select name="idprogram" id="idprogram" class="select2_single form-control input-md" required>
+                                    <option value="">-- Pilih Program --</option>
+                                    @{ foreach (var row in program)
+                                        {
+                                            <option value="@row.NamaProsedur">@row.NamaProsedur</option>
+                                        }
+                                    }
+                                </select>
+                                @*<span id="validate" class="text-danger" style="display: none;">* Data tidak boleh kosong</span>*@
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-2" style="margin-left:40px">Target Penerimaan</label>
+                            <div class="col-md-3 col-sm-2 col-xs-12">
+                                <input type="text" class="form-control wajib asd text-right" id="nilaitarget" name="nilaitarget" onkeyup="validate()" placeholder="Masukkan Nilai" autocomplete="off" required>
+                                <span class="form-control-feedback left" aria-hidden="true" style="margin:1px;margin-top:5px">Rp</span>
+                                @*<span id="validatetarget" class="text-danger" style="display: none;">* Data tidak boleh kosong</span>*@
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-2" style="margin-left:40px">Target Fisik</label>
+                            <div class="col-md-3 col-sm-2 col-xs-12">
+                                <input type="text" class="form-control wajib asd text-right" id="targetfisik" name="targetfisik" onkeyup="validate()" placeholder="Masukkan Target Fisik" autocomplete="off" required>
+                                @*<span class="form-control-feedback left" aria-hidden="true" style="margin:1px;margin-top:5px">Rp</span>*@
+                                @*<span id="validatetarget" class="text-danger" style="display: none;">* Data tidak boleh kosong</span>*@
+                            </div>
+                        </div>
+
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary btn-icon-text" onclick="validate()">
+                                    <i class="fa fa-check"></i>&nbsp;
+                                    Simpan
+                                </button>
+
+                                <a href="@Url.Action("TargetIndex","Target")">
+                                    <button type="button" class="btn btn-danger btn-icon-text">
+                                        <i class="fa fa-arrow-left"></i>&nbsp;
+                                        Kembali
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* test *@
+    @*<div>
+        <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel"  style="padding-top:15px">
+                        <div class="x_title" style="padding-left:25px">
+                            <h2 class="sub-header" style="margin-left: 3px">@(ViewBag.Judul)</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up" title="Hide Form"></i></a></li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="x_content">
+                            <form class="form-horizontal form-label-left" id="target" name="target" method="post">
+                                <div class="form-group row">
+                                    <label class="col-sm-2" style="margin-left:40px">Nama Prosedur</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control wajib" id="namaprosedur" name="namaprosedur" placeholder="Masukkan Nama Prosedur">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2" style="margin-left:40px">Nilai</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control wajib asd text-right" id="nilaitarget" name="nilaitarget" placeholder="Masukkan Nilai" autocomplete="off">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-12 text-center">
+                                        <button type="submit" class="btn btn-primary btn-icon-text">
+                                         Simpan
+                                        </button>
+
+                                        <a href="@Url.Action("TargetIndex","Target")">
+                                            <button type="button" class="btn btn-danger btn-icon-text">
+                                                Kembali
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>*@
+</body>
+</html>
+
+<script type="text/javascript">
+    $('.select2_single').select2();
+
+    @*function FillProgram() {
+        var jenislayanan = $('#jenislayanan').val();
+        var KantorId = $('#idkantor').val();
+        //console.log(idkantor);
+
+            $.ajax({
+                url: '@Url.Action("FillProgram","Target")',
+                type: 'GET',
+                dataType: 'JSON',
+                data: { jenislayanan: jenislayanan },
+                success: function (data) {
+                    console.log(data);
+                    //var html = "";
+                    //if (data.length > 0) {
+                    //    $.each(data, function (x) {
+                    //        html += ""
+                    //        + "<option value='" + data[x].NamaProsedur + "'>" + data[x].NamaProsedur + "</option>"
+                    //    })
+                    //} else {
+                    //    + "<option>Data Kosong</option>"
+                    //}
+                    $("#idprogram").html(html);
+                }
+            });
+    }*@
+    
+    //function validate() {
+    //    var namaprosedur = $('#namaprosedur').val();
+    //    var nilaitarget = $('#nilaitarget').val();
+    //    console.log(namaprosedur);
+    //    console.log(nilaitarget);
+    //    if ($('#namaprosedur').val() == '') {
+    //        $('#validate').show();
+    //        $('#validatetarget').show();
+    //    } else if ($('#namaprosedur').val() != ''){
+    //        $('#validate').hide();
+    //    } else if ($('#nilaitarget').val() != '') {
+    //        $('#validatetarget').hide();
+    //    }
+    //}
+
+    $('.asd').keyup(function (event) {
+
+        // skip for arrow keys
+        if (event.which >= 37 && event.which <= 40) return;
+
+        // format number
+        $(this).val(function (index, value) {
+            return value
+            .replace(/\D/g, "")
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            ;
+        });
+    });
+</script>

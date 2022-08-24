@@ -270,18 +270,24 @@
                         <div class="menu_section">
                             <ul class="nav side-menu">
                                 <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-home"></i>Beranda</a></li>
-                                @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
-                                {
-                                    <li>
-                                        <a><i class="fa fa-edit"></i>Alokasi<span class="fa fa-chevron-down"></span></a>
-                                        <ul class="nav child_menu">
+                                <li>
+                                    <a><i class="fa fa-edit"></i>Alokasi<span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+                                        {
                                             <li><a href="@Url.Action("ImportAlokasi", "Alokasi")">Import Alokasi</a></li>
-                                            @*<li><a href="@Url.Action("Ops", "Alokasi")">Operasional</a></li>*@
-                                            @*<li><a href="@Url.Action("NonOps", "Alokasi")">Non Operasional</a></li>*@
-                                            @*<li><a href="@Url.Action("RekapAlokasi", "Alokasi")">Rekap Alokasi</a></li>*@
-                                        </ul>
-                                    </li>
-                                }
+                                            <li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>
+                                            <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Monitoring Evaluasi</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li><a href="@Url.Action("ListDataManfaatKROV2", "Pemanfaatan")">Alokasi KRO</a></li>
+                                        }
+                                        @*<li><a href="@Url.Action("Ops", "Alokasi")">Operasional</a></li>*@
+                                        @*<li><a href="@Url.Action("NonOps", "Alokasi")">Non Operasional</a></li>*@
+                                        @*<li><a href="@Url.Action("RekapAlokasi", "Alokasi")">Rekap Alokasi</a></li>*@
+                                    </ul>
+                                </li>
                                 <li>
                                     <a><i class="fa fa-file-text-o"></i>Penerimaan<span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
@@ -303,8 +309,8 @@
                                     <a><i class="fa fa-file-text-o"></i>Pemanfaatan<span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
                                         <li><a href="@Url.Action("RincianAlokasi", "Pemanfaatan")">Rincian Alokasi</a></li>
-                                        <li><a href="@Url.Action("ListDataManfaat", "Pemanfaatan")">Data Pemanfaatan</a></li>
-                                        <li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Data Pemanfaatan V2</a></li>
+                                        @*<li><a href="@Url.Action("ListDataManfaat", "Pemanfaatan")">Data Pemanfaatan</a></li>*@
+                                        @*<li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Data Pemanfaatan</a></li>*@
                                         <li><a href="@Url.Action("PersetujuanRevisiManfaat", "Pemanfaatan")">Persetujuan Revisi</a></li>
                                     </ul>
 
@@ -314,7 +320,7 @@
                                     <ul class="nav child_menu">
                                         <li><a href="@Url.Action("Penerimaan", "MonitoringEvaluasi")">Penerimaan</a></li>
                                         <li><a href="@Url.Action("Belanja", "MonitoringEvaluasi")">Belanja</a></li>
-                                        <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Alokasi</a></li>
+                                        @*<li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Alokasi</a></li>*@
                                     </ul>
                                 </li>
                                 @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")

@@ -1,0 +1,377 @@
+﻿@model Pnbp.Entities.DataPengembalianPnbp
+
+<script src='@Url.Content("~/resources/js/jqueryautocomplete/jquery.autocomplete.js")' type="text/javascript"></script>
+<script src='@Url.Content("~/resources/js/jquery.inputmask.bundle.min.js")' type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $.validator.unobtrusive.parse(this);
+    });
+</script>
+
+<div class="" id="dynamic_content">
+    <div class="page-title">
+        <div class="title_left"><h2 style="width:100%">Entri Data Pengajuan Pengembalian PNBP</h2></div>
+        <div class="title_right" style="text-align:right;">
+            <div class="pull-right">
+                <span class="input-group-btn" style="padding-right:2px;">
+                    <button type="button" class="btn btn-warning" id="btnkembali">Kembali</button>
+                    <button type="button" class="btn btn-primary" id="btnentrilampiran" style="margin-left:3px;">Entri Lampiran</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:7px; border:1px solid #E6E9ED;">
+                <div class="x_title">
+                    <h2>Data Pengajuan</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" id="frmEntriPengajuan" role="form">
+                        @Html.HiddenFor(m => m.PengembalianPnbpId, new { @id = "PengembalianPnbpId" })
+                        @Html.HiddenFor(m => m.EditMode, new { @id = "EditMode" })
+                        @Html.HiddenFor(m => m.SelectedKantorId, new { @id = "SelectedKantorId" })
+                        @Html.HiddenFor(m => m.BerkasId, new { @id = "BerkasId" })
+                        @Html.HiddenFor(m => m.PemilikId, new { @id = "PemilikId" })
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tanggal Pengajuan <span style="color:red">*</span></label>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalPengaju, new { @class = "form-control", @id = "tanggalpengajuan", @required = "required" })
+                                @Html.ValidationMessageFor(model => model.TanggalPengaju, "Tanggal Pengajuan wajib diisi")
+                            </div>
+                        </div>
+                        <div class="divider-dashed"></div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor & Tahun Berkas <span style="color:red">*</span></label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                <div class="input-group" style="margin-bottom: 0px;">
+                                    @Html.TextBoxFor(model => model.NomorBerkas, new { @class = "form-control", @id = "nomorberkas", @required = "required", @placeholder = "Nomor/Tahun" })
+                                    <span class="input-group-addon button-success" id="BtnCariBerkas" style="cursor:pointer;">
+                                        <span class="fa fa-search"></span>&nbsp;Cari
+                                    </span>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.NomorBerkas, "Nomor dan Tahun Berkas wajib diisi")
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Nama Kegiatan Pelayanan</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaProsedur, new { @class = "form-control", @id = "namaprosedur", @placeholder = "Nama Kegiatan Pelayanan", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Tanggal & Kode Billing, NTPN</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalKodeBilling, new { @class = "form-control", @id = "tanggalkodebilling", @placeholder = "Tanggal", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.KodeBilling, new { @class = "form-control", @id = "kodebilling", @placeholder = "Kode Billing", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.Ntpn, new { @class = "form-control", @id = "ntpn", @placeholder = "NTPN", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Tanggal & Jumlah Bayar, Bank</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalBayar, new { @class = "form-control", @id = "tanggalbayar", @placeholder = "Tanggal Bayar", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.JumlahBayar, new { @class = "form-control", @id = "jumlahbayar", @placeholder = "Jumlah Bayar", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaBankPersepsi, new { @class = "form-control", @id = "namabankpersepsi", @placeholder = "Nama Bank Persepsi", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">NIK dan Nama Pemohon</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.NikPemohon, new { @class = "form-control", @id = "nikpemohon", @placeholder = "NIK Pemohon", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaPemohon, new { @class = "form-control", @id = "namapemohon", @placeholder = "Nama Pemohon", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Alamat, Email, Telepon Pemohon</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.AlamatPemohon, new { @class = "form-control", @id = "alamatpemohon", @placeholder = "Alamat", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.EmailPemohon, new { @class = "form-control", @id = "emailpemohon", @placeholder = "Email", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.NomorTelepon, new { @class = "form-control", @id = "nomortelepon", @placeholder = "Nomor Telepon", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="divider-dashed"></div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor Rekening <span style="color:red">*</span></label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NomorRekening, new { @class = "form-control", @id = "nomorrekening", @required = "required" })
+                                @Html.ValidationMessageFor(model => model.NomorRekening, "Nomor Rekening wajib diisi")
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Bank <span style="color:red">*</span></label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaBank, new { @class = "form-control", @id = "namabank", @required = "required" })
+                                @Html.ValidationMessageFor(model => model.NamaBank, "Nama Bank wajib diisi")
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Cabang</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaCabang, new { @class = "form-control", @id = "namacabang" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                <button type="submit" class="btn btn-success" id="btnsimpandatapengajuan">Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*<div id="myModalDocViewer" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="myModalContent"></div>
+        </div>
+    </div>
+</div>*@
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.select2_single').select2({ width: 'resolve' });
+
+        //$('#myModalDocViewer').on('shown.bs.modal', function () {
+        //    $(this).find('.modal-dialog').css({
+        //        width: '98%',
+        //        height: '98 %',
+        //        'max-height': '98%'
+        //    });
+        //});
+
+        $("#tanggalpengajuan").attr('data-inputmask', "'mask': '99-99-9999'");
+        //$("#tanggalfile").attr('data-inputmask', "'mask': '99-99-9999'");
+
+        //---- binding List Kantor
+        @*$.ajax({
+            url: '@Url.Action("GetListKantor", "Pengembalian")',
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                $('#namakantor').autocomplete({
+                    lookup: data,
+                    lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
+                        var re = new RegExp('\\b' + $.Autocomplete.utils.escapeRegExChars(queryLowerCase), 'gi');
+                        return re.test(suggestion.value);
+                    },
+                    onSelect: function (suggestion) {
+                        $('#SelectedKantorId').val(suggestion.data);
+                    }
+                });
+            }
+        });*@
+        //------- Eof binding List Kantor
+
+
+        //---- binding List Nama Bank
+         $.ajax({
+            url: '@Url.Action("GetListBank", "Pengembalian")',
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                $('#namabank').autocomplete({
+                    lookup: data,
+                    lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
+                        var re = new RegExp('\\b' + $.Autocomplete.utils.escapeRegExChars(queryLowerCase), 'gi');
+                        return re.test(suggestion.value);
+                    }
+                });
+            }
+        });
+        //------- Eof binding List Nama Bank
+
+
+        var editmode = $('#EditMode').val();
+        if (editmode !== null && editmode !== '') {
+            if (editmode == "edit") {
+                $("#BtnCariBerkas").css("pointer-events", "none");
+                $("#BtnCariBerkas").attr('class', 'input-group-addon button-default');
+                $("#nomorberkas").prop('readonly', true);
+            }
+        }
+
+    });
+
+    $("#btnkembali").on("click", function (e) {
+
+        window.location.href = '@Url.Action("PengajuanPengembalian", "Pengembalian")';
+
+        e.preventDefault();
+        return false;
+    });
+
+    $("#btnentrilampiran").on("click", function (e) {
+
+        var pengembalianpnbpid = $('#PengembalianPnbpId').val();
+
+        if (pengembalianpnbpid !== null && pengembalianpnbpid !== '') {
+
+            window.location.href = '@Url.Action("EntriLampiran", "Pengembalian")?pengembalianpnbpid=' + pengembalianpnbpid;
+
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+    function ResetEntriBerkas() {
+        //$('#frmEntriBidangTanah')[0].reset();
+
+        $('#BerkasId').val('');
+        $('#PemilikId').val('');
+
+        $('#namaprosedur').val('');
+        $('#tanggalkodebilling').val('');
+        $('#kodebilling').val('');
+        $('#ntpn').val('');
+        $('#tanggalbayar').val('');
+        $('#jumlahbayar').val('');
+        $('#namabankpersepsi').val('');
+        $('#nikpemohon').val('');
+        $('#namapemohon').val('');
+        $('#alamatpemohon').val('');
+        $('#emailpemohon').val('');
+        $('#nomortelepon').val('');
+    };
+
+    $("#BtnCariBerkas").on("click", function (e) {
+
+        var nomorberkas = $('#nomorberkas').val();
+        var selectedkantorid = $('#SelectedKantorId').val();
+        if (nomorberkas !== null && nomorberkas !== '' && selectedkantorid !== null && selectedkantorid !== '') {
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+            $.ajax({
+                url: '@Url.Action("GetInfoBerkas", "Pengembalian")',
+                type: "GET",
+                dataType: "JSON",
+                data: { nomorberkas: nomorberkas, kantorid: selectedkantorid },
+                success: function (data) {
+
+                    var cek_berkasid = data.BerkasId;
+
+                    if (cek_berkasid !== null && cek_berkasid !== '') {
+
+                        ResetEntriBerkas();
+
+                        var alertinfo = data.AlertInfo;
+                        if (alertinfo !== null && alertinfo !== '') {
+
+                            $.unblockUI();
+                            showalert(alertinfo);
+                            return false;
+                        }
+
+                        $('#namaprosedur').val(data.NamaProsedur);
+                        $('#tanggalkodebilling').val(data.TanggalKodeBilling);
+                        $('#kodebilling').val(data.KodeBilling);
+                        $('#ntpn').val(data.Ntpn);
+                        $('#tanggalbayar').val(data.TanggalBayar);
+                        $('#jumlahbayar').val(data.JumlahBayar);
+                        $('#namabankpersepsi').val(data.NamaBankPersepsi);
+                        $('#nikpemohon').val(data.NikPemohon);
+                        $('#namapemohon').val(data.NamaPemohon);
+                        $('#alamatpemohon').val(data.AlamatPemohon);
+                        $('#emailpemohon').val(data.EmailPemohon);
+                        $('#nomortelepon').val(data.NomorTelepon);
+
+                        $('#BerkasId').val(data.BerkasId);
+                        $('#PemilikId').val(data.PemilikId);
+
+                    }
+                    else {
+
+                        ResetEntriBerkas();
+                        showalert("Data pembayaran berkas no. " + nomorberkas + " tidak ditemukan.");
+
+                    }
+
+                    $.unblockUI();
+                },
+                error: function (jqXHR, textStatus, errorThrown) { showmsg("Error", errorThrown); $.unblockUI(); }
+            });
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+    $("#frmEntriPengajuan").submit(function (e) {
+        if ($("#frmEntriPengajuan").valid()) {
+
+            var selectedberkasid = $('#BerkasId').val();
+            if (selectedberkasid !== null && selectedberkasid !== '') {
+
+                $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+                var frmdata = new FormData(this);
+                frmdata.append("PengembalianPnbpId", $('#PengembalianPnbpId').val());
+                frmdata.append("BerkasId", $('#BerkasId').val());
+                frmdata.append("PemilikId", $('#PemilikId').val());
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SimpanPengembalianPnbp", "Pengembalian")',
+                    data: frmdata,
+                    contentType: false,
+                    processData: false,
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        if (data.Status) {
+
+                            $('#PengembalianPnbpId').val(data.ReturnValue);
+
+                            $('#EditMode').val("edit");
+
+                            $("#BtnCariBerkas").css("pointer-events", "none");
+                            $("#BtnCariBerkas").attr('class', 'input-group-addon button-default');
+                            $("#nomorberkas").prop('readonly', true);
+
+                            showinfo(data.Pesan);
+                        }
+                        else {
+                            showalert(data.Pesan);
+                        }
+                        $.unblockUI();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+                });
+
+            }
+            else {
+                showalert("Berkas belum dipilih");
+            }
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+</script>
+
+
+

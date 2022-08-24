@@ -505,11 +505,26 @@ namespace Pnbp.Models
                 //    ) WHERE RNumber BETWEEN :startCnt AND :limitCnt
                 //";
 
-                string sql = @"
+                string where = "";
+                if (!string.IsNullOrEmpty(namasatker))
+                {
+                    where += $" lower(s.NAMA_SATKER) like '%{namasatker.ToLower()}%' ";
+                    //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("namasatker", namasatker.ToLower()));
+                }
+
+                if (!string.IsNullOrEmpty(where))
+                {
+                    where = ("WHERE " + where);
+                }
+
+                string sql = $@"
                     SELECT * FROM ( 
                         SELECT 
                             row_number() over (order by s.kodesatker asc) as RNumber, 
-                            s.KODESATKER as Kodesatker, s.kantorid, s.NAMA_SATKER as Namasatker, ta.pagu as Nilaianggaran, ta.alokasi as JUMLAHALOKASI
+                            s.KODESATKER as Kodesatker, s.kantorid, s.NAMA_SATKER as Namasatker, 
+                            ta.pagu as Nilaianggaran, ta.alokasi as JUMLAHALOKASI, sp.totalalokasi,
+                            (CASE WHEN sp.totalalokasi = ta.alokasi THEN -99 ELSE 0 END) AS StatusRenaksi,
+                            (CASE WHEN statusaktif = 1 THEN 'Aktif' ELSE 'Non Aktif' END) AS Statusaktif
                             FROM satker s
                             JOIN (
                              SELECT t.kdsatker, t.pagu, t.alokasi
@@ -521,20 +536,30 @@ namespace Pnbp.Models
 				                    SELECT * FROM (
 					                    SELECT max(mp) mp, max(revisi) revisi 
 					                    FROM ALOKASISATKERSUMMARY a
-					                    WHERE tahun = EXTRACT(YEAR FROM sysdate)
+					                    WHERE tahun = :tahun1
 					                    GROUP BY mp
 					                    ORDER BY mp desc, revisi desc
 				                    ) WHERE rownum = 1
 			                    ) b ON a.mp = b.mp AND a.revisi = b.revisi
-			                    WHERE a.tahun = EXTRACT(YEAR FROM sysdate)
+			                    WHERE a.tahun = :tahun2
                              )
                             ) ta ON s.KODESATKER = ta.kdsatker
+                            LEFT JOIN (
+        	                    SELECT kodesatker, sum(nilaialokasi) AS totalalokasi
+			                    FROM manfaat 
+			                    WHERE tahun = :tahun3
+			                    GROUP BY kodesatker
+                            ) sp ON s.KODESATKER = sp.kodesatker 
+                            {where}
                             ORDER BY s.KODESATKER asc
                     ) WHERE RNumber BETWEEN :startCnt AND :limitCnt
                 ";
 
                 sql = sWhitespace.Replace(sql, " ");
 
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun1", tahun));
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun2", tahun));
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun3", tahun));
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 

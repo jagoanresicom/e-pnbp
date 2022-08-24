@@ -1,0 +1,291 @@
+﻿
+@model  Pnbp.Entities.CharDashboard
+
+<style>
+    .control-label {
+        padding-top: 8px;
+        padding-right: 0px;
+    }
+</style>
+
+<script src='@Url.Content("~/resources/js/echarts.min.js")'></script>
+
+<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <label class="control-label col-lg-4 col-md-4 col-sm-4 col-xs-12">Pilih Tahun : </label>
+                <div class="col-lg-8 col-md-8 col-sm-\8 col-xs-12">
+                    <div class="input-group">
+                        @*@Html.DropDownListFor(model => model.tahun, new SelectList(@Model.lstahun, "value", "tahun"), new { @class = "select2_single form-control", @id = "selectyear", @style = "width:100%;", @Label = "Pilih Tahun" })
+                        @Html.ValidationMessageFor(model => model.tahun, "", new { @class = "text-danger" })*@
+                        <select name="selectyear" id="selectyear" class="select2_single form-control" data-placement="Pilih Tahun">
+                            <option></option>
+                            @for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                        <span class="input-group-btn" style="padding-left:1px;">
+                            <button type="submit" class="btn btn-default" style="margin-right: -1px;" onclick="getpenerimaan()" title="lihat penerimaan"><span class="fa fa-search"></span></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="dashboard-widget-content">
+                <div id="penerimaan_bar" style="height: 300px;"></div>
+                <div id="penerimaan_bar2" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id='myModalDocViewer' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select2_single').select2({ width: 'resolve' });
+
+        $.ajax({
+            url: '@Url.Action("GetPengumumanText", "Administrasi")',
+            success: function (response) {
+                $('#docViewer').html(response);
+                if (response !== null && response !== '')
+                {
+                    var options = { "backdrop": "static", keyboard: true };
+                    $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("PengumumanViewer", "Administrasi")',
+                        success: function (data) {
+                            $('#myModalContent').html(data);
+                            $('#myModalDocViewer').modal(options);
+                            $('#myModalDocViewer').modal('show');
+                            $.unblockUI();
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $.unblockUI();
+                        }
+                    });
+
+                }
+            },
+            error: function (response) {
+                $.unblockUI();
+            }
+        });
+
+
+        @*init_bar_penerimaan(@Html.Raw(Json.Encode(@Model.Penerimaan)),@Html.Raw(Json.Encode(@Model.Operasional)),@Model.tahun.ToString());*@
+        @*init_bar_alokasi(@Html.Raw(Json.Encode(@Model.MP)),@Model.tahun.ToString());*@
+    });
+
+    var getpenerimaan = function () {
+        var v = $('#selectyear').find('option:selected').val();
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("getPenerimaan", "Penerimaan")',
+            data: ({ pTahun: v }),
+            success: function (data, textStatus, XMLHttpRequest) {
+                console.log(data);
+                if(data.Penerimaan.length > 0 && data.Operasional.length > 0)
+                {
+                    init_bar_penerimaan(data.Penerimaan, data.Operasional,v);
+                    init_bar_alokasi(data.MP,v);
+                    $.unblockUI();
+                }
+                else
+                {
+                    $.unblockUI();
+                    alert('Data tidak ditemukan!!');
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $.unblockUI();
+            }
+        });
+    }
+
+    function init_bar_penerimaan(vdata, xdata, tahun)
+    {
+        // based on prepared DOM, initialize echarts instance
+        var myChart = echarts.init(document.getElementById('penerimaan_bar'));
+        //var myChart2 = echarts.init(document.getElementById('penerimaan_bar2'));
+
+        // specify chart configuration item and data
+        var option = {
+            color: ['#006699', '#4cabce'],
+            title: {
+                text: 'Rekapitulasi PNBP tahun ' + tahun,
+                padding: [20,0,0,0]
+            },
+            tooltip: {
+                formatter: function (params) {
+                    var formtxt = "";
+                    if(params.name == "1")
+                    {
+                        formtxt = params.seriesName + '<br/> Januari: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "2")
+                    {
+                        formtxt = params.seriesName + '<br/> Februari: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "3")
+                    {
+                        formtxt = params.seriesName + '<br/> Maret: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "4")
+                    {
+                        formtxt = params.seriesName + '<br/> April: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "5")
+                    {
+                        formtxt = params.seriesName + '<br/> Mei: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "6")
+                    {
+                        formtxt = params.seriesName + '<br/> Juni: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "7")
+                    {
+                        formtxt = params.seriesName + '<br/> Juli: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "8")
+                    {
+                        formtxt = params.seriesName + '<br/> Agustus: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "9")
+                    {
+                        formtxt = params.seriesName + '<br/> September: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "10")
+                    {
+                        formtxt = params.seriesName + '<br/> Oktober: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "11")
+                    {
+                        formtxt = params.seriesName + '<br/> November: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }else if(params.name == "12")
+                    {
+                        formtxt = params.seriesName + '<br/> Desember: Rp' + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                    return formtxt;
+                }
+            },
+            legend: {
+
+            },
+            xAxis: {
+                data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+            },
+            yAxis: {
+                type: "value",
+                axisLabel: {
+                    formatter: function (value, index, values) {
+                        if (parseInt(value) >= 1000000000000) {
+                            value = parseInt(value) / 1000000000000;
+                            return 'Rp' + Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' T';
+                        }
+                        else if (parseInt(value) >= 1000000000)
+                        {
+                            value = parseInt(value) / 1000000000;
+                            return 'Rp' + Math.round(value) + ' M';
+                        }
+                        else if (parseInt(value) >= 1000000) {
+                            value = parseInt(value) / 1000000;
+                            return 'Rp' + Math.round(value) + ' Juta';
+                        } else if (parseInt(value) == 0)
+                        {
+                            return value;
+                        }
+                        else {
+                            return 'Rp' + value;
+                        }
+                    }
+                }
+            },
+            series: [
+                {
+                    name: 'Penerimaan',
+                    type: 'bar',
+                    barGap: 0,
+                    data: vdata
+                },
+                {
+                    name: 'Operasional',
+                    type: 'bar',
+                    data: xdata
+                }
+            ]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+    }
+
+    function init_bar_alokasi(xdata, tahun)
+    {
+        // based on prepared DOM, initialize echarts instance
+        var myChart2 = echarts.init(document.getElementById('penerimaan_bar2'));
+
+        // specify chart configuration item and data
+        var option2 = {
+            color: ['#006699'],
+            title: {
+                text: 'Rekapitulasi Alokasi tahun ' + tahun,
+                padding: [20,0,0,0]
+            },
+            tooltip: {
+                formatter: function (params) {
+                    var formtxt = "";
+                    if(params.data > 0)
+                    {
+                        formtxt = "Rp" + params.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                    return formtxt;
+                }
+            },
+            legend: {
+            },
+            xAxis: {
+                data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+            },
+            yAxis: {
+                type: "value",
+                axisLabel: {
+                    formatter: function (value, index, values) {
+                        if (parseInt(value) >= 1000000000000) {
+                            value = parseInt(value) / 1000000000000;
+                            return 'Rp' + Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' T';
+                        }
+                        else if (parseInt(value) >= 1000000000)
+                        {
+                            value = parseInt(value) / 1000000000;
+                            return 'Rp' + Math.round(value) + ' M';
+                        }
+                        else if (parseInt(value) >= 1000000) {
+                            value = parseInt(value) / 1000000;
+                            return 'Rp' + Math.round(value) + ' Juta';
+                        } else if (parseInt(value) == 0)
+                        {
+                            return value;
+                        }
+                        else {
+                            return 'Rp' + value;
+                        }
+                    }
+                }
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: xdata
+                }
+            ]
+        };
+
+        // use configuration item and data specified to show chart
+        myChart2.setOption(option2);
+    }
+
+</script>

@@ -597,5 +597,39 @@ namespace Pnbp.Models
             return _list;
         }
         #endregion
+
+        public Decimal GetAlokasiSatker(string kodesatker, int tahun)
+        {
+            Decimal value = 0;
+            using (var ctx = new PnbpContext())
+            {
+                Regex sWhitespace = new Regex(@"\s+");
+
+                string query =
+                   $@" select alokasi From alokasisatker where kdsatker = '{kodesatker}' and tahun = {tahun}";
+                value = ctx.Database.SqlQuery<decimal>(query).FirstOrDefault();
+
+            }
+            return value;
+        }
+
+        public Decimal GetAlokasiSatkerTerAlokasi(string kodesatker, int tahun)
+        {
+            Decimal value = 0;
+            using (var ctx = new PnbpContext())
+            {
+                Regex sWhitespace = new Regex(@"\s+");
+
+                string query =
+                   $@"  SELECT sum(NILAIALOKASI) 
+                        FROM manfaat 
+                        WHERE KODESATKER = '{kodesatker}' and tahun = {tahun} 
+                        GROUP BY kodesatker";
+                value = ctx.Database.SqlQuery<decimal>(query).FirstOrDefault();
+
+            }
+            return value;
+        }
+
     }
 }

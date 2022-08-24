@@ -591,6 +591,47 @@ namespace Pnbp.Models
             return tr;
         }
 
+        public Entities.TransactionResult KunciDataManfaatV2(string kantorid)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        Regex sWhitespace = new Regex(@"\s+");
+
+                        ArrayList arrayListParameters = new ArrayList();
+
+                        string sql = @"UPDATE manfaat SET statusedit = 0 
+                                    where kantorid = :kantorid and statusaktif = 1 and tahun = extract(year from sysdate)";
+                        arrayListParameters.Clear();
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorid", kantorid));
+                        object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                        var row = ctx.Database.ExecuteSqlCommand(sql, parameters);
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil diubah";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
         public List<Pnbp.Entities.Pengumuman> GetPengumuman(string judulBerita, string isiBerita, string tanggalMulai, string tanggalBerakhir, int from, int to)
         {
             List<Pnbp.Entities.Pengumuman> records = new List<Pnbp.Entities.Pengumuman>();

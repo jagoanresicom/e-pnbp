@@ -1,0 +1,125 @@
+﻿@model List<Pnbp.Entities.InformasiBerkas>
+
+@*<div id="DivBtnPrint" class="row hidden-print">
+    <div class="col-xs-12">
+        <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Print</button>
+    </div>
+</div>
+<div style="text-align:center;">
+    <h3>Informasi Berkas</h3>
+    <div class="clearfix"></div>
+</div>*@
+<!-- info row -->
+<div class="row invoice-info">
+    <div class="col-sm-12 col-xs-12 invoice-col">
+        @if (Model.Count > 0)
+        {
+        <table style="table-layout:auto;width:100%;font-size:15px;height:10px;">
+            <tbody>
+               @foreach (var item in Model)
+               {
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">NTPN</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.ntpn </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Kode Billing</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.kodebilling </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Tanggal Penerimaan</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.tglpenerimaan  </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Nama Kantor</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.namakantor  </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Nama Prosedur</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.namaprosedur  </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Nama Wajib Bayar</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.namawajibbayar  </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Total Biaya</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td class="numeric" style="width:auto;text-align:left;vertical-align:top;"> Rp @item.totalbiaya.ToString("N0", new System.Globalization.CultureInfo("id-ID")) </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Detail Penerimaan</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> <span style="white-space: pre-line;">@item.detailpenerimaan.Replace(";", "\n")</span> </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Status Berkas</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    <td style="width:auto;text-align:left;vertical-align:top;"> @item.statusberkas  </td>
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Nomor Berkas Kantah</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    @if (item.nomor != null)
+                    {
+                        <td style="width:auto;text-align:left;vertical-align:top;"> @item.nomor / @item.tahun </td>
+                    }
+                    else
+                    {
+                        <td style="width:auto;text-align:left;vertical-align:top;">&nbsp;</td>
+                    }
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Nomor Berkas Kanwil</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    @if (item.nomorkanwil != null)
+                    {
+                        <td style="width:auto;text-align:left;vertical-align:top;"> @item.nomorkanwil / @item.tahunkanwil </td>
+                    }
+                    else
+                    {
+                        <td style="width:auto;text-align:left;vertical-align:top;">&nbsp;</td>
+                    }
+                </tr>
+                <tr>
+                    <td style="width:12px;text-align:left;">&nbsp;</td>
+                    <td style="width:150px;text-align:left;vertical-align:top;">Nomor Berkas Pusat</td>
+                    <td style="width:0px;text-align:center;vertical-align:top;">&nbsp;:&nbsp;</td>
+                    @if (item.nomorpusat != null)
+                    {
+                        <td style="width:auto;text-align:left;vertical-align:top;"> @item.nomorpusat / @item.tahunpusat </td>
+                    }
+                    else
+                    {
+                        <td style="width:auto;text-align:left;vertical-align:top;">&nbsp;</td>
+                    }
+                </tr>
+                <tr>
+                    <td colspan="4">&nbsp;</td>
+                </tr>
+               }
+            </tbody>
+        </table>
+         } else {
+            <h1 style="text-align:center">Data tidak ditemukan</h1>
+         }
+    </div>
+    <!-- /.col -->
+</div>

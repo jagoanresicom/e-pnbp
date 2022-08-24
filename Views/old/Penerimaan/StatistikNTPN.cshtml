@@ -1,0 +1,237 @@
+﻿@model Dictionary<int, Pnbp.Models.StatistikNTPN>
+
+@{
+    ViewBag.Title = "Statistik NTPN";
+}
+
+<script src="../resources/js/jquery.validate.min.js" type="text/javascript"></script>
+<script src="../resources/js/jquery.validate.unobtrusive.min.js" type="text/javascript"></script>
+
+<script src="../resources/js/moment.js"></script>
+<script src="../resources/js/id.js"></script>
+<script src="../resources/js/bootstrap-datetimepicker.min.js"></script>
+
+<script src="../resources/js/infiniteScroll.js"></script>
+
+<link href="../resources/css/bootstrap-datetimepicker.css" rel="stylesheet">
+
+<style type="text/css">
+    .back-to-top {
+        cursor: pointer;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: none;
+        z-index: 10001;
+    }
+</style>
+
+<div id="dynamic_content">
+    <div class="page-title">
+        <div class="title_left">
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Mencari Berita Acara Serah Terima <small>blanko sertifikat</small></h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <br />
+                    <form class="form-horizontal form-label-left" id="frmQueryStatistikNTPN" role="form">
+                        @*<div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tipe Blanko : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.DropDownListFor(m => m.PilihanTipeBlanko, new SelectList(@Model.KumpulanTipeBlanko, "tipeblankoid", "tipe"), new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "idkabk" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tgl. Awal Serah Terima : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <div class='input-group date' id='tglAwalSerahTerima'>
+                                        @Html.TextBoxFor(model => model.TanggalAwalSerahTerima, new { @class = "form-control" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                @Html.ValidationMessageFor(model => model.TanggalAwalSerahTerima)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tgl. Akhir Serah Terima : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <div class='input-group date' id='tglAkhirSerahTerima'>
+                                        @Html.TextBoxFor(model => model.TanggalAkhirSerahTerima, new { @class = "form-control" })
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                @Html.ValidationMessageFor(model => model.TanggalAkhirSerahTerima)
+                            </div>
+                        </div>*@
+
+
+                        <div class="ln_solid"></div>
+
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                @*<button type="button" class="btn btn-success" onclick="proceedBeritaAcara('')">Entri Yang Baru</button>*@
+                                <button type="submit" class="btn btn-success">Cari</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Berita Acara</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                        <br />
+                            <div class="table-responsive">
+                                <table id="eventsTable" class="table table-striped table-bordered infinite-scroll">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center;">No.</th>
+                                <th style="text-align:center;">Nama Satker</th>
+                                <th style="text-align:center;">Jumlah NTPN</th>
+                                <th style="text-align:center;">Jumlah Berkas</th>
+                                <th style="text-align:center;">%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="statistikntpnrows"></tbody>
+                                </table>
+                            </div>
+
+                    @Html.Partial("_Loading")
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<a id="backtotop" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
+
+<script>
+    $(function () {
+        $("div#loading").hide();
+    });
+
+    (function (a) { a.createModal = function (b) { defaults = { title: "", message: "Your Message Goes Here!", closeButton: true, scrollable: false }; var b = a.extend({}, defaults, b); var c = (b.scrollable === true) ? 'style="max-height: 420px;overflow-y: auto;"' : ""; html = '<div class="modal fade" id="myModal">'; html += '<div class="modal-dialog">'; html += '<div class="modal-content">'; html += '<div class="modal-header">'; html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'; if (b.title.length > 0) { html += '<h4 class="modal-title">' + b.title + "</h4>" } html += "</div>"; html += '<div class="modal-body" ' + c + ">"; html += b.message; html += "</div>"; html += '<div class="modal-footer">'; if (b.closeButton === true) { html += '<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>' } html += "</div>"; html += "</div>"; html += "</div>"; html += "</div>"; a("body").prepend(html); a("#myModal").modal().on("hidden.bs.modal", function () { a(this).remove() }) } })(jQuery);
+
+    function showmsg(judul, isi) {
+        $.createModal({
+            title: judul,
+            message: isi,
+            closeButton: true,
+            scrollable: false
+        });
+        return false;
+    };
+
+    $(function () {
+        $.validator.methods.date = function (value, element) {
+            return this.optional(element) || moment(value, "DD/MM/YYYY", true).isValid();
+        }
+    });
+
+    $(document).ready(function () {
+        $('.select2_single').select2({ width: 'resolve' });
+        
+        $('#tglAwalSerahTerima').datetimepicker({
+            format: 'DD/MM/YYYY',
+            locale: 'id',
+        });
+
+        $('#tglAkhirSerahTerima').datetimepicker({
+            format: 'DD/MM/YYYY',
+            locale: 'id',
+        });
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#backtotop').fadeIn();
+            } else {
+                $('#backtotop').fadeOut();
+            }
+        });
+        $('#backtotop').click(function () {
+            $('#backtotop').tooltip('hide');
+            $('body,html').animate({
+                scrollTop: 0
+            }, 800);
+            return false;
+        });
+        $('#backtotop').tooltip('show');
+    });
+
+    $("#frmQueryStatistikNTPN").submit(function (e) {
+        if ($("#frmQueryStatistikNTPN").valid()) {
+            resetInfiniteScroll();
+            //formToPost = $('#frmQueryBeritaAcara');
+            $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Test", "Laporan")',
+                //data: $('#frmQueryBeritaAcara').serialize(),
+                success: function (data, textStatus, XMLHttpRequest) {
+
+                    if (data == 'noresults') {
+                        showmsg('Status', 'Tidak ada data yang ditemukan');
+                    }
+                    else {
+                        $('#statistikntpnrows').html(data);
+                    }
+                    $.unblockUI();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+            });
+        }
+        e.preventDefault();
+        return false;
+    });
+
+    var proceedBeritaAcara = function (v) {
+        var startUrl = '/TataUsaha/ShowWizard';
+        //$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.pjax({
+            container: '#dynamic_content',
+            type: "POST",
+            url: startUrl,
+            data: JSON.stringify({ 'id': v }),
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8"
+            //success: function (result) {
+            //    $('#right_col').html(result);
+            //    $.unblockUI();
+            //},
+            //error: function (xhr, status, p3, p4) {
+            //    $.unblockUI();
+            //}
+        });
+    }
+
+    var OpenDetailStatikNTPN = function () {
+        $.pjax({
+            container: '#dynamic_content',
+            type: "POST",
+            url: '/Laporan/ShowDetailNTPN',
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8"
+        });
+    }
+
+    moreRowsUrl = '@Url.Action("Test", "Laporan")';
+    $(window).scroll(scrollHandler);
+</script>
