@@ -1,10 +1,5 @@
 ﻿@model  Pnbp.Entities.CharDashboard
-@{
-//var penerimaan = ViewBag.total_penerimaan;
-//var belanja = ViewBag.total_belanja;
-//var persentase_penerimaan = ViewBag.persentase_penerimaan;
-//var persentase_belanja = ViewBag.persentase_belanja;
-}
+@{}
 <style>
     .control-label {
         padding-top: 8px;
@@ -150,40 +145,6 @@
                 </div>
             </div>
 
-            @*<div class="col-md-3 col-sm-2 col-xs-12">
-                <div class="x_panel" id="belanjaops" style="height:250px">
-                    <div class="loader loader-halfpie">
-                        <div class="loader-wheel"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-2 col-xs-12">
-                <div class="x_panel" id="belanjanonops" style="height:250px">
-                    <div class="loader loader-halfpie">
-                        <div class="loader-wheel"></div>
-                    </div>
-                </div>
-            </div>*@
-
-            @* Line Chart ALokasi VS Belanja OPS *@
-            @*<div class="col-md-6">
-                <div class="x_panel" id="alokasibelanjaops"  style="height:250px">
-                    <div class="loader loader-line">
-                        <div class="loader-wheel"></div>
-                    </div>
-                </div>
-            </div>*@
-
-            @* Line Chart ALokasi VS Belanja NON OPS *@
-            @*<div class="col-md-6">
-                <div class="x_panel" id="alokasibelanjanonops" style="height:250px">
-                    <div class="loader loader-line">
-                        <div class="loader-wheel"></div>
-                    </div>
-                </div>
-            </div>*@
-
         </div>
     </div>
 </div>
@@ -193,10 +154,6 @@
     var belanjaOps;
 
     $(document).ready(function () {
-        //getPaguvsMp();
-        //mpvsbelanja();
-        //mpvsbelanjaops();
-        //mpbelanjanonops();
         getDashboardLine();
 
         getTotalPenerimaan();
@@ -302,12 +259,6 @@
     }
 
     function getPaguvsMp(persenMp, persenPagu){
-        //var datamp = dataMp;
-        //var datapagu = dataPagu;
-        //var persenMp = Math.round(((datamp || 0) / (datapagu)) * 100);
-        //var persenPagu = 100 - persenMp;
-
-        //alert(isNAN(persenMp));
         Highcharts.chart('paguvsmp', {
             chart: {
                 renderTo: 'container',
@@ -353,19 +304,6 @@
                     useHTML: true,
                     y: 80
                 },
-                /*plotBands: [{
-                    from: 0,
-                    to: 46,
-                    color: 'pink',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                },{
-                    from: 46,
-                    to: 90,
-                    color: 'tan',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                }],*/
                 pane: 0,
 
             }],
@@ -384,14 +322,6 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                //gauge: {
-                //    dataLabels: {
-                //        enabled: false
-                //    },
-                //    dial: {
-                //        radius: '100%'
-                //    }
-                //}
             },
 
             series: [{
@@ -401,19 +331,8 @@
                 data: [
                     ['MP', Math.round(persenMp)],
                     ['PAGU', Math.round(persenPagu)]
-                    @*['PAGU', Math.round(persenbelanja)],
-                    ['MP', @nilai_mp[0]],*@
-
                     ]
             },
-                //{
-                //    type: 'gauge',
-                //    //data: [ Math.round(persenbelanja)],
-                //        data: [Math.round(persenMp == 0 ? 0 : persenMp)],
-                //    dial: {
-                //        rearLength: 0
-                //    }
-                //}
             ],
         });
     }
@@ -466,19 +385,6 @@
                     useHTML: true,
                     y: 80
                 },
-                /*plotBands: [{
-                    from: 0,
-                    to: 46,
-                    color: 'pink',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                },{
-                    from: 46,
-                    to: 90,
-                    color: 'tan',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                }],*/
                 pane: 0,
 
             }],
@@ -497,14 +403,7 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                //gauge: {
-                //    dataLabels: {
-                //        enabled: false
-                //    },
-                //    dial: {
-                //        radius: '100%'
-                //    }
-                //}
+               
             },
 
             series: [{
@@ -517,13 +416,6 @@
 
                 ]
             },
-                //{
-                //    type: 'gauge',
-                //    data: [persenBelanja <= 0 ? 0 : persenBelanja],
-                //    dial: {
-                //        rearLength: 0
-                //    }
-                //}
             ],
         });
     }
@@ -576,19 +468,6 @@
                     useHTML: true,
                     y: 80
                 },
-                /*plotBands: [{
-                    from: 0,
-                    to: 46,
-                    color: 'pink',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                },{
-                    from: 46,
-                    to: 90,
-                    color: 'tan',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                }],*/
                 pane: 0,
 
             }],
@@ -607,14 +486,6 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                //gauge: {
-                //    dataLabels: {
-                //        enabled: false
-                //    },
-                //    dial: {
-                //        radius: '100%'
-                //    }
-                //}
             },
 
             series: [{
@@ -627,13 +498,6 @@
 
                 ]
             },
-                //{
-                //    type: 'gauge',
-                //    data: [persenBelanja <= 0 ? 0 : persenBelanja],
-                //    dial: {
-                //        rearLength: 0
-                //    }
-                //}
             ],
         });
     }
@@ -688,19 +552,6 @@
                     useHTML: true,
                     y: 80
                 },
-                /*plotBands: [{
-                    from: 0,
-                    to: 46,
-                    color: 'pink',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                },{
-                    from: 46,
-                    to: 90,
-                    color: 'tan',
-                    innerRadius: '100%',
-                    outerRadius: '0%'
-                }],*/
                 pane: 0,
 
             }],
@@ -719,14 +570,6 @@
                     endAngle: 90,
                     center: ['50%', '75%']
                 },
-                //gauge: {
-                //    dataLabels: {
-                //        enabled: false
-                //    },
-                //    dial: {
-                //        radius: '100%'
-                //    }
-                //}
             },
 
             series: [{
@@ -739,13 +582,6 @@
 
                 ]
             },
-                //{
-                //    type: 'gauge',
-                //    data: [persenBelanja <= 0 ? 0 : persenBelanja],
-                //    dial: {
-                //        rearLength: 0
-                //    }
-                //}
             ],
         });
     }
@@ -761,7 +597,6 @@
             var cekNonOps = true;
             var cekOps = true;
             var cekAlokasiOps = true;
-            //Show Alokasi (Line Chart)
             $.each(bulan, function (j, v) {
                 if (i == v) {
                     alokasi.push(resultArray[j]);
@@ -771,7 +606,6 @@
 
             if (cek) {
                 alokasi.push(0);
-                //console.log(bulan);
             }
 
             //Show Alokasi OPS
@@ -784,7 +618,6 @@
 
             if (cekAlokasiOps) {
                 alokasiops.push(0);
-                //console.log(bulan);
             }
             //Show Alokasi OPS
 
@@ -855,15 +688,6 @@
                 line: {
                     dataLabels: {
                         enabled: false,
-                        //formatter: function() {
-                        //    //return this.value / 1000000000 + 'M';
-                        //    if (this.y >= 1E6) {
-                        //        return this.y / 1000000000;
-                        //    } else if(this.y == 0){
-                        //        return '0';
-                        //    }
-                        //    return '' + this.y / 1000000 + 'JT';
-                        //}
                     },
                     enableMouseTracking: true
                 }
@@ -873,7 +697,6 @@
                 data: alokasiops
             }, {
                 name: 'Belanja OPS',
-                //data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 data: ops
             }]
         });
@@ -924,7 +747,6 @@
             }, {
                 name: 'Belanja Non-OPS',
                 color: "#37659D",
-                //data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 data: nonOps
             }]
         });

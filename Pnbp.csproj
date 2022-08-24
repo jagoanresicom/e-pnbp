@@ -195,7 +195,6 @@
     <Compile Include="Controllers\PengembalianController.cs" />
     <Compile Include="Controllers\TargetController.cs" />
     <Compile Include="Controllers\TipeManfaatController.cs" />
-    <Compile Include="Controllers\V2\HomeController.cs" />
     <Compile Include="DomainModel\PnbpContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -5936,14 +5935,6 @@
     <Content Include="Views\MonitoringEvaluasi\AlokasiV2.cshtml" />
     <Content Include="Views\MonitoringEvaluasi\AlokasiSummaryDetail.cshtml" />
     <Content Include="Views\Pemanfaatan\ListDataManfaatKROV2.cshtml" />
-    <Content Include="Views\V2\Home\Index.cshtml" />
-    <Content Include="Views\V2\Shared\_Layout.cshtml" />
-    <Content Include="Views\V2\Shared\_Layout_old.cshtml" />
-    <Content Include="Views\V2\Shared\_Loading.cshtml" />
-    <Content Include="Views\V2\Account\ForgotPassword.cshtml" />
-    <Content Include="Views\V2\Account\Index.cshtml" />
-    <Content Include="Views\V2\Account\ListKantor.cshtml" />
-    <Content Include="Views\V2\Account\Register.cshtml" />
     <Content Include="V2\resources\ckeditor\bower.json" />
     <Content Include="V2\resources\ckeditor\CHANGES.md" />
     <Content Include="V2\resources\ckeditor\composer.json" />
@@ -5980,6 +5971,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Api\" />
+    <Folder Include="Views\old\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
