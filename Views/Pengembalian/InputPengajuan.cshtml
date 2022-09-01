@@ -413,19 +413,19 @@
         });
     }
 
-    $('.asd').keyup(function (event) {
+    //$('.asd').keyup(function (event) {
 
-        // skip for arrow keys
-        if (event.which >= 37 && event.which <= 40) return;
+    //    // skip for arrow keys
+    //    if (event.which >= 37 && event.which <= 40) return;
 
-        // format number
-        $(this).val(function (index, value) {
-            return value
-            .replace(/\D/g, "")
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-            ;
-        });
-    });
+    //    // format number
+    //    $(this).val(function (index, value) {
+    //        return value
+    //        .replace(/\D/g, "")
+    //        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    //        ;
+    //    });
+    //});
 
     function addCommas(nStr) {
         nStr += '';
@@ -465,40 +465,49 @@
     JumlahBayar.addEventListener('keydown', function (event) {
         return isNumberKey(event);
     });
+
+    var PermohonanPengembalian = document.getElementById("PermohonanPengembalian");
+    PermohonanPengembalian.addEventListener("keyup", function (e) {
+        PermohonanPengembalian.value = convertRupiah(this.value);
+    });
+    PermohonanPengembalian.addEventListener('keydown', function (event) {
+        return isNumberKey(event);
+    });
+
     //$(function () {
     //    alert(400000 - 500000);
     //})
-    $('#SetoranPnbp').keyup(function (event) {
-        var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);
-        var SetoranPnbp = parseInt(($('#SetoranPnbp').val() != '') ? $('#SetoranPnbp').val().replace(/\./g, ""): 0);
+    //$('#SetoranPnbp').keyup(function (event) {
+    //    var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);
+    //    var SetoranPnbp = parseInt(($('#SetoranPnbp').val() != '') ? $('#SetoranPnbp').val().replace(/\./g, ""): 0);
 
-        if (Number(SetoranPnbp) < Number(JumlahBayar)) {
-            var jml = '';
-            $('#PermohonanPengembalian').val( jml);
-        } else {
-            var permohonanpengembalian = (Number(SetoranPnbp) - Number(JumlahBayar));
-            var jml = permohonanpengembalian;
-            $('#PermohonanPengembalian').val(addCommas(jml));
-        }
-        console.log(JumlahBayar);
+    //    if (Number(SetoranPnbp) < Number(JumlahBayar)) {
+    //        var jml = '';
+    //        $('#PermohonanPengembalian').val( jml);
+    //    } else {
+    //        var permohonanpengembalian = (Number(SetoranPnbp) - Number(JumlahBayar));
+    //        var jml = permohonanpengembalian;
+    //        $('#PermohonanPengembalian').val(addCommas(jml));
+    //    }
+    //    console.log(JumlahBayar);
 
-    });
+    //});
 
-    $('#JumlahBayar').keyup(function (event) {
-        var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);
-        var SetoranPnbp = parseInt(($('#SetoranPnbp').val() != '') ? $('#SetoranPnbp').val().replace(/\./g, ""): 0);
+    //$('#JumlahBayar').keyup(function (event) {
+    //    var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);
+    //    var SetoranPnbp = parseInt(($('#SetoranPnbp').val() != '') ? $('#SetoranPnbp').val().replace(/\./g, ""): 0);
 
-        if (Number(SetoranPnbp) < Number(JumlahBayar)) {
-            var jml = '';
-            $('#PermohonanPengembalian').val(jml);
-        } else {
-            var permohonanpengembalian = (Number(SetoranPnbp) - Number(JumlahBayar));
-            var jml = permohonanpengembalian;
-            $('#PermohonanPengembalian').val(addCommas(jml));
-        }
-        console.log(parseInt(JumlahBayar));
+    //    if (Number(SetoranPnbp) < Number(JumlahBayar)) {
+    //        var jml = '';
+    //        $('#PermohonanPengembalian').val(jml);
+    //    } else {
+    //        var permohonanpengembalian = (Number(SetoranPnbp) - Number(JumlahBayar));
+    //        var jml = permohonanpengembalian;
+    //        $('#PermohonanPengembalian').val(addCommas(jml));
+    //    }
+    //    console.log(parseInt(JumlahBayar));
 
-    });
+    //});
 
     function convertRupiah(angka, prefix) {
         var number_string = angka.replace(/[^,\d]/g, "").toString(),
@@ -517,14 +526,18 @@
     }
 
     function isNumberKey(evt) {
-        key = evt.which || evt.keyCode;
+        var key = (evt.which) ? evt.which : event.keyCode;
         if (key != 188 // Comma
              && key != 8 // Backspace
              && key != 17 && key != 86 & key != 67 // Ctrl c, ctrl v
-             && (key < 48 || key > 57) // Non digit
-             ) {
-            evt.preventDefault();
-            return;
+            && (key < 48 || key > 57) // Non digit
+        ) {
+            if (key >= 96 && key <= 106) {
+                // numpad
+            } else {
+                evt.preventDefault();
+                return;
+            }
         }
     }
 

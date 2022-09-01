@@ -241,7 +241,6 @@
     <script src='@Url.Content("~/resources/js/select2.multi-checkboxes.min.js")'></script>
     <script src='@Url.Content("~/resources/sweetalert/sweetalert.min.js")'></script>
     <script src='@Url.Content("~/resources/js/myjs.js")' type="text/javascript"></script>
-
     <script src='@Url.Content("~/resources/js/jquery.validate.min.js")'></script>
     <script src='@Url.Content("~/resources/js/jquery.validate.unobtrusive.min.js")'></script>
 </head>
@@ -280,7 +279,8 @@
                                             <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Monitoring Evaluasi</a></li>*@
 
                                             <li><a href="@Url.Action("ImportAlokasi", "Alokasi")">Alokasi Pusat</a></li>
-                                            <li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>
+                                            @*<li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>*@
+                                            <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Monitoring Alokasi</a></li>
                                         }
                                         else
                                         {
@@ -332,6 +332,7 @@
                                         <li><a href="@Url.Action("RincianAlokasi", "Pemanfaatan")">Pusat</a></li>
                                         <li><a href="@Url.Action("PersetujuanRevisiManfaat", "Pemanfaatan")">Daerah</a></li>
                                         <li><a href="@Url.Action("PersetujuanRevisiManfaat", "Pemanfaatan")">Monitoring</a></li>
+                                        <li><a href="@Url.Action("PengajuanPengembalianIndex", "Pengembalian")">Pengembalian PNBP</a></li>
                                     </ul>
                                 </li>
                                 <!--<li>

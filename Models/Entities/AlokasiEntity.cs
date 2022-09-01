@@ -278,7 +278,22 @@ namespace Pnbp.Entities
     }
 
 
-    // new 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // new Sangkuriang
     public class TemplateAlokasi
     {
         public string KodeSatker { get; set; }
@@ -316,7 +331,7 @@ namespace Pnbp.Entities
 
     public class AlokasiSatkerDetail
     {
-        public List<AlokasiSatker> Data { get; set; }
+        public List<AlokasiSatkerV2> Data { get; set; }
         public List<AlokasiSatkerRevisi> Total { get; set; }
     }
 
