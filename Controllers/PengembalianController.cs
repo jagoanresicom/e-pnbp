@@ -206,6 +206,25 @@ namespace Pnbp.Controllers
             return View(find);
         }
 
+        public ActionResult mon_pengembalian()
+        {
+            Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
+
+            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+
+            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+
+            ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
+            ViewData["datasatker"] = result;
+            ViewData["kantorid"] = kantoriduser;
+
+
+            //return Json(kantoriduser, JsonRequestBehavior.AllowGet);
+
+            return View(find);
+        }
+
         public ActionResult PengajuanPengembalianForm()
         {
             return View();
@@ -820,6 +839,42 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
             //return Json(result, JsonRequestBehavior.AllowGet);
+            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult mon_pengembalian_list(int? start, int? length, Entities.FindPengembalianPnbp f)
+        {
+            int recNumber = start ?? 0;
+            int RecordsPerPage = length ?? 10;
+            int from = recNumber + 1;
+            int to = from + RecordsPerPage - 1;
+
+            decimal? total = 0;
+
+            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+
+            string namakantor = f.CariNamaKantor;
+            string judul = f.CariJudul;
+            string nomorberkas = f.CariNomorBerkas;
+            string kodebilling = f.CariKodeBilling;
+            string ntpn = f.CariNTPN;
+            string namapemohon = f.CariNamaPemohon;
+            string nikpemohon = f.CariNikPemohon;
+            string alamatpemohon = f.CariAlamatPemohon;
+            string teleponpemohon = f.CariTeleponPemohon;
+            string bankpersepsi = f.CariBankPersepsi;
+            string status = f.CariStatus;
+            string namasatker = f.CariNamaSatker;
+            string kodesatker = f.CariKodeSatker;
+            int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+
+            List<Entities.PengembalianPnbpTrain> result = pengembalianmodel.mon_pengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
+
+            if (result.Count > 0)
+            {
+                total = result[0].Total;
+            }
             return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
         }
 

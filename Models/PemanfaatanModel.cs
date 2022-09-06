@@ -976,6 +976,110 @@ namespace Pnbp.Models
             return records;
         }
 
+        public List<Entities.BelanjaKRO> lr_kro(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to)
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            ArrayList arrayListParameters = new ArrayList();
+
+            string query = @"SELECT * FROM (
+	SELECT 
+	    ROW_NUMBER() over (ORDER BY p.kode) RNUMBER,
+	    p.kode KodeKRO,
+        sum(amount) alokasi,
+        p.nama kro,
+        COUNT(1) OVER() TOTAL
+    FROM pnbp.span_belanja sb
+    JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
+    GROUP BY (p.kode, nama)
+)
+ WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+
+            query = sWhitespace.Replace(query, " ");
+
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, parameters).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+        public List<Entities.BelanjaKRO> rl_satker(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to)
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            ArrayList arrayListParameters = new ArrayList();
+
+            string query = @"SELECT * FROM (
+	SELECT 
+		ROW_NUMBER() over (ORDER BY kdsatker) RNUMBER,
+		KDSATKER KodeKRO,
+        namasatker KRO,
+		sum(pagu) pagu,
+        sum(alokasi) alokasi,
+        COUNT(1) OVER() TOTAL
+	FROM pnbp.alokasisatker alsk
+JOIN kkpwebdev.DATASATKER u ON alsk.KDSATKER  = u.KODESATKER 
+GROUP BY (kdsatker,namasatker)
+)
+ WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+
+            query = sWhitespace.Replace(query, " ");
+
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, parameters).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to)
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            ArrayList arrayListParameters = new ArrayList();
+
+            string query = @"SELECT * FROM (
+	                            SELECT 
+        ROW_NUMBER() over (ORDER BY prov.nama) RNUMBER,
+        prov.nama KodeKRO,
+        sum(pagu) pagu,
+        sum(alokasi) alokasi,
+        COUNT(1) OVER() TOTAL
+    FROM pnbp.alokasisatker alsk
+JOIN kkpwebdev.DATASATKER u ON alsk.KDSATKER  = u.KODESATKER 
+JOIN kantor k ON k.kodesatker = alsk.KDSATKER
+JOIN wilayah w ON k.kode = w.kode
+JOIN wilayah prov ON prov.wilayahid = w.induk
+WHERE prov.tipewilayahid = 1
+GROUP BY (prov.nama)
+                            )
+                             WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+
+            query = sWhitespace.Replace(query, " ");
+
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, parameters).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
         public List<Entities.PrioritasAlokasi> GetManfaatSatker(string kantorid, string tahun)
         {
             List<Entities.PrioritasAlokasi> prioritasManfaat = new List<Entities.PrioritasAlokasi>();

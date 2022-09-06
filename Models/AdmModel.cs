@@ -7,12 +7,15 @@ using System.Data.Entity.Infrastructure;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Configuration;
+using System.Web.Mvc;
 
 namespace Pnbp.Models
 {
     public class AdmModel
     {
+        private string _schemaKKP = OtorisasiUser.NamaSkemaKKP;
         Regex sWhitespace = new Regex(@"\s+");
+
         public static List<Entities.Wilayah> getPropinsi()
         {
             List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
@@ -890,7 +893,7 @@ namespace Pnbp.Models
                     "        to_char(beritaapp.validsampai, 'dd MONTH yyyy', 'nls_date_language=INDONESIAN') TanggalBerakhir, " +
                     "        COUNT(1) OVER() TOTAL " +
                     "    FROM " +
-                    "        KKPWEB.beritaapp " +
+                    $"        {_schemaKKP}.beritaapp " +
                     "    WHERE " +
                     "        beritaapp.APPLICATIONNAME = :ApplicationName " +
                     "        AND (beritaapp.STATUSHAPUS IS NULL OR beritaapp.STATUSHAPUS = '0') " +

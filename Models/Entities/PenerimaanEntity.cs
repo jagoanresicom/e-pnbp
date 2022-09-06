@@ -216,6 +216,7 @@ namespace Pnbp.Entities
         public string kantorid { get; set; }
         public string kodesatker { get; set; }
         public string nama_satker { get; set; }
+        public string nama_provinsi { get; set; }
         public string jenispenerimaan { get; set; }
         public string kodepenerimaan { get; set; }
         public decimal penerimaan { get; set; }

@@ -5967,6 +5967,14 @@
     <Content Include="V2\resources\fonts\ProximaNovaCond-Black.otf" />
     <Content Include="V2\resources\fonts\ProximaNovaCond-Bold.otf" />
     <Content Include="V2\resources\fonts\ProximaNovaCond-Reg.otf" />
+    <Content Include="Views\Pemanfaatan\DaftarBelanjaKRO.cshtml" />
+    <Content Include="Views\Penerimaan\pn_layanan.cshtml" />
+    <Content Include="Views\Penerimaan\pn_satker.cshtml" />
+    <Content Include="Views\Pemanfaatan\rl_satker.cshtml" />
+    <Content Include="Views\Pemanfaatan\rl_provinsi.cshtml" />
+    <Content Include="Views\Pengembalian\mon_pengembalian.cshtml" />
+    <Content Include="Views\Pemanfaatan\rl_kro.cshtml" />
+    <Content Include="Views\Penerimaan\pn_provinsi.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -432,6 +432,136 @@ namespace Pnbp.Models
             return records;
         }
 
+        public List<Entities.PengembalianPnbpTrain> mon_pengembalian(int tipekantorid, string kantoriduser, string namakantor, string judul, string nomorberkas, string kodebilling, string nptn, string namapemohon, string nikpemohon, string alamatpemohon, string teleponpemohon, string bankpersepsi, string status, string namasatker, string kodesatker, int from, int to)
+        {
+            List<Entities.PengembalianPnbpTrain> records = new List<Entities.PengembalianPnbpTrain>();
+
+            ArrayList arrayListParameters = new ArrayList();
+
+            string query =
+                //                kantor.kode,
+                @"SELECT * FROM (
+                    SELECT
+                        ROW_NUMBER() over (ORDER BY pengembalianpnbp.tanggalpengaju DESC, berkaskembalian.tanggalbayar, berkaskembalian.namapemohon) RNumber,
+                        pengembalianpnbp.pengembalianpnbpid, pengembalianpnbp.kantorid, pengembalianpnbp.namakantor,
+                        pengembalianpnbp.pegawaiidpengaju, pengembalianpnbp.namapegawaipengaju, 
+                        to_char(pengembalianpnbp.tanggalpengaju, 'dd-mm-yyyy') TanggalPengaju,
+                        pengembalianpnbp.pegawaiidsetuju, pengembalianpnbp.namapegawaisetuju, 
+                        to_char(pengembalianpnbp.tanggalsetuju, 'dd-mm-yyyy') TanggalSetuju,
+                        pengembalianpnbp.statussetuju, pengembalianpnbp.judul,pengembalianpnbp.StatusPengembalian, 
+                        berkaskembalian.berkasid, berkaskembalian.namaprosedur, berkaskembalian.kodebilling,
+                        to_char(berkaskembalian.tanggalkodebilling, 'dd-mm-yyyy') TanggalKodeBilling,
+                        to_char(berkaskembalian.tanggalbayar, 'dd-mm-yyyy') TanggalBayar,
+                        berkaskembalian.ntpn, berkaskembalian.jumlahbayar, berkaskembalian.namabankpersepsi,
+                        berkaskembalian.pemilikid, berkaskembalian.namapemohon, berkaskembalian.nikpemohon,
+                        berkaskembalian.alamatpemohon, berkaskembalian.emailpemohon, berkaskembalian.nomortelepon,
+                        berkaskembalian.nomorberkas, berkaskembalian.nomorrekening, berkaskembalian.namabank,
+                        berkaskembalian.namacabang, to_number(berkaskembalian.jumlahbayar) JumlahBayarNumber,
+                        berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
+                        satker.kodesatker KodeSatker,
+                        satker.nama_satker NamaSatker,
+                        COUNT(1) OVER() Total
+                    FROM
+                        pengembalianpnbp
+                        JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
+                        JOIN kantor ON kantor.kantorid = pengembalianpnbp.kantorid
+                        JOIN satker ON satker.kantorid = pengembalianpnbp.kantorid 
+                        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) 
+                   WHERE berkaskembalian.nomorsurat IS NOT NULL AND berkaskembalian.permohonanpengembalian IS NOT NULL";
+
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorIdUser", kantoriduser));
+
+            query = sWhitespace.Replace(query, " ");
+
+            if (!String.IsNullOrEmpty(namakantor))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaKantor", String.Concat("%", namakantor.ToLower(), "%")));
+                query += " AND LOWER(pengembalianpnbp.nama) LIKE :NamaKantor ";
+            }
+            if (tipekantorid == 1)
+            {
+                //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", String.Concat("%", kodebilling.ToLower(), "%")));
+                query += " AND pengembalianpnbp.StatusPengembalian != '0' ";
+            }
+            if (!String.IsNullOrEmpty(judul))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Judul", String.Concat("%", judul.ToLower(), "%")));
+                query += " AND LOWER(pengembalianpnbp.judul) LIKE :Judul ";
+            }
+            if (!String.IsNullOrEmpty(nomorberkas))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorBerkas", String.Concat("%", nomorberkas.ToLower(), "%")));
+                //query +=
+                //    " AND EXISTS (SELECT 1 FROM " + System.Web.Mvc.OtorisasiUser.NamaSkema + ".berkaskembalian WHERE berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid " +
+                //    "             AND LOWER(berkaskembalian.nomorberkas) LIKE :NomorBerkas)";
+                query += " AND LOWER(berkaskembalian.nomorberkas) LIKE :NomorBerkas ";
+            }
+            if (!String.IsNullOrEmpty(kodebilling))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", String.Concat("%", kodebilling.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.kodebilling) LIKE :KodeBilling ";
+            }
+            if (!String.IsNullOrEmpty(nptn))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Ntpn", String.Concat("%", nptn.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.ntpn) LIKE :Ntpn ";
+            }
+            if (!String.IsNullOrEmpty(namapemohon))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", String.Concat("%", namapemohon.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.namapemohon) LIKE :NamaPemohon ";
+            }
+            if (!String.IsNullOrEmpty(nikpemohon))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NikPemohon", String.Concat("%", nikpemohon.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.nikpemohon) LIKE :NikPemohon ";
+            }
+            if (!String.IsNullOrEmpty(alamatpemohon))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("AlamatPemohon", String.Concat("%", alamatpemohon.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.alamatpemohon) LIKE :AlamatPemohon ";
+            }
+            if (!String.IsNullOrEmpty(teleponpemohon))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorTelepon", String.Concat("%", teleponpemohon.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.nomortelepon) LIKE :NomorTelepon ";
+            }
+            if (!String.IsNullOrEmpty(bankpersepsi))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaBank", String.Concat("%", bankpersepsi.ToLower(), "%")));
+                query += " AND LOWER(berkaskembalian.namabank) LIKE :NamaBank ";
+            }
+            if (!String.IsNullOrEmpty(status))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("StatusPengembalian", String.Concat("%", status.ToLower(), "%")));
+                query += " AND LOWER(pengembalianpnbp.StatusPengembalian) LIKE :StatusPengembalian ";
+            }
+            if (!String.IsNullOrEmpty(namasatker))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaSatker", String.Concat("%", namasatker.ToLower(), "%")));
+                query += " AND LOWER(satker.nama_satker) LIKE :NamaSatker ";
+            }
+            if (!String.IsNullOrEmpty(kodesatker))
+            {
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeSatker", String.Concat("%", kodesatker.ToLower(), "%")));
+                query += " AND LOWER(satker.kodesatker) LIKE :KodeSatker ";
+            }
+
+            query +=
+                " ORDER BY pengembalianpnbp.tanggalpengaju DESC ) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
+
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                records = ctx.Database.SqlQuery<Entities.PengembalianPnbpTrain>(query, parameters).ToList();
+            }
+
+            return records;
+        }
+
         public int JumlahPengembalianPnbp(string kantoriduser, string namakantor, string judul, string nomorberkas, string kodebilling, string nptn, string namapemohon, string nikpemohon, string alamatpemohon, string teleponpemohon, string bankpersepsi)
         {
             int result = 0;

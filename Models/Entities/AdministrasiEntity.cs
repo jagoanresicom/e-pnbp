@@ -174,6 +174,20 @@ namespace Pnbp.Entities
 
         public HttpPostedFileBase filepdf { get; set; }
     }
+    public class BelanjaKRO
+    {
+        public decimal? RNumber { get; set; }
+        public decimal? Total { get; set; }
+        public string KodeKRO { get; set; }
+        public string KRO { get; set; }
+        public decimal? Pagu { get; set; }
+        public decimal? Alokasi { get; set; }
+        public decimal? Realisasi { get; set; }
+        public decimal? TotalAlokasi { get; set; }
+        public decimal? TotalPagu { get; set; }
+        public string PersentasePagu { get; set; }
+        public string PersentaseAlokasi { get; set; }
+    }
 
     public class DataPaguAlokasi
     {

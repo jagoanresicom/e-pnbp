@@ -1042,6 +1042,173 @@ namespace Pnbp.Controllers
             }
         }
 
+        public ActionResult rl_kro ()
+        {
+            int indexKaBiroPerencanaan = -1;
+            int indexKaBiroKeuangan = -1;
+
+            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            if (useridentity != null)
+            {
+                string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
+                indexKaBiroPerencanaan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroPerencanaan"].ToString());
+                indexKaBiroKeuangan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroKeuangan"].ToString());
+            }
+
+            Entities.FindManfaat fn = new Entities.FindManfaat();
+            fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
+            fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+            return View(fn);
+        }
+
+        public ActionResult rl_provinsi()
+        {
+            int indexKaBiroPerencanaan = -1;
+            int indexKaBiroKeuangan = -1;
+
+            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            if (useridentity != null)
+            {
+                string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
+                indexKaBiroPerencanaan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroPerencanaan"].ToString());
+                indexKaBiroKeuangan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroKeuangan"].ToString());
+            }
+
+            Entities.FindManfaat fn = new Entities.FindManfaat();
+            fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
+            fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+            return View(fn);
+        }
+
+        public ActionResult rl_satker()
+        {
+            int indexKaBiroPerencanaan = -1;
+            int indexKaBiroKeuangan = -1;
+
+            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            if (useridentity != null)
+            {
+                string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
+                indexKaBiroPerencanaan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroPerencanaan"].ToString());
+                indexKaBiroKeuangan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroKeuangan"].ToString());
+            }
+
+            Entities.FindManfaat fn = new Entities.FindManfaat();
+            fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
+            fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+            return View(fn);
+        }
+
+
+        [HttpPost]
+        public ActionResult rl_kro(int? start, Entities.FindManfaat f)
+        {
+            int recNumber = start ?? 0;
+            int RecordsPerPage = 10;
+            int from = recNumber + 1;
+            int to = from + RecordsPerPage - 1;
+
+
+
+            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            string kodesatker = f.KodeSatker;
+            string namasatker = f.NamaSatker;
+            string namaprogram = f.NamaProgram;
+            decimal? nilaianggaran = f.NilaiAnggaran;
+
+            this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
+            this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
+
+            List<Entities.BelanjaKRO> result = _manfaatanModel.lr_kro(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+
+
+            int custIndex = from;
+
+
+            decimal? total = 0;
+            if (result.Count > 0)
+            {
+                total = result[0].Total;
+            }
+
+            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult rl_satker_list(int? start, Entities.FindManfaat f)
+        {
+            int recNumber = start ?? 0;
+            int RecordsPerPage = 10;
+            int from = recNumber + 1;
+            int to = from + RecordsPerPage - 1;
+
+
+
+            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            string kodesatker = f.KodeSatker;
+            string namasatker = f.NamaSatker;
+            string namaprogram = f.NamaProgram;
+            decimal? nilaianggaran = f.NilaiAnggaran;
+
+            this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
+            this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
+
+            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_satker(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+            //List<Entities.BelanjaKRO> resultSumList = _manfaatanModel.rl_satker_sum(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+
+            //var resultSum = resultSumList.First();
+
+            foreach (var item in result)
+            {
+                //item.PersentaseAlokasi = ((item.Alokasi / resultSum.TotalAlokasi) * 100)?.ToString();
+                //var persenAlokasi = ((item.Pagu / resultSum.TotalPagu) * 100);
+                //item.PersentaseAlokasi = string.Format("{0:#,##0.##}", persenAlokasi) + " %"; ;
+            }
+
+            decimal? total = 0;
+            if (result.Count > 0)
+            {
+                total = result[0].Total;
+            }
+
+            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult rl_provinsi(int? start, Entities.FindManfaat f)
+        {
+            int recNumber = start ?? 0;
+            int RecordsPerPage = 10;
+            int from = recNumber + 1;
+            int to = from + RecordsPerPage - 1;
+
+
+
+            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            string kodesatker = f.KodeSatker;
+            string namasatker = f.NamaSatker;
+            string namaprogram = f.NamaProgram;
+            decimal? nilaianggaran = f.NilaiAnggaran;
+
+            this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
+            this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
+
+            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_provinsi(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+
+            foreach (var item in result)
+            {
+            }
+
+            decimal? total = 0;
+            if (result.Count > 0)
+            {
+                total = result[0].Total;
+            }
+
+            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+        }
+
 
         #region InformasiBerkas
         public ActionResult InformasiBerkas()
