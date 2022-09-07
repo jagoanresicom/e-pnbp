@@ -44,6 +44,16 @@
 				</div>
 				<div class="x_content">
 					<form class="form-horizontal form-label-left" id="frmCariManfaat" role="form" method="post" enctype="multipart/form-data">
+
+						@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+						{
+							<input type="hidden" name="jeniskantor" id="jeniskantor" value="Pusat" />
+						}
+						else
+						{
+							<input type="hidden" name="jeniskantor" id="jeniskantor" value="Kantah" />
+						}
+
 						<div class="table-responsive">
 							<table id="eventsTable" class="table table-striped table-bordered" style="width:100%">
 								<thead>
@@ -182,7 +192,9 @@
 					"width": "5%",
 					"render": function (data, type, row) {
 						var html = '<div class="text-center d-flex justify-content-center" style="gap:6px">';
-						html += '<button type="button" class="btn btn-success js-btn-selesai">Selesai</button>';
+						if ($('#jeniskantor').val() == 'Pusat') {
+							html += '<button type="button" class="btn btn-success js-btn-selesai">Selesai</button>';
+						}
 						html += '<button type="button" class="btn btn-primary js-btn-edit"><i class="fa fa-pencil js-btn-edit"></i> Edit</button>';
 						html += '</div>';
 						return html;

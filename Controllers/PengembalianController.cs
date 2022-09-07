@@ -1484,7 +1484,8 @@ namespace Pnbp.Controllers
             ViewData["file10"] = file10;
             ViewData["file11"] = file11;
             ViewData["Pengembaliandata"] = data;
-            return View();
+            //return View();
+            return View("pengembaliandaerah");
         }
 
         public ActionResult PengajuanPengembalianDetailPusat(string pengembalianpnbpid)
@@ -1527,7 +1528,8 @@ namespace Pnbp.Controllers
             ViewData["file11"] = file11;
             ViewData["Pengembaliandata"] = data;
             //return Json(file9, JsonRequestBehavior.AllowGet);
-            return View();
+            //return View();
+            return View("pengembalianpusat");
         }
 
         [HttpPost]
