@@ -7,13 +7,14 @@ using System.Data.Entity.Infrastructure;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Configuration;
+using System.Web.Mvc;
 
 namespace Pnbp.Models
 {
     public class PemanfaatanModel
     {
         Regex sWhitespace = new Regex(@"\s+");
-
+        private string _schemaKKP = OtorisasiUser.NamaSkemaKKP;
         public string GetUID()
         {
             string id = "";
@@ -1015,17 +1016,17 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
-            string query = @"SELECT * FROM (
+            string query = $@"SELECT * FROM (
 	SELECT 
 		ROW_NUMBER() over (ORDER BY kdsatker) RNUMBER,
 		KDSATKER KodeKRO,
-        namasatker KRO,
+        nama_satker KRO,
 		sum(pagu) pagu,
         sum(alokasi) alokasi,
         COUNT(1) OVER() TOTAL
 	FROM pnbp.alokasisatker alsk
-JOIN kkpwebdev.DATASATKER u ON alsk.KDSATKER  = u.KODESATKER 
-GROUP BY (kdsatker,namasatker)
+JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
+GROUP BY (kdsatker,nama_satker)
 )
  WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
 
@@ -1049,16 +1050,15 @@ GROUP BY (kdsatker,namasatker)
 
             ArrayList arrayListParameters = new ArrayList();
 
-            string query = @"SELECT * FROM (
+            string query = $@"SELECT * FROM (
 	                            SELECT 
         ROW_NUMBER() over (ORDER BY prov.nama) RNUMBER,
         prov.nama KodeKRO,
         sum(pagu) pagu,
         sum(alokasi) alokasi,
         COUNT(1) OVER() TOTAL
-    FROM pnbp.alokasisatker alsk
-JOIN kkpwebdev.DATASATKER u ON alsk.KDSATKER  = u.KODESATKER 
-JOIN kantor k ON k.kodesatker = alsk.KDSATKER
+    FROM alokasisatker alsk
+JOIN {_schemaKKP}.kantor k ON k.kodesatker = alsk.KDSATKER
 JOIN wilayah w ON k.kode = w.kode
 JOIN wilayah prov ON prov.wilayahid = w.induk
 WHERE prov.tipewilayahid = 1

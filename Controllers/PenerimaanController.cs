@@ -645,6 +645,7 @@ namespace Pnbp.Controllers
                         x.nilaitarget,
                         x.nama_satker,
                         x.namaprosedur,
+                        x.nama_provinsi,
                         x.kodesatker,
                         x.kodepenerimaan,
                         x.kanwilid,

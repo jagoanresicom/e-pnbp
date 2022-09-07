@@ -125,11 +125,11 @@
 				data: function (data, obj) { var ftp = $('#frmCariManfaat').serializeArray(); data.form = ftp; ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }); return ftp; }
             },
             "columns": [
-                { "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
+				{ "data": "urutan", "className": "centertaligncolumn", "width": "5%" },
+				{ "data": "namaprosedur", "className": "centertaligncolumn", "width": "5%" },
 				{ "data": null, "className": "centertaligncolumn", "width": "5%", "render": function () { return "" } },
-				{ "data": null, "className": "centertaligncolumn", "width": "5%", "render": function () { return "" } },
-				{ "data": null, "className": "centertaligncolumn", "width": "5%", "render": function () { return "" } },
-				{ "data": null, "className": "centertaligncolumn", "width": "5%", "render": function () { return "" } },
+				{ "data": "target", "className": "centertaligncolumn", "width": "5%", "render": formatAngka },
+				{ "data": "penerimaan", "className": "centertaligncolumn", "width": "5%", "render": formatAngka },
             ],
 		});
 
