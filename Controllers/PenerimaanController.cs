@@ -53,19 +53,6 @@ namespace Pnbp.Controllers
             return View("RealisasiPenerimaan_dtable");
         }
 
-
-        public ActionResult pn_satker()
-        {
-            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
-            var ctx = new PnbpContext();
-
-            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
-            ViewData["get_propinsi"] = get_propinsi;
-            //return Json(get_propinsi, JsonRequestBehavior.AllowGet);
-
-            return View();
-        }
-
         public ActionResult satker(string kode)
         {
             var ctx = new PnbpContext();
@@ -96,59 +83,6 @@ namespace Pnbp.Controllers
             );
 
             var resp = Json(new {
-                draw = req.Draw,
-                data = data.daftarRekapan.Select(x =>
-                {
-                    var operasional = x.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                    return new
-                    {
-                        x.urutan,
-                        penerimaan,
-                        operasional,
-                        x.nilaitarget,
-                        x.nama_satker,
-                        x.namaprosedur,
-                        x.kodesatker,
-                        x.kodepenerimaan,
-                        x.kanwilid,
-                        x.kantorid,
-                        x.jumlah,
-                        x.jenispenerimaan
-                    };
-                }),
-                recordsTotal = data.RecordsTotal,
-                recordsFiltered = data.RecordsFiltered
-            });
-
-            resp.MaxJsonLength = int.MaxValue;
-            return resp;
-        }
-
-        [HttpPost]
-        public ActionResult pn_satker_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
-        {
-
-            Models.PenerimaanModel model = new Models.PenerimaanModel();
-
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
-            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
-
-            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
-
-            var data = model.pn_satker(
-                reqTahun,
-                bulan,
-                propinsi,
-                satker,
-                tipekantorid,
-                kantorid,
-                req.Start,
-                req.Length
-            );
-
-            var resp = Json(new
-            {
                 draw = req.Draw,
                 data = data.daftarRekapan.Select(x =>
                 {
@@ -506,27 +440,6 @@ namespace Pnbp.Controllers
         #endregion
 
         #region RealisasiLayanan
-        public ActionResult pn_provinsi()
-        {
-            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
-            var ctx = new PnbpContext();
-
-            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("select kantorId, kode, replace(nama,'Kantor Wilayah ', '') as nama from kantor where tipekantorid=2").ToList();
-            //ViewData["get_propinsi"] = get_propinsi;
-
-            return View();
-        }
-
-        public ActionResult pn_layanan()
-        {
-            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
-            var ctx = new PnbpContext();
-
-            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("select kantorId, kode, replace(nama,'Kantor Wilayah ', '') as nama from kantor where tipekantorid=2").ToList();
-            //ViewData["get_propinsi"] = get_propinsi;
-
-            return View();
-        }
 
         public ActionResult DaftarRealisasiLayananDT(DatatablesRequest req, string tahun, string bulan)
         {
@@ -565,101 +478,6 @@ namespace Pnbp.Controllers
             result.MaxJsonLength = int.MaxValue;
 
             return result;
-        }
-
-        [HttpPost]
-        public ActionResult pn_layanan_list(DatatablesRequest req, string tahun, string bulan)
-        {
-            Models.PenerimaanModel model = new Models.PenerimaanModel();
-            Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
-
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
-            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
-
-            var data = model.pn_layanan(tahun, bulan, tipekantorid, kantorid, req.Start, req.Length);
-
-            var result = Json(new
-            {
-                draw = req.Draw,
-                data = data.ListPenerimaan.Select(x => {
-                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                    var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                    return new
-                    {
-                        x.jenispenerimaan,
-                        jumlah,
-                        x.kantorid,
-                        x.kanwilid,
-                        x.kodepenerimaan,
-                        x.kodesatker,
-                        x.nama,
-                        x.namaprosedur,
-                        x.operasional,
-                        penerimaan,
-                        x.urutan
-                    };
-                }),
-                recordsTotal = data.RecordsTotal,
-                recordsFiltered = data.RecordsFiltered
-            });
-
-            result.MaxJsonLength = int.MaxValue;
-
-            return result;
-        }
-
-        [HttpPost]
-        public ActionResult pn_provinsi_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
-        {
-
-            Models.PenerimaanModel model = new Models.PenerimaanModel();
-
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
-            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
-
-            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
-
-            var data = model.pn_provinsi(
-                reqTahun,
-                bulan,
-                propinsi,
-                satker,
-                tipekantorid,
-                kantorid,
-                req.Start,
-                req.Length
-            );
-
-            var resp = Json(new
-            {
-                draw = req.Draw,
-                data = data.daftarRekapan.Select(x =>
-                {
-                    var operasional = x.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                    return new
-                    {
-                        x.urutan,
-                        penerimaan,
-                        operasional,
-                        x.nilaitarget,
-                        x.nama_satker,
-                        x.namaprosedur,
-                        x.nama_provinsi,
-                        x.kodesatker,
-                        x.kodepenerimaan,
-                        x.kanwilid,
-                        x.kantorid,
-                        x.jumlah,
-                        x.jenispenerimaan
-                    };
-                }),
-                recordsTotal = data.RecordsTotal,
-                recordsFiltered = data.RecordsFiltered
-            });
-
-            resp.MaxJsonLength = int.MaxValue;
-            return resp;
         }
 
         public ActionResult DaftarRealisasiLayanan(Entities.FilterPenerimaan frm)
@@ -1176,5 +994,216 @@ namespace Pnbp.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         #endregion
+
+
+        // V2
+        public ActionResult pn_provinsi()
+        {
+            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
+            var ctx = new PnbpContext();
+
+            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("select kantorId, kode, replace(nama,'Kantor Wilayah ', '') as nama from kantor where tipekantorid=2").ToList();
+            //ViewData["get_propinsi"] = get_propinsi;
+
+            return View();
+        }
+
+        public ActionResult pn_satker(string pid)
+        {
+            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
+            var ctx = new PnbpContext();
+
+            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
+            ViewData["get_propinsi"] = get_propinsi;
+            ViewData["provinsi_id"] = pid;
+            //return Json(get_propinsi, JsonRequestBehavior.AllowGet);
+
+            return View();
+        }
+
+        public ActionResult pn_layanan(string pid)
+        {
+            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
+            var ctx = new PnbpContext();
+
+            var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("select kantorId, kode, replace(nama,'Kantor Wilayah ', '') as nama from kantor where tipekantorid=2").ToList();
+            //ViewData["get_propinsi"] = get_propinsi;
+            ViewData["satker"] = pid;
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult pn_provinsi_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
+        {
+
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+
+            var data = model.pn_provinsi(
+                reqTahun,
+                bulan,
+                propinsi,
+                satker,
+                tipekantorid,
+                kantorid,
+                req.Start,
+                req.Length
+            );
+
+            var resp = Json(new
+            {
+                draw = req.Draw,
+                data = data.daftarRekapan.Select(x =>
+                {
+                    var operasional = x.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    return new
+                    {
+                        x.urutan,
+                        penerimaan,
+                        operasional,
+                        x.nilaitarget,
+                        x.nama_satker,
+                        x.namaprosedur,
+                        x.id_provinsi,
+                        x.nama_provinsi,
+                        x.kodesatker,
+                        x.kodepenerimaan,
+                        x.kanwilid,
+                        x.kantorid,
+                        x.jumlah,
+                        x.jenispenerimaan,
+                        x.targetfisik
+                    };
+                }),
+                recordsTotal = data.RecordsTotal,
+                recordsFiltered = data.RecordsFiltered
+            });
+
+            resp.MaxJsonLength = int.MaxValue;
+            return resp;
+        }
+
+        [HttpPost]
+        public ActionResult pn_satker_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
+        {
+
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+            if (tipekantorid == "1")
+            {
+                kantorid = "";
+            }
+
+            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+
+            var data = model.pn_satker(
+                reqTahun,
+                bulan,
+                propinsi,
+                satker,
+                tipekantorid,
+                kantorid,
+                req.Start,
+                req.Length
+            );
+
+            var resp = Json(new
+            {
+                draw = req.Draw,
+                data = data.daftarRekapan.Select(x =>
+                {
+                    var operasional = x.operasional.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    return new
+                    {
+                        x.urutan,
+                        penerimaan,
+                        operasional,
+                        x.nilaitarget,
+                        x.nama_satker,
+                        x.namaprosedur,
+                        x.kodesatker,
+                        x.kodepenerimaan,
+                        x.kanwilid,
+                        x.kantorid,
+                        x.jumlah,
+                        x.jenispenerimaan
+                    };
+                }),
+                recordsTotal = data.RecordsTotal,
+                recordsFiltered = data.RecordsFiltered
+            });
+
+            resp.MaxJsonLength = int.MaxValue;
+            return resp;
+        }
+
+
+        [HttpPost]
+        public ActionResult pn_layanan_list(DatatablesRequest req, string tahun, string bulan, string pid, string layanan)
+        {
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
+            Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
+
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+            if (string.IsNullOrEmpty(pid))
+            {
+                kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                if (tipekantorid == "1")
+                {
+                    kantorid = "";
+                }
+            }
+            else
+            {
+                kantorid = pid;
+            }
+
+            tahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            var data = model.pn_layanan(tahun, bulan, tipekantorid, kantorid, layanan, req.Start, req.Length);
+
+            var result = Json(new
+            {
+                draw = req.Draw,
+                data = data.ListPenerimaan.Select(x => {
+                    var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    return new
+                    {
+                        x.jenispenerimaan,
+                        jumlah,
+                        x.kantorid,
+                        x.kanwilid,
+                        x.kodepenerimaan,
+                        x.targetfisik,
+                        x.kodesatker,
+                        x.nama,
+                        x.namaprosedur,
+                        x.operasional,
+                        penerimaan,
+                        x.urutan
+                    };
+                }),
+                recordsTotal = data.RecordsTotal,
+                recordsFiltered = data.RecordsFiltered
+            });
+
+            result.MaxJsonLength = int.MaxValue;
+
+            return result;
+        }
+
+
     }
 }

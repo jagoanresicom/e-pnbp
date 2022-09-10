@@ -204,6 +204,7 @@ namespace Pnbp.Entities
         public string kodepenerimaan { get; set; }
         public decimal penerimaan { get; set; }
         public decimal operasional { get; set; }
+        public decimal targetfisik { get; set; }
         public int urutan { get; set; }
         public string namaprosedur { get; set; }
         public int jumlah { get; set; }
@@ -216,11 +217,13 @@ namespace Pnbp.Entities
         public string kantorid { get; set; }
         public string kodesatker { get; set; }
         public string nama_satker { get; set; }
+        public string id_provinsi { get; set; }
         public string nama_provinsi { get; set; }
         public string jenispenerimaan { get; set; }
         public string kodepenerimaan { get; set; }
         public decimal penerimaan { get; set; }
         public decimal operasional { get; set; }
+        public decimal targetfisik { get; set; }
         public int urutan { get; set; }
         public string namaprosedur { get; set; }
         public int jumlah { get; set; }

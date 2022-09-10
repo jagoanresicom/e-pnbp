@@ -1009,7 +1009,30 @@ namespace Pnbp.Controllers
             foreach (Entities.berkaspenerimaanls item in _dtBerkas)
             {
                 List<Entities.statusberkasls> _dtStatus = lm.dtStatusBerkas(item.berkasid);
-                _dtInfo.Add(new Entities.InformasiBerkas() { berkasid = item.berkasid, ntpn = item.ntpn, kodebilling = item.kodebilling, tglpenerimaan = item.tglpenerimaan, namakantor = item.namakantor, namaprosedur = item.namaprosedur, namawajibbayar = item.namawajibbayar, totalbiaya = item.totalbiaya, detailpenerimaan = item.detailpenerimaan, nomor = _dtStatus[0].nomor, tahun = _dtStatus[0].tahun, nomorkanwil = _dtStatus[0].nomorkanwil, tahunkanwil = _dtStatus[0].tahunkanwil, nomorpusat = _dtStatus[0].nomorpusat, tahunpusat = _dtStatus[0].tahunpusat, tipekantor = _dtStatus[0].tipekantor, kantor = _dtStatus[0].kantor, tipekantorwilayah = _dtStatus[0].tipekantorwilayah, kantorwilayah = _dtStatus[0].kantorwilayah, tipekantortujuan = _dtStatus[0].tipekantortujuan, kantortujuan = _dtStatus[0].kantortujuan, statusberkas = _dtStatus[0].statusberkas });
+                _dtInfo.Add(new Entities.InformasiBerkas() { 
+                    berkasid = item.berkasid, 
+                    ntpn = item.ntpn, 
+                    kodebilling = item.kodebilling, 
+                    tglpenerimaan = item.tglpenerimaan, 
+                    namakantor = item.namakantor, 
+                    namaprosedur = item.namaprosedur, 
+                    namawajibbayar = item.namawajibbayar, 
+                    totalbiaya = item.totalbiaya, 
+                    detailpenerimaan = item.detailpenerimaan, 
+                    nomor = _dtStatus[0].nomor, 
+                    tahun = _dtStatus[0].tahun, 
+                    nomorkanwil = _dtStatus[0].nomorkanwil, 
+                    tahunkanwil = _dtStatus[0].tahunkanwil, 
+                    nomorpusat = _dtStatus[0].nomorpusat, 
+                    tahunpusat = _dtStatus[0].tahunpusat, 
+                    tipekantor = _dtStatus[0].tipekantor, 
+                    kantor = _dtStatus[0].kantor, 
+                    tipekantorwilayah = _dtStatus[0].tipekantorwilayah, 
+                    kantorwilayah = _dtStatus[0].kantorwilayah, 
+                    tipekantortujuan = _dtStatus[0].tipekantortujuan, 
+                    kantortujuan = _dtStatus[0].kantortujuan, 
+                    statusberkas = _dtStatus[0].statusberkas 
+                });
             }
             return PartialView("InformasiBerkasPartial", _dtInfo);
         }
