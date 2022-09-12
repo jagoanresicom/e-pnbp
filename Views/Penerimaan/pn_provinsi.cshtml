@@ -169,7 +169,7 @@
 	    let dTable = $('#eventsTable').DataTable({
             "bLengthChange": false,
             "paging": true,
-            "pageLength": 10,
+            "pageLength": 100,
             "bFilter": false,
             "ordering": false,
             "info": false,
@@ -182,7 +182,7 @@
 			    data: function (data, obj) {
                     var ftp = frmPencarian.serializeArray();
                     data.form = ftp;
-                    ftp.push({ name: "start", value: data.start }, { name: "length", value: 100 });
+					ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }, { name: "draw", value: data.draw });
                     return ftp;
 			    }
             },

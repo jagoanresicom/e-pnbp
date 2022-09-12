@@ -1088,7 +1088,7 @@ namespace Pnbp.Controllers
                     };
                 }),
                 recordsTotal = totalRecord,
-                recordsFiltered = totalRecord
+                recordsFiltered = totalRecord,
             });
 
             resp.MaxJsonLength = int.MaxValue;
