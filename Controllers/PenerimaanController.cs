@@ -1055,6 +1055,12 @@ namespace Pnbp.Controllers
                 req.Length
             );
 
+            int totalRecord = 0;
+            if (data.daftarRekapan.Count > 0)
+            {
+                totalRecord = data.daftarRekapan.First().RecordsTotal;
+            }
+
             var resp = Json(new
             {
                 draw = req.Draw,
@@ -1081,8 +1087,8 @@ namespace Pnbp.Controllers
                         x.targetfisik
                     };
                 }),
-                recordsTotal = data.RecordsTotal,
-                recordsFiltered = data.RecordsFiltered
+                recordsTotal = totalRecord,
+                recordsFiltered = totalRecord
             });
 
             resp.MaxJsonLength = int.MaxValue;
@@ -1115,6 +1121,12 @@ namespace Pnbp.Controllers
                 req.Length
             );
 
+            int totalRecord = 0;
+            if (data.daftarRekapan.Count > 0)
+            {
+                totalRecord = data.daftarRekapan.First().RecordsTotal;
+            }
+
             var resp = Json(new
             {
                 draw = req.Draw,
@@ -1138,8 +1150,8 @@ namespace Pnbp.Controllers
                         x.jenispenerimaan
                     };
                 }),
-                recordsTotal = data.RecordsTotal,
-                recordsFiltered = data.RecordsFiltered
+                recordsTotal = totalRecord,
+                recordsFiltered = totalRecord
             });
 
             resp.MaxJsonLength = int.MaxValue;
@@ -1173,6 +1185,12 @@ namespace Pnbp.Controllers
             tahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             var data = model.pn_layanan(tahun, bulan, tipekantorid, kantorid, layanan, req.Start, req.Length);
 
+            int totalRecord = 0;
+            if (data.ListPenerimaan.Count > 0)
+            {
+                totalRecord = data.ListPenerimaan.First().RecordsTotal;
+            }
+
             var result = Json(new
             {
                 draw = req.Draw,
@@ -1192,11 +1210,11 @@ namespace Pnbp.Controllers
                         x.namaprosedur,
                         x.operasional,
                         penerimaan,
-                        x.urutan
+                        x.urutan,
                     };
                 }),
-                recordsTotal = data.RecordsTotal,
-                recordsFiltered = data.RecordsFiltered
+                recordsTotal = totalRecord,
+                recordsFiltered = totalRecord
             });
 
             result.MaxJsonLength = int.MaxValue;
