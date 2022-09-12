@@ -1034,7 +1034,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
-        public ActionResult pn_provinsi_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
+        public ActionResult pn_provinsi_list(DatatablesRequest req, string tahun, string bulan, string satker, string provinsi)
         {
 
             Models.PenerimaanModel model = new Models.PenerimaanModel();
@@ -1047,7 +1047,7 @@ namespace Pnbp.Controllers
             var data = model.pn_provinsi(
                 reqTahun,
                 bulan,
-                propinsi,
+                provinsi,
                 satker,
                 tipekantorid,
                 kantorid,

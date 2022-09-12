@@ -1036,7 +1036,7 @@ namespace Pnbp.Models
 
 
         // V2
-        public RealisasiPenerimaanDT pn_provinsi(string pTahun, string pBulan, string propinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
+        public RealisasiPenerimaanDT pn_provinsi(string pTahun, string pBulan, string provinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
         {
             List<Entities.DaftarRekapPenerimaanDetail> _list = new List<Entities.DaftarRekapPenerimaanDetail>();
             List<object> lstparams = new List<object>();
@@ -1061,10 +1061,10 @@ namespace Pnbp.Models
                 lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pBulan));
             }
 
-            if (!String.IsNullOrEmpty(propinsi))
+            if (!String.IsNullOrEmpty(provinsi))
             {
                 query += " and lower(w.nama) like '%'||:param5||'%' ";
-                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", propinsi.ToLower()));
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
             }
 
             //if (!String.IsNullOrEmpty(satker))
@@ -1111,12 +1111,19 @@ namespace Pnbp.Models
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", start));
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", length));
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                var parameters = lstparams.ToArray();
-                _list = ctx.Database.SqlQuery<Entities.DaftarRekapPenerimaanDetail>(query, parameters).ToList<Entities.DaftarRekapPenerimaanDetail>();
-                //count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).First().Count;
+                using (var ctx = new PnbpContext())
+                {
+                    var parameters = lstparams.ToArray();
+                    _list = ctx.Database.SqlQuery<Entities.DaftarRekapPenerimaanDetail>(query, parameters).ToList<Entities.DaftarRekapPenerimaanDetail>();
+                    //count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).First().Count;
 
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
 
             return new RealisasiPenerimaanDT
@@ -1190,12 +1197,19 @@ namespace Pnbp.Models
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", start));
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", length));
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                var parameters = lstparams.ToArray();
-                _list = ctx.Database.SqlQuery<Entities.DaftarRekapPenerimaanDetail>(query, parameters).ToList<Entities.DaftarRekapPenerimaanDetail>();
-                //count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).First().Count;
+                using (var ctx = new PnbpContext())
+                {
+                    var parameters = lstparams.ToArray();
+                    _list = ctx.Database.SqlQuery<Entities.DaftarRekapPenerimaanDetail>(query, parameters).ToList<Entities.DaftarRekapPenerimaanDetail>();
+                    //count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).First().Count;
 
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
 
             return new RealisasiPenerimaanDT
@@ -1261,11 +1275,18 @@ namespace Pnbp.Models
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", start));
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", length));
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                var parameters = lstparams.ToArray();
-                _list = ctx.Database.SqlQuery<Entities.StatistikPenerimaan>(query, parameters).ToList<Entities.StatistikPenerimaan>();
-                //count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).FirstOrDefault().Count;
+                using (var ctx = new PnbpContext())
+                {
+                    var parameters = lstparams.ToArray();
+                    _list = ctx.Database.SqlQuery<Entities.StatistikPenerimaan>(query, parameters).ToList<Entities.StatistikPenerimaan>();
+                    //count = ctx.Database.SqlQuery<CountResult>(queryCount, parameters).FirstOrDefault().Count;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
 
             return new RealisasiLayananDT

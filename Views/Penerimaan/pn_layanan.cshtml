@@ -51,13 +51,13 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                    <form class="form-horizontal form-label-left" id="frmCariManfaat" role="form" method="post" enctype="multipart/form-data">
+                    <form class="form-horizontal form-label-left" id="js-frm-pencarian" role="form" method="post" enctype="multipart/form-data">
 
                         <div class="row">
                             <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
                                 <div class="col-md-4 col-sm-4 col-xs-12">
-                                    <select name="year" id="year" class="select2_single form-control input-md text-">
+                                    <select name="tahun" class="select2_single form-control input-md text-">
                                         <option value="" class="text-left">-- Pilih Tahun --</option>
                                         @for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
                                         {
@@ -127,8 +127,6 @@
 
     $(document).ready(function () {
 
-		createPagingPengajuan();
-
         $('#myModalDocViewer').on('shown.bs.modal', function () {
             $(this).find('.modal-dialog').css({
                 width: '98%',
@@ -154,12 +152,14 @@
         });
 
         $('#back-to-top').tooltip('show');
-    });
 
+        let frmPencarian = $('#js-frm-pencarian');
+        frmPencarian.on('submit', (e) => {
+            e.preventDefault();
+            dTable.draw();
+        });
 
-	var dtablePengajuan;
-    var createPagingPengajuan = function () {
-		dtablePengajuan = $('#eventsTable').DataTable({
+        let dTable = $('#eventsTable').DataTable({
             "bLengthChange": false,
             "paging": true,
             "pageLength": 10,
@@ -170,39 +170,39 @@
             "serverSide": true,
             "scrollX": false,
             "ajax": {
-				url: '@Url.Action("pn_layanan_list", "Penerimaan")',
+                url: '@Url.Action("pn_layanan_list", "Penerimaan")',
                 type: "POST",
-				data: function (data, obj) {
-					var pid = '@ViewBag.satker';
-                    var ftp = $('#frmCariManfaat').serializeArray();
-					data.form = ftp;
-					ftp.push(
-						{ name: "start", value: data.start },
-						{ name: "length", value: data.length },
+                data: function (data, obj) {
+                    var pid = '@ViewBag.satker';
+                    var ftp = frmPencarian.serializeArray();
+                    data.form = ftp;
+                    ftp.push(
+                        { name: "start", value: data.start },
+                        { name: "length", value: data.length },
                         { name: "pid", value: pid }
-					);
-					return ftp;
-				}
+                    );
+                    return ftp;
+                }
             },
             "columns": [
-				{ "data": "urutan", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "namaprosedur", "width": "50%" },
+                { "data": "urutan", "className": "centertaligncolumn", "width": "5%" },
+                { "data": "namaprosedur", "width": "50%" },
                 { "data": null, "className": "text-right", "width": "15%", "render": function () { return "" } },
                 { "data": "jumlah", "className": "text-right", "width": "15%", "render": formatAngka },
-				{ "data": "penerimaan", "className": "text-right", "width": "15%", "render": formatAngka },
+                { "data": "penerimaan", "className": "text-right", "width": "15%", "render": formatAngka },
             ],
-		});
+        });
 
-		function formatAngka(data) {
-			let formattedString = formatangka(data);
-			console.log(formattedString)
-			if (formattedString == 'null') {
-				formattedString = '';
-			}
-			return formattedString;
-		}
+        function formatAngka(data) {
+            let formattedString = formatangka(data);
+            console.log(formattedString)
+            if (formattedString == 'null') {
+                formattedString = '';
+            }
+            return formattedString;
+        }
 
-    };
+    });
 
 </script>
 
