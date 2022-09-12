@@ -82,9 +82,11 @@
                         <div class="row">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                <button id="btn-cari" type="submit" class="btn btn-info">Cari</button>
+                                <button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
                             </div>
                         </div>
+                        <br>
+
                         <div class="table-responsive">
                             <table id="eventsTable" class="table table-striped table-bordered" style="width:100%">
                                 <thead>
@@ -187,12 +189,14 @@
 		    "columns": [
 			    { "data": "urutan", "className": "centertaligncolumn", "width": "5%" },
 			    { "data": "kodesatker", "className": "centertaligncolumn", "width": "15%" },
-			    { "data": "nama_satker", "width": "40%" },
+			    { "data": "nama_satker", "width": "30%" },
 			    //{ "data": "nilaitarget", "className": "text-right", "width": "15%", "rendr": formatAngka },
                 { "data": "operasional", "className": "text-right", "width": "20%", "rendr": formatAngka },
                 { "data": "penerimaan", "className": "text-right", "width": "20%", "rendr": formatAngka },
                 {
-                    "mData": "Name",
+					"mData": "Name",
+                    "width": "10%",
+					"className": "centertaligncolumn",
                     "mRender": function (data, type, row) {
                         return "<a class='centertaligncolumn' href='/Penerimaan/pn_layanan?pid=" + row.kantorid + "'><i class='fa fa-eye'></i></a>";
                     }
