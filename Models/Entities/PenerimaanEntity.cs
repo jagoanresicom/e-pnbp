@@ -237,6 +237,7 @@ namespace Pnbp.Entities
         [Key]
         public Decimal? totalpenerimaan { get; set; }
         public Decimal? totaloperasional { get; set; }
+        public Decimal? totalfisik { get; set; }
     }
 
     public class RekapPenerimaanDetail
