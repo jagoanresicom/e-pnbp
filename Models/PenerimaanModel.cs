@@ -1091,6 +1091,7 @@ namespace Pnbp.Models
                         c.kodesatker kodesatker, 
                         w.nama nama_provinsi,
                         w.wilayahid id_provinsi, 
+                        COUNT (a.jumlah) AS jumlah,
                         nvl(sum(b.TARGETFISIK), 0) AS targetfisik,
                         nvl(sum(a.penerimaan),0) as penerimaan, 
                         nvl(round(sum(a.operasional),2),0) as operasional ");
@@ -1103,6 +1104,7 @@ namespace Pnbp.Models
                                         penerimaan, 
                                         operasional, 
                                         targetfisik,
+                                        jumlah,
                                         row_number() over(order by nama_provinsi asc) as urutan 
                                     FROM 
                                         ({0})
@@ -1184,6 +1186,7 @@ namespace Pnbp.Models
             query = string.Format(query, @" c.kantorid, 
                         c.nama_satker, 
                         c.kodesatker,
+	                    COUNT (a.jumlah) AS jumlah,
                         nvl(sum(a.penerimaan),0) as penerimaan, 
                         nvl(sum(b.TARGETFISIK), 0) AS targetfisik,
                         nvl(round(sum(a.operasional),2),0) as operasional, 
