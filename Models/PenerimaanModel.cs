@@ -1087,6 +1087,7 @@ namespace Pnbp.Models
             //var queryCount = string.Format(query, @"COUNT(c.kantorid) OVER() as count");
 
             query = string.Format(query, @"
+                        COUNT(1) OVER() RecordsTotal,
                         k.kantorid kantorid,
                         c.kodesatker kodesatker, 
                         w.nama nama_provinsi,
@@ -1097,6 +1098,7 @@ namespace Pnbp.Models
                         nvl(round(sum(a.operasional),2),0) as operasional ");
 
             query = string.Format(@"SELECT * FROM (SELECT 
+                                        RecordsTotal,
                                         kantorid, 
                                         kodesatker,
                                         id_provinsi, 
@@ -1111,7 +1113,7 @@ namespace Pnbp.Models
                                     ) WHERE urutan BETWEEN :startCnt AND :limitCnt", query);
 
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", start));
-            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", length));
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", start + length));
 
             try
             {
@@ -1190,7 +1192,7 @@ namespace Pnbp.Models
                         nvl(sum(a.penerimaan),0) as penerimaan, 
                         nvl(sum(b.TARGETFISIK), 0) AS targetfisik,
                         nvl(round(sum(a.operasional),2),0) as operasional, 
-                        COUNT(1) OVER() TOTAL,
+                        COUNT(1) OVER() RecordsTotal,
                         row_number() over (order by sum(a.penerimaan) desc) as urutan");
 
             //query += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", start, length);
@@ -1198,7 +1200,7 @@ namespace Pnbp.Models
             query = string.Format("SELECT * FROM ({0}) WHERE urutan BETWEEN :startCnt AND :limitCnt", query);
 
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", start));
-            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", length));
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", start+length));
 
             try
             {
@@ -1259,24 +1261,22 @@ namespace Pnbp.Models
 
             query += " group by r1.namaprosedur";
 
-            var queryCount = String.Format(query, "COUNT(r1.NAMAPROSEDUR) OVER() as count");
+            //var queryCount = String.Format(query, "COUNT(r1.NAMAPROSEDUR) OVER() as count");
 
             query = string.Format(query, @"
-                DISTINCT
-	            r1.namaprosedur,
+                DISTINCT r1.namaprosedur,
 	            COUNT (r1.jumlah) AS jumlah,
 	            SUM (r1.penerimaan) AS penerimaan,
                 nvl(sum(b.TARGETFISIK), 0) AS targetfisik,
-                COUNT(1) OVER() TOTAL,
-	            ROW_NUMBER () OVER (ORDER BY SUM (r1.penerimaan) DESC) AS urutan
+                COUNT(1) OVER() RecordsTotal
             ");
 
             //query += string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", start, length);
 
-            query = string.Format("SELECT * FROM ({0}) WHERE urutan BETWEEN :startCnt AND :limitCnt", query);
+            query = string.Format("SELECT * FROM (SELECT RecordsTotal, namaprosedur, jumlah, penerimaan, targetfisik, ROW_NUMBER () OVER (ORDER BY penerimaan DESC) AS urutan FROM ({0})) WHERE urutan BETWEEN :startCnt AND :limitCnt", query);
 
             lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", start));
-            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", length));
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", start+length));
 
             try
             {

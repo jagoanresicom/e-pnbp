@@ -208,6 +208,7 @@ namespace Pnbp.Entities
         public int urutan { get; set; }
         public string namaprosedur { get; set; }
         public int jumlah { get; set; }
+        public int RecordsTotal { get; set; }
     }
 
     public class DaftarRekapPenerimaanDetail
@@ -228,6 +229,7 @@ namespace Pnbp.Entities
         public string namaprosedur { get; set; }
         public int jumlah { get; set; }
         public int? nilaitarget { get; set; }
+        public int RecordsTotal { get; set; }
     }
 
     public class DaftarTotal
