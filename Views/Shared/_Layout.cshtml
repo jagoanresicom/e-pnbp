@@ -344,7 +344,7 @@
                                     <!--</ul>
                                 </li>-->
 
-                                @*@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+                                 @*@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
                                 {
                                     <li>
                                         <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
@@ -371,6 +371,15 @@
                                         </ul>
                                     </li>
                                 }*@
+                                @if (OtorisasiUser.GetJenisKantorUser() == "Pusat")
+                                {
+                                    <li>
+                                        <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="@Url.Action("manajemendata", "administrasi")">Manajemen Data</a></li>
+                                        </ul>
+                                    </li>
+                                }
                             </ul>
                         </div>
                     </div>
