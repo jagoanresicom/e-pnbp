@@ -977,104 +977,157 @@ namespace Pnbp.Models
             return records;
         }
 
-        public List<Entities.BelanjaKRO> lr_kro(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to)
+        public List<Entities.BelanjaKRO> rl_kro(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to, string kantorId, string kodeKRO)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
 
-            ArrayList arrayListParameters = new ArrayList();
+            List<object> lstParams = new List<object>();
 
-            string query = @"SELECT * FROM (
-	SELECT 
-	    ROW_NUMBER() over (ORDER BY p.kode) RNUMBER,
-	    p.kode KodeKRO,
-        sum(amount) alokasi,
-        p.nama kro,
-        COUNT(1) OVER() TOTAL
-    FROM pnbp.span_belanja sb
-    JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
-    GROUP BY (p.kode, nama)
-)
- WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
-
-            query = sWhitespace.Replace(query, " ");
-
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
-
-            using (var ctx = new PnbpContext())
-            {
-                object[] parameters = arrayListParameters.OfType<object>().ToArray();
-                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, parameters).ToList<Entities.BelanjaKRO>();
-            }
-
-            return records;
-        }
-
-        public List<Entities.BelanjaKRO> rl_satker(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to)
-        {
-            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
-
-            ArrayList arrayListParameters = new ArrayList();
-
-            string query = $@"SELECT * FROM (
-	SELECT 
-		ROW_NUMBER() over (ORDER BY kdsatker) RNUMBER,
-		KDSATKER KodeKRO,
-        nama_satker KRO,
-		sum(pagu) pagu,
-        sum(alokasi) alokasi,
-        COUNT(1) OVER() TOTAL
-	FROM pnbp.alokasisatker alsk
-JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
-GROUP BY (kdsatker,nama_satker)
-)
- WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
-
-            query = sWhitespace.Replace(query, " ");
-
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
-
-            using (var ctx = new PnbpContext())
-            {
-                object[] parameters = arrayListParameters.OfType<object>().ToArray();
-                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, parameters).ToList<Entities.BelanjaKRO>();
-            }
-
-            return records;
-        }
-
-        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to)
-        {
-            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
-
-            ArrayList arrayListParameters = new ArrayList();
-
-            string query = $@"SELECT * FROM (
+            string subQuery = @"
 	                            SELECT 
-        ROW_NUMBER() over (ORDER BY prov.nama) RNUMBER,
-        prov.nama KodeKRO,
-        sum(pagu) pagu,
-        sum(alokasi) alokasi,
-        COUNT(1) OVER() TOTAL
-    FROM alokasisatker alsk
-JOIN {_schemaKKP}.kantor k ON k.kodesatker = alsk.KDSATKER
-JOIN wilayah w ON k.kode = w.kode
-JOIN wilayah prov ON prov.wilayahid = w.induk
-WHERE prov.tipewilayahid = 1
-GROUP BY (prov.nama)
-                            )
-                             WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+	                                ROW_NUMBER() over (ORDER BY p.kode) RNUMBER,
+	                                p.kode KodeKRO,
+                                    sum(amount) alokasi,
+                                    p.nama kro,
+                                    COUNT(1) OVER() TOTAL
+                                FROM 
+                                    pnbp.span_belanja sb
+                                    JOIN pnbp.satker s ON s.kodesatker = sb.KDSATKER 
+                                    JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
+                                WHERE 
+                                    sb.tahun = :tahun
+                                ";
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
+            if (!String.IsNullOrEmpty(kantorId))
+            {
+                subQuery += " and s.kantorId = :kantorId ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorId", kantorId));
+            }
+
+            if (!String.IsNullOrEmpty(kodeKRO))
+            {
+                subQuery += " and lower(p.kode) LIKE '%'||:kodeKRO||'%'";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeKRO", kodeKRO));
+            }
+
+            subQuery += " GROUP BY (p.kode, nama)  ";
+
+            string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+
+            query = string.Format(query, subQuery);
             query = sWhitespace.Replace(query, " ");
 
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 
             using (var ctx = new PnbpContext())
             {
-                object[] parameters = arrayListParameters.OfType<object>().ToArray();
-                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, parameters).ToList<Entities.BelanjaKRO>();
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+        public List<Entities.BelanjaKRO> rl_satker(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to, string wilayahId)
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            List<object> lstParams = new List<object>();
+
+            string subQuery = $@"
+	                            SELECT 
+		                            ROW_NUMBER() over (ORDER BY kdsatker) RNUMBER,
+		                            KDSATKER KodeKRO,
+                                    u.kantorid,
+                                    nama_satker KRO,
+		                            sum(pagu) pagu,
+                                    sum(alokasi) alokasi,
+                                    COUNT(1) OVER() TOTAL
+	                            FROM 
+                                    alokasisatker alsk
+                                    JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
+                                    JOIN { _schemaKKP}.kantor k ON k.kodesatker = u.KODESATKER
+                                    JOIN wilayah w ON k.kode = w.kode
+                                    JOIN wilayah prov ON prov.wilayahid = w.induk
+                                WHERE 
+                                    prov.tipewilayahid = 1
+                                    AND alsk.tahun = :tahun ";
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+            if (!String.IsNullOrEmpty(namasatker))
+            {
+                subQuery += " and lower(u.nama_satker) like '%'||:param4||'%' ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", namasatker.ToLower()));
+            }
+
+            if (!String.IsNullOrEmpty(wilayahId))
+            {
+                subQuery += " and prov.wilayahid= :wilayahId ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
+            }
+
+            subQuery += " GROUP BY (kdsatker,nama_satker, u.kantorid) ";
+
+            string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+
+            query = string.Format(query, subQuery);
+            query = sWhitespace.Replace(query, " ");
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, int from, int to)
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            List<object> lstParams = new List<object>();
+
+            string subQuery = $@"
+                                SELECT 
+                                    ROW_NUMBER() over(ORDER BY prov.nama) RNUMBER,
+                                    prov.nama KodeKRO,
+                                    prov.wilayahid,
+                                    sum(pagu) pagu,
+                                    sum(alokasi) alokasi,
+                                    COUNT(1) OVER() TOTAL
+                                FROM 
+                                    alokasisatker alsk
+                                    JOIN {_schemaKKP}.kantor k ON k.kodesatker = alsk.KDSATKER
+                                    JOIN wilayah w ON k.kode = w.kode
+                                    JOIN wilayah prov ON prov.wilayahid = w.induk
+                                WHERE 
+                                    prov.tipewilayahid = 1
+                                    AND alsk.tahun = :tahun";
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
+
+            if (!String.IsNullOrEmpty(provinsi))
+            {
+                subQuery += " and lower(prov.nama) like '%'||:param5||'%' ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
+            }
+           subQuery += " GROUP BY(prov.wilayahid, prov.nama) ";
+
+            string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
+
+            query = string.Format(query, subQuery);
+            query = sWhitespace.Replace(query, " ");
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
             }
 
             return records;

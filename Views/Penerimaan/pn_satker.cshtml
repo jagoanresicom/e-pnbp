@@ -51,58 +51,58 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                    <form class="form-horizontal form-label-left" id="js-frm-pencarian" role="form" method="post" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
-                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                    <select name="tahun" class="select2_single form-control input-md text-">
-                                        <option value="" class="text-left">-- Pilih Tahun --</option>
-                                        @for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
-                                        {
-                                            <option value="@i" class="text-left">@i</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Bulan : </label>
-                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                    @Html.DropDownListFor(model => model.bulan, lsbulan, " -- Pilih Bulan --", new { @class = "select2_single form-control input-md", @id = "bulan" })
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
-                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                    <input type="text" class="form-control" placeholder="Satuan Kerja" name="satker" />
-                                </div>
-                            </div>
-                        </div>
+					<form class="form-horizontal form-label-left" id="js-frm-pencarian" role="form" method="post" enctype="multipart/form-data">
+						<div class="row">
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
+								<div class="col-md-4 col-sm-4 col-xs-12">
+									<select name="tahun" class="select2_single form-control input-md text-">
+										<option value="" class="text-left">-- Pilih Tahun --</option>
+										@for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
+										{
+											<option value="@i" class="text-left">@i</option>
+										}
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12">Bulan : </label>
+								<div class="col-md-4 col-sm-4 col-xs-12">
+									@Html.DropDownListFor(model => model.bulan, lsbulan, " -- Pilih Bulan --", new { @class = "select2_single form-control input-md", @id = "bulan" })
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
+								<div class="col-md-4 col-sm-4 col-xs-12">
+									<input type="text" class="form-control" placeholder="Satuan Kerja" name="satker" />
+								</div>
+							</div>
+						</div>
 
-                        <div class="row">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
-                            </div>
-                        </div>
-                        <br>
+						<div class="row">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+							<div class="col-md-6 col-sm-6 col-xs-12">
+								<button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
+							</div>
+						</div>
+						<br>
 
-                        <div class="table-responsive">
-                            <table id="eventsTable" class="table table-striped table-bordered" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Kode Satker</th>
-                                        <th>Satuan Kerja</th>
-                                        <th>Fisik</th>
-                                        <th>Operasional</th>
-                                        <th>Penerimaan</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </form>
+						<div class="table-responsive">
+							<table id="eventsTable" class="table table-striped table-bordered" style="width:100%">
+								<thead>
+									<tr>
+										<th>No</th>
+										<th>Kode Satker</th>
+										<th>Satuan Kerja</th>
+										<th>Fisik</th>
+										<th>Operasional</th>
+										<th>Penerimaan</th>
+										<th>Aksi</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</form>
                 </div>
             </div>
         </div>
@@ -208,7 +208,6 @@
 
 		function formatAngka(data) {
 			let formattedString = formatangka(data);
-			console.log(formattedString)
 			if (formattedString == 'null') {
 				formattedString = '';
 			}

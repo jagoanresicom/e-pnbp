@@ -1381,6 +1381,31 @@ namespace Pnbp.Models
             return result;
         }
 
+        public string GetNamaWilayahById(string wilayahId)
+        {
+            string result = "";
+
+            string query = $@"
+                            SELECT nama FROM wilayah
+                            WHERE wilayahid = :wilayahId";
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    List<object> lstparams = new List<object>();
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
+                    result = ctx.Database.SqlQuery<string>(query, lstparams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
+        }
+
         public string GetNamaKantorByKantorId(string kantorId)
         {
             string result = "";
