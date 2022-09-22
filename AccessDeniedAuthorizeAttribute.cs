@@ -12,11 +12,11 @@ namespace Pnbp
             base.OnAuthorization(filterContext);
             if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                UriBuilder urlbld = new UriBuilder(filterContext.HttpContext.Request.Url);
-                urlbld.Port = -1;
-                string returnUrl = urlbld.Uri.ToString();
-                string loginUrl = FormsAuthentication.LoginUrl;
-                filterContext.Result = new RedirectResult(loginUrl + "?returnUrl=" + returnUrl);
+                //UriBuilder urlbld = new UriBuilder(filterContext.HttpContext.Request.Url);
+                //urlbld.Port = -1;
+                //string returnUrl = urlbld.Uri.ToString();
+                //string loginUrl = FormsAuthentication.LoginUrl;
+                //filterContext.Result = new RedirectResult(loginUrl + "?returnUrl=" + returnUrl);
                 return;
             }
 

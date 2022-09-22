@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Owin.Security.Cookies;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -156,12 +158,31 @@ namespace Pnbp.Controllers
             return View();
         }
 
+        //public ActionResult LogOff()
+        //{
+        //    //WebSecurity.Logout();
+        //    System.Web.Security.FormsAuthentication.SignOut();
+        //    Session.Abandon();
+        //    return RedirectToAction("Index", "Home");
+        //}
+
         public ActionResult LogOff()
         {
-            //WebSecurity.Logout();
-            System.Web.Security.FormsAuthentication.SignOut();
-            Session.Abandon();
+            HttpContext.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(string.Empty), null);
+
+            Request.GetOwinContext().Authentication.SignOut(HttpContext.GetOwinContext().Authentication.GetAuthenticationTypes().Select(o => o.AuthenticationType).ToArray());
+            HttpContext.Response.Headers.Remove("Set-Cookie");
+            Request.GetOwinContext().Authentication.SignOut();
+            this.HttpContext.GetOwinContext().Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
+
+            // clear authentication cookie
+            string _CookieName = ConfigurationManager.AppSettings["CookieName"].ToString();
+            HttpCookie cookie1 = new HttpCookie(_CookieName);
+            cookie1.Expires = DateTime.Now.AddYears(-1);
+            Response.Cookies.Add(cookie1);
+
             return RedirectToAction("Index", "Home");
+
         }
 
         public ActionResult SetKantor(SelectOffice m)
