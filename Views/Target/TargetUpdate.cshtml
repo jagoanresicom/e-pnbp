@@ -43,8 +43,8 @@
                     <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Kantor</label>
                         <div class="col-md-5 col-sm-3 col-xs-12">
-                            <input type="text" name="kodetarget" id="kodetarget" class="form-control" placeholder="Kode Targer" maxlength="5" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" readonly />
-                            <input type="hidden" class="form-control wajib" id="idkantor" name="idkantor" onkeyup="validate()" value=" @((User as Pnbp.Entities.InternalUserIdentity).KantorId.Replace("Kantor Pertanahan", "")) " readonly>
+                            <input type="text" name="kodetarget" id="kodetarget" class="form-control" placeholder="Kode Targer" maxlength="5" value="@(userIdentity.NamaKantor.Replace("Kantor Pertanahan", ""))" readonly />
+                            <input type="hidden" class="form-control wajib" id="idkantor" name="idkantor" onkeyup="validate()" value=" @(userIdentity.KantorId.Replace("Kantor Pertanahan", "")) " readonly>
                         </div>
                     </div>
                    

@@ -239,6 +239,7 @@ namespace Pnbp.Controllers
 
         public ActionResult GenerateSuratTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
             if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "...............";
             if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "...............";
@@ -253,7 +254,7 @@ namespace Pnbp.Controllers
                 doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
                 doc.ReplaceText("{ALAMAT}", AlamatPemohon);
                 doc.ReplaceText("{NOMOR_BERKAS}", nomorberkas);
-                doc.ReplaceText("{UNIT_KERJA}", (User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""));
+                doc.ReplaceText("{UNIT_KERJA}", userIdentity.NamaKantor.Replace("Kantor Pertanahan", ""));
                 doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
 
                 doc.SaveAs(ms);
@@ -369,6 +370,7 @@ namespace Pnbp.Controllers
             string tanggalpengaju
             )
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
 
 
             if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
@@ -390,7 +392,7 @@ namespace Pnbp.Controllers
                 //doc.ReplaceText("@nosprindik", (data.SprindikNumber != null) ? data.SprindikNumber : "........");
                 doc.ReplaceText("{TANGGAL_BULAN_TAUN}", (!String.IsNullOrEmpty(tanggalpengaju) ? tanggalpengaju : dateTime.ToString("dd/MM/yyyy")));
                 doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
-                doc.ReplaceText("{UNIT_KERJA}", (User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""));
+                doc.ReplaceText("{UNIT_KERJA}", userIdentity.NamaKantor.Replace("Kantor Pertanahan", ""));
                 doc.ReplaceText("{ALAMAT}", AlamatPemohon);
                 doc.ReplaceText("{NPWP}", npwpberkas);
                 doc.ReplaceText("{NAMA_REKENING}", NamaRekening);
@@ -631,11 +633,14 @@ namespace Pnbp.Controllers
         //public ActionResult PengajuanPengembalianIndex()
         private ActionResult PengajuanPengembalianIndex()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
             SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
             List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
@@ -657,12 +662,13 @@ namespace Pnbp.Controllers
         public ActionResult PengajuanPengembalianForm(FormCollection form)
         {
             //return Json(form, JsonRequestBehavior.AllowGet);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
             PnbpContext db = new PnbpContext();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
 
             var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
             var AtasNama = ((form.AllKeys.Contains("NamaPemohon")) ? form["NamaPemohon"] : "").Replace("'","");
@@ -2423,9 +2429,10 @@ namespace Pnbp.Controllers
 
         public ActionResult PengajuanPengembalian()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
@@ -2435,6 +2442,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarPengajuanPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -2442,7 +2450,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
 
             string namakantor = f.CariNamaKantor;
             string judul = f.CariJudul;
@@ -2475,6 +2483,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarPengajuanPengembalianTrain(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -2482,7 +2491,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
 
             string namakantor = f.CariNamaKantor;
             string judul = f.CariJudul;
@@ -2513,13 +2522,14 @@ namespace Pnbp.Controllers
         //public ActionResult ExportPengembalian(string pNamaPemohon, string pStatus)
         public ActionResult ExportPengembalian(string pNamaPemohon, string pStatus, string pNamaSatker)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
 
 
             //pTahun = "2019";
             //int result = 1;
             {
-                string kantorid = (User as Entities.InternalUserIdentity).KantorId;
-                string NamaKantor = (User as Entities.InternalUserIdentity).NamaKantor;
+                string kantorid = userIdentity.KantorId;
+                string NamaKantor = userIdentity.NamaKantor;
                 string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
                 PnbpContext db = new PnbpContext();
@@ -2627,6 +2637,7 @@ namespace Pnbp.Controllers
         [HttpPost]
         public FileResult ExportDataPengajuanPengembalian(Entities.FindPengembalianPnbp f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             System.Data.DataTable dt = new System.Data.DataTable("DAFTARPENGAJUAN");
             dt.Columns.AddRange(new System.Data.DataColumn[16] {
                 new System.Data.DataColumn("No", typeof(int)),
@@ -2647,7 +2658,7 @@ namespace Pnbp.Controllers
                 new System.Data.DataColumn("Nama_Bank_Rekening")
             });
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
 
             string namakantor = f.CariNamaKantor;
             string judul = f.CariJudul;
@@ -2686,10 +2697,11 @@ namespace Pnbp.Controllers
 
         public ActionResult InputPengajuan()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.DataPengembalianPnbpDev data = new Entities.DataPengembalianPnbpDev();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
 
 
             data.KantorIdUser = kantoriduser;
@@ -2701,10 +2713,11 @@ namespace Pnbp.Controllers
 
         public ActionResult EntriPengajuan(string pengembalianpnbpid)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.DataPengembalianPnbp data = new Entities.DataPengembalianPnbp();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
 
             if (!string.IsNullOrEmpty(pengembalianpnbpid))
             {
@@ -2727,10 +2740,11 @@ namespace Pnbp.Controllers
 
         public ActionResult EntriLampiran(string pengembalianpnbpid)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.DataPengembalianPnbp data = new Entities.DataPengembalianPnbp();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
 
             if (!string.IsNullOrEmpty(pengembalianpnbpid))
             {
@@ -2748,10 +2762,11 @@ namespace Pnbp.Controllers
 
         public ActionResult LihatLampiran(string pengembalianpnbpid)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.DataPengembalianPnbp data = new Entities.DataPengembalianPnbp();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
 
             if (!string.IsNullOrEmpty(pengembalianpnbpid))
             {
@@ -2770,18 +2785,19 @@ namespace Pnbp.Controllers
         [HttpPost]
         public JsonResult SimpanPengembalianPnbp(Entities.DataPengembalianPnbp data)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
-            string userid = (HttpContext.User.Identity as Entities.InternalUserIdentity).UserId;
+            string userid = userIdentity.UserId;
             data.UserId = userid;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
             data.KantorId = kantoriduser;
             data.NamaKantor = namakantor;
 
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
             data.PegawaiIdPengaju = pegawaiid;
             data.NamaPegawaiPengaju = namapegawai;
 
@@ -2793,18 +2809,19 @@ namespace Pnbp.Controllers
         [HttpPost]
         public JsonResult SimpanPengembalianPnbpDev(Entities.DataPengembalianPnbpDev data)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
-            string userid = (HttpContext.User.Identity as Entities.InternalUserIdentity).UserId;
+            string userid = userIdentity.UserId;
             data.UserId = userid;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
             data.KantorId = kantoriduser;
             data.NamaKantor = namakantor;
 
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
             data.PegawaiIdPengaju = pegawaiid;
             data.NamaPegawaiPengaju = namapegawai;
 
@@ -2898,18 +2915,19 @@ namespace Pnbp.Controllers
         [HttpPost]
         public JsonResult SimpanPersetujuanPengembalian(Entities.DataPengembalianPnbp data)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
-            string userid = (HttpContext.User.Identity as Entities.InternalUserIdentity).UserId;
+            string userid = userIdentity.UserId;
             data.UserId = userid;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
             data.KantorId = kantoriduser;
             data.NamaKantor = namakantor;
 
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
             data.PegawaiIdSetuju = pegawaiid;
             data.NamaPegawaiSetuju = namapegawai;
 
@@ -2992,15 +3010,16 @@ namespace Pnbp.Controllers
         [HttpPost]
         public JsonResult SimpanLampiranKembalian(Entities.DataPengembalianPnbp data)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
-            string userid = (HttpContext.User.Identity as Entities.InternalUserIdentity).UserId;
+            string userid = userIdentity.UserId;
             data.UserId = userid;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             data.KantorId = kantoriduser;
 
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
+            string pegawaiid = userIdentity.PegawaiId;
             data.NipPengupload = pegawaiid;
 
             // File Upload
@@ -3080,9 +3099,10 @@ namespace Pnbp.Controllers
 
         public ActionResult PersetujuanPengembalian()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
@@ -3092,10 +3112,11 @@ namespace Pnbp.Controllers
 
         public ActionResult ProsesPersetujuan(string pengembalianpnbpid)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.DataPengembalianPnbp data = new Entities.DataPengembalianPnbp();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
 
             if (!string.IsNullOrEmpty(pengembalianpnbpid))
             {
@@ -3132,7 +3153,8 @@ namespace Pnbp.Controllers
         [HttpPost]
         public ActionResult GetBerkasDataByID(FormCollection form)
         {
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            string kantorid = userIdentity.KantorId;
             var noberkas = (form.AllKeys.Contains("noberkas") ? form["noberkas"] : "");
 
 
@@ -3475,6 +3497,7 @@ namespace Pnbp.Controllers
         public ActionResult PengajuanPengembalianDetail(FormCollection form)
         {
             //return Json(form, JsonRequestBehavior.AllowGet);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
             PnbpContext db = new PnbpContext();
             var pengembalianpnbpid = ((form.AllKeys.Contains("pengembalianpnbpid")) ? form["pengembalianpnbpid"] : "");
@@ -3489,10 +3512,10 @@ namespace Pnbp.Controllers
             var fileid9 = ((form.AllKeys.Contains("fileid9")) ? form["fileid9"] : "");
             var fileid10 = ((form.AllKeys.Contains("fileid10")) ? form["fileid10"] : "");
             var fileid11 = ((form.AllKeys.Contains("fileid11")) ? form["fileid11"] : "");
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
 
             var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
             var AtasNama = ((form.AllKeys.Contains("NamaPemohon")) ? form["NamaPemohon"] : "");
@@ -4705,14 +4728,15 @@ namespace Pnbp.Controllers
         public ActionResult PengajuanPengembalianDetailPusat(FormCollection form, string[] qcpusat, string[] fileid)
         {
             //return Json(fileid[4], JsonRequestBehavior.AllowGet);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
             PnbpContext db = new PnbpContext();
             var pengembalianpnbpid = ((form.AllKeys.Contains("pengembalianpnbpid")) ? form["pengembalianpnbpid"] : "");
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
 
             var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "");
             var NomorSurat = ((form.AllKeys.Contains("NomorSurat")) ? form["NomorSurat"] : "");
@@ -4843,11 +4867,12 @@ namespace Pnbp.Controllers
 
         public ActionResult mon_pengembalian()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
             SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
             List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
@@ -4860,6 +4885,7 @@ namespace Pnbp.Controllers
         [HttpPost]
         public ActionResult ListPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -4867,7 +4893,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
 
             string namakantor = f.CariNamaKantor;
             string judul = f.CariJudul;

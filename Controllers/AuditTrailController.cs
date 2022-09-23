@@ -16,8 +16,10 @@ namespace Pnbp.Controllers
 
         public ActionResult AuditTrailIndex()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             var ctx = new PnbpContext();
-            string kantorid = (User as Pnbp.Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
 
             string query =
                 @"
@@ -40,8 +42,9 @@ namespace Pnbp.Controllers
 
         public ActionResult AuditTrailPengembalian()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
-            string kantorid = (User as Pnbp.Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
 
             string query =
                 @"
@@ -68,8 +71,9 @@ namespace Pnbp.Controllers
 
         public ActionResult AuditTrailEntri()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
-            string kantorid = (User as Pnbp.Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
 
             string query =
                 @"
@@ -97,8 +101,9 @@ namespace Pnbp.Controllers
 
         public ActionResult AuditTrailAlokasi()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
-            string kantorid = (User as Pnbp.Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
 
             string query =
                 @"

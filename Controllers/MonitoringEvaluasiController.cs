@@ -68,9 +68,10 @@ namespace Pnbp.Controllers
 
         public ActionResult Penerimaan()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.CariPenerimaan find = new Entities.CariPenerimaan();
             //List<Entities.GetSatkerList> result = _manfaatanModel.GetSatker();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = monitoringevaluasimodel.GetTipeKantor(kantoriduser);
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
             //ViewData["datasatker"] = result;
@@ -79,6 +80,8 @@ namespace Pnbp.Controllers
 
         public ActionResult ListPenerimaan(int? start, int? length, Entities.CariPenerimaan f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -86,9 +89,9 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            //string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            //string kantoriduser = userIdentity.KantorId;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
             //return Json(tipekantorid, JsonRequestBehavior.AllowGet);
 
@@ -116,9 +119,10 @@ namespace Pnbp.Controllers
 
         public ActionResult Belanja()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.CariBelanja find = new Entities.CariBelanja();
             //List<Entities.GetSatkerList> result = _manfaatanModel.GetSatker();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = monitoringevaluasimodel.GetTipeKantor(kantoriduser);
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
             //ViewData["datasatker"] = result;
@@ -127,6 +131,8 @@ namespace Pnbp.Controllers
 
         public ActionResult ListBelanja(int? start, int? length, Entities.CariBelanja f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -134,10 +140,10 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
 
             string pgmaxpagu = f.PGMAXPAGU != null ? f.PGMAXPAGU : "100";
             pgmaxpagu = pgmaxpagu.Replace(",", ".");
@@ -257,7 +263,7 @@ namespace Pnbp.Controllers
 
         //    decimal? total = 0;
 
-        //    string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+        //    string kantoriduser = userIdentity.KantorId;
 
         //    string namakantor = f.CariNamaKantor;
         //    decimal persen = pgmin;
@@ -293,7 +299,7 @@ namespace Pnbp.Controllers
 
         //    decimal? total = 0;
 
-        //    string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+        //    string kantoriduser = userIdentity.KantorId;
 
         //    string namakantor = f.CariNamaKantor;
         //    string judul = f.CariJudul;

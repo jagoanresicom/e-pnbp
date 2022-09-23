@@ -63,10 +63,11 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRealisasiPenerimaanDT(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
 
             Models.PenerimaanModel model = new Models.PenerimaanModel();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
@@ -114,10 +115,11 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRealisasiPenerimaan(Entities.FilterPenerimaan frm)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
             Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             _frm.tahun = (!string.IsNullOrEmpty(frm.tahun)) ? frm.tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
@@ -131,7 +133,8 @@ namespace Pnbp.Controllers
         [HttpPost]
         public FileResult Export(Entities.FilterPenerimaan frm)
         {
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             Pnbp.Models.PenerimaanModel _pm = new Models.PenerimaanModel();
@@ -443,10 +446,11 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRealisasiLayananDT(DatatablesRequest req, string tahun, string bulan)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
             Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             var data = model.GetRealisasiLayananDT(tahun, bulan, tipekantorid, kantorid, req.Start, req.Length);
@@ -482,10 +486,11 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRealisasiLayanan(Entities.FilterPenerimaan frm)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
             Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             _frm.tahun = (!string.IsNullOrEmpty(frm.tahun)) ? frm.tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
@@ -499,7 +504,8 @@ namespace Pnbp.Controllers
         [HttpPost]
         public FileResult ExportLayanan(Entities.FilterPenerimaan frm)
         {
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             Pnbp.Models.PenerimaanModel _pm = new Models.PenerimaanModel();
@@ -596,10 +602,11 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarPenerimaan(Entities.FilterPenerimaan frm)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
             Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             _frm.tahun = (!string.IsNullOrEmpty(frm.tahun)) ? frm.tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
@@ -623,7 +630,8 @@ namespace Pnbp.Controllers
         #region StatistikNTPN
         public ActionResult StatistikNTPN()
         {
-            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId((User as Entities.InternalUserIdentity).KantorId);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(userIdentity.KantorId);
             this.ViewData["tipeKantor"] = tipekantorid;
             Entities.QueryStatistikNTPN _qStatistikNTPN = new Entities.QueryStatistikNTPN();
             if (tipekantorid == "1")
@@ -635,15 +643,15 @@ namespace Pnbp.Controllers
             }
             else if (tipekantorid == "2")
             {
-                _qStatistikNTPN.propinsi = Pnbp.Models.AdmModel.getKantorList((User as Entities.InternalUserIdentity).KantorId);
-                _qStatistikNTPN.kabupaten = Pnbp.Models.AdmModel.getKantorKanwil(true, (User as Entities.InternalUserIdentity).KantorId);
+                _qStatistikNTPN.propinsi = Pnbp.Models.AdmModel.getKantorList(userIdentity.KantorId);
+                _qStatistikNTPN.kabupaten = Pnbp.Models.AdmModel.getKantorKanwil(true, userIdentity.KantorId);
                 _qStatistikNTPN.TanggalMulai = DateTime.Now.AddDays(-29).ToShortDateString();
                 _qStatistikNTPN.TanggalSampai = DateTime.Now.ToShortDateString();
             }
             else
             {
-                _qStatistikNTPN.propinsi = Pnbp.Models.AdmModel.getKantorKanwil(false, (User as Entities.InternalUserIdentity).KantorId);
-                _qStatistikNTPN.kabupaten = Pnbp.Models.AdmModel.getKantorList((User as Entities.InternalUserIdentity).KantorId);
+                _qStatistikNTPN.propinsi = Pnbp.Models.AdmModel.getKantorKanwil(false, userIdentity.KantorId);
+                _qStatistikNTPN.kabupaten = Pnbp.Models.AdmModel.getKantorList(userIdentity.KantorId);
                 _qStatistikNTPN.TanggalMulai = DateTime.Now.AddDays(-29).ToShortDateString();
                 _qStatistikNTPN.TanggalSampai = DateTime.Now.ToShortDateString();
             }
@@ -653,6 +661,7 @@ namespace Pnbp.Controllers
 
         public ActionResult StatistikNTPNRows(Entities.QueryStatistikNTPN query, int? draw, int? start, int? length)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 100;
             int from = recNumber + 1;
@@ -661,9 +670,9 @@ namespace Pnbp.Controllers
             string pKantorId = String.IsNullOrEmpty(query.selectedKabupaten) ? !String.IsNullOrEmpty(query.pKantorId) ? query.pKantorId : "" : query.selectedKabupaten;
             Models.PenerimaanModel lm = new Models.PenerimaanModel();
             List<Entities.StatistikNTPN> result = new List<Entities.StatistikNTPN>();
-            if (String.IsNullOrEmpty(pKantorId) && Pnbp.Models.AdmModel.GetTipeKantorId((User as Entities.InternalUserIdentity).KantorId) == "2")
+            if (String.IsNullOrEmpty(pKantorId) && Pnbp.Models.AdmModel.GetTipeKantorId(userIdentity.KantorId) == "2")
             {
-                result = lm.dtStatistikNTPNKanwil((User as Entities.InternalUserIdentity).KantorId, Convert.ToDateTime(query.TanggalMulai), Convert.ToDateTime(query.TanggalSampai), from, to);
+                result = lm.dtStatistikNTPNKanwil(userIdentity.KantorId, Convert.ToDateTime(query.TanggalMulai), Convert.ToDateTime(query.TanggalSampai), from, to);
             }
             else
             {
@@ -1059,9 +1068,10 @@ namespace Pnbp.Controllers
         public ActionResult pn_provinsi_list(DatatablesRequest req, string tahun, string bulan, string satker, string provinsi)
         {
 
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
@@ -1135,9 +1145,10 @@ namespace Pnbp.Controllers
         public ActionResult pn_satker_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
         {
 
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
             if (tipekantorid == "1")
             {
@@ -1212,16 +1223,17 @@ namespace Pnbp.Controllers
         [HttpPost]
         public ActionResult pn_layanan_list(DatatablesRequest req, string tahun, string bulan, string pid, string layanan)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
             Entities.FilterPenerimaan _frm = new Entities.FilterPenerimaan();
 
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             if (string.IsNullOrEmpty(pid))
             {
-                kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                kantorid = userIdentity.KantorId;
                 if (tipekantorid == "1")
                 {
                     kantorid = "";

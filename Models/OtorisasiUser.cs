@@ -30,7 +30,8 @@
 
             try
             {
-                string kantorid = (HttpContext.Current.User.Identity as Pnbp.Entities.InternalUserIdentity).KantorId;
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                string kantorid = userIdentity.KantorId;
 
                 int tipekantor = model.GetTipeKantor(kantorid);
 
@@ -92,8 +93,9 @@
 
             try
             {
-                string pegawaiid = (HttpContext.Current.User.Identity as Pnbp.Entities.InternalUserIdentity).PegawaiId;
-                string kantorid = (HttpContext.Current.User.Identity as Pnbp.Entities.InternalUserIdentity).KantorId;
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                string pegawaiid = userIdentity.PegawaiId;
+                string kantorid = userIdentity.KantorId;
                 string profileid = "'A80100','A80300','A80400','A80500','B80100'"; // profile Administrator
 
                 Pnbp.Models.HakAksesModel model = new Pnbp.Models.HakAksesModel();

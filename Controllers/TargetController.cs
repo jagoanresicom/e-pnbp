@@ -26,8 +26,9 @@ namespace Pnbp.Controllers
         //Untuk Reload Tampilan List Target
         public ActionResult TargetIndex()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
-            string kantorid = (User as Pnbp.Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string currentYear = DateTime.Now.Year.ToString();
             //return Json(kantorid, JsonRequestBehavior.AllowGet);
             if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
@@ -45,10 +46,11 @@ namespace Pnbp.Controllers
         //Untuk Reload Tampilan Create Target
         public ActionResult TargetCreate()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             //get Penerimaan
             string currentYear = DateTime.Now.Year.ToString();
             var ctx = new PnbpContext();
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             //var get_penerimaan = ctx.Database.SqlQuery<Entities.GetJenisPenerimaan>("SELECT DISTINCT JENISPENERIMAAN FROM REKAPPENERIMAANDETAIL").ToList();
             var get_program = ctx.Database.SqlQuery<Entities.GetProgram>("SELECT DISTINCT NAMAKANTOR, JENISPENERIMAAN, NAMAPROSEDUR, KANTORID FROM REKAPPENERIMAANDETAIL WHERE tahun = "+ currentYear +" and KANTORID = '"+ kantorid + "'").ToList();
             //return Json(get_program, JsonRequestBehavior.AllowGet);
@@ -102,9 +104,10 @@ namespace Pnbp.Controllers
 
         public ActionResult TargetUpdate(string kodetarget)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             string currentYear = DateTime.Now.Year.ToString();
             var ctx = new PnbpContext();
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             var get_data = ctx.Database.SqlQuery<Entities.Target>("SELECT DISTINCT * FROM TARGETPROSEDUR WHERE KODETARGET='" + kodetarget + "' ORDER BY KODETARGET DESC").FirstOrDefault();
             //return Json(new { result = get_data }, JsonRequestBehavior.AllowGet);
 
@@ -143,7 +146,7 @@ namespace Pnbp.Controllers
         //    //return Json(jenislayanan, JsonRequestBehavior.AllowGet);
         //    string currentYear = DateTime.Now.Year.ToString();
         //    var ctx = new PnbpContext();
-        //    string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+        //    string kantorid = userIdentity.KantorId;
         //    //return Json(kantorid, JsonRequestBehavior.AllowGet);
 
         //    //var get_program = ctx.Database.SqlQuery<Entities.GetProgram>("SELECT DISTINCT NAMAKANTOR, JENISPENERIMAAN, NAMAPROSEDUR, KANTORID FROM REKAPPENERIMAANDETAIL WHERE tahun = "+ currentYear +" and JenisPenerimaan = '"+jenislayanan+ "' and KANTORID = '"+ kantorid + "'").ToList();

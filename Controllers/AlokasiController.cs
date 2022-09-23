@@ -802,10 +802,11 @@ namespace Pnbp.Controllers
 
         public ActionResult CalculateAsync(Entities.FormAlokasi _parameter)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.AlokasiModel _data = new Models.AlokasiModel();
             Task.Run(() =>
             {
-                _data.RunCalculate((User as Entities.InternalUserIdentity).UserId, Convert.ToInt16(DateTime.Now.Year), _parameter.Tglpenerimaan, _parameter.JenisAlokasi);
+                _data.RunCalculate(userIdentity.UserId, Convert.ToInt16(DateTime.Now.Year), _parameter.Tglpenerimaan, _parameter.JenisAlokasi);
             });
 
             if (_parameter.JenisAlokasi == "OPS")
@@ -820,12 +821,14 @@ namespace Pnbp.Controllers
 
         public ActionResult AllocationAsync(Entities.FormAlokasi _parameter)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             if (_parameter.JenisAlokasi == "OPS")
             {
                 Models.AlokasiModel _data = new Models.AlokasiModel();
                 Task.Run(() =>
                 {
-                    _data.RunAllocation((User as Entities.InternalUserIdentity).UserId, Convert.ToInt16(DateTime.Now.Year), _parameter.Tglpenerimaan, _parameter.JenisAlokasi);
+                    _data.RunAllocation(userIdentity.UserId, Convert.ToInt16(DateTime.Now.Year), _parameter.Tglpenerimaan, _parameter.JenisAlokasi);
                 });
                 return View("Ops");
             }
@@ -834,7 +837,7 @@ namespace Pnbp.Controllers
                 Models.AlokasiModel _data = new Models.AlokasiModel();
                 Task.Run(() =>
                 {
-                    _data.RunAllocation((User as Entities.InternalUserIdentity).UserId, Convert.ToInt16(DateTime.Now.Year), _parameter.InputAlokasi.ToString(), _parameter.JenisAlokasi);
+                    _data.RunAllocation(userIdentity.UserId, Convert.ToInt16(DateTime.Now.Year), _parameter.InputAlokasi.ToString(), _parameter.JenisAlokasi);
                 });
                 return View("NonOps");
             }
@@ -842,10 +845,11 @@ namespace Pnbp.Controllers
 
         public ActionResult SaveAllocationAsync(Entities.FormAlokasi _parameter)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.AlokasiModel _data = new Models.AlokasiModel();
             Task.Run(() =>
             {
-                _data.RunSaveAllocation((User as Entities.InternalUserIdentity).UserId, Convert.ToString(DateTime.Now.Year), _parameter.JenisAlokasi);
+                _data.RunSaveAllocation(userIdentity.UserId, Convert.ToString(DateTime.Now.Year), _parameter.JenisAlokasi);
             });
 
             Entities.FormAlokasi _resultdata = new Entities.FormAlokasi();
@@ -913,10 +917,11 @@ namespace Pnbp.Controllers
 
         public ActionResult ResetAllocationAsync(Entities.FormAlokasi _parameter)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.AlokasiModel _data = new Models.AlokasiModel();
             Task.Run(() =>
             {
-                _data.RunReset((User as Entities.InternalUserIdentity).UserId, Convert.ToString(DateTime.Now.Year), _parameter.JenisAlokasi);
+                _data.RunReset(userIdentity.UserId, Convert.ToString(DateTime.Now.Year), _parameter.JenisAlokasi);
             });
 
             _parameter.Dapatalokasi = null;
@@ -1438,7 +1443,6 @@ namespace Pnbp.Controllers
         [HttpPost]
         public ActionResult ProsesRevisiAlokasi()
         {
-            var user = (HttpContext.User.Identity as Entities.InternalUserIdentity);
             var alm = new Models.AlokasiModel();
             var isProcessRevisiAlokasiSuccess = alm.ProcessRevisiAlokasi();
             return Json(new { success = isProcessRevisiAlokasiSuccess }, JsonRequestBehavior.AllowGet);

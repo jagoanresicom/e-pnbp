@@ -18,7 +18,7 @@
             <div class="x_panel">
                 <div class="x_title">
                     <h2 class="sub-header" style="padding:10px">@(ViewBag.Judul)</h2>
-                    @*@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))*@
+                    @*@(userIdentity.NamaKantor.Replace("Kantor Pertanahan", ""))*@
                     @*<h2 style="padding:10px">Form Design <small>different form elements</small></h2>*@
                     <ul class="nav navbar-right panel_toolbox">
                         <li class="text-right" style="padding:10px">
@@ -34,8 +34,8 @@
                         <div class="form-group row">
                             <label class="col-sm-2" style="margin-left:40px">Nama Kantor</label>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control wajib" id="namakantor" name="namakantor" onkeyup="validate()" value=" @((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" readonly>
-                                <input type="hidden" class="form-control wajib" id="idkantor" name="idkantor" onkeyup="validate()" value=" @((User as Pnbp.Entities.InternalUserIdentity).KantorId.Replace("Kantor Pertanahan", ""))" readonly>
+                                <input type="text" class="form-control wajib" id="namakantor" name="namakantor" onkeyup="validate()" value=" @(userIdentity.NamaKantor.Replace("Kantor Pertanahan", ""))" readonly>
+                                <input type="hidden" class="form-control wajib" id="idkantor" name="idkantor" onkeyup="validate()" value=" @(userIdentity.KantorId.Replace("Kantor Pertanahan", ""))" readonly>
                                 @*<span id="validate" class="text-danger" style="display: none;">* Data tidak boleh kosong</span>*@
                             </div>
                         </div>

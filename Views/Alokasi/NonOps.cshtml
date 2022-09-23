@@ -45,9 +45,9 @@
                 <div class="x_content">
                     <form class="form-horizontal form-label-left" id="frmalok" method="post">
                         @Html.HiddenFor(Model => Model.JenisAlokasi, new { id = "JenisAlokasi" })
-                        <input type="hidden" name="pegawaiid" id="pegawaiid" value=" @((User as Pnbp.Entities.InternalUserIdentity).PegawaiId) " />
+                        <input type="hidden" name="pegawaiid" id="pegawaiid" value=" @(userIdentity.PegawaiId) " />
 
-                        @*@if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "198511142011011005")
+                        @*@if (userIdentity.PegawaiId == "198511142011011005")
                             {*@
                         <div class="form-group">
                             <label class="control-label col-md-2 col-sm-2 col-xs-12 col-md-offset-2 col-sm-offset-2">Nilai Alokasi : </label>
@@ -58,7 +58,7 @@
                                 <input type="hidden" id="index" />
                             </div>
                         </div>
-                        @if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "197804302003122002")
+                        @if (userIdentity.PegawaiId == "197804302003122002")
                         {
                             <div class="form-group">
                                 <label class="control-label col-md-2 col-sm-2 col-xs-12 col-md-offset-2 col-sm-offset-2">Persentase Realisasi Belanja : </label>
@@ -104,7 +104,7 @@
                 <div style="text-align:center;">
                     <div style="text-align:center;">
 
-                        @*@if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "198511142011011005")
+                        @*@if (userIdentity.PegawaiId == "198511142011011005")
                             {*@
                         <button id="btncek" type="button" class="btn btn-info"><span class="fa fa-search"></span> Cek Proses </button>
                         @*<button id="btnprioritas" type="button" class="btn btn-info"><span class="fa fa-search"></span> Cek Prioritas </button>*@
@@ -115,7 +115,7 @@
                         <button id="btnreset" type="button" class="btn btn-danger"><span class="fa fa-refresh"></span> Hapus </button>
                         @*}*@
 
-                        @if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "197804302003122002")
+                        @if (userIdentity.PegawaiId == "197804302003122002")
                         {
                             <button id="btnupdate" type="button" class="btn btn-success" onclick="update_datasatker()"><span class="fa fa-floppy-o"></span> Simpan </button>
                         }
@@ -177,7 +177,7 @@
                                     </td>
                                 </tr>
                             }*@
-                        @if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "197804302003122002")
+                        @if (userIdentity.PegawaiId == "197804302003122002")
                         {
                             if (get_approve.Count > 0)
                             {
@@ -379,7 +379,7 @@
     function get_data()
     {
         var persentase = $('#persentase').val();
-        var pegawaiid =  "@((User as Pnbp.Entities.InternalUserIdentity).PegawaiId)";
+        var pegawaiid =  "@(userIdentity.PegawaiId)";
             //console.log(pegawaiid);
 
         $.ajax({
@@ -444,7 +444,7 @@
     //ESELON Approval
     function get_data_eselon() {
         var persentase = $('#persentase').val();
-        var pegawaiid = "@((User as Pnbp.Entities.InternalUserIdentity).PegawaiId)";
+        var pegawaiid = "@(userIdentity.PegawaiId)";
         //console.log(pegawaiid);
 
         $.ajax({

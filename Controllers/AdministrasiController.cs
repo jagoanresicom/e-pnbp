@@ -180,9 +180,10 @@ namespace Pnbp.Controllers
                 
                 if (mfile != null && mfile.ContentType == "application/pdf")
                 {
-                    string kantorid = (User.Identity as Entities.InternalUserIdentity).KantorId;
+                    var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                    string kantorid = userIdentity.KantorId;
                     
-                    string petugas = (User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+                    string petugas = userIdentity.NamaPegawai;
                     string judul = frm.Namaprogram + " - " + frm.Namasatker;
 
                     int versi = 0;
@@ -309,10 +310,11 @@ namespace Pnbp.Controllers
 
             if (!String.IsNullOrEmpty(id))
             {
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
                 var reqmessage = new HttpRequestMessage();
                 var content = new MultipartFormDataContent();
 
-                string kantorid = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+                string kantorid = userIdentity.KantorId;
                 string tipe = "Manfaat";
                 string versi = kontentm.CekVersi(id).ToString();
 
@@ -356,7 +358,8 @@ namespace Pnbp.Controllers
             //return Json(pTahun, JsonRequestBehavior.AllowGet);
             //int result = 1;
             {
-                string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                string kantorid = userIdentity.KantorId;
                 string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
                 PnbpContext db = new PnbpContext();
@@ -554,7 +557,8 @@ namespace Pnbp.Controllers
             //int result = 1;
             //return Json(pTahun, JsonRequestBehavior.AllowGet);
             {
-                string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                string kantorid = userIdentity.KantorId;
                 string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
                 //var ctx = new PnbpContext();
@@ -666,7 +670,8 @@ namespace Pnbp.Controllers
             //pBulan = "2016";
             //int result = 1;
             {
-                string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                string kantorid = userIdentity.KantorId;
                 string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
                 PnbpContext db = new PnbpContext();
@@ -745,7 +750,8 @@ namespace Pnbp.Controllers
          [Authorize]
         public ActionResult ExportntpnV2(string pTahun, string pBulan)
         {
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             PnbpContext db = new PnbpContext();
@@ -1272,7 +1278,8 @@ namespace Pnbp.Controllers
                 string id = Request.Form["id"].ToString();
                 if (!String.IsNullOrEmpty(id))
                 {
-                    string userid = (User.Identity as Pnbp.Entities.InternalUserIdentity).UserId;
+                    var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                    string userid = userIdentity.UserId;
                     result = admModel.HapusPengumuman(id, userid);
                     if (!result.Status)
                     {

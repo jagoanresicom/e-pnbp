@@ -55,7 +55,7 @@ namespace Pnbp.Controllers
             Entities.DataManfaat _data = new Entities.DataManfaat();
             List<Entities.SatkerAlokasi> _lsSatkerALokasi = _manfaatanModel.GetSatkerAlokasi();
             _data.satkermanfaat = _lsSatkerALokasi;
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             _data.UserAdmin = _manfaatanModel.UsersInRoles(useridentity.UserId, "Administrator Pusat");
             return View(_data);
         }
@@ -136,6 +136,8 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarDataManfaat(int? pageNum, Entities.FindManfaat f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             int pageNumber = pageNum ?? 0;
             int RecordsPerPage = 10;
             int from = (pageNumber * RecordsPerPage) + 1;
@@ -146,7 +148,7 @@ namespace Pnbp.Controllers
             //string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             string tahun = f.tahun;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             List<Entities.SatkerAlokasi> result = _manfaatanModel.GetDataManfaat(tahun, namasatker, nilaianggaran, tipekantorid, kantorid, from, to);
@@ -178,6 +180,8 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarDataManfaatV2(int? pageNum, Entities.FindManfaat f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             int pageNumber = pageNum ?? 0;
             int RecordsPerPage = 10;
             int from = (pageNumber * RecordsPerPage) + 1;
@@ -188,7 +192,7 @@ namespace Pnbp.Controllers
             //string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             string tahun = f.tahun;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             List<Entities.SatkerAlokasi> result = _manfaatanModel.GetDataManfaatV2(tahun, namasatker, nilaianggaran, tipekantorid, kantorid, from, to);
@@ -301,6 +305,7 @@ namespace Pnbp.Controllers
 
         public ActionResult AlokasiPemanfaatan()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Models.PemanfaatanModel model = new Models.PemanfaatanModel();
 
             Entities.DataPaguAlokasi dataPaguAlokasi = new Entities.DataPaguAlokasi();
@@ -347,7 +352,7 @@ namespace Pnbp.Controllers
 
             TotalPagu = 0; TotalAlokasi = 0; BelumAlokasi = 0; PersentaseAlokasi = 0;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             List<Entities.Kantor> qKanwil = model.GetKantorKanwil(tipekantorid, kantorid);
@@ -449,6 +454,7 @@ namespace Pnbp.Controllers
 
         public ActionResult AlokasiPemanfaatanDetail(string Id, string Nama)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             if (String.IsNullOrEmpty(Id))
             {
                 return RedirectToAction("AlokasiPemanfaatan");
@@ -458,7 +464,7 @@ namespace Pnbp.Controllers
 
             Models.PemanfaatanModel model = new Models.PemanfaatanModel();
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             if (tipekantorid == "3" || tipekantorid == "4")
@@ -574,7 +580,7 @@ namespace Pnbp.Controllers
             Entities.DataPrioritas _data = new Entities.DataPrioritas();
             List<Entities.PrioritasAlokasi> _lsSatkerALokasi = _manfaatanModel.GetManfaatSatker(s, ConfigurationManager.AppSettings["TahunAnggaran"].ToString());
             _data.dataPrioritas = _lsSatkerALokasi;
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             _data.UserAdmin = _manfaatanModel.UsersInRoles(useridentity.UserId, "Administrator Pusat");
             _data.NamaSatKer = ns;
 
@@ -583,7 +589,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DataManfaatDetail(string kantorid, string namakantor, string tahun)
         {
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
 
             string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
             int indexKaBiroPerencanaan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroPerencanaan"].ToString());
@@ -653,7 +659,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DataManfaatDetailKRO()
         {
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
 
             var _data = GetDataDetailManfaat(useridentity.KantorId, useridentity.NamaKantor, DateTime.Now.Year.ToString());
 
@@ -677,7 +683,7 @@ namespace Pnbp.Controllers
 
         private Entities.DataPrioritas GetDataDetailManfaat(string kantorid, string namakantor, string tahun)
         {
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
 
             string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
             int indexKaBiroPerencanaan = Array.IndexOf(userProfiles, ConfigurationManager.AppSettings["ProfileBiroPerencanaan"].ToString());
@@ -740,6 +746,7 @@ namespace Pnbp.Controllers
 
         public ActionResult SimpanRenaksiSatker(string kantorid, string judul)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var result = new Pnbp.Entities.TransactionResult() { Status = false, Pesan = "" };
 
             string tahun = DateTime.Now.Year.ToString();
@@ -755,8 +762,8 @@ namespace Pnbp.Controllers
             var mfile = Request.Files["filepdf"];
             if (mfile != null && mfile.ContentType == "application/pdf")
             {
-                string kantoridUser = (User.Identity as Entities.InternalUserIdentity).KantorId;
-                string petugas = (User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+                string kantoridUser = userIdentity.KantorId;
+                string petugas = userIdentity.NamaPegawai;
 
                 int versi = 0;
                 string id = dokumenid;
@@ -797,10 +804,11 @@ namespace Pnbp.Controllers
 
             if (!String.IsNullOrEmpty(id))
             {
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
                 var reqmessage = new HttpRequestMessage();
                 var content = new MultipartFormDataContent();
 
-                string kantorid = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+                string kantorid = userIdentity.KantorId;
                 string tipe = "RenaksiSatker";
                 string versi = kontentm.CekVersi(id).ToString();
 
@@ -949,7 +957,7 @@ namespace Pnbp.Controllers
         {
             var result = new Pnbp.Entities.TransactionResult() { Status = false, Pesan = "" };
             List<Entities.PrioritasAlokasi> _lsSatkerALokasi = new List<Entities.PrioritasAlokasi>();
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             try
             {
                 if (!Pnbp.Models.AdmModel.GetStatusKantorbyManfaat(frm.Manfaatid))
@@ -986,7 +994,7 @@ namespace Pnbp.Controllers
             int indexKaBiroPerencanaan = -1;
             int indexKaBiroKeuangan = -1;
 
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             if (useridentity != null)
             {
                 string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
@@ -1048,7 +1056,7 @@ namespace Pnbp.Controllers
             int indexKaBiroPerencanaan = -1;
             int indexKaBiroKeuangan = -1;
 
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             if (useridentity != null)
             {
                 string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
@@ -1076,7 +1084,7 @@ namespace Pnbp.Controllers
             int indexKaBiroPerencanaan = -1;
             int indexKaBiroKeuangan = -1;
 
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             if (useridentity != null)
             {
                 string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
@@ -1096,7 +1104,7 @@ namespace Pnbp.Controllers
             int indexKaBiroPerencanaan = -1;
             int indexKaBiroKeuangan = -1;
 
-            var useridentity = (User.Identity as Entities.InternalUserIdentity);
+            var useridentity = new Pnbp.Codes.Functions().claimUser();
             if (useridentity != null)
             {
                 string[] userProfiles = _manfaatanModel.GetProfileIdForUser(useridentity.UserId, useridentity.KantorId);
@@ -1338,11 +1346,12 @@ namespace Pnbp.Controllers
         #endregion
         public ActionResult RincianAlokasi()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             string currentYear = DateTime.Now.Year.ToString();
             var ctx = new PnbpContext();
             Entities.CariRincianAlokasiSatker find = new Entities.CariRincianAlokasiSatker();
             List<Entities.GetSatkerList> result = _manfaatanModel.GetSatker();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = _manfaatanModel.GetTipeKantor(kantoriduser);
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
             ViewData["datasatker"] = result;
@@ -1382,9 +1391,10 @@ namespace Pnbp.Controllers
 
         public ActionResult RincianAlokasiOutput()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.CariRincianAlokasiSatker find = new Entities.CariRincianAlokasiSatker();
             List<Entities.GetSatkerList> result = _manfaatanModel.GetSatker();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = _manfaatanModel.GetTipeKantor(kantoriduser);
             ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
             ViewData["datasatker"] = result;
@@ -1393,8 +1403,9 @@ namespace Pnbp.Controllers
 
         public ActionResult RincianAlokasiDetail(string kantorid)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.CariRincianAlokasiSatker find = new Entities.CariRincianAlokasiSatker();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             Entities.satker satker = new Entities.satker();
             int tipekantorid = _manfaatanModel.GetTipeKantor(kantoriduser);
             satker = _manfaatanModel.GetSatkerByKantorId(kantorid);
@@ -1406,6 +1417,7 @@ namespace Pnbp.Controllers
 
         public ActionResult RincianAlokasiDetailOutput(string programid)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             string currentYear = DateTime.Now.Year.ToString();
             var ctx = new PnbpContext();
             //return Json(programid, JsonRequestBehavior.AllowGet);
@@ -1414,7 +1426,7 @@ namespace Pnbp.Controllers
             List<Entities.GetSatkerList> result = _manfaatanModel.GetSatker();
             resultprogram = _manfaatanModel.GetLayananById(programid);
             Entities.GetManfaat manfaat = new Entities.GetManfaat();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             int tipekantorid = _manfaatanModel.GetTipeKantor(kantoriduser);
             //manfaat = _manfaatanModel.GetLayananById(programid);
             
@@ -1445,16 +1457,17 @@ namespace Pnbp.Controllers
         public ActionResult EntriRenaksi()
         {
 
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
             PnbpContext db = new PnbpContext();
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
             //return Json(kantoriduser, JsonRequestBehavior.AllowGet);
             List<Entities.GetSatkerList> result = _manfaatanModel.GetSatker();
             List<Entities.RenaksiList> renaksi = _manfaatanModel.GetRenaksiList(kantoriduser);
             int tipekantorid = _manfaatanModel.GetTipeKantor(kantoriduser);
             string aksesEdit = _manfaatanModel.GetAksesEditPagu();
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
+            string pegawaiid = userIdentity.PegawaiId;
 
 
             string query =
@@ -1481,12 +1494,13 @@ namespace Pnbp.Controllers
             string[] HIST_ANGGJUL, string[] HIST_ANGGAGT, string[] HIST_ANGGSEP, string[] HIST_ANGGOKT, string[] HIST_ANGGNOV, string[] HIST_ANGGDES
             )
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
             PnbpContext db = new PnbpContext();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+            string kantoriduser = userIdentity.KantorId;
+            string namakantor = userIdentity.NamaKantor;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
             var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
 
             //return Json(revisi, JsonRequestBehavior.AllowGet);
@@ -1616,6 +1630,7 @@ namespace Pnbp.Controllers
         }
         public ActionResult DaftarRincianAlokasi(int? start, int? length, Entities.CariRincianAlokasiSatker f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -1623,7 +1638,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             string idsatker = f.KANTORID;
@@ -1642,6 +1657,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRincianAlokasiOutput(int? start, int? length, Entities.CariRincianAlokasiSatker f, FormCollection form)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -1649,7 +1665,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             string kodesatker = f.KODESATKER;
@@ -1671,6 +1687,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRincianAlokasiDetail(int? start, int? length, Entities.CariRincianAlokasiSatker f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -1678,7 +1695,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = userIdentity.KantorId;
 
             string kantorid = f.KANTORID;
             //string tahun = f.TAHUN;
@@ -1713,6 +1730,7 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarRincianAlokasiDetailOutput(int? start, int? length, Entities.CariRincianAlokasiSatker f)
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
             int from = recNumber + 1;
@@ -1720,7 +1738,7 @@ namespace Pnbp.Controllers
 
             decimal? total = 0;
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = userIdentity.KantorId;
             string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
             string programid = f.PROGRAMID;
@@ -1747,8 +1765,9 @@ namespace Pnbp.Controllers
 
         public ActionResult EntriRenaksiPusat()
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
-            if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "197804302003122002")
+            if (userIdentity.PegawaiId == "197804302003122002")
             {
                 var get_satker = ctx.Database.SqlQuery<Entities.DataSatker>("SELECT DISTINCT KANTORID, NAMAKANTOR from MANFAAT WHERE PERSETUJUAN2 = 0 OR PERSETUJUAN2 = NULL AND STATUSREVISI = 1").ToList();
                 ViewData["get_satker"] = get_satker;
@@ -1851,7 +1870,7 @@ namespace Pnbp.Controllers
                 LEFT JOIN MANFAAT b on a.MANFAAT_MANFAATID = b.MANFAATID AND a.PROGRAMID = b.PROGRAMID
                 LEFT JOIN PROGRAM c ON a.PROGRAMID = c.PROGRAMID
                 LEFT JOIN EVIDEN d ON b.MANFAATID = d.EVIDENMANFAATID
-                WHERE a.USERINSERT = '" + (User as Pnbp.Entities.InternalUserIdentity).PegawaiId + "'").ToList();
+                WHERE a.USERINSERT = '" + userIdentity.PegawaiId + "'").ToList();
             ViewData["get_historis"] = get_historis;
 
             return View();
@@ -1859,10 +1878,11 @@ namespace Pnbp.Controllers
 
         public ActionResult GetDataRenaksi(string kantorid)
         {
-            //return Json((User as Pnbp.Entities.InternalUserIdentity).Pegawa, JsonRequestBehavior.AllowGet);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            //return Json(userIdentity.Pegawa, JsonRequestBehavior.AllowGet);
 
             var ctx = new PnbpContext();
-            if ((User as Pnbp.Entities.InternalUserIdentity).PegawaiId == "197804302003122002")
+            if (userIdentity.PegawaiId == "197804302003122002")
             {
                 var getdata = ctx.Database.SqlQuery<Entities.DataRenaksiPusat>("SELECT DISTINCT a.NAMAKANTOR, a.PERSETUJUAN1, a.PERSETUJUAN2, a.STATUSREVISI, a.MANFAATID, a.KANTORID, a.NAMAPROGRAM, a.TIPE, a.NILAIANGGARAN,  nvl(A .ANGGJAN, 0) AS ANGGJAN, nvl(A.ANGGFEB, 0) AS ANGGFEB, nvl(A.ANGGMAR, 0) AS ANGGMAR, nvl(A.ANGGAPR, 0) AS ANGGAPR, nvl(A.ANGGMEI, 0) AS ANGGMEI, nvl(A.ANGGJUN, 0) AS ANGGJUN, nvl(A.ANGGJUL, 0) AS ANGGJUL, nvl(A.ANGGAGT, 0) AS ANGGAGT, nvl(A.ANGGSEP, 0) AS ANGGSEP, nvl(A.ANGGOKT, 0) AS ANGGOKT, nvl(A.ANGGNOV, 0) AS ANGGNOV, nvl(A.ANGGDES, 0) AS ANGGDES, a.PROGRAMID, b.KODE, c.EVIDENPATH FROM MANFAAT a LEFT JOIN PROGRAM b on a.PROGRAMID = b.PROGRAMID LEFT JOIN EVIDEN c ON A.MANFAATID = c.EVIDENMANFAATID WHERE a.KANTORID = '" + kantorid + "' AND PERSETUJUAN2 = 0 OR PERSETUJUAN2 = NULL AND STATUSREVISI = 1").ToList();
                 return Json(getdata, JsonRequestBehavior.AllowGet);
@@ -1883,6 +1903,8 @@ namespace Pnbp.Controllers
             string[] HIST_ANGGJUL, string[] HIST_ANGGAGT, string[] HIST_ANGGSEP, string[] HIST_ANGGOKT, string[] HIST_ANGGNOV, string[] HIST_ANGGDES, string[] ketPenolakan
             )
         {
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+
             var ctx = new PnbpContext();
             var kodesatker = ((form.AllKeys.Contains("satker")) ? form["satker"] : "NULL");
             var programid = ((form.AllKeys.Contains("programid")) ? form["programid"] : "NULL");
@@ -1890,7 +1912,7 @@ namespace Pnbp.Controllers
 
             string[] programidsplit = programid.TrimStart(',').Split(',');
             string[] checkboxsplit = checkbox.TrimStart(',').Split(',');
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
+            string pegawaiid = userIdentity.PegawaiId;
 
             for (int i = 0; i < programidsplit.Count(); i++)
             {
@@ -1929,6 +1951,7 @@ namespace Pnbp.Controllers
             string[] HIST_ANGGJUL, string[] HIST_ANGGAGT, string[] HIST_ANGGSEP, string[] HIST_ANGGOKT, string[] HIST_ANGGNOV, string[] HIST_ANGGDES, string[] ketPenolakan)
         {
             //return Json(check, JsonRequestBehavior.AllowGet);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             var ctx = new PnbpContext();
             var kodesatker = ((form.AllKeys.Contains("satker")) ? form["satker"] : "NULL");
             var programid = ((form.AllKeys.Contains("programid")) ? form["programid"] : "NULL");
@@ -1936,8 +1959,8 @@ namespace Pnbp.Controllers
 
             string[] programidsplit = programid.TrimStart(',').Split(',');
             string[] checkboxsplit = checkbox.TrimStart(',').Split(',');
-            string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string pegawaiid = userIdentity.PegawaiId;
+            string kantorid = userIdentity.KantorId;
 
 
             for (int i = 0; i < programidsplit.Count(); i++)

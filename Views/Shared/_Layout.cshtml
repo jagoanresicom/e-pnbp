@@ -1,4 +1,5 @@
 ﻿@{
+	var userIdentity = new Pnbp.Codes.Functions().claimUser();
 	string jenisKantorUser = OtorisasiUser.GetJenisKantorUser();
 	bool isAuthorizedPengembalian = OtorisasiUser.IsAuthorizedPengembalian();
 }
@@ -256,7 +257,7 @@
 					<div class="text-center nav_title navbar profile" style="border: 0;">
 						<h2>PNBP</h2>
 						@*Kantor Pertanahan<br />*@
-						@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))
+						@(userIdentity.NamaKantor.Replace("Kantor Pertanahan", ""))
 					</div>
 					<div class="clearfix"></div>
 					<!-- menu profile quick info -->
@@ -420,7 +421,7 @@
 						<ul class="nav navbar-nav navbar-right">
 							<li class="">
 								<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-									@((User as Pnbp.Entities.InternalUserIdentity).NamaPegawai)
+									@(userIdentity.NamaPegawai)
 									<span class="fa fa-angle-down"></span>
 								</a>
 								<ul class="dropdown-menu dropdown-usermenu pull-right">
