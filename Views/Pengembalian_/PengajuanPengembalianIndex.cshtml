@@ -188,7 +188,7 @@
 
     var dtablePengajuan;
     var createPagingPengajuan = function () {
-        var kantorid = "@((User as Pnbp.Entities.InternalUserIdentity).KantorId)";
+        var kantorid = "@(new Pnbp.Codes.Functions().claimUser().KantorId)";
         dtablePengajuan = $('#myTablePengembalianPnbp').DataTable({
             "bLengthChange": false,
             "paging": true,
