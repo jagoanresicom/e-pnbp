@@ -1138,6 +1138,59 @@ namespace Pnbp.Models
             };
         }
 
+        public Entities.DaftarTotal pn_provinsi_sum(string pTahun, string pBulan, string provinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
+        {
+            Entities.DaftarTotal result = null;
+
+            List<object> lstparams = new List<object>();
+            var count = 0;
+            string query =
+                @" select 
+                       {0}
+                   from rekappenerimaandetail a 
+                   LEFT JOIN TARGETPROSEDUR b on a.NAMAPROSEDUR = b.NAMAPROSEDUR AND A .KANTORID = b.KANTORID
+                   LEFT JOIN SATKER c ON A.KANTORID = C.KANTORID
+                    JOIN kantor k ON k.kodesatker = c.KODESATKER 
+                    JOIN wilayah w ON k.kode = w.kode
+                    JOIN wilayah prov ON prov.wilayahid = w.induk
+                    where c.tipekantorid = 2 AND a.tahun = :param1 AND c.KODESATKER IS NOT NULL";
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param1", pTahun));
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                query += " and a.bulan = :param2 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pBulan));
+            }
+
+            if (!String.IsNullOrEmpty(provinsi))
+            {
+                query += " and lower(w.nama) like '%'||:param5||'%' ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
+            }
+
+
+            query = string.Format(query, @"
+                        nvl(count(a.jumlah), 0) AS totalfisik,
+                        nvl(sum(a.penerimaan),0) as totalpenerimaan, 
+                        nvl(round(sum(a.operasional),2),0) as totaloperasional ");
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    var parameters = lstparams.ToArray();
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, parameters).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+
         public RealisasiPenerimaanDT pn_satker(string pTahun, string pBulan, string propinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
         {
             List<Entities.DaftarRekapPenerimaanDetail> _list = new List<Entities.DaftarRekapPenerimaanDetail>();
@@ -1298,6 +1351,85 @@ namespace Pnbp.Models
                 RecordsFiltered = count,
                 RecordsTotal = count
             };
+        }
+
+        public string GetNamaProvinsiBySatkerInduk(string induk)
+        {
+            string result = "";
+
+            string query = $@"
+                            SELECT distinct prov.nama FROM pnbp.SATKER s
+                            JOIN kantor k ON s.kantorid = k.kantorid
+                            JOIN wilayah w ON k.kode = w.kode
+                            JOIN wilayah prov ON prov.wilayahid = w.induk
+                            WHERE s.induk  = :induk";
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    List<object> lstparams = new List<object>();
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", induk));
+                    result = ctx.Database.SqlQuery<string>(query, lstparams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
+        }
+
+        public string GetNamaWilayahById(string wilayahId)
+        {
+            string result = "";
+
+            string query = $@"
+                            SELECT nama FROM wilayah
+                            WHERE wilayahid = :wilayahId";
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    List<object> lstparams = new List<object>();
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
+                    result = ctx.Database.SqlQuery<string>(query, lstparams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
+        }
+
+        public string GetNamaKantorByKantorId(string kantorId)
+        {
+            string result = "";
+
+            string query = $@"
+                            SELECT s.NAMA_SATKER FROM pnbp.satker s
+                            JOIN kantor k ON k.kantorid = s.KANTORID 
+                            WHERE k.KANTORID  = :kantorId";
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    List<object> lstparams = new List<object>();
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorId", kantorId));
+                    result = ctx.Database.SqlQuery<string>(query, lstparams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
         }
 
 

@@ -5979,6 +5979,7 @@
     <Content Include="Views\Pengembalian\pengembalianpusat.cshtml" />
     <Content Include="Views\Pengembalian\pusat.cshtml" />
     <Content Include="Views\Pengembalian\daerah.cshtml" />
+    <Content Include="Views\Administrasi\ManajemenDataV2.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

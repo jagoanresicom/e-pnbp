@@ -1042,7 +1042,7 @@ namespace Pnbp.Controllers
             }
         }
 
-        public ActionResult rl_kro ()
+        public ActionResult rl_kro(string pid)
         {
             int indexKaBiroPerencanaan = -1;
             int indexKaBiroKeuangan = -1;
@@ -1058,6 +1058,15 @@ namespace Pnbp.Controllers
             Entities.FindManfaat fn = new Entities.FindManfaat();
             fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+
+            if (!String.IsNullOrEmpty(pid))
+            {
+                Models.PenerimaanModel model = new Models.PenerimaanModel();
+                ViewData["nama_kantor"] = model.GetNamaKantorByKantorId(pid);
+                fn.KantorId = pid;
+            }
+
             return View(fn);
         }
 
@@ -1077,10 +1086,11 @@ namespace Pnbp.Controllers
             Entities.FindManfaat fn = new Entities.FindManfaat();
             fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             return View(fn);
         }
 
-        public ActionResult rl_satker()
+        public ActionResult rl_satker(string pid)
         {
             int indexKaBiroPerencanaan = -1;
             int indexKaBiroKeuangan = -1;
@@ -1096,21 +1106,28 @@ namespace Pnbp.Controllers
             Entities.FindManfaat fn = new Entities.FindManfaat();
             fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
+            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+
+            if (!String.IsNullOrEmpty(pid))
+            {
+                Models.PenerimaanModel model = new Models.PenerimaanModel();
+                ViewData["nama_wilayah"] = model.GetNamaWilayahById(pid);
+                fn.WilayahId = pid;
+            }
+
             return View(fn);
         }
 
 
         [HttpPost]
-        public ActionResult rl_kro(int? start, Entities.FindManfaat f)
+        public ActionResult rl_kro_list(int? start, Entities.FindManfaat f, string KantorId, string kodeKRO, string tahun)
         {
             int recNumber = start ?? 0;
             int RecordsPerPage = 10;
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
-
-
-            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             string kodesatker = f.KodeSatker;
             string namasatker = f.NamaSatker;
             string namaprogram = f.NamaProgram;
@@ -1119,8 +1136,7 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            List<Entities.BelanjaKRO> result = _manfaatanModel.lr_kro(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
-
+            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_kro(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to, KantorId, kodeKRO);
 
             int custIndex = from;
 
@@ -1136,25 +1152,22 @@ namespace Pnbp.Controllers
 
 
         [HttpPost]
-        public ActionResult rl_satker_list(int? start, Entities.FindManfaat f)
+        public ActionResult rl_satker_list(int? start, Entities.FindManfaat f, int length, string tahun, string satker, string WilayahId)
         {
             int recNumber = start ?? 0;
-            int RecordsPerPage = 10;
+            int RecordsPerPage = length;
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
-
-
-            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             string kodesatker = f.KodeSatker;
-            string namasatker = f.NamaSatker;
             string namaprogram = f.NamaProgram;
             decimal? nilaianggaran = f.NilaiAnggaran;
 
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_satker(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_satker(reqTahun, kodesatker, satker, namaprogram, nilaianggaran, true, from, to, WilayahId);
             //List<Entities.BelanjaKRO> resultSumList = _manfaatanModel.rl_satker_sum(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
 
             //var resultSum = resultSumList.First();
@@ -1176,16 +1189,15 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
-        public ActionResult rl_provinsi(int? start, Entities.FindManfaat f)
+        public ActionResult rl_provinsi_list(int? start, Entities.FindManfaat f, int length, string tahun, string bulan, string satker, string provinsi)
         {
             int recNumber = start ?? 0;
-            int RecordsPerPage = 10;
+            int RecordsPerPage = length;
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
+            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
 
-
-            string tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             string kodesatker = f.KodeSatker;
             string namasatker = f.NamaSatker;
             string namaprogram = f.NamaProgram;
@@ -1194,7 +1206,7 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_provinsi(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_provinsi(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true, from, to);
 
             foreach (var item in result)
             {

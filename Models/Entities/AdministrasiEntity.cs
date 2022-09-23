@@ -97,6 +97,8 @@ namespace Pnbp.Entities
 
         public List<Tahun> lstahun { get; set; }
         public string tahun { get; set; }
+        public string WilayahId { get; set; }
+        public string KantorId { get; set; }
     }
 
     public class PrioritasAlokasi
@@ -180,6 +182,8 @@ namespace Pnbp.Entities
         public decimal? Total { get; set; }
         public string KodeKRO { get; set; }
         public string KRO { get; set; }
+        public string WilayahId { get; set; }
+        public string KantorId { get; set; }
         public decimal? Pagu { get; set; }
         public decimal? Alokasi { get; set; }
         public decimal? Realisasi { get; set; }

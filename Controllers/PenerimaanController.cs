@@ -1011,11 +1011,16 @@ namespace Pnbp.Controllers
         public ActionResult pn_satker(string pid)
         {
             List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
             var ctx = new PnbpContext();
 
             var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
             ViewData["get_propinsi"] = get_propinsi;
             ViewData["provinsi_id"] = pid;
+            if (!String.IsNullOrEmpty(pid))
+            { 
+                ViewData["nama_wilayah"] = model.GetNamaProvinsiBySatkerInduk(pid);
+            }
             //return Json(get_propinsi, JsonRequestBehavior.AllowGet);
 
             return View();
@@ -1023,12 +1028,17 @@ namespace Pnbp.Controllers
 
         public ActionResult pn_layanan(string pid)
         {
+            Models.PenerimaanModel model = new Models.PenerimaanModel();
             List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
             var ctx = new PnbpContext();
 
             var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("select kantorId, kode, replace(nama,'Kantor Wilayah ', '') as nama from kantor where tipekantorid=2").ToList();
             //ViewData["get_propinsi"] = get_propinsi;
             ViewData["satker"] = pid;
+            if (!String.IsNullOrEmpty(pid))
+            {
+                ViewData["nama_satker"] = model.GetNamaKantorByKantorId(pid);
+            }
 
             return View();
         }
@@ -1045,6 +1055,17 @@ namespace Pnbp.Controllers
             var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
 
             var data = model.pn_provinsi(
+                reqTahun,
+                bulan,
+                provinsi,
+                satker,
+                tipekantorid,
+                kantorid,
+                req.Start,
+                req.Length
+            );
+
+            Entities.DaftarTotal daftarTotal = model.pn_provinsi_sum(
                 reqTahun,
                 bulan,
                 provinsi,
@@ -1084,7 +1105,10 @@ namespace Pnbp.Controllers
                         x.kantorid,
                         x.jumlah,
                         x.jenispenerimaan,
-                        x.targetfisik
+                        x.targetfisik,
+                        daftarTotal.totalfisik,
+                        daftarTotal.totalpenerimaan,
+                        daftarTotal.totaloperasional,
                     };
                 }),
                 recordsTotal = totalRecord,

@@ -808,7 +808,8 @@ namespace Pnbp.Controllers
 
         public ActionResult ManajemenData()
         { 
-            return View();
+            //return View();
+            return View("ManajemenDataV2");
         }
 
         public ActionResult ListTargetHistory(int? start, int? length)
