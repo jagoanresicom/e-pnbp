@@ -14,6 +14,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
 using Xceed.Words.NET;
+using Pnbp.Models;
+using Pnbp.Entities;
 
 namespace Pnbp.Controllers
 {
@@ -190,8 +192,8 @@ namespace Pnbp.Controllers
         public ActionResult PengajuanPengembalianIndex()
         {
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-
-            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
+            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
@@ -782,7 +784,8 @@ namespace Pnbp.Controllers
 
         public ActionResult DaftarSatker()
         {
-            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
+            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -1431,6 +1434,11 @@ namespace Pnbp.Controllers
             ViewData["Pengembaliandata"] = data;
             //return View();
             return View("pengembaliandaerah");
+        }
+
+        public ActionResult EntriPengembalian()
+        {
+            return View("EntriPengembalian");
         }
 
         public ActionResult PengajuanPengembalianDetailPusat(string pengembalianpnbpid)
@@ -2099,7 +2107,8 @@ namespace Pnbp.Controllers
         public ActionResult pusat()
         {
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
+            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
@@ -2114,7 +2123,8 @@ namespace Pnbp.Controllers
         public ActionResult daerah()
         {
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
+            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
@@ -2129,7 +2139,8 @@ namespace Pnbp.Controllers
         public ActionResult mon_pengembalian()
         {
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
+            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
+            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);

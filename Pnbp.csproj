@@ -183,6 +183,7 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\KodeSpanController.cs" />
+    <Compile Include="Controllers\SatuanKerjaController.cs" />
     <Compile Include="Controllers\ProgramController.cs" />
     <Compile Include="Controllers\SatkernomenklaturController.cs" />
     <Compile Include="Controllers\KontenController.cs" />
@@ -205,8 +206,10 @@
     <Compile Include="Models\Entities\KodeSpan.cs" />
     <Compile Include="Models\Entities\Programs.cs" />
     <Compile Include="Models\Entities\Satkernomenklatur.cs" />
+    <Compile Include="Models\Entities\SatuanKerja.cs" />
     <Compile Include="Models\Entities\TargetEntity.cs" />
     <Compile Include="Models\Entities\TipeManfaat.cs" />
+    <Compile Include="Models\SatuanKerjaModel.cs" />
     <Compile Include="Models\KodeSpanModel.cs" />
     <Compile Include="Models\KontentModel.cs" />
     <Compile Include="Models\MonitoringEvaluasiModel.cs" />
@@ -5980,6 +5983,9 @@
     <Content Include="Views\Pengembalian\pusat.cshtml" />
     <Content Include="Views\Pengembalian\daerah.cshtml" />
     <Content Include="Views\Administrasi\ManajemenDataV2.cshtml" />
+    <Content Include="Views\Pengembalian\daerah.cshtml" />
+    <Content Include="Views\Pengembalian\pusat.cshtml" />
+    <Content Include="Views\Pengembalian\EntriPengembalian.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

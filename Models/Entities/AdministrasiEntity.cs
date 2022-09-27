@@ -326,13 +326,6 @@ namespace Pnbp.Entities
         public string Nama { get; set; }
     }
 
-    public class SatuanKerja
-    {
-        public string KantorId { get; set; }
-        public string KodeSatker { get; set; }
-        public string NamaSatker { get; set; }
-    }
-
     public class FindPengumuman
     {
         public string JudulBerita { get; set; }

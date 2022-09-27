@@ -294,14 +294,6 @@ namespace Pnbp.Models
             return records;
         }
 
-        public List<Entities.GetSatkerList> GetSatker()
-        {
-            var ctx = new PnbpContext();
-            List<Entities.GetSatkerList> records = new List<Entities.GetSatkerList>();
-            var query = "SELECT * FROM SATKER WHERE STATUSAKTIF = '1'";
-            return records = ctx.Database.SqlQuery<Entities.GetSatkerList>(query).ToList();
-        }
-
         public List<Entities.PengembalianPnbpTrain> GetPengembalianPnbpTrain(int tipekantorid,string kantoriduser, string namakantor, string judul, string nomorberkas, string kodebilling, string nptn, string namapemohon, string nikpemohon, string alamatpemohon, string teleponpemohon, string bankpersepsi, string status, string namasatker, string kodesatker, int from, int to)
         {
             List<Entities.PengembalianPnbpTrain> records = new List<Entities.PengembalianPnbpTrain>();
@@ -1516,14 +1508,17 @@ namespace Pnbp.Models
                     PENERIMAAN,
                     KANTORID
                 FROM AA
-            WHERE NOTAHUNBERKAS = '" + NoTahun + "' AND KANTORID = '" + kantorid + "'";
+            WHERE NOTAHUNBERKAS = :NoTahun AND KANTORID = :kantorid ";
 
             query = sWhitespace.Replace(query, " ");
             //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorBerkas", String.Concat("%", NomorBerkas.ToLower(), "%")));
 
             using (var ctx = new PnbpContext())
             {
-                var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query).FirstOrDefault();
+                List<object> lstParams = new List<object>();
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NoTahun", NoTahun));
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorid", kantorid));
+                var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query, lstParams.ToArray()).FirstOrDefault();
                 return records;
             }
         }

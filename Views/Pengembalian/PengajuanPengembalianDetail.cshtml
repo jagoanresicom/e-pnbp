@@ -38,7 +38,7 @@
                                 <div class="panel-body form-horizontal">
                                     @* form *@
                                     <div class="form-group">
-                                        <input type="hidden" name="satker" id="satker" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" />
+                                        <input type="hidden" name="satker" id="satker" value="@(new Pnbp.Codes.Functions().claimUser().NamaKantor.Replace("Kantor Pertanahan", ""))" />
                                         <label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
                                         <div class="col-sm-8">
                                             <input type="text" name="NomorBerkas" id="nmorberkas" class="form-control" value="@Pengembaliandata.NOMORBERKAS" readonly />

@@ -24,7 +24,7 @@
 
                             <div class="panel panel-default">
                                 <div class="panel-heading">Data Berkas</div>
-                                <input type="hidden" name="satker" id="satker" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" />
+                                <input type="hidden" name="satker" id="satker" value="@(new Pnbp.Codes.Functions().claimUser().NamaKantor.Replace("Kantor Pertanahan", ""))" />
                                 <div class="panel-body form-horizontal">
                                     @* form *@
                                     <div class="form-group">
