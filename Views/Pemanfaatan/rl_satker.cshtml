@@ -64,9 +64,10 @@
 
 						<div class="row">
 							<label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-							<div class="col-md-6 col-sm-6 col-xs-12">
-								<button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
-							</div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
+                                <button onclick="history.back()" class="btn btn-info">Kembali</button>
+                            </div>
 						</div>
 						<br>
 
@@ -79,9 +80,9 @@
 										<th>Satuan Kerja</th>
 										<th>Pagu</th>
 										<th>Alokasi</th>
-										<th>Realisasi</th>
+										@*<th>Realisasi</th>
 										<th>%Pagu</th>
-										<th>%Alokasi</th>
+										<th>%Alokasi</th>*@
 										<th>Aksi</th>
 									</tr>
 								</thead>
@@ -173,9 +174,9 @@
                 { "data": "KRO", "className": "centertaligncolumn", "width": "20%" },
 				{ "data": "Pagu", "className": "centertaligncolumn", "width": "5%", render: formatAngka },
 				{ "data": "Alokasi", "className": "centertaligncolumn", "width": "5%", render: formatAngka },
-				{ "data": "Realisasi", "className": "centertaligncolumn", "width": "5%", render: formatAngka },
-				{ "data": "PersentasePagu", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "PersentaseAlokasi", "className": "centertaligncolumn", "width": "5%" },
+				//{ "data": "Realisasi", "className": "centertaligncolumn", "width": "5%", render: formatAngka },
+				//{ "data": "PersentasePagu", "className": "centertaligncolumn", "width": "5%" },
+				//{ "data": "PersentaseAlokasi", "className": "centertaligncolumn", "width": "5%" },
 				{
 					"mData": "Name",
 					"width": "10%",
