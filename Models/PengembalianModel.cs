@@ -986,7 +986,7 @@ namespace Pnbp.Models
             return tr;
         }
 
-        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai)
+        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1068,7 +1068,7 @@ namespace Pnbp.Models
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaCabang", data.NamaCabang));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaCabang", ""));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("SetoranPnbp", data.SETORANPNBP));
-                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Npwp", data.NPWP));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Npwp", npwpberkas));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaRekening", data.NAMAREKENING));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PermohonanPengembalian", data.PERMOHONANPENGEMBALIAN));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PermohonanPengembalian", ""));

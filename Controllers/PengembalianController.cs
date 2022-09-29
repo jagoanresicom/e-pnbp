@@ -1134,7 +1134,7 @@ namespace Pnbp.Controllers
 
         [HttpPost]
         //public JsonResult SimpanPengembalianPnbpDev(Entities.DataPengembalianPnbpDev data)
-        public JsonResult SimpanPengembalianDaerah(DetailDataBerkas data)
+        public JsonResult SimpanPengembalianDaerah(DetailDataBerkas data, string npwpberkas)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1150,7 +1150,7 @@ namespace Pnbp.Controllers
             string pegawaiid = userIdentity.PegawaiId;
             string namapegawai = userIdentity.NamaPegawai;
 
-            tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai);
+            tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas);
 
             return Json(tr, JsonRequestBehavior.AllowGet);
         }
