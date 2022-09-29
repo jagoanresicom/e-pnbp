@@ -46,9 +46,12 @@
 
 					<input type="hidden" name="Status" id="Stataus" />
 					<div class="text-right">@*<a href="@Url.Action("PengajuanPengembalianIndex","Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>*@</div>
-                    <div class="text-right" style="margin-bottom:8px;">
-						<a href="@Url.Action("mon_pengembalian","Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
-					</div>
+                    @if (!string.IsNullOrEmpty(Model.BerkasId))
+					{
+						<div class="text-right" style="margin-bottom:8px;">
+							<a href="@Url.Action("mon_pengembalian", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
+						</div>
+					}
 					<div class="row">
 
 						<div class="col-md-4">
@@ -302,7 +305,8 @@
 									<div class="form-group">
 										<div class="col-sm-12">
 											<button type="submit" form="pengembalian_form" id="simpan" class="btn btn-primary">Simpan</button>
-											<button type="submit" form="pengembalian_form" class="btn btn-primary" id="proses">Kirim Berkas</button>
+											<button type="submit" form="pengembalian_form" class="btn btn-primary" id="proses">Proses</button>
+											@*<button type="submit" form="pengembalian_form" class="btn btn-primary" id="proses">Kirim Berkas</button>*@
 										</div>
 									</div>
 
@@ -458,7 +462,10 @@
     //    });
     //});
 
-    function addCommas(nStr) {
+	function addCommas(nStr) {
+		if (nStr == null) {
+			nStr = '0';
+		}
         nStr += '';
         x = nStr.split(',');
         x1 = x[0];

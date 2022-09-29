@@ -892,7 +892,7 @@ namespace Pnbp.Entities
         public string SETORANPNBP { get; set; }
         public string PERMOHONANPENGEMBALIAN { get; set; }
         public string NOMORSURAT { get; set; }
-        public int STATUSPENGEMBALIAN { get; set; }
+        public string STATUSPENGEMBALIAN { get; set; }
         public string NPWPPEGAWAIPENGAJU { get; set; }
         public string TANGGALPENGAJU { get; set; }
     }

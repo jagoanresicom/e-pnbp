@@ -1010,7 +1010,7 @@ namespace Pnbp
                     object[] parameters = new object[1] { p1 };
 
                     string sql = "SELECT UserId, Username, Email, Password, PasswordQuestion, Commentar, IsApproved, IsLockedOut, NVL(CreationDate,SYSDATE) CreationDate, NVL(LastLoginDate,SYSDATE) LastLoginDate, NVL(LastActivityDate,SYSDATE) LastActivityDate, NVL(LastPasswordChangedDate,SYSDATE) LastPasswordChangedDate, NVL(LastLockedOutDate,SYSDATE) LastLockedOutDate " +
-                        "FROM SIMPEG." + tableName + " WHERE Username = :param1 AND IsLockedOut = 0";
+                        "FROM " + tableName + " WHERE Username = :param1 AND IsLockedOut = 0";
                         m = ctx.MembershipData.SqlQuery(sql, parameters).FirstOrDefault();
                 }
 

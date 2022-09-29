@@ -713,7 +713,7 @@ namespace Pnbp.Controllers
             if (ModelState.IsValid)
             {
                 TempData["Upload"] = "Data Berhasil Disimpan";
-                return RedirectToAction("daerah");
+                return RedirectToAction("mon_pengembalian");
                 //return RedirectToAction("PengajuanPengembalianIndex");
             }
             else
@@ -721,7 +721,7 @@ namespace Pnbp.Controllers
 
             }
 
-            return RedirectToAction("daerah");
+            return RedirectToAction("mon_pengembalian");
             //return RedirectToAction("PengajuanPengembalianIndex");
             //mati
         }
@@ -1133,6 +1133,29 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        //public JsonResult SimpanPengembalianPnbpDev(Entities.DataPengembalianPnbpDev data)
+        public JsonResult SimpanPengembalianDaerah(DetailDataBerkas data)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            if (string.IsNullOrEmpty(data.BERKASID))
+            {
+                tr.Pesan = "Harap lakukan pencarian berkas terlebih dahulu";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+
+            var userIdentity = (HttpContext.User.Identity as Entities.InternalUserIdentity);
+            string userid = userIdentity.UserId;
+            string kantoriduser = userIdentity.KantorId;
+            string pegawaiid = userIdentity.PegawaiId;
+            string namapegawai = userIdentity.NamaPegawai;
+
+            tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai);
+
+            return Json(tr, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
         public JsonResult SimpanPersetujuanPengembalian(Entities.DataPengembalianPnbp data)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
@@ -1373,6 +1396,11 @@ namespace Pnbp.Controllers
             var noberkas = (form.AllKeys.Contains("noberkas") ? form["noberkas"] : "");
 
 
+            if (string.IsNullOrEmpty(noberkas))
+            { 
+                return View();
+            }
+
             string tipe = OtorisasiUser.GetJenisKantorUser();
             
             if(tipe == "Kantah")
@@ -1433,9 +1461,10 @@ namespace Pnbp.Controllers
             ViewData["file9"] = file9;
             ViewData["file10"] = file10;
             ViewData["file11"] = file11;
-            ViewData["Pengembaliandata"] = data;
+            //ViewData["Pengembaliandata"] = data;
             //return View();
-            return View("pengembaliandaerah");
+            //return View("pengembaliandaerah");
+            return View("EntriPengembalianDaerah", data);
         }
 
         public ActionResult EntriPengembalian()
@@ -2106,36 +2135,28 @@ namespace Pnbp.Controllers
 
         // V2
 
-        public ActionResult pusat()
+        public ActionResult Pusat()
         {
-            Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
-            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
+            //Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
+            //SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
+            //List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+            //string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            //int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
-            ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
-            ViewData["datasatker"] = result;
-            ViewData["kantorid"] = kantoriduser;
+            //ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
+            //ViewData["datasatker"] = result;
+            //ViewData["kantorid"] = kantoriduser;
 
-            return View(find);
+            //return View(find);
+            DataPengembalianPnbpDev data = new DataPengembalianPnbpDev();
+            return View("EntriPengembalianPusat", data);
         }
 
-        public ActionResult daerah()
+        public ActionResult Daerah()
         {
-            Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
-            SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
-            List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
-
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-            int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
-
-            ViewData["tipekantorid"] = Convert.ToString(tipekantorid);
-            ViewData["datasatker"] = result;
-            ViewData["kantorid"] = kantoriduser;
-
-            return View(find);
+            DetailDataBerkas data = new DetailDataBerkas();
+            return View("EntriPengembalianDaerah", data);
         }
 
         public ActionResult mon_pengembalian()
@@ -2155,7 +2176,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
-        public ActionResult mon_pengembalian_list(int? start, int? length, Entities.FindPengembalianPnbp f)
+        public ActionResult ListPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
             int recNumber = start ?? 0;
             int RecordsPerPage = length ?? 10;
@@ -2181,7 +2202,7 @@ namespace Pnbp.Controllers
             string kodesatker = f.CariKodeSatker;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
-            List<Entities.PengembalianPnbpTrain> result = pengembalianmodel.mon_pengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
+            List<Entities.PengembalianPnbpTrain> result = pengembalianmodel.ListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
 
             if (result.Count > 0)
             {

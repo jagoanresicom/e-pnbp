@@ -193,7 +193,7 @@
 			"serverSide": true,
 			"scrollX": false,
 			"ajax": {
-				url: '@Url.Action("mon_pengembalian_list", "Pengembalian")',
+				url: '@Url.Action("ListPengembalian", "Pengembalian")',
 				type: "POST",
 				data: function (data, obj) { var ftp = $('#js-section-pencarian form').serializeArray(); data.form = ftp; ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }); return ftp; }
 			},
@@ -244,7 +244,7 @@
 						if ($('#jeniskantor').val() == 'Pusat') {
 							html += '<button type="button" class="btn btn-success --js-btn-selesai">Selesai</button>';
 						}
-						html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil js-btn-edit"></i> Edit</button>';
+						html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
 						html += '</div>';
 						return html;
 					}

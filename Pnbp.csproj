@@ -5985,6 +5985,8 @@
     <Content Include="Views\Administrasi\ManajemenDataV2.cshtml" />
     <Content Include="Views\Pengembalian\daerah.cshtml" />
     <Content Include="Views\Pengembalian\pusat.cshtml" />
+    <Content Include="Views\Pengembalian\EntriPengembalianPusat.cshtml" />
+    <Content Include="Views\Pengembalian\EntriPengembalianDaerah.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalian.cshtml" />
   </ItemGroup>
   <ItemGroup>

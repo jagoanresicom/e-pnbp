@@ -195,7 +195,7 @@
 			"serverSide": true,
 			"scrollX": false,
 			"ajax": {
-				url: '@Url.Action("mon_pengembalian_list", "Pengembalian")',
+				url: '@Url.Action("ListPengembalian", "Pengembalian")',
 				type: "POST",
 				data: function (data, obj) { var ftp = $('#js-section-pencarian form').serializeArray(); data.form = ftp; ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }); return ftp; }
 			},

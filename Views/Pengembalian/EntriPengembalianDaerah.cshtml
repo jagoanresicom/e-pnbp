@@ -1,0 +1,307 @@
+﻿@model Pnbp.Entities.DetailDataBerkas
+
+<style>
+	/*panel style overwrite*/
+	.panel-heading {
+		background: white !important;
+		padding: 10px 0 !important;
+		font-size: 1.6rem !important;
+	}
+
+	.panel-default {
+		padding: 0 12px !important;
+	}
+
+	.panel-body {
+		margin-top: 10px;
+	}
+</style>
+
+<form class="form-horizontal" method="post" enctype="multipart/form-data" id="js-form-entri">
+	<div id="dynamic_content">
+
+		@if (!string.IsNullOrEmpty(Model.BERKASID))
+		{ 
+			<div class="text-right" style="margin-bottom:8px;">
+				<a href="@Url.Action("mon_pengembalian","Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
+			</div>
+		}
+		<div class="clearfix"></div>
+
+		<div class="row">
+			<div class="col-md-4">
+
+				@* section panel 1 *@
+				<div class="panel panel-default x_panel">
+					<div class="panel-heading x_title">
+						Data Berkas
+						<ul class="nav navbar-right panel_toolbox">
+							<li>
+								<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+							</li>
+							<li>
+								<a class="close-link"><i class="fa fa-close"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="panel-body form-horizontal x_content">
+						@* form *@
+						@Html.HiddenFor(m => m.BERKASID)
+						<div class="form-group">
+							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
+							<div class="col-sm-6">
+								@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
+							</div>
+							<div class="col-sm-2 text-left"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" style="margin-left:0px;"><span class="fa fa-search"></span></button></button></div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Atas Nama</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NAMAPEGAWAIPENGAJU, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Alamat</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.ALAMATPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Alamat Pemohon" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NPWP, new { @Value = "", @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })
+								@*@Html.TextBoxFor(m => m.NPWP, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })*@
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Kode Biling</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.KODEBILLING, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Kode Billing" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NTPN</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NTPN, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NTPN" })
+							</div>
+						</div>
+						@* end form 1 *@
+					</div>
+				</div>
+
+			</div>
+			<div class="col-md-4">
+
+				<div class="panel panel-default x_panel">
+					<div class="panel-heading x_title">
+						Data Pengembalian
+						<ul class="nav navbar-right panel_toolbox ">
+							<li>
+								<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+							</li>
+							<li>
+								<a class="close-link"><i class="fa fa-close"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="panel-body form-horizontal x_content">
+						@*Panel content*@
+						<div class="form-group">
+							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Setoran PNBP</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.SETORANPNBP, new { @class = "form-control input-md" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Jumlah Biaya Layanan yang sudah dikeluarkan</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.JUMLAHBAYAR, new { @class = "form-control input-md" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Permohonan Pengembalian</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.PERMOHONANPENGEMBALIAN, new { @class = "form-control input-md" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="npwpberkas" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NPWP, new { @class = "form-control input-md" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Rekening</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NAMAREKENING, new { @class = "form-control input-md" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Rekening</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NOMORREKENING, new { @class = "form-control input-md" })
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Bank</label>
+							<div class="col-sm-8">
+								@Html.TextBoxFor(m => m.NAMABANK, new { @class = "form-control input-md" })
+							</div>
+						</div>
+
+						<div class="ln_solid"></div>
+						<button type="submit" class="btn btn-primary" id="selesai">Proses</button>
+
+					</div>
+				</div>
+
+			</div>
+			<div class="col-md-4">
+
+				@*template surat*@
+				<div class="panel panel-default x_panel">
+					<div class="panel-heading x_title">
+						Template Surat
+						<ul class="nav navbar-right panel_toolbox">
+							<li>
+								<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+							</li>
+							<li>
+								<a class="close-link"><i class="fa fa-close"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="panel-body x_content">
+						@*Panel content*@
+
+						<div>
+							<button type="button" class="btn btn-primary">Surat Permohonan Pengembalian</button>
+						</div>
+						<div>
+							<button type="button" class="btn btn-primary">Surat Pernyataan PNBP Berutang</button>
+						</div>
+						<div>
+							<button type="button" class="btn btn-primary">Surat Keterangan Pengeluaran</button>
+						</div>
+						<div>
+							<button type="button" class="btn btn-primary">Surat Pernyataan Tidak Terlayani</button>
+						</div>
+						<div>
+							<button type="button" class="btn btn-primary">Surat Kuasa Wajib Bayar</button>
+						</div>
+						<div>
+							<button type="button" class="btn btn-primary">Surat Persetujuan</button>
+						</div>
+						<div>
+							<button type="button" class="btn btn-primary">Surat Pernyataan Tanggung Jawab Mutlak</button>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
+<script>
+	$(document).ready(function () {
+
+		function cariBerkas() {
+			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+			$.ajax({
+				url: '@Url.Action("GetBerkasDataByID", "Pengembalian")',
+				type: 'POST',
+				data: { noberkas: $('#js-form-entri [name="NOMORBERKAS"]').val()},
+				success: function (res) {
+					$('#BERKASID').val(res.BERKASID);
+					$('#NAMAPEGAWAIPENGAJU').val(res.NAMA);
+					$('#ALAMATPEMOHON').val(res.ALAMAT);
+					$('#NPWP').val(res.NPWP);
+					$('#KODEBILLING').val(res.KODEBILLING);
+					$('#NTPN').val(res.NTPN);
+					$('#SETORANPNBP').val(addCommas(res.PENERIMAAN));
+				}
+			}).always(() => {
+				$.unblockUI();
+			});
+		}
+
+		function addCommas(nStr) {
+			if (nStr == null) {
+				nStr = '0';
+			}
+
+			nStr += '';
+			x = nStr.split(',');
+			x1 = x[0];
+			x2 = x.length > 1 ? ',' + x[1] : '';
+			var rgx = /(\d+)(\d{3})/;
+			while (rgx.test(x1)) {
+				x1 = x1.replace(rgx, '$1' + '.' + '$2');
+			}
+			return x1 + x2;
+		}
+
+		function simpanPengembalian(e) {
+			e.preventDefault();
+			let frmData = new FormData($('#js-form-entri')[0]);
+			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+			$.ajax({
+				type: "POST",
+				url: '@Url.Action("SimpanPengembalianDaerah", "Pengembalian")',
+				data: frmData,
+				processData: false,
+				contentType: false,
+				success: function (data, textStatus, XMLHttpRequest) {
+					if (data.Status) {
+						swal({
+							title: "Sukses",
+							text: "Berhasil",
+							type: "success",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						}, function () {
+							window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
+						});
+					} else {
+						swal({
+							title: "Proses Gagal",
+							text: data.Pesan,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
+			}).always(() => {
+				$.unblockUI();
+			});
+
+		}
+
+		$('#js-btn-cari-berkas').on('click', () => cariBerkas());
+		$('#js-form-entri').on('submit', (e) => simpanPengembalian(e));
+
+	});
+</script>
