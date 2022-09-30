@@ -189,7 +189,8 @@ namespace Pnbp.Controllers
 
         #region Pengajuan
 
-        public ActionResult PengajuanPengembalianIndex()
+        //public ActionResult PengajuanPengembalianIndex()
+        private ActionResult PengajuanPengembalianIndex()
         {
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();
             SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
@@ -1144,6 +1145,11 @@ namespace Pnbp.Controllers
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
 
+            // filter input
+            data.SETORANPNBP = data.SETORANPNBP.Replace(".", String.Empty);
+            data.JUMLAHBAYAR = data.JUMLAHBAYAR.Replace(".", String.Empty);
+            data.PERMOHONANPENGEMBALIAN = data.PERMOHONANPENGEMBALIAN.Replace(".", String.Empty);
+
             var userIdentity = (HttpContext.User.Identity as Entities.InternalUserIdentity);
             string userid = userIdentity.UserId;
             string kantoriduser = userIdentity.KantorId;
@@ -1464,7 +1470,55 @@ namespace Pnbp.Controllers
             //ViewData["Pengembaliandata"] = data;
             //return View();
             //return View("pengembaliandaerah");
-            return View("EntriPengembalianDaerah", data);
+            //return View("EntriPengembalianDaerah", data);
+            return View("PengajuanPengembalianDetail", data);
+        }
+
+        public ActionResult DetailPengajuan(string pengembalianpnbpid)
+        {
+            Entities.DetailDataBerkas data = new Entities.DetailDataBerkas();
+            Entities.LampiranKembalianTrain file1 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file2 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file3 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file4 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file5 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file6 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file7 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file8 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file9 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file10 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file11 = new Entities.LampiranKembalianTrain();
+            data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
+            file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN");
+            file2 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN");
+            file3 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI PENERIMAAN NEGARA");
+            file4 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERINTAH SETOR");
+            file5 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT BUKTI SETOR");
+            file6 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI KEPEMILIKAN REK TUJUAN");
+            file7 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "NPWP");
+            file8 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI DOMISILI PEMOHON");
+            file9 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KUASA BERMATERAI");
+            file10 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT WAJIB BAYAR");
+            file11 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN TIDAK TERLAYANI");
+            ViewData["file1"] = file1;
+            ViewData["file2"] = file2;
+            ViewData["file3"] = file3;
+            ViewData["file4"] = file4;
+            ViewData["file5"] = file5;
+            ViewData["file6"] = file6;
+            ViewData["file7"] = file7;
+            ViewData["file8"] = file8;
+            ViewData["file9"] = file9;
+            ViewData["file10"] = file10;
+            ViewData["file11"] = file11;
+
+            HakAksesModel model = new HakAksesModel();
+            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            int tipekantor = model.GetTipeKantor(kantoriduser);
+
+            string viewName = (tipekantor == 1 ? "DetailPengajuanPusat" : "DetailPengajuan");
+            //string viewName = (tipekantor == 1 ? "PengajuanPengembalianDetailPusat" : "PengajuanPengembalianDetail");
+            return View(viewName, data);
         }
 
         public ActionResult EntriPengembalian()

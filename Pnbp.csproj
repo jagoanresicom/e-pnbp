@@ -5988,6 +5988,8 @@
     <Content Include="Views\Pengembalian\EntriPengembalianPusat.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalianDaerah.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalian.cshtml" />
+    <Content Include="Views\Pengembalian\DetailPengajuanPusat.cshtml" />
+    <Content Include="Views\Pengembalian\DetailPengajuan.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

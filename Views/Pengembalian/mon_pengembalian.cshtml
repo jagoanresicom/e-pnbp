@@ -267,17 +267,9 @@
 		}
 
 		function redirectEdit(e, data) {
-			if($('#jeniskantor').val()=='Pusat'){
-				window.location.href = '@Url.Action("PengajuanPengembalianDetailPusat", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
-
-				e.preventDefault();
-				return false;
-			}else{
-				window.location.href = '@Url.Action("PengajuanPengembalianDetail", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
-
-				e.preventDefault();
-				return false;
-			}
+			window.location.href = '@Url.Action("DetailPengajuan", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
+			e.preventDefault();
+			return false;
 		}
 
 		function formatAngka(data) {
