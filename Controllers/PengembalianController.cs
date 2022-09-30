@@ -249,8 +249,8 @@ namespace Pnbp.Controllers
 
             //mati
             string id = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
-            string insert_target = "INSERT INTO PENGEMBALIANPNBP (PENGEMBALIANPNBPID, KANTORID, NAMAPEGAWAIPENGAJU, STATUSPENGEMBALIAN,NAMAKANTOR,PEGAWAIIDPENGAJU,TANGGALPENGAJU,NPWPPEGAWAIPENGAJU) " +
-                                            "VALUES ('" + pengembalianid + "','" + kantoriduser + "','" + AtasNama + "','" + Status + "' ,'" + namakantor + "','" + pegawaiid + "'," + TanggalPengajuan + ",'" + NPWP + "')";
+            string insert_target = "INSERT INTO PENGEMBALIANPNBP (PENGEMBALIANPNBPID, KANTORID, NAMAPEGAWAIPENGAJU, STATUSPENGEMBALIAN,NAMAKANTOR,PEGAWAIIDPENGAJU,TANGGALPENGAJU,NPWPPEGAWAIPENGAJU,tipepengembalian) " +
+                                            "VALUES ('" + pengembalianid + "','" + kantoriduser + "','" + AtasNama + "','" + Status + "' ,'" + namakantor + "','" + pegawaiid + "'," + TanggalPengajuan + ",'" + NPWP + "','2')";
             //return Json(insert_target, JsonRequestBehavior.AllowGet);
             db.Database.ExecuteSqlCommand(insert_target);
             string insert_target_berkas = "INSERT INTO BERKASKEMBALIAN (BERKASID, PENGEMBALIANPNBPID, NOMORBERKAS, NAMAPEMOHON,ALAMATPEMOHON,KODEBILLING,NTPN,JUMLAHBAYAR,NOMORREKENING,NAMABANK,NAMAREKENING,NPWP,NOMORSURAT,SETORANPNBP,PERMOHONANPENGEMBALIAN) " +

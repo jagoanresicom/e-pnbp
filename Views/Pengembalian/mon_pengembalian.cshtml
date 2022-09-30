@@ -19,6 +19,7 @@
 	.justify-content-center {
 		justify-content: center;
 	}
+
 </style>
 
 
@@ -110,6 +111,7 @@
 										<th>Nomor Surat</th>
 										<th>Tangal Pengajuan</th>
 										<th>SP2D</th>
+										<th>Tipe</th>
 										<th>Status</th>
 										<th>Aksi</th>
 									</tr>
@@ -206,6 +208,7 @@
 				{ "data": "NomorSurat", "className": "centertaligncolumn", "width": "5%" },
 				{ "data": "TanggalPengaju", "className": "centertaligncolumn", "width": "5%" },
 				{ "data": null, "className": "centertaligncolumn", "width": "5%", "render": function () { return "" } },
+				{ "data": "LabelTipePengembalian", "className": "centertaligncolumn", "width": "5%" },
 				{
 					"data": "StatusPengembalian",
 					"className": "centertaligncolumn",
@@ -240,12 +243,35 @@
 					"className": "centertaligncolumn",
 					"width": "5%",
 					"render": function (data, type, row) {
-						var html = '<div class="text-center d-flex justify-content-center" style="gap:6px">';
-						if ($('#jeniskantor').val() == 'Pusat') {
-							html += '<button type="button" class="btn btn-success --js-btn-selesai">Selesai</button>';
+						let isPusat = ($('#jeniskantor').val() == 'Pusat');
+						let html = '';
+						console.log(data.StatusPengembalian)
+						switch (data.StatusPengembalian) { 
+							case 3:
+								html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
+								break;
+							case 1:
+							case 2:
+								if (isPusat) {
+									html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
+								} else {
+									html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+								}
+								break;
+							case 0:
+							case 4:
+								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+								break;
+							default:
+								break;
 						}
-						html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
-						html += '</div>';
+
+						//if (isPusat) {
+						//	html += '<button type="button" class="btn btn-success --js-btn-selesai">Selesai</button>';
+						//}
+						//html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+
+						html = '<div class="text-center d-flex justify-content-center" style="gap:6px">' + html + '</div>';
 						return html;
 					}
 				},

@@ -433,35 +433,35 @@ namespace Pnbp.Models
             ArrayList arrayListParameters = new ArrayList();
 
             string query =
-                ////                kantor.kode,
-                //@"SELECT * FROM (
-                //    SELECT
-                //        ROW_NUMBER() over (ORDER BY pengembalianpnbp.tanggalpengaju DESC, berkaskembalian.tanggalbayar, berkaskembalian.namapemohon) RNumber,
-                //        pengembalianpnbp.pengembalianpnbpid, pengembalianpnbp.kantorid, pengembalianpnbp.namakantor,
-                //        pengembalianpnbp.pegawaiidpengaju, pengembalianpnbp.namapegawaipengaju, 
-                //        to_char(pengembalianpnbp.tanggalpengaju, 'dd-mm-yyyy') TanggalPengaju,
-                //        pengembalianpnbp.pegawaiidsetuju, pengembalianpnbp.namapegawaisetuju, 
-                //        to_char(pengembalianpnbp.tanggalsetuju, 'dd-mm-yyyy') TanggalSetuju,
-                //        pengembalianpnbp.statussetuju, pengembalianpnbp.judul,pengembalianpnbp.StatusPengembalian, 
-                //        berkaskembalian.berkasid, berkaskembalian.namaprosedur, berkaskembalian.kodebilling,
-                //        to_char(berkaskembalian.tanggalkodebilling, 'dd-mm-yyyy') TanggalKodeBilling,
-                //        to_char(berkaskembalian.tanggalbayar, 'dd-mm-yyyy') TanggalBayar,
-                //        berkaskembalian.ntpn, berkaskembalian.jumlahbayar, berkaskembalian.namabankpersepsi,
-                //        berkaskembalian.pemilikid, berkaskembalian.namapemohon, berkaskembalian.nikpemohon,
-                //        berkaskembalian.alamatpemohon, berkaskembalian.emailpemohon, berkaskembalian.nomortelepon,
-                //        berkaskembalian.nomorberkas, berkaskembalian.nomorrekening, berkaskembalian.namabank,
-                //        berkaskembalian.namacabang, to_number(berkaskembalian.jumlahbayar) JumlahBayarNumber,
-                //        berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
-                //        satker.kodesatker KodeSatker,
-                //        satker.nama_satker NamaSatker,
-                //        COUNT(1) OVER() Total
-                //    FROM
-                //        pengembalianpnbp
-                //        JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
-                //        JOIN kantor ON kantor.kantorid = pengembalianpnbp.kantorid
-                //        JOIN satker ON satker.kantorid = pengembalianpnbp.kantorid 
-                //        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) 
-                //   WHERE berkaskembalian.nomorsurat IS NOT NULL AND berkaskembalian.permohonanpengembalian IS NOT NULL";
+            ////                kantor.kode,
+            //@"SELECT * FROM (
+            //    SELECT
+            //        ROW_NUMBER() over (ORDER BY pengembalianpnbp.tanggalpengaju DESC, berkaskembalian.tanggalbayar, berkaskembalian.namapemohon) RNumber,
+            //        pengembalianpnbp.pengembalianpnbpid, pengembalianpnbp.kantorid, pengembalianpnbp.namakantor,
+            //        pengembalianpnbp.pegawaiidpengaju, pengembalianpnbp.namapegawaipengaju, 
+            //        to_char(pengembalianpnbp.tanggalpengaju, 'dd-mm-yyyy') TanggalPengaju,
+            //        pengembalianpnbp.pegawaiidsetuju, pengembalianpnbp.namapegawaisetuju, 
+            //        to_char(pengembalianpnbp.tanggalsetuju, 'dd-mm-yyyy') TanggalSetuju,
+            //        pengembalianpnbp.statussetuju, pengembalianpnbp.judul,pengembalianpnbp.StatusPengembalian, 
+            //        berkaskembalian.berkasid, berkaskembalian.namaprosedur, berkaskembalian.kodebilling,
+            //        to_char(berkaskembalian.tanggalkodebilling, 'dd-mm-yyyy') TanggalKodeBilling,
+            //        to_char(berkaskembalian.tanggalbayar, 'dd-mm-yyyy') TanggalBayar,
+            //        berkaskembalian.ntpn, berkaskembalian.jumlahbayar, berkaskembalian.namabankpersepsi,
+            //        berkaskembalian.pemilikid, berkaskembalian.namapemohon, berkaskembalian.nikpemohon,
+            //        berkaskembalian.alamatpemohon, berkaskembalian.emailpemohon, berkaskembalian.nomortelepon,
+            //        berkaskembalian.nomorberkas, berkaskembalian.nomorrekening, berkaskembalian.namabank,
+            //        berkaskembalian.namacabang, to_number(berkaskembalian.jumlahbayar) JumlahBayarNumber,
+            //        berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
+            //        satker.kodesatker KodeSatker,
+            //        satker.nama_satker NamaSatker,
+            //        COUNT(1) OVER() Total
+            //    FROM
+            //        pengembalianpnbp
+            //        JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
+            //        JOIN kantor ON kantor.kantorid = pengembalianpnbp.kantorid
+            //        JOIN satker ON satker.kantorid = pengembalianpnbp.kantorid 
+            //        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) 
+            //   WHERE berkaskembalian.nomorsurat IS NOT NULL AND berkaskembalian.permohonanpengembalian IS NOT NULL";
 
             @"SELECT * FROM (
                     SELECT
@@ -483,6 +483,7 @@ namespace Pnbp.Models
                         berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
                         satker.kodesatker KodeSatker,
                         satker.nama_satker NamaSatker,
+                        CASE WHEN tipepengembalian = '1' THEN 'Daerah' WHEN tipepengembalian = '2' THEN 'Pusat' END labeltipepengembalian,
                         COUNT(1) OVER() Total
                     FROM
                         pengembalianpnbp
@@ -1011,10 +1012,10 @@ namespace Pnbp.Models
                         sql =
                             "INSERT INTO pengembalianpnbp ( " +
                             "            pengembalianpnbpid, tanggalpengaju, kantorid, namakantor, " +
-                            "            pegawaiidpengaju, namapegawaipengaju, isdaerah) VALUES " +
+                            "            pegawaiidpengaju, namapegawaipengaju, tipepengembalian, statuspengembalian) VALUES " +
                             "( " +
                             "            :PengembalianPnbpId, TO_DATE(SYSDATE,'DD/MM/YYYY'), :KantorId, :NamaKantor, " +
-                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1')";
+                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', '2')";
                         arrayListParameters.Clear();
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", pengembalianPnbpId));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalPengaju", data.TANGGALPENGAJU));

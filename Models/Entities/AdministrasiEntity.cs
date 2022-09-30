@@ -786,6 +786,7 @@ namespace Pnbp.Entities
         public string NamaSatker { get; set; }
         public string NomorSurat { get; set; }
         public string permohonanpengembalian { get; set; }
+        public string LabelTipePengembalian { get; set; }
     }
 
     public class DataPengembalianPnbpDev
