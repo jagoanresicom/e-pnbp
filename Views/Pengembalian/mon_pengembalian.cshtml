@@ -20,6 +20,14 @@
 		justify-content: center;
 	}
 
+	.btn-edit {
+		background: #17a2b8;
+		border-color: #187787 !important;
+	}
+	.btn-edit:hover, .btn-edit:focus, .btn-edit:active {
+		background: #1594a8 !important;
+		border-color: #187787 !important;
+	}
 </style>
 
 
@@ -245,20 +253,20 @@
 					"render": function (data, type, row) {
 						let isPusat = ($('#jeniskantor').val() == 'Pusat');
 						let html = '';
-						console.log(data.StatusPengembalian)
+
 						switch (data.StatusPengembalian) { 
 							case 3:
-								html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
-								break;
 							case 1:
+							case 0:
+								html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+								break;
 							case 2:
-								if (isPusat) {
+								if ((data.LabelTipePengembalian == "Pusat" && isPusat) || (data.LabelTipePengembalian == "Daerah" && !isPusat)) {
 									html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
 								} else {
 									html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
 								}
 								break;
-							case 0:
 							case 4:
 								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
 								break;

@@ -458,46 +458,59 @@
 						</div>
 					</div>
 
-					<div class="row" style="display: none;">
-						<div class="col-md-12">
-
-							<div class="panel panel-default x_panel">
-								<div class="panel-heading x_title">Data SP2D</div>
-								<div class="panel-body form-horizontal">
-
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor</label>
-										<div class="col-sm-8">
-											<input type="text" name="NomorSP2D" class="form-control" />
-										</div>
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Unggah File</label>
-										<div class="col-sm-8">
-											<input type="file">
-										</div>
-									</div>
-
-									<div class="form-group">
-
-										<div class="col-sm-12">
-											<button type="button" class="btn btn-primary">Simpan</button>
-										</div>
-
-									</div>
-
-								</div>
-							</div>
-
-						</div>
-					</div>
-
 				</div>
 			</div>
 
 		</div>
 	</div>
 </form>
+
+@if (Model.STATUSPENGEMBALIAN == "2")
+{
+	<div class="row" style="margin-top: 2rem;">
+		<div class="col-md-12">
+
+			<div class="panel panel-default x_panel">
+				<div class="panel-heading x_title">Data SP2D</div>
+				<div class="panel-body form-horizontal">
+
+					<form id="js-form-sp2d" class="form-horizontal" method="POST" enctype="multipart/form-data">
+						@Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
+
+						<div class="row">
+							<div class="col-md-6 col-md-offset-3">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor</label>
+									<div class="col-sm-8">
+										<input type="text" name="NomorSP2D" class="form-control" maxlength="20"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Unggah File</label>
+									<div class="col-sm-8">
+										<input type="file" name="file">
+									</div>
+								</div>
+
+								<div class="form-group">
+
+									<div class="col-md-offset-4 col-md-8">
+										<button class="btn btn-primary">Simpan</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+}
+
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
 <script>
     $(document).ready(function() {
@@ -649,6 +662,52 @@
         //    });
         //}, 3000);
     });
+
+	$('#js-form-sp2d').submit(function (e) {
+		e.preventDefault();
+		let frmData = new FormData(e.target);
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: "POST",
+            data: frmData,
+            processData: false,
+            contentType: false,
+            url: '@Url.Action("SimpanSP2D", "Pengembalian")',
+            success: function (data, textStatus, XMLHttpRequest) {
+				if (data.Status) {
+					swal({
+						title: "Sukses",
+						text: data.Pesan,
+						type: "success",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					}, function () {
+						window.location.href = window.location.href;
+					});
+				} else {
+					swal({
+						title: "Proses Gagal",
+						text: data.Pesan,
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+                }
+            },
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				swal({
+					title: "Proses Gagal",
+					text: "Terjadi kesalahan",
+					type: "error",
+					closeOnEsc: true,
+					allowOutsideClick: true,
+				});
+			}
+        }).always(() => {
+            $.unblockUI();
+        })
+
+	});
 
     $('#SetoranPnbp').keyup(function (event) {
         var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);

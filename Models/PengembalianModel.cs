@@ -1098,6 +1098,57 @@ namespace Pnbp.Models
             return tr;
         }
 
+        public Entities.TransactionResult UpdateSP2DPengembalian(string PengembalianPnbpId, string nomorSP2D, string idLampiran, string filePath, string ekstensi)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        List<object> lstParams = new List<object>();
+
+                        // update status = selesai
+                        string sql = @"UPDATE pengembalianpnbp SET nomorsp2d = :nomorSP2D, STATUSPENGEMBALIAN = 4 WHERE pengembalianpnbpid = :PengembalianPnbpId ";
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("nomorSP2D", nomorSP2D));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", PengembalianPnbpId));
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        
+                        sql = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                          "VALUES (:idLampiran, :idPengembalian, :filePath, '1', SYSDATE, 'Pengajuan', 'SP2D', :ekstensi)";
+
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idLampiran", idLampiran));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idPengembalian", PengembalianPnbpId));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("filePath", filePath));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", ekstensi));
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
         public Entities.TransactionResult HapusPengembalianPnbp(string pengembalianpnbpid)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };

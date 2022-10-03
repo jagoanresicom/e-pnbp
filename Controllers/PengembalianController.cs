@@ -1571,6 +1571,69 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        public ActionResult SimpanSP2D(string nomorSP2D, string PengembalianPnbpId)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            var mfile = Request.Files["file"];
+
+            if (mfile == null) { 
+                tr.Pesan = "Harap pilih file terlebih dahulu";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+            if (mfile == null)
+            {
+                tr.Pesan = "Harap pilih file terlebih dahulu";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+            if (mfile.ContentLength > 5000000)
+            {
+                tr.Pesan = "Ukuran file maksimal 5MB";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+            if (string.IsNullOrEmpty(nomorSP2D))
+            {
+                tr.Pesan = "Nomor SP2D tidak boleh kosong";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+            if (nomorSP2D.Length > 20)
+            {
+                tr.Pesan = "Nomor SP2D maksimal 20 karakter";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+            if (string.IsNullOrEmpty(PengembalianPnbpId))
+            {
+                tr.Pesan = "Data pengembalian tidak ditemukan";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+
+            string id9 = RandomString(32);
+            var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+            var stream = mfile.InputStream;
+            var FileSizeByte = mfile.ContentLength;
+            var FileSize = FileSizeByte / 50000;
+            var Extension = System.IO.Path.GetExtension(mfile.FileName);
+            var fileName = "SP2D_" + tgl + "" + Extension;
+            string folderPath = Server.MapPath("~/Uploads/sp2d/");
+            //Check whether Directory (Folder) exists.
+            if (!Directory.Exists(folderPath))
+            {
+                //If Dir3ectory (Folder) does not exists. Create it.
+                Directory.CreateDirectory(folderPath);
+            }
+
+            var path = Path.Combine(Server.MapPath("~/Uploads/sp2d/"), fileName);
+            var Filefilepath9 = "/Uploads/sp2d/" + fileName;
+            using (var fileStream = System.IO.File.Create(path))
+            {
+                stream.CopyTo(fileStream);
+                tr = pengembalianmodel.UpdateSP2DPengembalian(PengembalianPnbpId, nomorSP2D, id9, Filefilepath9, Extension);
+            }
+
+            return Json(tr, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
         public ActionResult PengajuanPengembalianDetail(FormCollection form)
         {
             //return Json(form, JsonRequestBehavior.AllowGet);
@@ -2164,14 +2227,16 @@ namespace Pnbp.Controllers
             if (ModelState.IsValid)
             {
                 TempData["Upload"] = "Data Berhasil Disimpan";
-                return RedirectToAction("PengajuanPengembalianIndex");
+                //return RedirectToAction("PengajuanPengembalianIndex");
+                return RedirectToAction("mon_pengembalian");
             }
             else
             {
 
             }
 
-            return RedirectToAction("PengajuanPengembalianIndex");
+            //return RedirectToAction("PengajuanPengembalianIndex");
+            return RedirectToAction("mon_pengembalian");
         }
 
         public string NewGuID()

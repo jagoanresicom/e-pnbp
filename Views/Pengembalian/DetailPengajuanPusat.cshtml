@@ -62,7 +62,7 @@
 	}
 </style>
 
-<form class="form-horizontal" method="post" enctype="multipart/form-data" id="pengembalian_form">
+<form class="form-horizontal" method="post" enctype="multipart/form-data" id="pengembalian_form" action="@Url.Action("PengajuanPengembalianDetailPusat", "Pengembalian")">
 	<div class="" id="dynamic_content">
 
 		<div class="clearfix"></div>
@@ -71,9 +71,9 @@
 			<div class="col-md-12 col-sm-12 col-xs-12">
 				<div>
 					@*<div class="x_title">
-			<h2>Pencarian Data</h2>
-			<div class="clearfix"></div>
-		</div>*@
+							<h2>Pencarian Data</h2>
+							<div class="clearfix"></div>
+						</div>*@
 
 
 					<div class="text-right" style="margin-bottom:8px;">
@@ -137,11 +137,11 @@
 									@if (Model.STATUSPENGEMBALIAN == "0" || Model.STATUSPENGEMBALIAN == "3")
 									{
 										@*<div class="form-group">
-								<div class="col-sm-12">
-									<button type="submit" id="simpan" class="btn btn-primary">Simpan</button>
-									<button type="reset" class="btn btn-primary">Hapus</button>
-								</div>
-							</div>*@
+												<div class="col-sm-12">
+													<button type="submit" id="simpan" class="btn btn-primary">Simpan</button>
+													<button type="reset" class="btn btn-primary">Hapus</button>
+												</div>
+											</div>*@
 									}
 
 									@* end form 1 *@
@@ -202,11 +202,11 @@
 										</div>
 									</div>
 									@*<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label">NPWP</label>
-							<div class="col-sm-8">
-								<input type="text" class="form-control" id="NPWP" name="NPWP" placeholder="NPWP">
-							</div>
-						</div>*@
+											<label for="inputPassword3" class="col-sm-4 control-label">NPWP</label>
+											<div class="col-sm-8">
+												<input type="text" class="form-control" id="NPWP" name="NPWP" placeholder="NPWP">
+											</div>
+										</div>*@
 									<div class="form-group">
 										<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Bank</label>
 										<div class="col-sm-8">
@@ -221,259 +221,316 @@
 
 						</div>
 						<div class="col-md-4">
+							<input type="hidden" name="pengembalianpnbpid" id="pengembalianpnbpid" value="@Model.PENGEMBALIANPNBPID" />
+							<input type="hidden" name="Status" id="Stataus" />
+							<div class="panel panel-default x_panel">
+								<div class="panel-heading x_title">Kirim Permohonan</div>
+								<div class="panel-body">
+									@*Panel content*@
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Surat</label>
+										<div class="col-sm-8">
+											@*@Html.TextBoxFor(model => model.NomorSurat, new { @class = "form-control", @id = "NomorSurat", @placeholder = "Nomor Surat", @required = "required" })*@
+											<input type="text" name="NomorSurat" id="NomorSurat" class="form-control" value="@Model.NOMORSURAT" readonly />
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar</label>
+
+										@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file10.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file10 != null && file10.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file10 != null && file10.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file10 != null && !String.IsNullOrEmpty(file10.NamaFile)?file10.LampiranKembalianId:" ")" />
+									</div>
+
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani</label>
+
+										@if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file11.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file11 != null && file11.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file11 != null && file11.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file11 != null && !String.IsNullOrEmpty(file11.NamaFile)?file11.LampiranKembalianId:" ")" />
+									</div>
+
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan</label>
+
+										@if (file1 != null && !String.IsNullOrEmpty(file1.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file1.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file1 != null && file1.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file1 != null && file1.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file1 != null && !String.IsNullOrEmpty(file1.NamaFile)?file1.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan</label>
+										@if (file2 != null && !String.IsNullOrEmpty(file2.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file2.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file2 != null && file2.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file2 != null && file2.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file2 != null && !String.IsNullOrEmpty(file2.NamaFile)?file2.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group" style="display:none;">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
+										@if (file3 != null && !String.IsNullOrEmpty(file3.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file3.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file3 != null && file3.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file3 != null && file3.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file3 != null && !String.IsNullOrEmpty(file3.NamaFile)?file3.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor</label>
+										@if (file4 != null && !String.IsNullOrEmpty(file4.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file4.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file4 != null && file4.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file4 != null && file4.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file4 != null && !String.IsNullOrEmpty(file4.NamaFile)?file4.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor</label>
+										@if (file5 != null && !String.IsNullOrEmpty(file5.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file5.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file5 != null && file5.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file5 != null && file5.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file5 != null && !String.IsNullOrEmpty(file5.NamaFile)?file5.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan</label>
+										@if (file6 != null && !String.IsNullOrEmpty(file6.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file6.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @(file6 != null && file6.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
+												<option value="3" @(file6 != null && file6.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file6 != null && !String.IsNullOrEmpty(file6.NamaFile)?file6.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
+										@if (file7 != null && !String.IsNullOrEmpty(file7.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file7.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @((file7 != null && file7.StatusLampiran == "2") ? "selected" : "")>Sesuai</option>
+												<option value="3" @((file7 != null && file7.StatusLampiran == "3") ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file7 != null && !String.IsNullOrEmpty(file7.NamaFile)?file7.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon</label>
+										@if (file8 != null && !String.IsNullOrEmpty(file8.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file8.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @((file8 != null && file8.StatusLampiran == "2") ? "selected" : "")>Sesuai</option>
+												<option value="3" @((file8 != null && file8.StatusLampiran == "3") ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file8 != null && !String.IsNullOrEmpty(file8.NamaFile)?file8.LampiranKembalianId:" ")" />
+									</div>
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Bermaterai</label>
+										@if (file9 != null && !String.IsNullOrEmpty(file9.NamaFile))
+										{
+											<div class="col-sm-2 text-left" style="margin-left:0px !important;">
+												<a href="@file9.NamaFile" class="btn btn-default" download>
+													<i class="fa fa-download"></i>
+												</a>
+											</div>
+										}
+										<div class="col-sm-6">
+											<select name="qcpusat" class="form-control">
+												<option value="">-Pilih-</option>
+												<option value="2" @((file9 != null && file9.StatusLampiran == "2") ? "selected" : "")>Sesuai</option>
+												<option value="3" @((file9 != null && file9.StatusLampiran == "3") ? "selected" : "")>Tidak</option>
+											</select>
+										</div>
+										<input type="hidden" name="fileid" value="@(file9 != null && !String.IsNullOrEmpty(file9.NamaFile)?file9.LampiranKembalianId:" ")" />
+									</div>
+									@if (Model.STATUSPENGEMBALIAN == "0" || Model.STATUSPENGEMBALIAN == "3")
+									{
+
+									}
+									<div class="form-group text-right">
+
+										<div class="col-sm-4 text-right">
+											<button type="submit" class="btn btn-primary" id="proses">&nbsp;Proses&nbsp;</button>
+										</div>
+										<div class="col-sm-4">
+											<button type="submit" class="btn btn-primary" id="kembalikan">Kembalikan</button>
+										</div>
+
+										@*
+										<div class="col-sm-4">
+											<button type="submit" class="btn btn-primary" id="selesai">Selesai</button>
+										</div>
+										*@
+									</div>
+
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
 </form>
-<form method="post" enctype="multipart/form-data" id="qc_form">
-	<input type="hidden" name="pengembalianpnbpid" id="pengembalianpnbpid" value="@Model.PENGEMBALIANPNBPID" />
-	<input type="hidden" name="Status" id="Stataus" />
-	<div class="panel panel-default x_panel">
-		<div class="panel-heading x_title">Kirim Permohonan</div>
-		<div class="panel-body">
-			@*Panel content*@
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Surat</label>
-				<div class="col-sm-8">
-					@*@Html.TextBoxFor(model => model.NomorSurat, new { @class = "form-control", @id = "NomorSurat", @placeholder = "Nomor Surat", @required = "required" })*@
-					<input type="text" name="NomorSurat" id="NomorSurat" class="form-control" value="@Model.NOMORSURAT" readonly />
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar</label>
-
-				@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file10.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file10 != null && file10.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file10 != null && file10.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file10 != null && !String.IsNullOrEmpty(file10.NamaFile)?file10.LampiranKembalianId:" ")" />
-			</div>
-
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani</label>
-
-				@if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file11.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file11 != null && file11.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file11 != null && file11.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file11 != null && !String.IsNullOrEmpty(file11.NamaFile)?file11.LampiranKembalianId:" ")" />
-			</div>
-
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan</label>
-
-				@if (file1 != null && !String.IsNullOrEmpty(file1.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file1.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file1 != null && file1.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file1 != null && file1.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file1 != null && !String.IsNullOrEmpty(file1.NamaFile)?file1.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan</label>
-				@if (file2 != null && !String.IsNullOrEmpty(file2.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file2.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file2 != null && file2.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file2 != null && file2.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file2 != null && !String.IsNullOrEmpty(file2.NamaFile)?file2.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group" style="display:none;">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
-				@if (file3 != null && !String.IsNullOrEmpty(file3.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file3.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file3 != null && file3.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file3 != null && file3.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file3 != null && !String.IsNullOrEmpty(file3.NamaFile)?file3.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor</label>
-				@if (file4 != null && !String.IsNullOrEmpty(file4.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file4.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file4 != null && file4.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file4 != null && file4.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file4 != null && !String.IsNullOrEmpty(file4.NamaFile)?file4.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor</label>
-				@if (file5 != null && !String.IsNullOrEmpty(file5.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file5.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file5 != null && file5.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file5 != null && file5.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file5 != null && !String.IsNullOrEmpty(file5.NamaFile)?file5.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan</label>
-				@if (file6 != null && !String.IsNullOrEmpty(file6.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file6.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @(file6 != null && file6.StatusLampiran == "2" ? "selected" : "")>Sesuai</option>
-						<option value="3" @(file6 != null && file6.StatusLampiran == "3" ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file6 != null && !String.IsNullOrEmpty(file6.NamaFile)?file6.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
-				@if (file7 != null && !String.IsNullOrEmpty(file7.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file7.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @((file7 != null && file7.StatusLampiran == "2") ? "selected" : "")>Sesuai</option>
-						<option value="3" @((file7 != null && file7.StatusLampiran == "3") ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file7 != null && !String.IsNullOrEmpty(file7.NamaFile)?file7.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon</label>
-				@if (file8 != null && !String.IsNullOrEmpty(file8.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file8.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @((file8 != null && file8.StatusLampiran == "2") ? "selected" : "")>Sesuai</option>
-						<option value="3" @((file8 != null && file8.StatusLampiran == "3") ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file8 != null && !String.IsNullOrEmpty(file8.NamaFile)?file8.LampiranKembalianId:" ")" />
-			</div>
-			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Bermaterai</label>
-				@if (file9 != null && !String.IsNullOrEmpty(file9.NamaFile))
-				{
-					<div class="col-sm-2 text-left" style="margin-left:0px !important;">
-						<a href="@file9.NamaFile" class="btn btn-default" download>
-							<i class="fa fa-download"></i>
-						</a>
-					</div>
-				}
-				<div class="col-sm-6">
-					<select name="qcpusat" class="form-control">
-						<option value="">-Pilih-</option>
-						<option value="2" @((file9 != null && file9.StatusLampiran == "2") ? "selected" : "")>Sesuai</option>
-						<option value="3" @((file9 != null && file9.StatusLampiran == "3") ? "selected" : "")>Tidak</option>
-					</select>
-				</div>
-				<input type="hidden" name="fileid" value="@(file9 != null && !String.IsNullOrEmpty(file9.NamaFile)?file9.LampiranKembalianId:" ")" />
-			</div>
-			@if (Model.STATUSPENGEMBALIAN == "0" || Model.STATUSPENGEMBALIAN == "3")
-			{
-
-			}
-			<div class="form-group text-right">
-
-				<div class="col-sm-4 text-right">
-					<button type="submit" class="btn btn-primary" id="proses">&nbsp;Proses&nbsp;</button>
-				</div>
-				<div class="col-sm-4">
-					<button type="submit" class="btn btn-primary" id="kembalikan">Kembalikan</button>
-				</div>
-
-				<div class="col-sm-4">
-					<button type="submit" class="btn btn-primary" id="selesai">Selesai</button>
-				</div>
-			</div>
 
 
+
+@if (Model.STATUSPENGEMBALIAN == "2")
+{
+	<div class="row" style="margin-top: 2rem;">
+		<div class="col-md-12">
+
+			<div class="panel panel-default x_panel">
+				<div class="panel-heading x_title">Data SP2D</div>
+				<div class="panel-body form-horizontal">
+
+					<form id="js-form-sp2d" class="form-horizontal" method="POST" enctype="multipart/form-data">
+						@Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
+
+						<div class="row">
+							<div class="col-md-6 col-md-offset-3">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor</label>
+									<div class="col-sm-8">
+										<input type="text" name="NomorSP2D" class="form-control" maxlength="20" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Unggah File</label>
+									<div class="col-sm-8">
+										<input type="file" name="file">
+									</div>
+								</div>
+
+								<div class="form-group">
+
+									<div class="col-md-offset-4 col-md-8">
+										<button class="btn btn-primary">Simpan</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
 
 		</div>
 	</div>
-</form>
+}
+
+
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
 <script>
         $(document).ready(function() {
@@ -533,7 +590,55 @@
         });
         $('#selesai').click(function (e) {
             $('#Stataus').val('4');
-        });
+		});
+
+
+		$('#js-form-sp2d').submit(function (e) {
+			e.preventDefault();
+			let frmData = new FormData(e.target);
+			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+			$.ajax({
+				type: "POST",
+				data: frmData,
+				processData: false,
+				contentType: false,
+				url: '@Url.Action("SimpanSP2D", "Pengembalian")',
+				success: function (data, textStatus, XMLHttpRequest) {
+					if (data.Status) {
+						swal({
+							title: "Sukses",
+							text: data.Pesan,
+							type: "success",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						}, function () {
+							window.location.href = window.location.href;
+						});
+					} else {
+						swal({
+							title: "Proses Gagal",
+							text: data.Pesan,
+							type: "error",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				}
+			}).always(() => {
+				$.unblockUI();
+			})
+
+		});
+
         function cari_berkas() {
             //alert($('#nomorberkas').val());
             $.ajax({
