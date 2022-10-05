@@ -896,6 +896,7 @@ namespace Pnbp.Entities
         public string STATUSPENGEMBALIAN { get; set; }
         public string NPWPPEGAWAIPENGAJU { get; set; }
         public string TANGGALPENGAJU { get; set; }
+        public string TIPEPENGEMBALIAN { get; set; }
     }
 
     public class RincianAlokasiList
