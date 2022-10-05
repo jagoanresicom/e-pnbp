@@ -758,6 +758,7 @@ namespace Pnbp.Entities
         public string PegawaiIdSetuju { get; set; }
         public string NamaPegawaiSetuju { get; set; }
         public string TanggalSetuju { get; set; }
+        public string NomorSP2D { get; set; }
         public decimal? StatusSetuju { get; set; }
         public decimal? StatusPengembalian { get; set; }
 
