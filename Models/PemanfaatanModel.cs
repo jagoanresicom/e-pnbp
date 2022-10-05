@@ -1029,6 +1029,50 @@ namespace Pnbp.Models
             return records;
         }
 
+        public Entities.DaftarTotal rl_kro_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, string kantorId, string kodeKRO)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstParams = new List<object>();
+
+            string query = @"
+	                            SELECT 
+                                    sum(amount) totalalokasi
+                                FROM 
+                                    pnbp.span_belanja sb
+                                    JOIN pnbp.satker s ON s.kodesatker = sb.KDSATKER 
+                                    JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
+                                WHERE 
+                                    sb.tahun = :tahun
+                                ";
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
+            if (!String.IsNullOrEmpty(kantorId))
+            {
+                query += " and s.kantorId = :kantorId ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorId", kantorId));
+            }
+
+            if (!String.IsNullOrEmpty(kodeKRO))
+            {
+                query += " and lower(p.kode) LIKE '%'||:kodeKRO||'%'";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeKRO", kodeKRO));
+            }
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
         public List<Entities.BelanjaKRO> rl_satker(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to, string wilayahId)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
@@ -1084,6 +1128,52 @@ namespace Pnbp.Models
             return records;
         }
 
+        public Entities.DaftarTotal rl_satker_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, string wilayahId)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstParams = new List<object>();
+
+            string query = $@"
+	                            SELECT 
+		                            sum(pagu) totalpagu,
+                                    sum(alokasi) totalalokasi
+	                            FROM 
+                                    alokasisatker alsk
+                                    JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
+                                    JOIN { _schemaKKP}.kantor k ON k.kodesatker = u.KODESATKER
+                                    JOIN wilayah w ON k.kode = w.kode
+                                    JOIN wilayah prov ON prov.wilayahid = w.induk
+                                WHERE 
+                                    prov.tipewilayahid = 1
+                                    AND alsk.tahun = :tahun ";
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+            if (!String.IsNullOrEmpty(namasatker))
+            {
+                query += " and lower(u.nama_satker) like '%'||:param4||'%' ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", namasatker.ToLower()));
+            }
+
+            if (!String.IsNullOrEmpty(wilayahId))
+            {
+                query += " and prov.wilayahid= :wilayahId ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
+            }
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
         public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, int from, int to)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
@@ -1131,6 +1221,48 @@ namespace Pnbp.Models
             }
 
             return records;
+        }
+
+        public Entities.DaftarTotal rl_provinsi_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstParams = new List<object>();
+
+            string query = $@"
+                                SELECT 
+                                    sum(pagu) totalpagu,
+                                    sum(alokasi) totalalokasi
+                                FROM 
+                                    alokasisatker alsk
+                                    JOIN {_schemaKKP}.kantor k ON k.kodesatker = alsk.KDSATKER
+                                    JOIN wilayah w ON k.kode = w.kode
+                                    JOIN wilayah prov ON prov.wilayahid = w.induk
+                                WHERE 
+                                    prov.tipewilayahid = 1
+                                    AND alsk.tahun = :tahun";
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
+
+            if (!String.IsNullOrEmpty(provinsi))
+            {
+                query += " and lower(prov.nama) like '%'||:param5||'%' ";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
+            }
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
         }
 
         public List<Entities.PrioritasAlokasi> GetManfaatSatker(string kantorid, string tahun)

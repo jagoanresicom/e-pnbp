@@ -238,6 +238,8 @@ namespace Pnbp.Entities
         public Decimal? totalpenerimaan { get; set; }
         public Decimal? totaloperasional { get; set; }
         public Decimal? totalfisik { get; set; }
+        public Decimal? totalpagu{ get; set; }
+        public Decimal? totalalokasi{ get; set; }
     }
 
     public class RekapPenerimaanDetail
