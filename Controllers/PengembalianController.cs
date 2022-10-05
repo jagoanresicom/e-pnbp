@@ -2159,14 +2159,16 @@ namespace Pnbp.Controllers
             if (ModelState.IsValid)
             {
                 TempData["Upload"] = "Data Berhasil Disimpan";
-                return RedirectToAction("PengajuanPengembalianIndex");
+                return RedirectToAction("mon_pengembalian");
+                //return RedirectToAction("PengajuanPengembalianIndex");
             }
             else
             {
 
             }
 
-            return RedirectToAction("PengajuanPengembalianIndex");
+            //return RedirectToAction("PengajuanPengembalianIndex");
+            return RedirectToAction("mon_pengembalian");
         }
 
         [HttpPost]
