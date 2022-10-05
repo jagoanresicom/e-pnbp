@@ -130,6 +130,78 @@ namespace Pnbp.Controllers
             return View();
         }
 
+        public ActionResult GeneratePNBPTerutang()
+        {
+            DateTime dateTime = DateTime.UtcNow.Date;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string filename = Path.Combine(Server.MapPath(@"~/Format/"), "PernyataanPNBPTerutang.docx");
+                DocX doc = DocX.Load(filename);
+                doc.SaveAs(ms);
+
+                Response.ContentType = "application/msword";
+                Response.AddHeader("content-disposition", "inline; filename=" + "PernyataanPNBPTerutang.docx");
+                Response.AddHeader("content-length", ms.Length.ToString());
+                Response.BinaryWrite(ms.ToArray());
+                Response.End();
+            }
+            return View();
+        }
+
+        public ActionResult GenerateTanggungJawab()
+        {
+            DateTime dateTime = DateTime.UtcNow.Date;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string filename = Path.Combine(Server.MapPath(@"~/Format/"), "TanggungJawabMutlak.docx");
+                DocX doc = DocX.Load(filename);
+                doc.SaveAs(ms);
+
+                Response.ContentType = "application/msword";
+                Response.AddHeader("content-disposition", "inline; filename=" + "TanggungJawabMutlak.docx");
+                Response.AddHeader("content-length", ms.Length.ToString());
+                Response.BinaryWrite(ms.ToArray());
+                Response.End();
+            }
+            return View();
+        }
+
+        public ActionResult GeneratePersetujuan()
+        {
+            DateTime dateTime = DateTime.UtcNow.Date;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string filename = Path.Combine(Server.MapPath(@"~/Format/"), "Persetujuan.docx");
+                DocX doc = DocX.Load(filename);
+                doc.SaveAs(ms);
+
+                Response.ContentType = "application/msword";
+                Response.AddHeader("content-disposition", "inline; filename=" + "Persetujuan.docx");
+                Response.AddHeader("content-length", ms.Length.ToString());
+                Response.BinaryWrite(ms.ToArray());
+                Response.End();
+            }
+            return View();
+        }
+
+        public ActionResult GenerateWajibBayar()
+        {
+            DateTime dateTime = DateTime.UtcNow.Date;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string filename = Path.Combine(Server.MapPath(@"~/Format/"), "KuasaWajibBayar.docx");
+                DocX doc = DocX.Load(filename);
+                doc.SaveAs(ms);
+
+                Response.ContentType = "application/msword";
+                Response.AddHeader("content-disposition", "inline; filename=" + "KuasaWajibBayar.docx");
+                Response.AddHeader("content-length", ms.Length.ToString());
+                Response.BinaryWrite(ms.ToArray());
+                Response.End();
+            }
+            return View();
+        }
+
         public JsonResult GetInfoBerkas(string nomorberkas, string kantorid)
         {
             Entities.BerkasKembalian data = new Entities.BerkasKembalian();
@@ -1517,6 +1589,7 @@ namespace Pnbp.Controllers
             int tipekantor = model.GetTipeKantor(kantoriduser);
 
             ViewBag.PreviewMode = "FALSE";
+
             if ((tipekantor == 1 && data.TIPEPENGEMBALIAN == "1") || (tipekantor != 1 && data.TIPEPENGEMBALIAN == "2" && data.STATUSPENGEMBALIAN == "2"))
             {
                 ViewBag.PreviewMode = "TRUE";

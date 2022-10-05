@@ -17,6 +17,7 @@
 	var file11 = ViewBag.file11;
 
 	bool isPreviewMode = (!String.IsNullOrEmpty(ViewBag.PreviewMode) && ViewBag.PreviewMode == "TRUE");
+	bool isPengembalianDaerah = (Model.TIPEPENGEMBALIAN == "1");
 }
 
 <style>
@@ -46,6 +47,16 @@
 	.section-form-input .panel-heading {
 		border-bottom: 2px solid #E6E9ED;
 	}
+
+	/* custom full height grid panel */
+	.pnbp-grid-panel {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-gap: 2rem;
+	}
+	.pnbp-grid-panel > div {
+		display: flex;
+	}
 </style>
 
 <form class="form-horizontal" method="post" enctype="multipart/form-data" id="pengembalian_form" action="@Url.Action("PengajuanPengembalianDetail", "Pengembalian")">
@@ -65,8 +76,8 @@
 					<div class="text-right" style="margin-bottom:8px;">
 						<a href="@Url.Action("mon_pengembalian", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
 					</div>
-					<div class="row">
-						<div class="col-md-4">
+					<div class="pnbp-grid-panel">
+						<div class="">
 
 							<div class="panel panel-default x_panel">
 								<div class="panel-heading x_title">Data Berkas</div>
@@ -131,6 +142,9 @@
 										</div>
 									</div>
 									@*}*@
+
+									@if (!isPengembalianDaerah)
+									{ 
 									<div class="form-group">
 										@*<div class="col-sm-12">*@
 										@*<a href="@Url.Action("GeneratePermohonanPengembalian","Pengembalian")" class="btn btn-primary" download>Surat Permohonan</a>*@
@@ -148,6 +162,7 @@
 										<div class="col-sm-12"><button type="button" class="btn btn-primary" onclick="generate_tidak_terlayani()">Surat Pernyataan Tidak Terlayani</button></div>
 										@*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
 									</div>
+									}
 
 									@*<div class="form-group">
 											<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>
@@ -156,7 +171,7 @@
 							</div>
 
 						</div>
-						<div class="col-md-4">
+						<div class="">
 
 							<div class="panel panel-default x_panel">
 								<div class="panel-heading x_title">Data Pengembalian</div>
@@ -227,7 +242,10 @@
 							</div>
 
 						</div>
-						<div class="col-md-4">
+
+						@if (!isPengembalianDaerah)
+						{ 
+						<div class="">
 
 							<div class="panel panel-default x_panel">
 								<div class="panel-heading x_title">Kirim Permohonan<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small></div>
@@ -458,6 +476,59 @@
 							</div>
 
 						</div>
+						}
+
+						@if (isPengembalianDaerah)
+						{ 
+							<div class="">
+
+								@*template surat*@
+								<div class="panel panel-default x_panel">
+									<div class="panel-heading x_title">
+										Template Surat
+										<ul class="nav navbar-right panel_toolbox">
+											<li>
+												<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+											</li>
+											<li class="dropdown">
+												<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+											</li>
+											<li>
+												<a class="close-link"><i class="fa fa-close"></i></a>
+											</li>
+										</ul>
+									</div>
+									<div class="panel-body x_content">
+										@*Panel content*@
+
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="permohonan-pengembalian">Surat Permohonan Pengembalian</button>
+										</div>
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-pnbp-berutang">Surat Pernyataan PNBP Berutang</button>
+										</div>
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
+										</div>
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
+										</div>
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="wajib-bayar">Surat Kuasa Wajib Bayar</button>
+										</div>
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan</button>
+										</div>
+										<div>
+											<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
+										</div>
+
+									</div>
+								</div>
+
+							</div>
+						}
+
 					</div>
 
 				</div>
@@ -522,7 +593,7 @@
          {
              $("#pengembalian_form :input").prop("disabled", false);
         }else{
-            $("#pengembalian_form :input").prop("disabled", true);
+			$("#pengembalian_form :input:not(.js-btn-generate-surat)").prop("disabled", true);
         }
     });
     $('.asd').keyup(function(event) {
@@ -742,6 +813,41 @@
         console.log(parseInt(JumlahBayar));
 
     });
+
+	// generate surat
+	$('.js-btn-generate-surat').on('click', generateSuratHandler);
+
+	function generateSuratHandler(e) {
+		switch (e.target.dataset.template) {
+			case 'permohonan-pengembalian': generate_permohonan(); break;
+			case 'pernyataan-pnbp-berutang': generatePNBPTerutang(); break;
+			case 'keterangan-pengeluaran': generate_keterangan(); break;
+			case 'pernyataan-tidak-terlayani': generate_tidak_terlayani(); break;
+			case 'wajib-bayar': generateWajibBayar(); break;
+			case 'persetujuan': generatePersetujuan(); break;
+			case 'tanggung-jawab': generateTanggungJawab(); break;
+		}
+	}
+
+	function generatePNBPTerutang() {
+		var url = '@Url.Action("GeneratePNBPTerutang","Pengembalian")';
+		window.open(url, '_blank');
+	}
+
+	function generateWajibBayar() {
+		var url = '@Url.Action("GenerateWajibBayar","Pengembalian")';
+		window.open(url, '_blank');
+	}
+
+	function generatePersetujuan() {
+		var url = '@Url.Action("GeneratePersetujuan","Pengembalian")';
+		window.open(url, '_blank');
+	}
+
+	function generateTanggungJawab() {
+		var url = '@Url.Action("GenerateTanggungJawab","Pengembalian")';
+		window.open(url, '_blank');
+	}
 
     function generate_permohonan() {
         var url = '@Url.Action("GeneratePermohonanPengembalian","Pengembalian")';
