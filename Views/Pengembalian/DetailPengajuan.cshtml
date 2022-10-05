@@ -15,6 +15,8 @@
 	var file9 = ViewBag.file9;
 	var file10 = ViewBag.file10;
 	var file11 = ViewBag.file11;
+
+	bool isPreviewMode = (!String.IsNullOrEmpty(ViewBag.PreviewMode) && ViewBag.PreviewMode == "TRUE");
 }
 
 <style>
@@ -465,7 +467,7 @@
 	</div>
 </form>
 
-@if (Model.STATUSPENGEMBALIAN == "2")
+@if (!isPreviewMode && Model.STATUSPENGEMBALIAN == "2")
 {
 	<div class="row" style="margin-top: 2rem;">
 		<div class="col-md-12">
@@ -495,7 +497,7 @@
 								<div class="form-group">
 
 									<div class="col-md-offset-4 col-md-8">
-										<button class="btn btn-primary">Simpan</button>
+										<button class="btn btn-success">Selesai</button>
 									</div>
 
 								</div>
@@ -682,7 +684,7 @@
 						closeOnEsc: true,
 						allowOutsideClick: true,
 					}, function () {
-						window.location.href = window.location.href;
+						window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
 					});
 				} else {
 					swal({

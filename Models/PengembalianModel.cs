@@ -483,6 +483,7 @@ namespace Pnbp.Models
                         berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
                         satker.kodesatker KodeSatker,
                         satker.nama_satker NamaSatker,
+                        nomorsp2d,
                         CASE WHEN tipepengembalian = '1' THEN 'Daerah' WHEN tipepengembalian = '2' THEN 'Pusat' END labeltipepengembalian,
                         COUNT(1) OVER() Total
                     FROM
@@ -1741,7 +1742,8 @@ namespace Pnbp.Models
                     TO_CHAR(BERKASKEMBALIAN.NAMAREKENING) NAMAREKENING,
                     TO_CHAR(BERKASKEMBALIAN.SETORANPNBP) SETORANPNBP,
                     TO_CHAR(BERKASKEMBALIAN.PERMOHONANPENGEMBALIAN) PERMOHONANPENGEMBALIAN,
-                    TO_CHAR(BERKASKEMBALIAN.NOMORSURAT) NOMORSURAT
+                    TO_CHAR(BERKASKEMBALIAN.NOMORSURAT) NOMORSURAT,
+                    PENGEMBALIANPNBP.TIPEPENGEMBALIAN
                     FROM PENGEMBALIANPNBP
                     LEFT JOIN BERKASKEMBALIAN ON PENGEMBALIANPNBP.PENGEMBALIANPNBPID = BERKASKEMBALIAN.PENGEMBALIANPNBPID)
                     SELECT * FROM AA 

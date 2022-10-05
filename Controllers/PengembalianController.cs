@@ -1516,6 +1516,12 @@ namespace Pnbp.Controllers
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantor = model.GetTipeKantor(kantoriduser);
 
+            ViewBag.PreviewMode = "FALSE";
+            if ((tipekantor == 1 && data.TIPEPENGEMBALIAN == "1") || (tipekantor != 1 && data.TIPEPENGEMBALIAN == "2" && data.STATUSPENGEMBALIAN == "2"))
+            {
+                ViewBag.PreviewMode = "TRUE";
+            }
+
             string viewName = (tipekantor == 1 ? "DetailPengajuanPusat" : "DetailPengajuan");
             //string viewName = (tipekantor == 1 ? "PengajuanPengembalianDetailPusat" : "PengajuanPengembalianDetail");
             return View(viewName, data);
