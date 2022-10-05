@@ -19,6 +19,10 @@
 		align-items: center;
 		min-height: 37px;
 	}
+
+	.thead-row-no-border-bottom th {
+		border-bottom: 0px !important;
+	}
 </style>
 
 
@@ -167,7 +171,21 @@
 					ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }, { name: "draw", value: data.draw });
                     return ftp;
 			    }
-            },
+			},
+			"headerCallback": function (thead, data, start, end, display) {
+				let totalfisik = 0;
+				let totaloperasional = 0;
+				let totalpenerimaan = 0;
+				if (data.length > 0) {
+					totalfisik = formatAngka(data[0].totalfisik);
+					totaloperasional = formatAngka(data[0].totaloperasional);
+					totalpenerimaan = formatAngka(data[0].totalpenerimaan);
+				}
+				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="2" class="numeric">Total</th><th class="text-center">${totalfisik}</th><th class="text-center">${totaloperasional}</th></tr>`)
+				if ($(thead).hasClass('thead-row-no-border-bottom')) {
+					$(thead).remove();
+				}
+			},
 			"columns": [
 				{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
 				{ "data": "KodeKRO", "className": "centertaligncolumn", "width": "5%" },
