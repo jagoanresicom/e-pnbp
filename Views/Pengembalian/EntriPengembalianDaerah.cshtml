@@ -18,10 +18,13 @@
 </style>
 
 <form class="form-horizontal" method="post" enctype="multipart/form-data" id="js-form-entri">
+
+	<input type="hidden" name="satker" id="satker" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" />
+	
 	<div id="dynamic_content">
 
 		@if (!string.IsNullOrEmpty(Model.BERKASID))
-		{ 
+		{
 			<div class="text-right" style="margin-bottom:8px;">
 				<a href="@Url.Action("mon_pengembalian","Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
 			</div>
@@ -184,31 +187,32 @@
 						@*Panel content*@
 
 						<div>
-							<button type="button" class="btn btn-primary">Surat Permohonan Pengembalian</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="permohonan-pengembalian">Surat Permohonan Pengembalian</button>
 						</div>
 						<div>
-							<button type="button" class="btn btn-primary">Surat Pernyataan PNBP Berutang</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-pnbp-berutang">Surat Pernyataan PNBP Berutang</button>
 						</div>
 						<div>
-							<button type="button" class="btn btn-primary">Surat Keterangan Pengeluaran</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
 						</div>
 						<div>
-							<button type="button" class="btn btn-primary">Surat Pernyataan Tidak Terlayani</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
 						</div>
 						<div>
-							<button type="button" class="btn btn-primary">Surat Kuasa Wajib Bayar</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="wajib-bayar">Surat Kuasa Wajib Bayar</button>
 						</div>
 						<div>
-							<button type="button" class="btn btn-primary">Surat Persetujuan</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan</button>
 						</div>
 						<div>
-							<button type="button" class="btn btn-primary">Surat Pernyataan Tanggung Jawab Mutlak</button>
+							<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
 						</div>
 
 					</div>
 				</div>
 
 			</div>
+
 		</div>
 	</div>
 </form>
@@ -343,6 +347,74 @@
 		$('.js-input-currency').on('keydown', (e) => {
 			return isNumberKey(event)
 		});
+
+		// generate surat
+		$('.js-btn-generate-surat').on('click', generateSuratHandler);
+
+		function generateSuratHandler(e) {
+			switch (e.target.dataset.template) {
+				case 'permohonan-pengembalian': generate_permohonan(); break;
+				case 'pernyataan-pnbp-berutang': generatePNBPTerutang(); break;
+				case 'keterangan-pengeluaran': generate_keterangan(); break;
+				case 'pernyataan-tidak-terlayani': generate_tidak_terlayani(); break;
+				case 'wajib-bayar': generateWajibBayar(); break;
+				case 'persetujuan': generatePersetujuan(); break;
+				case 'tanggung-jawab': generateTanggungJawab(); break;
+			}
+		}
+
+		function generatePNBPTerutang() {
+			var url = '@Url.Action("GeneratePNBPTerutang","Pengembalian")';
+			window.open(url, '_blank');
+		}
+
+		function generateWajibBayar() {
+			var url = '@Url.Action("GenerateWajibBayar","Pengembalian")';
+			window.open(url, '_blank');
+		}
+
+		function generatePersetujuan() {
+			var url = '@Url.Action("GeneratePersetujuan","Pengembalian")';
+			window.open(url, '_blank');
+		}
+
+		function generateTanggungJawab() {
+			var url = '@Url.Action("GenerateTanggungJawab","Pengembalian")';
+			window.open(url, '_blank');
+		}
+
+		function generate_permohonan() {
+			var url = '@Url.Action("GeneratePermohonanPengembalian","Pengembalian")';
+			var namapemohon = $('#namapemohon').val();
+			var NomorSurat = $('#NomorSurat').val();
+			var PermohonanPengembalian = $('#PermohonanPengembalian').val();
+			var AlamatPemohon = $('#AlamatPemohon').val();
+			var npwpberkas = $('#npwpberkas').val();
+			var NamaRekening = $('#NamaRekening').val();
+			var NomorRekening = $('#NomorRekening').val();
+			var TanggalPengaju = $('#tanggalpengaju').val();
+			window.open(url + '?namapemohon=' + namapemohon + '&NomorSurat=' + NomorSurat + '&PermohonanPengembalian=' + PermohonanPengembalian + '&AlamatPemohon=' + AlamatPemohon + '&npwpberkas=' + npwpberkas + '&NamaRekening=' + NamaRekening + '&NomorRekening=' + NomorRekening + '&tanggalpengaju='+ TanggalPengaju,'_blank');
+		}
+
+		function generate_keterangan() {
+			var url = '@Url.Action("GenerateSuratKeteranganPengembalian","Pengembalian")';
+			var nomorsurat = $('#NomorSurat').val();
+			var nomorberkas = $('#nomorberkas').val();
+			var namapemohon = $('#namapemohon').val();
+			var SetoranPnbp = $('#SetoranPnbp').val();
+			var JumlahBayar = $('#JumlahBayar').val();
+			var NamaProsedur = $('#NamaProsedur').val();
+			window.open(url + '?NomorSurat=' + nomorsurat + '&nomorberkas=' + nomorberkas + '&namapemohon=' + namapemohon + '&SetoranPnbp=' + SetoranPnbp + '&JumlahBayar=' + JumlahBayar + '&NamaProsedur=' + NamaProsedur, '_blank');
+		}
+
+		function generate_tidak_terlayani() {
+			var url         = '@Url.Action("GenerateSuratTidakTerlayani", "Pengembalian")';
+			var namapemohon = $('#namapemohon').val();
+			var AlamatPemohon = $('#AlamatPemohon').val();
+			var nomorberkas = $('#nomorberkas').val();
+			var NamaProsedur = $('#NamaProsedur').val();
+			window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker, '_blank');
+		}
 
 	});
 </script>
