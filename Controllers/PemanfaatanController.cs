@@ -1147,7 +1147,25 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
 
-            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_kro_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, KantorId, kodeKRO);
+
+            var dTableResult = result.Select(x =>
+            {
+                return new
+                {
+                    x.Alokasi,
+                    x.KRO,
+                    x.KantorId,
+                    x.KodeKRO,
+                    x.Total,
+                    x.WilayahId,
+                    x.RNumber,
+                    x.Pagu,
+                    daftarTotal.totalalokasi,
+                };
+            });
+
+            return Json(new { data = dTableResult, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -1185,7 +1203,29 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
 
-            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_satker_sum(reqTahun, kodesatker, satker, namaprogram, nilaianggaran, true, WilayahId);
+
+            var dTableResult = result.Select(x =>
+            {
+                //var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                //var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                return new
+                {
+                    x.Alokasi,
+                    x.KRO,
+                    x.KantorId,
+                    x.KodeKRO,
+                    x.Total,
+                    x.WilayahId,
+                    x.RNumber,
+                    x.Pagu,
+                    daftarTotal.totalpagu,
+                    daftarTotal.totalalokasi,
+                };
+            });
+
+            return Json(new { data = dTableResult, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+            //return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -1218,7 +1258,29 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
 
-            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_provinsi_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true);
+
+            var dTableResult = result.Select(x =>
+            {
+                //var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                //var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                return new
+                {
+                    x.Alokasi,
+                    x.KRO,
+                    x.KantorId,
+                    x.KodeKRO,
+                    x.Total,
+                    x.WilayahId,
+                    x.RNumber,
+                    x.Pagu,
+                    daftarTotal.totalpagu,
+                    daftarTotal.totalalokasi,
+                };
+            });
+
+            return Json(new { data = dTableResult, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+            //return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
         }
 
 

@@ -197,9 +197,9 @@
 				let totaloperasional = 0;
 				let totalpenerimaan = 0;
 				if (data.length > 0) {
-					//totalfisik = formatAngka(data[0].totalfisik);
-					//totaloperasional = formatAngka(data[0].totaloperasional);
-					//totalpenerimaan = formatAngka(data[0].totalpenerimaan);
+					totalfisik = formatAngka(data[0].totalfisik);
+					totaloperasional = formatAngka(data[0].totaloperasional);
+					totalpenerimaan = formatAngka(data[0].totalpenerimaan);
 				}
 				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="3" class="numeric">Total</th><th class="text-center">${totalfisik}</th><th class="text-center">${totaloperasional}</th><th class="text-center">${totalpenerimaan}</th><th class="disabled"></th></tr>`)
 				if ($(thead).hasClass('thead-row-no-border-bottom')) {

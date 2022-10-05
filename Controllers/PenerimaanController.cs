@@ -1145,6 +1145,17 @@ namespace Pnbp.Controllers
                 req.Length
             );
 
+            Entities.DaftarTotal daftarTotal = model.pn_satker_sum(
+                reqTahun,
+                bulan,
+                propinsi,
+                satker,
+                tipekantorid,
+                kantorid,
+                req.Start,
+                req.Length
+            );
+
             int totalRecord = 0;
             if (data.daftarRekapan.Count > 0)
             {
@@ -1171,7 +1182,10 @@ namespace Pnbp.Controllers
                         x.kanwilid,
                         x.kantorid,
                         x.jumlah,
-                        x.jenispenerimaan
+                        x.jenispenerimaan,
+                        daftarTotal.totalfisik,
+                        daftarTotal.totalpenerimaan,
+                        daftarTotal.totaloperasional,
                     };
                 }),
                 recordsTotal = totalRecord,
@@ -1209,6 +1223,14 @@ namespace Pnbp.Controllers
             tahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             var data = model.pn_layanan(tahun, bulan, tipekantorid, kantorid, layanan, req.Start, req.Length);
 
+            Entities.DaftarTotal daftarTotal = model.pn_layanan_sum(
+                tahun,
+                bulan,
+                tipekantorid,
+                kantorid,
+                layanan
+            );
+
             int totalRecord = 0;
             if (data.ListPenerimaan.Count > 0)
             {
@@ -1235,6 +1257,9 @@ namespace Pnbp.Controllers
                         x.operasional,
                         penerimaan,
                         x.urutan,
+                        daftarTotal.totalfisik,
+                        daftarTotal.totalpenerimaan,
+                        daftarTotal.totaloperasional,
                     };
                 }),
                 recordsTotal = totalRecord,

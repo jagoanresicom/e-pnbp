@@ -1190,6 +1190,125 @@ namespace Pnbp.Models
             return result;
         }
 
+        public Entities.DaftarTotal pn_satker_sum(string pTahun, string pBulan, string provinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstparams = new List<object>();
+
+
+            string query =
+                @" select 
+                       {0}
+                   from rekappenerimaandetail a 
+                   LEFT JOIN TARGETPROSEDUR b on a.NAMAPROSEDUR = b.NAMAPROSEDUR AND A .KANTORID = b.KANTORID
+                   LEFT JOIN SATKER c ON A.KANTORID = C.KANTORID
+                    where a.tahun = :param1 AND c.KODESATKER IS NOT NULL";
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param1", pTahun));
+            //lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", satker));
+
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                query += " and a.bulan = :param2 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pBulan));
+            }
+
+            if (!String.IsNullOrEmpty(provinsi))
+            {
+                query += " and c.induk= :param5 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi));
+            }
+
+            if (!String.IsNullOrEmpty(satker))
+            {
+                query += " and lower(c.nama_satker) like '%'||:param4||'%' ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", satker.ToLower()));
+            }
+
+            if (pTipeKantorId == "2" || pTipeKantorId == "3" || pTipeKantorId == "4")
+            {
+                if (!string.IsNullOrEmpty(pKantorId))
+                {
+                    query += " and a.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :param3 CONNECT BY NOCYCLE PRIOR kantorid = induk) ";
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pKantorId));
+                }
+            }
+
+            query = string.Format(query, @" 
+	                    COUNT (a.jumlah) AS totalfisik,
+                        nvl(sum(a.penerimaan),0) as totalpenerimaan, 
+                        nvl(round(sum(a.operasional),2),0) as totaloperasional ");
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    var parameters = lstparams.ToArray();
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, parameters).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+        public Entities.DaftarTotal pn_layanan_sum(string pTahun, string pBulan, string pTipeKantorId, string pKantorId, string pLayanan)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstparams = new List<object>();
+
+            string query =
+                @"
+                        SELECT 
+                           {0}
+                        FROM
+	                        rekappenerimaandetail r1
+                        LEFT JOIN TARGETPROSEDUR b on r1.NAMAPROSEDUR = b.NAMAPROSEDUR AND r1.KANTORID = b.KANTORID
+                        WHERE r1.TAHUN = :param1 ";
+            lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param1", pTahun));
+
+            if (!String.IsNullOrEmpty(pBulan))
+            {
+                query += " and r1.bulan = :param2 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param2", pBulan));
+            }
+
+            if (!String.IsNullOrEmpty(pKantorId))
+            {
+                query += " and r1.kantorid = :param3 ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param3", pKantorId));
+            }
+
+            if (!String.IsNullOrEmpty(pLayanan))
+            {
+                query += " and lower(r1.namaprosedur) like '%'||:param4||'%' ";
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", pLayanan.ToLower()));
+            }
+
+            query = string.Format(query, @"
+	            COUNT (r1.jumlah) AS totalfisik,
+	            SUM (r1.penerimaan) AS totalpenerimaan
+            ");
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    var parameters = lstparams.ToArray();
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, parameters).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
 
         public RealisasiPenerimaanDT pn_satker(string pTahun, string pBulan, string propinsi, string satker, string pTipeKantorId, string pKantorId, int start, int length)
         {
