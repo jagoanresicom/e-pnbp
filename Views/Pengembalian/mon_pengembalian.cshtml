@@ -28,6 +28,10 @@
 		background: #1594a8 !important;
 		border-color: #187787 !important;
 	}
+
+	.column-aksi button {
+		min-width: 80px;
+	}
 </style>
 
 
@@ -248,7 +252,7 @@
 				},
 				{
 					"data": null,
-					"className": "centertaligncolumn",
+					"className": "centertaligncolumn column-aksi",
 					"width": "5%",
 					"render": function (data, type, row) {
 						let isPusat = ($('#jeniskantor').val() == 'Pusat');

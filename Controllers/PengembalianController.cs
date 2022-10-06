@@ -122,7 +122,7 @@ namespace Pnbp.Controllers
                 doc.SaveAs(ms);
 
                 Response.ContentType = "application/msword";
-                Response.AddHeader("content-disposition", "inline; filename=" + "Permohonan.docx");
+                Response.AddHeader("content-disposition", "inline; filename=" + "PermohonanPengembalianPNBP.docx");
                 Response.AddHeader("content-length", ms.Length.ToString());
                 Response.BinaryWrite(ms.ToArray());
                 Response.End();
