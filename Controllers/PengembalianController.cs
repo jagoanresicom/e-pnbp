@@ -40,6 +40,15 @@ namespace Pnbp.Controllers
 
         public ActionResult GenerateSuratKeteranganPengembalian(string nomorsurat, string nomorberkas, string NamaProsedur, string namapemohon, string SetoranPnbp, string JumlahBayar)
         {
+
+            if (!String.IsNullOrEmpty(nomorsurat) && nomorsurat.ToLower() == "undefined") nomorsurat = "";
+            if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "";
+            if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "";
+            if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "";
+            if (!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") SetoranPnbp = "";
+            if (!String.IsNullOrEmpty(JumlahBayar) && JumlahBayar.ToLower() == "undefined") JumlahBayar = "";
+
+
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
@@ -66,6 +75,11 @@ namespace Pnbp.Controllers
 
         public ActionResult GenerateSuratTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur)
         {
+            if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
+            if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "...............";
+            if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "...............";
+            if (!String.IsNullOrEmpty(AlamatPemohon) && AlamatPemohon.ToLower() == "undefined") AlamatPemohon = "...............";
+
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
@@ -101,6 +115,17 @@ namespace Pnbp.Controllers
             string tanggalpengaju
             )
         {
+
+
+            if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
+            if (!String.IsNullOrEmpty(NomorSurat) && NomorSurat.ToLower() == "undefined") NomorSurat = "...............";
+            if (!String.IsNullOrEmpty(PermohonanPengembalian) && PermohonanPengembalian.ToLower() == "undefined") PermohonanPengembalian = "...............";
+            if (!String.IsNullOrEmpty(AlamatPemohon) && AlamatPemohon.ToLower() == "undefined") AlamatPemohon = "...............";
+            if (!String.IsNullOrEmpty(npwpberkas) && npwpberkas.ToLower() == "undefined") npwpberkas = "...............";
+            if (!String.IsNullOrEmpty(NamaRekening) && NamaRekening.ToLower() == "undefined") NamaRekening = "...............";
+            if (!String.IsNullOrEmpty(NomorRekening) && NomorRekening.ToLower() == "undefined") NomorRekening = "...............";
+            if (!String.IsNullOrEmpty(tanggalpengaju) && tanggalpengaju.ToLower() == "undefined") tanggalpengaju = "";
+
             //return Json(AlamatPemohon, JsonRequestBehavior.AllowGet);
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
