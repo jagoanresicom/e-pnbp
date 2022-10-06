@@ -380,19 +380,18 @@
 									</li>
 								}*@
 
-								
-								<li>
-									<a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
-									<ul class="nav child_menu">
-										@if (OtorisasiUser.GetJenisKantorUser() == "Pusat")
-										{
+								@if (OtorisasiUser.GetJenisKantorUser() == "Pusat")
+								{
+								    <li>
+									    <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
+									    <ul class="nav child_menu">
 											<li><a href="@Url.Action("manajemendata", "administrasi")">Manajemen Data</a></li>
-										}
-									    <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
-									    <li><a href="@Url.Action("Kantor", "Administrasi")">Kantor</a></li>
-									    <li><a href="@Url.Action("Prioritas", "Administrasi")">Prioritas</a></li>
-									</ul>
-								</li>
+									        <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
+									        <li><a href="@Url.Action("Kantor", "Administrasi")">Kantor</a></li>
+									        <li><a href="@Url.Action("Prioritas", "Administrasi")">Prioritas</a></li>
+									    </ul>
+								    </li>
+								}
 
 							</ul>
                         </div>
