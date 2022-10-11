@@ -491,7 +491,8 @@
 								@* Surat Permohonan *@
 								<div class="panel panel-default x_panel">
 									<div class="panel-heading x_title">
-										Surat Permohonan
+										Kirim Permohonan
+										<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small>
 									</div>
 									<div class="panel-body ps-0 pe-0">
 										@*Panel content*@
@@ -510,7 +511,7 @@
 												</div>
 											}
 										</div>
-										
+
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan PNBP Berulang</label>
 											<div class="col-sm-6">
@@ -540,6 +541,18 @@
 												</div>
 											}
 										</div>
+
+										@if (Model.STATUSPENGEMBALIAN == "0")
+										{
+											<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>
+											<div class="form-group">
+												<div class="col-sm-12">
+													@* dari EntriPengembalianPusat.cshtml *@
+													<button type="submit" id="js-btn-simpan" class="btn btn-primary">Simpan</button>
+													<button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
+												</div>
+											</div>
+										}
 
 									</div>
 								</div>
@@ -599,7 +612,7 @@
 		<div class="col-md-12">
 
 			<div class="panel panel-default x_panel">
-				<div class="panel-heading x_title">Data SP2D</div>
+				<div class="panel-heading x_title">Unggah File SP2D</div>
 				<div class="panel-body form-horizontal">
 
 					<form id="js-form-sp2d" class="form-horizontal" method="POST" enctype="multipart/form-data">
@@ -715,29 +728,10 @@
         return true;
     }
 
-     $('#simpan').click(function (e) {
-        $('#Stataus').val('0');
-        //setTimeout(function () {
-        //    swal({
-        //        type: "success",
-        //        html: true,
-        //        title: "Data Berhasil Disimpan",
-        //        confirmButtonColor: "#4CAF50"
-        //    });
-        //}, 3000);
-    });
-
-    $('#proses').click(function (e) {
-        $('#Stataus').val('1');
-        //setTimeout(function () {
-        //    swal({
-        //        type: "success",
-        //        html: true,
-        //        title: "Data Berhasil Disimpan",
-        //        confirmButtonColor: "#4CAF50"
-        //    });
-        //}, 3000);
-    });
+	$('#js-btn-simpan').on('click', () => $('#Stataus').val(0));
+	$('#js-btn-proses').on('click', () => $('#Stataus').val(2));
+    $('#simpan').click(function (e) { $('#Stataus').val('0'); });
+    $('#proses').click(function (e) { $('#Stataus').val('1'); });
 
     function cari_berkas() {
         //alert($('#nomorberkas').val());
