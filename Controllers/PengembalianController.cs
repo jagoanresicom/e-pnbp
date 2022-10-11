@@ -803,6 +803,9 @@ namespace Pnbp.Controllers
                                           "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT KUASA BERMATERAI')";
                 db.Database.ExecuteSqlCommand(insert_lampiran);
             }
+
+            TransactionResult tr = UploadFileSuratPernyataanPNBPBerulang(form, pengembalianid);
+
             //string insert_lampiran = "INSERT INTO PNBPTRAIN.LAMPIRANPENGEMBALIANPNBP (LAMPIRANID, LAMPIRANPENGEMBALIANID, SURATPERMOHONAN, SURATKETERANGAN, BUKTIPENERIMAAN, PERINTAHSETOR, BUKTISETOR,BUKTIREKENING,BUKTINPWP,BUKTIDOMISILI,SURATKUASA,STATUS) " +
             //                                "VALUES ((SELECT RAWTOHEX(SYS_GUID()) FROM DUAL)" + "','" + pengembalianid + "','" + file_name1 + "','" + file_name2 + "','" + file_name3 + "','" + file_name4 + "','" + file_name5 + "','"+file_name6+"','"+fileContent7+"','"+fileContent8+"','"+fileContent9+"',1)";
             //db.Database.ExecuteSqlCommand(insert_lampiran);
@@ -822,6 +825,61 @@ namespace Pnbp.Controllers
             return RedirectToAction("mon_pengembalian");
             //return RedirectToAction("PengajuanPengembalianIndex");
             //mati
+        }
+
+        private TransactionResult UploadFileSuratPernyataanPNBPBerulang(FormCollection form, string pengembalianId)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            var filePath = ((form.AllKeys.Contains("SuratPernyataanPNBPBerulang")) ? form["SuratPernyataanPNBPBerulang"] : "NULL");
+            var fileContent = Request.Files["SuratPernyataanPNBPBerulang"];
+
+            LampiranKembalian dataLampiran = new LampiranKembalian()
+            {
+                PengembalianPnbpId = pengembalianId,
+                TipeFile = "SURAT PERNYATAAN PNBP BERULANG",
+            };
+
+            //Insert SURATPERMOHONAN
+            if (fileContent != null && fileContent.ContentLength > 0)
+            {
+                string id9 = RandomString(32);
+                var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                var stream = fileContent.InputStream;
+                var FileSizeByte = fileContent.ContentLength;
+                var FileSize = FileSizeByte / 50000;
+                var Extension = System.IO.Path.GetExtension(fileContent.FileName);
+                var fileName = "SuratPernyataanPNBPBerulang_" + tgl + "" + Extension;
+                string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                //Check whether Directory (Folder) exists.
+                if (!Directory.Exists(folderPath))
+                {
+                    //If Dir3ectory (Folder) does not exists. Create it.
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
+
+                using (var fileStream = System.IO.File.Create(path))
+                {
+                    stream.CopyTo(fileStream);
+                    filePath = Filefilepath9;
+
+                    dataLampiran = new LampiranKembalian()
+                    {
+                        LampiranKembalianId = id9,
+                        PengembalianPnbpId = pengembalianId,
+                        NamaFile = filePath,
+                        TipeFile = "SURAT PERNYATAAN PNBP BERULANG",
+                        Ekstensi = Extension,
+                    };
+                }
+            }
+
+            tr = pengembalianmodel.InsertLampiranKembalian(dataLampiran);
+
+            return tr;
         }
 
         private static Random random = new Random();
@@ -1585,6 +1643,7 @@ namespace Pnbp.Controllers
             Entities.LampiranKembalianTrain file9 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file10 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file11 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain file12 = new Entities.LampiranKembalianTrain();
             data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
             file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN");
             file2 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN");
@@ -1597,6 +1656,7 @@ namespace Pnbp.Controllers
             file9 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KUASA BERMATERAI");
             file10 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT WAJIB BAYAR");
             file11 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN TIDAK TERLAYANI");
+            file12 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN PNBP BERULANG");
             ViewData["file1"] = file1;
             ViewData["file2"] = file2;
             ViewData["file3"] = file3;
@@ -1608,6 +1668,7 @@ namespace Pnbp.Controllers
             ViewData["file9"] = file9;
             ViewData["file10"] = file10;
             ViewData["file11"] = file11;
+            ViewData["file12"] = file12;
 
             HakAksesModel model = new HakAksesModel();
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;

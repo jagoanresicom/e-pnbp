@@ -207,7 +207,7 @@
 								<div class="panel-body">
 									@*Panel content*@
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Surat<span class="text-danger">*</span></label>
+										<label for="NomorSurat" class="col-sm-4 control-label" style="text-align:left;">Nomor Surat<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											@Html.TextBoxFor(model => model.NomorSurat, new { @class = "form-control", @id = "NomorSurat", @placeholder = "Nomor Surat", @required = "required" })
 										</div>
@@ -215,7 +215,7 @@
 
 									@* Upload Request Baru *@
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar<span class="text-danger">*</span></label>
+										<label for="SuratWajibBayar" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" placeholder="Surat Wajib Bayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											@*<label id="label-SuratPermohhonan" class="custom-file-label" for="customFile">Pilih File</label>*@
@@ -225,7 +225,7 @@
 									</div>
 
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani<span class="text-danger">*</span></label>
+										<label for="TidakTerlayani" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="TidakTerlayani" name="TidakTerlayani" placeholder="Surat Pernyataan Tidak Terlayani" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											@*<label id="label-SuratPermohhonan" class="custom-file-label" for="customFile">Pilih File</label>*@
@@ -236,7 +236,7 @@
 									@* Upload Request Baru *@
 
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan<span class="text-danger">*</span></label>
+										<label for="SuratPermohhonan" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="SuratPermohhonan" name="SuratPermohonan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											@*<label id="label-SuratPermohhonan" class="custom-file-label" for="customFile">Pilih File</label>*@
@@ -245,59 +245,66 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan<span class="text-danger">*</span></label>
+										<label for="SuratKeterangan" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="SuratKeterangan" name="SuratKeterangan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											<span id="cancel-SuratKeterangan"></span>
 										</div>
 									</div>
 									<div class="form-group" style="display:none;">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
+										<label for="BuktiPenerimaan" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="BuktiPenerimaan" name="BuktiPenerimaan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
 											<span id="cancel-BuktiPenerimaan"></span>
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor<span class="text-danger">*</span></label>
+										<label for="SuratPerintah" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="SuratPerintah" name="SuratPerintah" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											<span id="cancel-SuratPerintah"></span>
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor<span class="text-danger">*</span></label>
+										<label for="BuktiSetor" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="BuktiSetor" name="BuktiSetor" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											<span id="cancel-BuktiSetor"></span>
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan<span class="text-danger">*</span></label>
+										<label for="BuktiRek" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="BuktiRek" name="BuktiRek" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											<span id="cancel-BuktiRek"></span>
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">NPWP<span class="text-danger">*</span></label>
+										<label for="NpwpFile" class="col-sm-4 control-label" style="text-align:left;">NPWP<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="NpwpFile" name="NpwpFile" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											<span id="cancel-NpwpFile"></span>
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon<span class="text-danger">*</span></label>
+										<label for="BuktiDomisili" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon<span class="text-danger">*</span></label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="BuktiDomisili" name="BuktiDomisili" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" required>
 											<span id="cancel-BuktiDomisili"></span>
 										</div>
 									</div>
 									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Kuasa Bermaterai</label>
+										<label for="SuratKuasa" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Kuasa Bermaterai</label>
 										<div class="col-sm-8">
 											<input type="file" class="form-control max_5mb" id="SuratKuasa" name="SuratKuasa" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
 											<span id="cancel-SuratKuasa"></span>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang</label>
+										<div class="col-sm-8">
+											<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<span id="cancel-SuratPernyataanPNBPBerulang"></span>
 										</div>
 									</div>
 
@@ -311,14 +318,14 @@
 									</div>
 
 									@*
-										<div class="col-sm-4">
-											<button type="button" class="btn btn-primary">Kembalikan</button>
-										</div>
+		<div class="col-sm-4">
+			<button type="button" class="btn btn-primary">Kembalikan</button>
+		</div>
 
-										<div class="col-sm-4">
-											<button type="button" class="btn btn-primary">Selesai</button>
-										</div>
-										</div>*@
+		<div class="col-sm-4">
+			<button type="button" class="btn btn-primary">Selesai</button>
+		</div>
+		</div>*@
 
 								</div>
 							</div>

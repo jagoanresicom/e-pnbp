@@ -432,6 +432,19 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
+            string queryOrder = @" CASE WHEN pengembalianpnbp.StatusPengembalian = '2' THEN '1' 
+                                    WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '2' 
+                                    ELSE '99' END statuspengembalianorder ";
+
+            if (tipekantorid != 1) 
+            {
+                queryOrder = @" CASE WHEN pengembalianpnbp.StatusPengembalian = '3' THEN '1' 
+                                WHEN pengembalianpnbp.StatusPengembalian = '0' THEN '2' 
+                                WHEN pengembalianpnbp.StatusPengembalian IN (1, 2) THEN '3' 
+                                WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '4' 
+                                ELSE '99' END statuspengembalianorder ";
+            }
+
             string query =
             ////                kantor.kode,
             //@"SELECT * FROM (
@@ -463,9 +476,52 @@ namespace Pnbp.Models
             //        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) 
             //   WHERE berkaskembalian.nomorsurat IS NOT NULL AND berkaskembalian.permohonanpengembalian IS NOT NULL";
 
-            @"SELECT * FROM (
+            $@"SELECT * FROM (SELECT 
+                  ROW_NUMBER() over (
+                    ORDER BY 
+                      statuspengembalianorder, tanggalpengaju DESC
+                  ) RNumber,
+                  pengembalianpnbpid, 
+                  kantorid, 
+                  namakantor, 
+                  pegawaiidpengaju, 
+                  namapegawaipengaju, 
+                  TanggalPengaju, 
+                  pegawaiidsetuju, 
+                  namapegawaisetuju, 
+                  TanggalSetuju, 
+                  statussetuju, 
+                  judul, 
+                  StatusPengembalian, 
+                  berkasid, 
+                  namaprosedur, 
+                  kodebilling, 
+                  TanggalKodeBilling, 
+                  TanggalBayar, 
+                  ntpn, 
+                  jumlahbayar, 
+                  namabankpersepsi, 
+                  pemilikid, 
+                  namapemohon, 
+                  nikpemohon, 
+                  alamatpemohon, 
+                  emailpemohon, 
+                  nomortelepon, 
+                  nomorberkas, 
+                  nomorrekening, 
+                  namabank, 
+                  namacabang, 
+                  JumlahBayarNumber, 
+                  nomorsurat, 
+                  permohonanpengembalian, 
+                  KodeSatker, 
+                  NamaSatker, 
+                  nomorsp2d, 
+                  labeltipepengembalian, 
+                  statuspengembalianorder,
+                  Total 
+                FROM (
                     SELECT
-                        ROW_NUMBER() over (ORDER BY pengembalianpnbp.tanggalpengaju DESC, berkaskembalian.tanggalbayar, berkaskembalian.namapemohon) RNumber,
                         pengembalianpnbp.pengembalianpnbpid, pengembalianpnbp.kantorid, pengembalianpnbp.namakantor,
                         pengembalianpnbp.pegawaiidpengaju, pengembalianpnbp.namapegawaipengaju, 
                         to_char(pengembalianpnbp.tanggalpengaju, 'dd-mm-yyyy') TanggalPengaju,
@@ -485,7 +541,8 @@ namespace Pnbp.Models
                         satker.nama_satker NamaSatker,
                         nomorsp2d,
                         CASE WHEN tipepengembalian = '1' THEN 'Daerah' WHEN tipepengembalian = '2' THEN 'Pusat' END labeltipepengembalian,
-                        COUNT(1) OVER() Total
+                        COUNT(1) OVER() Total,
+                        {queryOrder}
                     FROM
                         pengembalianpnbp
                         JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
@@ -572,7 +629,7 @@ namespace Pnbp.Models
             }
 
             query +=
-                " ORDER BY pengembalianpnbp.tanggalpengaju DESC ) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
+                " ORDER BY statuspengembalianorder, pengembalianpnbp.tanggalpengaju DESC)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
 
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
@@ -1507,6 +1564,59 @@ namespace Pnbp.Models
             return tr;
         }
 
+        public TransactionResult InsertLampiranKembalian(LampiranKembalian data)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "";
+                        List<object> lstParams = new List<object>();
+
+                        string idLampiranKembalian = data.LampiranKembalianId;
+
+                        if (String.IsNullOrEmpty(data.LampiranKembalianId)) 
+                        {
+                            idLampiranKembalian = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        }
+
+                        sql = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                      "VALUES (:idLampiran, :idPengembalian, :namaFile, '1',SYSDATE,'Pengajuan',:tipefile, :ekstensi)";
+
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idLampiran", idLampiranKembalian));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idPengembalian", data.PengembalianPnbpId));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("namaFile", data.NamaFile));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tipefile", data.TipeFile));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", data.Ekstensi));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.ReturnValue = data.LampiranKembalianId;
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
         public Entities.TransactionResult HapusLampiranKembalian(string lampirankembalianid)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
@@ -1781,9 +1891,10 @@ namespace Pnbp.Models
 
 
         #region BerkasKembalian
-
-
+        
         #endregion
+
+
 
     }
 }

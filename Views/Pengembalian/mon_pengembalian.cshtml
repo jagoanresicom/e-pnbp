@@ -1,4 +1,7 @@
 ﻿@model Pnbp.Entities.FindPengembalianPnbp
+@{
+	string jenisKantorUser = @OtorisasiUser.GetJenisKantorUser();
+}
 
 <script src='@Url.Content("~/resources/js/infiniteScroll.js")'></script>
 <style>
@@ -16,6 +19,7 @@
 	.d-flex {
 		display: flex;
 	}
+
 	.justify-content-center {
 		justify-content: center;
 	}
@@ -24,10 +28,11 @@
 		background: #17a2b8;
 		border-color: #187787 !important;
 	}
-	.btn-edit:hover, .btn-edit:focus, .btn-edit:active {
-		background: #1594a8 !important;
-		border-color: #187787 !important;
-	}
+
+		.btn-edit:hover, .btn-edit:focus, .btn-edit:active {
+			background: #1594a8 !important;
+			border-color: #187787 !important;
+		}
 
 	.column-aksi button {
 		min-width: 80px;
@@ -58,7 +63,7 @@
 				<div class="x_content" id="js-section-pencarian">
 					<form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">
 
-						@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+						@if (jenisKantorUser == "Pusat")
 						{
 							<input type="hidden" name="jeniskantor" id="jeniskantor" value="Pusat" />
 						}
@@ -68,6 +73,12 @@
 						}
 
 						<div class="row">
+							<div class="form-group">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor Berkas : </label>
+								<div class="col-md-4 col-sm-4 col-xs-12">
+									@Html.TextBoxFor(m => m.CariNomorBerkas, new { @class = "form-control input-md" })
+								</div>
+							</div>
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Pemohon : </label>
 								<div class="col-md-4 col-sm-4 col-xs-12">
@@ -80,12 +91,12 @@
 									@{
 										var lsStatus = new List<SelectListItem>();
 										lsStatus.Add(new SelectListItem { Value = "0", Text = "Belum Kirim" });
-										if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+										if (jenisKantorUser == "Pusat")
 										{
 											lsStatus.Add(new SelectListItem { Value = "1", Text = "Usulan Baru" });
 										}
 										else
-										{ 
+										{
 											lsStatus.Add(new SelectListItem { Value = "1", Text = "Terkirim" });
 										}
 										lsStatus.Add(new SelectListItem { Value = "2", Text = "Proses" });
@@ -117,7 +128,10 @@
 									<tr>
 										<th>No</th>
 										<th>Tipe</th>
-										<th>Satuan Kerja</th>
+										@if (jenisKantorUser == "Pusat")
+										{ 
+											<th>Satuan Kerja</th>
+										}
 										<th>Nomor Berkas</th>
 										<th>Nama Pemohon</th>
 										<th>Nominal</th>
@@ -196,6 +210,103 @@
 
         //$('#back-to-top').tooltip('show');
 
+		let dTableColumns = [
+			{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "LabelTipePengembalian", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "NamaSatker", "className": "centertaligncolumn", "width": "20%" },
+			{ "data": "NomorBerkas", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "NamaPemohon", "className": "centertaligncolumn", "width": "20%" },
+			{ "data": "permohonanpengembalian", "className": "rightaligncolumn", render: formatAngka },
+			{ "data": "NomorSurat", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "TanggalPengaju", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "NomorSP2D", "className": "centertaligncolumn", "width": "5%" },
+			{
+				"data": "StatusPengembalian",
+				"className": "centertaligncolumn",
+				"width": "10%",
+				render: function (data) {
+					if (data == null) {
+						return 'Belum Kirim'
+					}
+					if (data == '0') {
+						return 'Belum Kirim'
+					}
+					if (data == '1') {
+						if ($('#jeniskantor').val() == 'Pusat') {
+							return 'Usulan Baru'
+						} else {
+							return 'Terkirim'
+						}
+					}
+					if (data == '2') {
+						return 'Proses'
+					}
+					if (data == '3') {
+						return 'Berkas Tidak Lengkap'
+					}
+					if (data == '4') {
+						return 'Selesai'
+					}
+				}
+			},
+			{
+				"data": null,
+				"className": "centertaligncolumn column-aksi",
+				"width": "5%",
+				"render": function (data, type, row) {
+					let isPusat = ($('#jeniskantor').val() == 'Pusat');
+					let html = '';
+
+					switch (data.StatusPengembalian) {
+						case 1:
+							if (data.LabelTipePengembalian == "Pusat" && isPusat) {
+								html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+							} else if ((data.LabelTipePengembalian == "Daerah" && !isPusat)) {
+								html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
+							} else {
+								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+							}
+							break;
+						case 3:
+						case 0:
+							html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+							break;
+						case 2:
+							if ((data.LabelTipePengembalian == "Pusat" && isPusat) || (data.LabelTipePengembalian == "Daerah" && !isPusat)) {
+								html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
+							} else {
+								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+							}
+							break;
+						case 4:
+							html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+							break;
+						default:
+							break;
+					}
+
+					//if (isPusat) {
+					//	html += '<button type="button" class="btn btn-success --js-btn-selesai">Selesai</button>';
+					//}
+					//html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+
+					html = '<div class="text-center d-flex justify-content-center" style="gap:6px">' + html + '</div>';
+					return html;
+				}
+			},
+		];
+
+		if ($('#jeniskantor').val() != 'Pusat') {
+			dTableColumns.forEach(function (item, index) {
+				if (item.data == 'NamaSatker') {
+					dTableColumns.splice(index, 1);
+				}
+				if (item.data == 'permohonanpengembalian') {
+					item.width = '20%';
+				}
+			})
+		};
+
 		let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
 			"bLengthChange": false,
 			"paging": true,
@@ -211,91 +322,7 @@
 				type: "POST",
 				data: function (data, obj) { var ftp = $('#js-section-pencarian form').serializeArray(); data.form = ftp; ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }); return ftp; }
 			},
-			"columns": [
-				{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "LabelTipePengembalian", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "NamaSatker", "className": "centertaligncolumn", "width": "20%"},
-				{ "data": "NomorBerkas", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "NamaPemohon", "className": "centertaligncolumn", "width": "20%" },
-				{ "data": "permohonanpengembalian", "className": "rightaligncolumn", render: formatAngka },
-				{ "data": "NomorSurat", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "TanggalPengaju", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "NomorSP2D", "className": "centertaligncolumn", "width": "5%" },
-				{
-					"data": "StatusPengembalian",
-					"className": "centertaligncolumn",
-					"width": "10%",
-					render: function (data) {
-						if (data == null) {
-							return 'Belum Kirim'
-						}
-						if (data == '0') {
-							return 'Belum Kirim'
-						}
-						if (data == '1') {
-							if ($('#jeniskantor').val() == 'Pusat') {
-								return 'Usulan Baru'
-							} else {
-								return 'Terkirim'
-							}
-						}
-						if (data == '2') {
-							return 'Proses'
-						}
-						if (data == '3') {
-							return 'Berkas Tidak Lengkap'
-						}
-						if (data == '4') {
-							return 'Selesai'
-						}
-					}
-				},
-				{
-					"data": null,
-					"className": "centertaligncolumn column-aksi",
-					"width": "5%",
-					"render": function (data, type, row) {
-						let isPusat = ($('#jeniskantor').val() == 'Pusat');
-						let html = '';
-
-						switch (data.StatusPengembalian) { 
-							case 1:
-								if (data.LabelTipePengembalian == "Pusat" && isPusat) {
-									html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
-								} else if ((data.LabelTipePengembalian == "Daerah" && !isPusat)) {
-									html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
-								} else {
-									html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
-								}
-								break;
-							case 3:
-							case 0:
-								html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
-								break;
-							case 2:
-								if ((data.LabelTipePengembalian == "Pusat" && isPusat) || (data.LabelTipePengembalian == "Daerah" && !isPusat)) {
-									html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
-								} else {
-									html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
-								}
-								break;
-							case 4:
-								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
-								break;
-							default:
-								break;
-						}
-
-						//if (isPusat) {
-						//	html += '<button type="button" class="btn btn-success --js-btn-selesai">Selesai</button>';
-						//}
-						//html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
-
-						html = '<div class="text-center d-flex justify-content-center" style="gap:6px">' + html + '</div>';
-						return html;
-					}
-				},
-			],
+			"columns": dTableColumns,
 		});
 
 		$('tbody', dTable.table().container()).delegate('tr td', 'click', function (e) {
