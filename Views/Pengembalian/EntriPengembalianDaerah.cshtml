@@ -24,7 +24,8 @@
 <form class="form-horizontal" method="post" enctype="multipart/form-data" id="js-form-entri">
 
 	<input type="hidden" name="satker" id="satker" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" />
-	
+	@Html.HiddenFor(m => m.STATUSPENGEMBALIAN)
+
 	<div id="dynamic_content">
 
 		@if (!string.IsNullOrEmpty(Model.BERKASID))
@@ -203,10 +204,8 @@
 						<div class="form-group">
 							<div class="col-sm-12">
 								@* dari EntriPengembalianPusat.cshtml *@
-								<button type="submit" form="pengembalian_form" id="simpan" class="btn btn-primary">Simpan</button>
-								@*<button type="submit" form="pengembalian_form" class="btn btn-primary" id="proses">Proses</button>*@
-
-								<button type="submit" class="btn btn-primary" id="selesai">Proses</button>
+								<button type="submit" id="js-btn-simpan" class="btn btn-primary">Simpan</button>
+								<button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
 							</div>
 						</div>
 
@@ -377,6 +376,8 @@
 		}
 
 		$('#js-btn-cari-berkas').on('click', () => cariBerkas());
+		$('#js-btn-simpan').on('click', () => $('#STATUSPENGEMBALIAN').val(0));
+		$('#js-btn-proses').on('click', () => $('#STATUSPENGEMBALIAN').val(2));
 		$('#js-form-entri').on('submit', (e) => simpanPengembalian(e));
 
 		// init input currency

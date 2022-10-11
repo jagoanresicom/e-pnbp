@@ -73,9 +73,9 @@
 		grid-gap: 2rem;
 	}
 
-	.pnbp-grid-panel > div {
-		display: flex;
-	}
+		.pnbp-grid-panel > div {
+			display: flex;
+		}
 
 	.panel-body__template-surat, .panel-body__template-surat > div {
 		display: grid;
@@ -511,9 +511,9 @@
 												</div>
 
 												@*
-				<div class="col-sm-4">
-					<button type="submit" class="btn btn-primary" id="selesai">Selesai</button>
-				</div>
+													<div class="col-sm-4">
+														<button type="submit" class="btn btn-primary" id="selesai">Selesai</button>
+													</div>
 												*@
 											</div>
 										}
@@ -591,7 +591,81 @@
 		<div class="col-md-12">
 
 			<div class="panel panel-default x_panel">
-				<div class="panel-heading x_title">Data SP2D</div>
+				<div class="panel-heading x_title">Unggah Surat Permohonan Pengembalian</div>
+				<div class="panel-body form-horizontal">
+
+					<form action="@Url.Action("UploadSuratPermohonanPengembalian", "Pengembalian")" sclass="form-horizontal" method="POST" enctype="multipart/form-data">
+						@Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
+
+						<div class="row">
+							<div class="col-md-6 col-md-offset-3">
+								<div class="form-group">
+									<label class="col-sm-4 control-label" style="text-align:left;">Unggah File</label>
+									<div class="col-sm-8">
+										<input type="file" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+									</div>
+								</div>
+
+								<div class="form-group">
+
+									<div class="col-md-offset-4 col-md-8">
+										<button class="btn btn-primary">Unggah</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="row" style="margin-top: 2rem;">
+		<div class="col-md-12">
+
+			<div class="panel panel-default x_panel">
+				<div class="panel-heading x_title">Unggah File SPTJM</div>
+				<div class="panel-body form-horizontal">
+
+					<form action="@Url.Action("UploadSPTJM", "Pengembalian")" sclass="form-horizontal" method="POST" enctype="multipart/form-data">
+						@Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
+
+						<div class="row">
+							<div class="col-md-6 col-md-offset-3">
+								<div class="form-group">
+									<label class="col-sm-4 control-label" style="text-align:left;">Unggah File</label>
+									<div class="col-sm-8">
+										<input type="file" name="SPTJM" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+									</div>
+								</div>
+
+								<div class="form-group">
+
+									<div class="col-md-offset-4 col-md-8">
+										<button class="btn btn-primary">Unggah</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="row" style="margin-top: 2rem;">
+		<div class="col-md-12">
+
+			<div class="panel panel-default x_panel">
+				<div class="panel-heading x_title">Unggah File SP2D</div>
 				<div class="panel-body form-horizontal">
 
 					<form id="js-form-sp2d" class="form-horizontal" method="POST" enctype="multipart/form-data">

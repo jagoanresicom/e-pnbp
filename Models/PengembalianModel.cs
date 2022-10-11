@@ -1045,7 +1045,7 @@ namespace Pnbp.Models
             return tr;
         }
 
-        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas)
+        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1073,7 +1073,7 @@ namespace Pnbp.Models
                             "            pegawaiidpengaju, namapegawaipengaju, tipepengembalian, statuspengembalian) VALUES " +
                             "( " +
                             "            :PengembalianPnbpId, TO_DATE(SYSDATE,'DD/MM/YYYY'), :KantorId, :NamaKantor, " +
-                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', '2')";
+                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', :statusPengembalian)";
                         arrayListParameters.Clear();
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", pengembalianPnbpId));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalPengaju", data.TANGGALPENGAJU));
@@ -1081,6 +1081,7 @@ namespace Pnbp.Models
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaKantor", namakantor));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PegawaiIdPengaju", pegawaiid));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPegawaiPengaju", namapegawai));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusPengembalian", statusPengembalian));
                         parameters = arrayListParameters.OfType<object>().ToArray();
                         ctx.Database.ExecuteSqlCommand(sql, parameters);
 
