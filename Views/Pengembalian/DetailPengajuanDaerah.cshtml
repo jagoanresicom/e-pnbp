@@ -15,6 +15,7 @@
 	var file9 = ViewBag.file9;
 	var file10 = ViewBag.file10;
 	var file11 = ViewBag.file11;
+	var file12 = ViewBag.file12;
 
 	bool isPreviewMode = (!String.IsNullOrEmpty(ViewBag.PreviewMode) && ViewBag.PreviewMode == "TRUE");
 	bool isPengembalianDaerah = (Model.TIPEPENGEMBALIAN == "1");
@@ -484,13 +485,54 @@
 
 						@if (isPengembalianDaerah)
 						{ 
-							<div class="">
+							<div style="display: flex; flex-wrap: wrap;">
+
+								@* Surat Permohonan *@
+								<div class="panel panel-default x_panel">
+									<div class="panel-heading x_title">
+										Surat Permohonan
+									</div>
+									<div class="panel-body ps-0 pe-0">
+										@*Panel content*@
+
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan PNBP Berulang</label>
+											<div class="col-sm-6">
+												<input type="file" class="form-control max_5mb" disabled accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											</div>
+											@if (file12 != null && !String.IsNullOrEmpty(file12.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file12.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+										</div>
+
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
+											<div class="col-sm-6">
+												<input type="file" class="form-control max_5mb" disabled accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											</div>
+											@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file10.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+										</div>
+
+									</div>
+								</div>
 
 								@*template surat*@
 								<div class="panel panel-default x_panel">
 									<div class="panel-heading x_title">
 										Template Surat
-										<ul class="nav navbar-right panel_toolbox">
+										@*<ul class="nav navbar-right panel_toolbox">
 											<li>
 												<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
 											</li>
@@ -500,26 +542,17 @@
 											<li>
 												<a class="close-link"><i class="fa fa-close"></i></a>
 											</li>
-										</ul>
+										</ul>*@
 									</div>
 									<div class="panel-body x_content">
 										@*Panel content*@
 
 										<div class="panel-body__template-surat">
 											<div>
-												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="permohonan-pengembalian">Surat Permohonan Pengembalian</button>
-											</div>
-											<div>
-												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-pnbp-berutang">Surat Pernyataan PNBP Berutang</button>
-											</div>
-											<div>
 												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
 											</div>
 											<div>
 												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
-											</div>
-											<div>
-												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="wajib-bayar">Surat Kuasa Wajib Bayar</button>
 											</div>
 											<div>
 												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan</button>

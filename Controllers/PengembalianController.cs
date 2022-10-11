@@ -804,7 +804,7 @@ namespace Pnbp.Controllers
                 db.Database.ExecuteSqlCommand(insert_lampiran);
             }
 
-            TransactionResult tr = UploadFileSuratPernyataanPNBPBerulang(form, pengembalianid);
+            TransactionResult tr = UploadFileSuratPernyataanPNBPBerulang(pengembalianid);
 
             //string insert_lampiran = "INSERT INTO PNBPTRAIN.LAMPIRANPENGEMBALIANPNBP (LAMPIRANID, LAMPIRANPENGEMBALIANID, SURATPERMOHONAN, SURATKETERANGAN, BUKTIPENERIMAAN, PERINTAHSETOR, BUKTISETOR,BUKTIREKENING,BUKTINPWP,BUKTIDOMISILI,SURATKUASA,STATUS) " +
             //                                "VALUES ((SELECT RAWTOHEX(SYS_GUID()) FROM DUAL)" + "','" + pengembalianid + "','" + file_name1 + "','" + file_name2 + "','" + file_name3 + "','" + file_name4 + "','" + file_name5 + "','"+file_name6+"','"+fileContent7+"','"+fileContent8+"','"+fileContent9+"',1)";
@@ -827,11 +827,11 @@ namespace Pnbp.Controllers
             //mati
         }
 
-        private TransactionResult UploadFileSuratPernyataanPNBPBerulang(FormCollection form, string pengembalianId)
+        private TransactionResult UploadFileSuratPernyataanPNBPBerulang(string pengembalianId)
         {
             TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
 
-            var filePath = ((form.AllKeys.Contains("SuratPernyataanPNBPBerulang")) ? form["SuratPernyataanPNBPBerulang"] : "NULL");
+            //var filePath = ((form.AllKeys.Contains("SuratPernyataanPNBPBerulang")) ? form["SuratPernyataanPNBPBerulang"] : "NULL");
             var fileContent = Request.Files["SuratPernyataanPNBPBerulang"];
 
             LampiranKembalian dataLampiran = new LampiranKembalian()
@@ -864,7 +864,7 @@ namespace Pnbp.Controllers
                 using (var fileStream = System.IO.File.Create(path))
                 {
                     stream.CopyTo(fileStream);
-                    filePath = Filefilepath9;
+                    string filePath = Filefilepath9;
 
                     dataLampiran = new LampiranKembalian()
                     {
@@ -872,6 +872,116 @@ namespace Pnbp.Controllers
                         PengembalianPnbpId = pengembalianId,
                         NamaFile = filePath,
                         TipeFile = "SURAT PERNYATAAN PNBP BERULANG",
+                        Ekstensi = Extension,
+                    };
+                }
+            }
+
+            tr = pengembalianmodel.InsertLampiranKembalian(dataLampiran);
+
+            return tr;
+        }
+
+        private TransactionResult UploadFileSuratKuasaWajibBayar(string pengembalianId)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            //var filePath = ((form.AllKeys.Contains("SuratPernyataanPNBPBerulang")) ? form["SuratPernyataanPNBPBerulang"] : "NULL");
+            var fileContent = Request.Files["SuratWajibBayar"];
+            string tipeFile = "SURAT WAJIB BAYAR";
+            string fileNamePrefix = "SuratWajibBayar";
+
+            LampiranKembalian dataLampiran = new LampiranKembalian()
+            {
+                PengembalianPnbpId = pengembalianId,
+                TipeFile = tipeFile,
+            };
+
+            //Insert SURATPERMOHONAN
+            if (fileContent != null && fileContent.ContentLength > 0)
+            {
+                string id9 = RandomString(32);
+                var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                var stream = fileContent.InputStream;
+                var FileSizeByte = fileContent.ContentLength;
+                var FileSize = FileSizeByte / 50000;
+                var Extension = System.IO.Path.GetExtension(fileContent.FileName);
+                var fileName = fileNamePrefix + tgl + "" + Extension;
+                string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
+
+                using (var fileStream = System.IO.File.Create(path))
+                {
+                    stream.CopyTo(fileStream);
+                    string filePath = Filefilepath9;
+
+                    dataLampiran = new LampiranKembalian()
+                    {
+                        LampiranKembalianId = id9,
+                        PengembalianPnbpId = pengembalianId,
+                        NamaFile = filePath,
+                        TipeFile = tipeFile,
+                        Ekstensi = Extension,
+                    };
+                }
+            }
+
+            tr = pengembalianmodel.InsertLampiranKembalian(dataLampiran);
+
+            return tr;
+        }
+
+        private TransactionResult UploadFileSuratPermohonanPengembalian(string pengembalianId)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            //var filePath = ((form.AllKeys.Contains("SuratPernyataanPNBPBerulang")) ? form["SuratPernyataanPNBPBerulang"] : "NULL");
+            var fileContent = Request.Files["SuratPermohonanPengembalian"];
+            string tipeFile = "SURAT PERMOHONAN PENGEMBALIAN";
+            string fileNamePrefix = "SuratPermohonanPengembalian_";
+
+            LampiranKembalian dataLampiran = new LampiranKembalian()
+            {
+                PengembalianPnbpId = pengembalianId,
+                TipeFile = tipeFile,
+            };
+
+            //Insert SURATPERMOHONAN
+            if (fileContent != null && fileContent.ContentLength > 0)
+            {
+                string id9 = RandomString(32);
+                var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                var stream = fileContent.InputStream;
+                var FileSizeByte = fileContent.ContentLength;
+                var FileSize = FileSizeByte / 50000;
+                var Extension = System.IO.Path.GetExtension(fileContent.FileName);
+                var fileName = fileNamePrefix + tgl + "" + Extension;
+                string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
+
+                using (var fileStream = System.IO.File.Create(path))
+                {
+                    stream.CopyTo(fileStream);
+                    string filePath = Filefilepath9;
+
+                    dataLampiran = new LampiranKembalian()
+                    {
+                        LampiranKembalianId = id9,
+                        PengembalianPnbpId = pengembalianId,
+                        NamaFile = filePath,
+                        TipeFile = tipeFile,
                         Ekstensi = Extension,
                     };
                 }
@@ -1290,7 +1400,7 @@ namespace Pnbp.Controllers
 
         [HttpPost]
         //public JsonResult SimpanPengembalianPnbpDev(Entities.DataPengembalianPnbpDev data)
-        public JsonResult SimpanPengembalianDaerah(DetailDataBerkas data, string npwpberkas)
+        public JsonResult SimpanPengembalianDaerah(DetailDataBerkas data, string npwpberkas, FormCollection form)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1312,6 +1422,14 @@ namespace Pnbp.Controllers
             string namapegawai = userIdentity.NamaPegawai;
 
             tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas);
+            if (tr.Status && !String.IsNullOrEmpty(tr.ReturnValue))
+            {
+                string pengembalianId = tr.ReturnValue;
+
+                UploadFileSuratPermohonanPengembalian(pengembalianId);
+                UploadFileSuratPernyataanPNBPBerulang(pengembalianId);
+                UploadFileSuratKuasaWajibBayar(pengembalianId);
+            }
 
             return Json(tr, JsonRequestBehavior.AllowGet);
         }
@@ -1681,7 +1799,7 @@ namespace Pnbp.Controllers
                 ViewBag.PreviewMode = "TRUE";
             }
 
-            string viewName = (tipekantor == 1 ? "DetailPengajuanPusat" : "DetailPengajuan");
+            string viewName = (tipekantor == 1 ? "DetailPengajuanPusat" : "DetailPengajuanDaerah");
             //string viewName = (tipekantor == 1 ? "PengajuanPengembalianDetailPusat" : "PengajuanPengembalianDetail");
             return View(viewName, data);
         }
