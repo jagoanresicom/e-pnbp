@@ -1157,7 +1157,7 @@ namespace Pnbp.Models
             return tr;
         }
 
-        public Entities.TransactionResult UpdateSP2DPengembalian(string PengembalianPnbpId, string nomorSP2D, string idLampiran, string filePath, string ekstensi)
+        public Entities.TransactionResult SelesaiPengembalianDaerah(string PengembalianPnbpId, string nomorSP2D, string filePath, string ekstensi)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1175,8 +1175,9 @@ namespace Pnbp.Models
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("nomorSP2D", nomorSP2D));
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", PengembalianPnbpId));
                         ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
-
                         
+                        // insert SP2D
+                        string idLampiran = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
                         sql = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
                                           "VALUES (:idLampiran, :idPengembalian, :filePath, '1', SYSDATE, 'Pengajuan', 'SP2D', :ekstensi)";
 
@@ -1185,6 +1186,83 @@ namespace Pnbp.Models
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idPengembalian", PengembalianPnbpId));
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("filePath", filePath));
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", ekstensi));
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public TransactionResult SelesaiPengembalianPusat(string PengembalianPnbpId, string nomorSP2D, string filePath, string ekstensi, string filePathSPTJM, string ekstensiSPTJM, string filePathPengembalian, string ekstensiPengembalian)
+        {
+            TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        List<object> lstParams = new List<object>();
+
+                        // update status = selesai
+                        string sql = @"UPDATE pengembalianpnbp SET nomorsp2d = :nomorSP2D, STATUSPENGEMBALIAN = 4 WHERE pengembalianpnbpid = :PengembalianPnbpId ";
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("nomorSP2D", nomorSP2D));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", PengembalianPnbpId));
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+
+                        // insert SP2D
+                        string idLampiran = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        sql = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                          "VALUES (:idLampiran, :idPengembalian, :filePath, '1', SYSDATE, 'Pengajuan', 'SP2D', :ekstensi)";
+
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idLampiran", idLampiran));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idPengembalian", PengembalianPnbpId));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("filePath", filePath));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", ekstensi));
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        // insert SPTJM
+                        idLampiran = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        sql = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                          "VALUES (:idLampiran, :idPengembalian, :filePath, '1', SYSDATE, 'Pengajuan', 'SPTJM', :ekstensi)";
+
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idLampiran", idLampiran));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idPengembalian", PengembalianPnbpId));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("filePath", filePathSPTJM));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", ekstensiSPTJM));
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        // insert Surat Permohonan Pengembalian
+                        idLampiran = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        sql = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                          "VALUES (:idLampiran, :idPengembalian, :filePath, '1', SYSDATE, 'Pengajuan', 'SURAT PERMOHONAN PENGEMBALIAN', :ekstensi)";
+
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idLampiran", idLampiran));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idPengembalian", PengembalianPnbpId));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("filePath", filePathPengembalian));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", ekstensiPengembalian));
                         ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
 
 
@@ -1390,6 +1468,24 @@ namespace Pnbp.Models
             string result = "";
 
             string query = @"SELECT to_char(STATUSPENGEMBALIAN) FROM PENGEMBALIANPNBP WHERE PENGEMBALIANPNBPID = :pengembalianPnbpId";
+
+            ArrayList arrayListParameters = new ArrayList();
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("pengembalianPnbpId", pengembalianPnbpId));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                result = ctx.Database.SqlQuery<string>(query, parameters).FirstOrDefault();
+            }
+
+            return result;
+        }
+
+        public string GetTipePengembalian(string pengembalianPnbpId)
+        {
+            string result = "";
+
+            string query = @"SELECT TIPEPENGEMBALIAN FROM PENGEMBALIANPNBP WHERE PENGEMBALIANPNBPID = :pengembalianPnbpId";
 
             ArrayList arrayListParameters = new ArrayList();
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("pengembalianPnbpId", pengembalianPnbpId));

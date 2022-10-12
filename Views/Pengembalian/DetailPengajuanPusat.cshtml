@@ -587,7 +587,77 @@
 
 @if (!isPreviewMode && Model.STATUSPENGEMBALIAN == "2")
 {
+
 	<div class="row" style="margin-top: 2rem;">
+		<div class="col-md-12">
+
+			<div class="panel panel-default x_panel">
+				<div class="panel-heading x_title">Selesaikan Permohonan</div>
+				<div class="panel-body form-horizontal">
+
+					<form id="js-form-selesaikan" class="form-horizontal" method="POST" enctype="multipart/form-data">
+						@Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
+
+						@if (!isPengembalianDaerah)
+						{
+							<div class="row">
+								<div class="col-md-3"><div class="control-label"><b>Surat Permohonan Pengembalian<span class="text-danger">*</span></b></div></div><div class="col-md-6">
+									<div class="form-group">
+										<label for="FileSuratPengembalian" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Unggah File</label>
+										<div class="col-sm-8" style="min-height: 53px;">
+											<input type="file" name="FileSuratPengembalian" id="FileSuratPengembalian" class="form-control" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<span id="cancel-FileSuratPengembalian"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-3"><div class="control-label"><b>SPTJM<span class="text-danger">*</span></b></div></div><div class="col-md-6">
+									<div class="form-group">
+										<label for="FileSPTJM" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Unggah File</label>
+										<div class="col-sm-8" style="min-height: 53px;">
+											<input type="file" name="FileSPTJM" id="FileSPTJM" class="form-control" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<span id="cancel-FileSPTJM"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="ln_solid"></div>
+						}
+
+						<div class="row">
+							<div class="col-md-3"><div class="control-label"><b>SP2D<span class="text-danger">*</span></b></div></div><div class="col-md-6">
+								<div class="form-group">
+									<label for="NomorSP2D" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Nomor</label>
+									<div class="col-sm-8">
+										<input type="text" id="NomorSP2D" name="NomorSP2D" class="form-control" maxlength="20" required>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="FileSP2D" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Unggah File</label>
+									<div class="col-sm-8" style="min-height: 53px;">
+										<input type="file" name="FileSP2D" id="FileSP2D" class="form-control" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+										<span id="cancel-FileSP2D"></span>
+									</div>
+								</div>
+								<div class="form-group mt-4">
+									<div class="col-md-offset-4 col-md-8">
+										<button class="btn btn-success">Selesai</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	@*<div class="row" style="margin-top: 2rem;">
 		<div class="col-md-12">
 
 			<div class="panel panel-default x_panel">
@@ -702,7 +772,7 @@
 			</div>
 
 		</div>
-	</div>
+	</div>*@
 }
 
 
@@ -770,7 +840,7 @@
 		});
 
 
-		$('#js-form-sp2d').submit(function (e) {
+		$('#js-form-selesaikan').submit(function (e) {
 			e.preventDefault();
 			let frmData = new FormData(e.target);
 			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
@@ -779,16 +849,16 @@
 				data: frmData,
 				processData: false,
 				contentType: false,
-				url: '@Url.Action("SimpanSP2D", "Pengembalian")',
+				url: '@Url.Action("SelesaiPengembalian", "Pengembalian")',
 				success: function (data, textStatus, XMLHttpRequest) {
+					$.unblockUI();
 					if (data.Status) {
 						swal({
 							title: "Sukses",
 							text: data.Pesan,
 							type: "success",
-							closeOnEsc: true,
-							allowOutsideClick: true,
 						}, function () {
+							$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
 							window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
 						});
 					} else {
@@ -802,6 +872,7 @@
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
 					swal({
 						title: "Proses Gagal",
 						text: "Terjadi kesalahan",
@@ -810,8 +881,6 @@
 						allowOutsideClick: true,
 					});
 				}
-			}).always(() => {
-				$.unblockUI();
 			})
 
 		});
@@ -906,5 +975,45 @@
         var NamaProsedur = $('#NamaProsedur').val();
         window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker, '_blank');
     }
+
+	$('body').on('change', 'input:file', function () {
+		let status = true
+		//alert($(this)[0].files[0].type);
+		if (['application/pdf'].includes(this.accept)) {
+			if (!["application/pdf", ".zip", ".rar", ".7zip"].includes($(this)[0].files[0].type)) {
+				alert('Format FIle Tidak Sesuai')
+				status = false
+			}
+		}
+
+		if ($(this).hasClass("max_5mb")) {
+			if ($(this)[0].files[0].size > 5000000) {
+				//alert('Ukuran File Lebih Dari 5MB')
+				swal({
+					type: "error",
+					html: true,
+					title: "Gagal<br><small>Ukuran File Lebih Dari 5MB</small>",
+					confirmButtonColor: "#4CAF50"
+				});
+				status = false
+			}
+		}
+
+		if (status) {
+			// alert('aaaaaaaaaa');
+			$('#cancel-' + this.id).html('<a href="javascript:void(0)" class="text-danger" onclick="cancelDoc(\'' + this.id + '\')" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
+		} else {
+			$(this).val('')
+			$('#cancel-' + (this.id)).html('')
+			$('#label-' + (this.id)).html('Test')
+		}
+	})
+
+	const cancelDoc = (x) => {
+		$('#' + x).val('')
+		// alert(x)
+		$('#cancel-' + x).html('')
+		$('#label-' + x).html('Test')
+	}
 
 </script>

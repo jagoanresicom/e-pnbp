@@ -2382,27 +2382,30 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
-        public ActionResult SimpanSP2D(string nomorSP2D, string PengembalianPnbpId)
+        public ActionResult SelesaiPengembalian(string nomorSP2D, string PengembalianPnbpId)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
-            var mfile = Request.Files["file"];
+            var fileSuratPengembalian = Request.Files["FileSuratPengembalian"];
+            var fileSPTJM = Request.Files["FileSPTJM"];
+            var fileSP2D = Request.Files["FileSP2D"];
 
-            if (mfile == null) { 
-                tr.Pesan = "Harap pilih file terlebih dahulu";
-                return Json(tr, JsonRequestBehavior.AllowGet);
-            }
-            if (mfile == null)
+            if (string.IsNullOrEmpty(PengembalianPnbpId))
             {
-                tr.Pesan = "Harap pilih file terlebih dahulu";
+                tr.Pesan = "Data pengembalian tidak ditemukan";
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
-            if (mfile.ContentLength > 5000000)
+            if (fileSP2D == null)
+            {
+                tr.Pesan = "Harap untuk mengisi kolom yang wajib untuk diisi";
+                return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+            if (fileSP2D.ContentLength > 5000000)
             {
                 tr.Pesan = "Ukuran file maksimal 5MB";
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
-            if (string.IsNullOrEmpty(nomorSP2D))
+            if (String.IsNullOrEmpty(nomorSP2D))
             {
                 tr.Pesan = "Nomor SP2D tidak boleh kosong";
                 return Json(tr, JsonRequestBehavior.AllowGet);
@@ -2412,33 +2415,90 @@ namespace Pnbp.Controllers
                 tr.Pesan = "Nomor SP2D maksimal 20 karakter";
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
-            if (string.IsNullOrEmpty(PengembalianPnbpId))
+
+            string tipePengembalian = pengembalianmodel.GetTipePengembalian(PengembalianPnbpId);
+            if (!(tipePengembalian == "1" || tipePengembalian == "2"))
             {
-                tr.Pesan = "Data pengembalian tidak ditemukan";
+                tr.Pesan = "Tipe pengembalian tidak valid";
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
 
-            string id9 = RandomString(32);
-            var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
-            var stream = mfile.InputStream;
-            var FileSizeByte = mfile.ContentLength;
-            var FileSize = FileSizeByte / 50000;
-            var Extension = System.IO.Path.GetExtension(mfile.FileName);
-            var fileName = "SP2D_" + tgl + "" + Extension;
-            string folderPath = Server.MapPath("~/Uploads/pengembalian/");
-            //Check whether Directory (Folder) exists.
-            if (!Directory.Exists(folderPath))
+            if (tipePengembalian == "2") 
             {
-                //If Dir3ectory (Folder) does not exists. Create it.
-                Directory.CreateDirectory(folderPath);
+                if (fileSuratPengembalian == null || fileSPTJM == null)
+                {
+                    tr.Pesan = "Harap untuk mengisi kolom yang wajib untuk diisi";
+                    return Json(tr, JsonRequestBehavior.AllowGet);
+                }
+                if (fileSuratPengembalian.ContentLength > 5000000 || fileSPTJM.ContentLength > 5000000)
+                {
+                    tr.Pesan = "Ukuran file maksimal 5MB";
+                    return Json(tr, JsonRequestBehavior.AllowGet);
+                }
             }
 
-            var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
-            var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
-            using (var fileStream = System.IO.File.Create(path))
+            try
             {
-                stream.CopyTo(fileStream);
-                tr = pengembalianmodel.UpdateSP2DPengembalian(PengembalianPnbpId, nomorSP2D, id9, Filefilepath9, Extension);
+                // upload file SP2D
+                var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                var stream = fileSP2D.InputStream;
+                var Extension = Path.GetExtension(fileSP2D.FileName);
+                var fileName = "SP2D_" + tgl + "" + Extension;
+                string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+                var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
+
+                using (var fileStream = System.IO.File.Create(path))
+                {
+                    stream.CopyTo(fileStream);
+                }
+
+                if (tipePengembalian == "2")
+                {
+                    // upload file Surat Pengembalian
+                    string ekstensiPengembalian = Path.GetExtension(fileSuratPengembalian.FileName);
+                    var fileNamePengembalian = "SuratPermohonanPengembalian_" + DateTime.Now.ToString("yyMMddHHmmssff") + ekstensiPengembalian;
+                    string folderPathPengembalian = Server.MapPath("~/Uploads/pengembalian/");
+                    if (!Directory.Exists(folderPathPengembalian))
+                    {
+                        Directory.CreateDirectory(folderPathPengembalian);
+                    }
+                    var pathPengembalian = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileNamePengembalian);
+                    var filePathPengembalian = "/Uploads/pengembalian/" + fileNamePengembalian;
+                    using (var fileStream = System.IO.File.Create(pathPengembalian))
+                    {
+                        fileSuratPengembalian.InputStream.CopyTo(fileStream);
+                    }
+
+                    // upload file SPTJM
+                    string ekstensiSPTJM = Path.GetExtension(fileSPTJM.FileName);
+                    var fileNameSPTJM = "SPTJM_" + DateTime.Now.ToString("yyMMddHHmmssff") + ekstensiSPTJM;
+                    string folderPathSPTJM = Server.MapPath("~/Uploads/pengembalian/");
+                    if (!Directory.Exists(folderPathSPTJM))
+                    {
+                        Directory.CreateDirectory(folderPathSPTJM);
+                    }
+                    var pathSPTJM = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileNameSPTJM);
+                    var filePathSPTJM = "/Uploads/pengembalian/" + fileNameSPTJM;
+                    using (var fileStream = System.IO.File.Create(pathSPTJM))
+                    {
+                        fileSPTJM.InputStream.CopyTo(fileStream);
+                    }
+
+                    tr = pengembalianmodel.SelesaiPengembalianPusat(PengembalianPnbpId, nomorSP2D, Filefilepath9, Extension, filePathSPTJM, ekstensiSPTJM, filePathPengembalian, ekstensiPengembalian);
+                }
+                else
+                {
+                    tr = pengembalianmodel.SelesaiPengembalianDaerah(PengembalianPnbpId, nomorSP2D, Filefilepath9, Extension);
+                }
+            }
+            catch (Exception e)
+            {
+                tr.Pesan = e.Message;
             }
 
             return Json(tr, JsonRequestBehavior.AllowGet);
