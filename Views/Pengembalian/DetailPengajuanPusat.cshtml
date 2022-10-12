@@ -890,7 +890,7 @@
     }
 
     function generate_keterangan() {
-        var url = '@Url.Action("GenerateSuratKeteranganPengembalian","Pengembalian")';
+        var url = '@Url.Action("GenerateSuratKeteranganPengeluaran", "Pengembalian")';
         var nomorsurat = $('#NomorSurat').val();
         var nomorberkas = $('#nomorberkas').val();
         var namapemohon = $('#namapemohon').val();
@@ -901,7 +901,7 @@
     }
 
     function generate_tidak_terlayani() {
-        var url         = '@Url.Action("GenerateSuratTidakTerlayani", "Pengembalian")';
+        var url         = '@Url.Action("GenerateSuratPernyataanTidakTerlayani", "Pengembalian")';
         var namapemohon = $('#namapemohon').val();
         var AlamatPemohon = $('#AlamatPemohon').val();
         var nomorberkas = $('#nomorberkas').val();

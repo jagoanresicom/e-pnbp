@@ -73,6 +73,41 @@ namespace Pnbp.Controllers
             return View();
         }
 
+        public ActionResult GenerateSuratKeteranganPengeluaran(string nomorsurat, string nomorberkas, string NamaProsedur, string namapemohon, string SetoranPnbp, string JumlahBayar)
+        {
+
+            if (!String.IsNullOrEmpty(nomorsurat) && nomorsurat.ToLower() == "undefined") nomorsurat = "";
+            if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "";
+            if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "";
+            if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "";
+            if (!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") SetoranPnbp = "";
+            if (!String.IsNullOrEmpty(JumlahBayar) && JumlahBayar.ToLower() == "undefined") JumlahBayar = "";
+
+
+            DateTime dateTime = DateTime.UtcNow.Date;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian"), "surat-keterangan-pengeluaran.docx");
+                DocX doc = DocX.Load(filename);
+
+                doc.ReplaceText("{NOMOR_SURAT}", nomorsurat);
+                doc.ReplaceText("{NOMOR_BERKAS}", nomorberkas);
+                doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
+                doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
+                doc.ReplaceText("{JUMLAH_SETOR}", SetoranPnbp);
+                doc.ReplaceText("{JUMLAH_KELUAR}", JumlahBayar);
+
+                doc.SaveAs(ms);
+
+                Response.ContentType = "application/msword";
+                Response.AddHeader("content-disposition", "inline; filename=" + "Surat Keterangan Pengeluaran.docx");
+                Response.AddHeader("content-length", ms.Length.ToString());
+                Response.BinaryWrite(ms.ToArray());
+                Response.End();
+            }
+            return View();
+        }
+
         public ActionResult GenerateSuratTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur)
         {
             if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
@@ -96,6 +131,36 @@ namespace Pnbp.Controllers
 
                 Response.ContentType = "application/msword";
                 Response.AddHeader("content-disposition", "inline; filename=" + "SuratPernyataanTidakTerlayani.docx");
+                Response.AddHeader("content-length", ms.Length.ToString());
+                Response.BinaryWrite(ms.ToArray());
+                Response.End();
+            }
+            return View();
+        }
+
+        public ActionResult GenerateSuratPernyataanTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur)
+        {
+            if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
+            if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "...............";
+            if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "...............";
+            if (!String.IsNullOrEmpty(AlamatPemohon) && AlamatPemohon.ToLower() == "undefined") AlamatPemohon = "...............";
+
+            DateTime dateTime = DateTime.UtcNow.Date;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-pernyataan-tidak-terlayani.docx");
+                DocX doc = DocX.Load(filename);
+
+                doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
+                doc.ReplaceText("{ALAMAT}", AlamatPemohon);
+                doc.ReplaceText("{NOMOR_BERKAS}", nomorberkas);
+                doc.ReplaceText("{UNIT_KERJA}", (User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""));
+                doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
+
+                doc.SaveAs(ms);
+
+                Response.ContentType = "application/msword";
+                Response.AddHeader("content-disposition", "inline; filename=" + "Surat Pernyataan Tidak Terlayani.docx");
                 Response.AddHeader("content-length", ms.Length.ToString());
                 Response.BinaryWrite(ms.ToArray());
                 Response.End();
@@ -178,12 +243,12 @@ namespace Pnbp.Controllers
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
-                string filename = Path.Combine(Server.MapPath(@"~/Format/"), "TanggungJawabMutlak.docx");
+                string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-pernyataan-tanggung-jawab-mutlak.docx");
                 DocX doc = DocX.Load(filename);
                 doc.SaveAs(ms);
 
                 Response.ContentType = "application/msword";
-                Response.AddHeader("content-disposition", "inline; filename=" + "TanggungJawabMutlak.docx");
+                Response.AddHeader("content-disposition", "inline; filename=" + "Surat Pernyataan Tanggung Jawab Mutlak.docx");
                 Response.AddHeader("content-length", ms.Length.ToString());
                 Response.BinaryWrite(ms.ToArray());
                 Response.End();
@@ -196,12 +261,12 @@ namespace Pnbp.Controllers
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
-                string filename = Path.Combine(Server.MapPath(@"~/Format/"), "Persetujuan.docx");
+                string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-persetujuan-pengembalian-pnbp.docx");
                 DocX doc = DocX.Load(filename);
                 doc.SaveAs(ms);
 
                 Response.ContentType = "application/msword";
-                Response.AddHeader("content-disposition", "inline; filename=" + "Persetujuan.docx");
+                Response.AddHeader("content-disposition", "inline; filename=" + "Surat Persetujuan Pengembalian PNBP.docx");
                 Response.AddHeader("content-length", ms.Length.ToString());
                 Response.BinaryWrite(ms.ToArray());
                 Response.End();
