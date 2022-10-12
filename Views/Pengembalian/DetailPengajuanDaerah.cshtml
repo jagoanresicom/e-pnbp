@@ -17,9 +17,13 @@
 	var file11 = ViewBag.file11;
 	var file12 = ViewBag.file12;
 	var file13 = ViewBag.file13;
+	var file20 = ViewBag.file20;
+	var file21 = ViewBag.file21;
+	var file22 = ViewBag.file22;
 
 	bool isPreviewMode = (!String.IsNullOrEmpty(ViewBag.PreviewMode) && ViewBag.PreviewMode == "TRUE");
 	bool isPengembalianDaerah = (Model.TIPEPENGEMBALIAN == "1");
+	string formSubmitURL = (isPengembalianDaerah ? Url.Action("PengajuanPengembalianDetailDaerah", "Pengembalian") : Url.Action("PengajuanPengembalianDetail", "Pengembalian"));
 }
 
 <style>
@@ -65,7 +69,7 @@
 	}
 </style>
 
-<form class="form-horizontal" method="post" enctype="multipart/form-data" id="pengembalian_form" action="@Url.Action("PengajuanPengembalianDetail", "Pengembalian")">
+<form class="form-horizontal" method="post" enctype="multipart/form-data" id="pengembalian_form" action="@formSubmitURL">
 	<div class="" id="dynamic_content">
 		<input type="hidden" name="pengembalianpnbpid" id="pengembalianpnbpid" value="@Model.PENGEMBALIANPNBPID" />
 		<div class="clearfix"></div>
@@ -73,12 +77,7 @@
 		<div class="row">
 			<div class="col-md-12 col-sm-12 col-xs-12">
 				<div>
-					@*<div class="x_title">
-							<h2>Pencarian Data</h2>
-							<div class="clearfix"></div>
-						</div>*@
-
-					<input type="hidden" name="Status" id="Stataus" />
+					@Html.HiddenFor(m => m.STATUSPENGEMBALIAN, new { @Name = "Status" })
 					<div class="text-right" style="margin-bottom:8px;">
 						<a href="@Url.Action("mon_pengembalian", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
 					</div>
@@ -140,7 +139,7 @@
 										</div>
 									</div>
 									@*@if (Pengembaliandata.STATUSPENGEMBALIAN == 0 || Pengembaliandata.STATUSPENGEMBALIAN == 3)
-										{*@
+									{*@
 									<div class="form-group">
 										<div class="col-sm-12">
 											@*<button type="submit" id="simpan" form="pengembalian_form" class="btn btn-primary">Simpan</button>*@
@@ -150,29 +149,29 @@
 									@*}*@
 
 									@if (!isPengembalianDaerah)
-									{ 
-									<div class="form-group">
-										@*<div class="col-sm-12">*@
-										@*<a href="@Url.Action("GeneratePermohonanPengembalian","Pengembalian")" class="btn btn-primary" download>Surat Permohonan</a>*@
-										<div class="col-sm-12"><a href="javascript:void(0)" class="btn btn-primary" onclick="generate_permohonan()">Surat Permohonan</a></div>
-										@*</div>*@
-									</div>
-									<input type="hidden" value="@Model.TANGGALPENGAJU" id="tanggalpengaju" name="tanggalpengaju" />
+									{
+										<div class="form-group">
+											@*<div class="col-sm-12">*@
+											@*<a href="@Url.Action("GeneratePermohonanPengembalian","Pengembalian")" class="btn btn-primary" download>Surat Permohonan</a>*@
+											<div class="col-sm-12"><a href="javascript:void(0)" class="btn btn-primary" onclick="generate_permohonan()">Surat Permohonan</a></div>
+											@*</div>*@
+										</div>
+										<input type="hidden" value="@Model.TANGGALPENGAJU" id="tanggalpengaju" name="tanggalpengaju" />
 
-									<div class="form-group row">
-										<div class="col-sm-12"><button type="button" class="btn btn-primary" onclick="generate_keterangan()">Surat Keterangan</button></div>
-										@*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
-									</div>
+										<div class="form-group row">
+											<div class="col-sm-12"><button type="button" class="btn btn-primary" onclick="generate_keterangan()">Surat Keterangan</button></div>
+											@*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
+										</div>
 
-									<div class="form-group row">
-										<div class="col-sm-12"><button type="button" class="btn btn-primary" onclick="generate_tidak_terlayani()">Surat Pernyataan Tidak Terlayani</button></div>
-										@*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
-									</div>
+										<div class="form-group row">
+											<div class="col-sm-12"><button type="button" class="btn btn-primary" onclick="generate_tidak_terlayani()">Surat Pernyataan Tidak Terlayani</button></div>
+											@*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
+										</div>
 									}
 
 									@*<div class="form-group">
-											<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>
-										</div>*@
+										<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>
+									</div>*@
 								</div>
 							</div>
 
@@ -230,11 +229,11 @@
 										</div>
 									</div>
 									@*<div class="form-group">
-											<label for="inputPassword3" class="col-sm-4 control-label">NPWP</label>
-											<div class="col-sm-8">
-												<input type="text" class="form-control" id="NPWP" name="NPWP" placeholder="NPWP">
-											</div>
-										</div>*@
+										<label for="inputPassword3" class="col-sm-4 control-label">NPWP</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" id="NPWP" name="NPWP" placeholder="NPWP">
+										</div>
+									</div>*@
 									<div class="form-group">
 										<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Bank</label>
 										<div class="col-sm-8">
@@ -250,287 +249,28 @@
 						</div>
 
 						@if (!isPengembalianDaerah)
-						{ 
-						<div class="">
+						{
+							<div class="">
 
-							<div class="panel panel-default x_panel">
-								<div class="panel-heading x_title">Kirim Permohonan<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small></div>
-								<div class="panel-body">
-									@*Panel content*@
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Surat</label>
-										<div class="col-sm-7">
-											@*@Html.TextBoxFor(model => model.NomorSurat, new { @class = "form-control", @id = "NomorSurat", @placeholder = "Nomor Surat", @required = "required" })*@
-											<input type="text" name="NomorSurat" id="NomorSurat" class="form-control" value="@Model.NOMORSURAT" />
-										</div>
-									</div>
-
-									@* Surat Wajib Bayar *@
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" placeholder="Surat Wajib Bayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-SuratWajibBayar"></span>
-											@Html.Raw((file10 != null && !String.IsNullOrEmpty(file10.StatusLampiran) && file10.StatusLampiran != "1" ? ((file10.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file10.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid10" value="@(file10 != null && !String.IsNullOrEmpty(file10.LampiranKembalianId)?file10.LampiranKembalianId:"")" />
-									</div>
-									@* Surat Wajib Bayar *@
-
-									@* Surat Pernyataan Tidak Terlayani *@
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="TidakTerlayani" name="TidakTerlayani" placeholder="Surat Pernyataan Tidak Terlayani" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-TidakTerlayani"></span>
-											@Html.Raw((file11 != null && !String.IsNullOrEmpty(file11.StatusLampiran) && file11.StatusLampiran != "1" ? ((file11.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file11.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid11" value="@(file11 != null && !String.IsNullOrEmpty(file11.LampiranKembalianId)?file11.LampiranKembalianId:"")" />
-									</div>
-									@* Surat Pernyataan Tidak Terlayani *@
-
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="SuratPermohhonan" name="SuratPermohonan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-SuratPermohhonan"></span>
-											@Html.Raw((file1 != null && !String.IsNullOrEmpty(file1.StatusLampiran) && file1.StatusLampiran != "1" ? ((file1.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file1 != null && !String.IsNullOrEmpty(file1.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file1.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid1" value="@(file1 != null && !String.IsNullOrEmpty(file1.LampiranKembalianId)?file1.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="SuratKeterangan" name="SuratKeterangan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-SuratKeterangan"></span>
-											@Html.Raw((file2 != null && !String.IsNullOrEmpty(file2.StatusLampiran) && file2.StatusLampiran != "1" ? ((file2.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file2 != null && !String.IsNullOrEmpty(file2.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file2.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid2" value="@(file2 != null && !String.IsNullOrEmpty(file2.LampiranKembalianId)?file2.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group" style="display:none;">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="BuktiPenerimaan" name="BuktiPenerimaan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-BuktiPenerimaan"></span>
-											@Html.Raw((file3 != null && !String.IsNullOrEmpty(file3.StatusLampiran) && file3.StatusLampiran != "1" ? ((file3.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file3 != null && !String.IsNullOrEmpty(file3.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file3.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid3" value="@(file3 != null && !String.IsNullOrEmpty(file3.LampiranKembalianId)?file3.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="SuratPerintah" name="SuratPerintah" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-SuratPerintah"></span>
-											@Html.Raw((file4 != null && !String.IsNullOrEmpty(file4.StatusLampiran) && file4.StatusLampiran != "1" ? ((file4.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file4 != null && !String.IsNullOrEmpty(file4.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file4.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid4" value="@(file4 != null && !String.IsNullOrEmpty(file4.LampiranKembalianId)?file4.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="BuktiSetor" name="BuktiSetor" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-BuktiSetor"></span>
-											@Html.Raw((file5 != null && !String.IsNullOrEmpty(file5.StatusLampiran) && file5.StatusLampiran != "1" ? ((file5.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file5 != null && !String.IsNullOrEmpty(file5.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file5.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid5" value="@(file5 != null && !String.IsNullOrEmpty(file5.LampiranKembalianId)?file5.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="BuktiRek" name="BuktiRek" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-BuktiRek"></span>
-											@Html.Raw((file6 != null && !String.IsNullOrEmpty(file6.StatusLampiran) && file6.StatusLampiran != "1" ? ((file6.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file6 != null && !String.IsNullOrEmpty(file6.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file6.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid6" value="@(file6 != null && !String.IsNullOrEmpty(file6.LampiranKembalianId)?file6.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="NpwpFile" name="NpwpFile" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-NpwpFile"></span>
-											@Html.Raw((file7 != null && !String.IsNullOrEmpty(file7.StatusLampiran) && file7.StatusLampiran != "1" ? ((file7.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file7 != null && !String.IsNullOrEmpty(file7.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file7.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid7" value="@(file7 != null && !String.IsNullOrEmpty(file7.LampiranKembalianId)?file7.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="BuktiDomisili" name="BuktiDomisili" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-BuktiDomisili"></span>
-											@Html.Raw((file8 != null && !String.IsNullOrEmpty(file8.StatusLampiran) && file8.StatusLampiran != "1" ? ((file8.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file8 != null && !String.IsNullOrEmpty(file8.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file8.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid8" value="@(file8 != null && !String.IsNullOrEmpty(file8.LampiranKembalianId)?file8.LampiranKembalianId:"")" />
-									</div>
-									<div class="form-group">
-										<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Bermaterai</label>
-										<div class="col-sm-7">
-											<input type="file" class="form-control max_5mb" id="SuratKuasa" name="SuratKuasa" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											<span id="cancel-SuratKuasa"></span>
-											@Html.Raw((file9 != null && !String.IsNullOrEmpty(file9.StatusLampiran) && file9.StatusLampiran != "1" ? ((file9.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
-										</div>
-										@if (file9 != null && !String.IsNullOrEmpty(file9.NamaFile))
-										{
-											<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-												<a href="@file9.NamaFile" class="btn btn-default btn-xs" download>
-													<i class="fa fa-download"></i>
-												</a>
-											</div>
-										}
-										<input type="hidden" name="fileid9" value="@(file9 != null && !String.IsNullOrEmpty(file9.LampiranKembalianId)?file9.LampiranKembalianId:"")" />
-									</div>
-									@if (Model.STATUSPENGEMBALIAN == "0" || Model.STATUSPENGEMBALIAN == "3")
-									{
-										<div class="form-group">
-
-											<div class="col-sm-12">
-												<button type="submit" id="simpan" form="pengembalian_form" class="btn btn-primary">Simpan</button>
-												<button type="submit" form="pengembalian_form" class="btn btn-primary" id="proses">Kirim Berkas</button>
-											</div>
-										</div>
-									}
-									@*
-										<div class="col-sm-4">
-											<button type="button" class="btn btn-primary">Kembalikan</button>
-										</div>
-
-										<div class="col-sm-4">
-											<button type="button" class="btn btn-primary">Selesai</button>
-										</div>
-										</div>*@
-
-								</div>
-							</div>
-
-						</div>
-						}
-
-						@if (isPengembalianDaerah)
-						{ 
-							<div style="display: flex; flex-wrap: wrap;">
-
-								@* Surat Permohonan *@
 								<div class="panel panel-default x_panel">
-									<div class="panel-heading x_title">
-										Kirim Permohonan
-										<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small>
-									</div>
-									<div class="panel-body ps-0 pe-0">
+									<div class="panel-heading x_title">Kirim Permohonan<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small></div>
+									<div class="panel-body">
 										@*Panel content*@
-
 										<div class="form-group">
-											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian</label>
-											<div class="col-sm-6">
-												<input type="file" class="form-control max_5mb" disabled accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Surat</label>
+											<div class="col-sm-7">
+												@*@Html.TextBoxFor(model => model.NomorSurat, new { @class = "form-control", @id = "NomorSurat", @placeholder = "Nomor Surat", @required = "required" })*@
+												<input type="text" name="NomorSurat" id="NomorSurat" class="form-control" value="@Model.NOMORSURAT" />
 											</div>
-											@if (file13 != null && !String.IsNullOrEmpty(file13.NamaFile))
-											{
-												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-													<a href="@file13.NamaFile" class="btn btn-default btn-xs" download>
-														<i class="fa fa-download"></i>
-													</a>
-												</div>
-											}
 										</div>
 
+										@* Surat Wajib Bayar *@
 										<div class="form-group">
-											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan PNBP Berulang</label>
-											<div class="col-sm-6">
-												<input type="file" class="form-control max_5mb" disabled accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-											</div>
-											@if (file12 != null && !String.IsNullOrEmpty(file12.NamaFile))
-											{
-												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
-													<a href="@file12.NamaFile" class="btn btn-default btn-xs" download>
-														<i class="fa fa-download"></i>
-													</a>
-												</div>
-											}
-										</div>
-
-										<div class="form-group">
-											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
-											<div class="col-sm-6">
-												<input type="file" class="form-control max_5mb" disabled accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" placeholder="Surat Wajib Bayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratWajibBayar"></span>
+												@Html.Raw((file10 != null && !String.IsNullOrEmpty(file10.StatusLampiran) && file10.StatusLampiran != "1" ? ((file10.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
 											@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
 											{
@@ -540,7 +280,349 @@
 													</a>
 												</div>
 											}
+											<input type="hidden" name="fileid10" value="@(file10 != null && !String.IsNullOrEmpty(file10.LampiranKembalianId)?file10.LampiranKembalianId:"")" />
 										</div>
+										@* Surat Wajib Bayar *@
+
+										@* Surat Pernyataan Tidak Terlayani *@
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="TidakTerlayani" name="TidakTerlayani" placeholder="Surat Pernyataan Tidak Terlayani" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-TidakTerlayani"></span>
+												@Html.Raw((file11 != null && !String.IsNullOrEmpty(file11.StatusLampiran) && file11.StatusLampiran != "1" ? ((file11.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file11.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid11" value="@(file11 != null && !String.IsNullOrEmpty(file11.LampiranKembalianId)?file11.LampiranKembalianId:"")" />
+										</div>
+										@* Surat Pernyataan Tidak Terlayani *@
+
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="SuratPermohhonan" name="SuratPermohonan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratPermohhonan"></span>
+												@Html.Raw((file1 != null && !String.IsNullOrEmpty(file1.StatusLampiran) && file1.StatusLampiran != "1" ? ((file1.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file1 != null && !String.IsNullOrEmpty(file1.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file1.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid1" value="@(file1 != null && !String.IsNullOrEmpty(file1.LampiranKembalianId)?file1.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="SuratKeterangan" name="SuratKeterangan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratKeterangan"></span>
+												@Html.Raw((file2 != null && !String.IsNullOrEmpty(file2.StatusLampiran) && file2.StatusLampiran != "1" ? ((file2.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file2 != null && !String.IsNullOrEmpty(file2.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file2.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid2" value="@(file2 != null && !String.IsNullOrEmpty(file2.LampiranKembalianId)?file2.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group" style="display:none;">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="BuktiPenerimaan" name="BuktiPenerimaan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-BuktiPenerimaan"></span>
+												@Html.Raw((file3 != null && !String.IsNullOrEmpty(file3.StatusLampiran) && file3.StatusLampiran != "1" ? ((file3.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file3 != null && !String.IsNullOrEmpty(file3.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file3.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid3" value="@(file3 != null && !String.IsNullOrEmpty(file3.LampiranKembalianId)?file3.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="SuratPerintah" name="SuratPerintah" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratPerintah"></span>
+												@Html.Raw((file4 != null && !String.IsNullOrEmpty(file4.StatusLampiran) && file4.StatusLampiran != "1" ? ((file4.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file4 != null && !String.IsNullOrEmpty(file4.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file4.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid4" value="@(file4 != null && !String.IsNullOrEmpty(file4.LampiranKembalianId)?file4.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="BuktiSetor" name="BuktiSetor" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-BuktiSetor"></span>
+												@Html.Raw((file5 != null && !String.IsNullOrEmpty(file5.StatusLampiran) && file5.StatusLampiran != "1" ? ((file5.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file5 != null && !String.IsNullOrEmpty(file5.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file5.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid5" value="@(file5 != null && !String.IsNullOrEmpty(file5.LampiranKembalianId)?file5.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="BuktiRek" name="BuktiRek" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-BuktiRek"></span>
+												@Html.Raw((file6 != null && !String.IsNullOrEmpty(file6.StatusLampiran) && file6.StatusLampiran != "1" ? ((file6.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file6 != null && !String.IsNullOrEmpty(file6.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file6.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid6" value="@(file6 != null && !String.IsNullOrEmpty(file6.LampiranKembalianId)?file6.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="NpwpFile" name="NpwpFile" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-NpwpFile"></span>
+												@Html.Raw((file7 != null && !String.IsNullOrEmpty(file7.StatusLampiran) && file7.StatusLampiran != "1" ? ((file7.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file7 != null && !String.IsNullOrEmpty(file7.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file7.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid7" value="@(file7 != null && !String.IsNullOrEmpty(file7.LampiranKembalianId)?file7.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="BuktiDomisili" name="BuktiDomisili" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-BuktiDomisili"></span>
+												@Html.Raw((file8 != null && !String.IsNullOrEmpty(file8.StatusLampiran) && file8.StatusLampiran != "1" ? ((file8.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file8 != null && !String.IsNullOrEmpty(file8.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file8.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid8" value="@(file8 != null && !String.IsNullOrEmpty(file8.LampiranKembalianId)?file8.LampiranKembalianId:"")" />
+										</div>
+										<div class="form-group">
+											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Bermaterai</label>
+											<div class="col-sm-7">
+												<input type="file" class="form-control max_5mb" id="SuratKuasa" name="SuratKuasa" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratKuasa"></span>
+												@Html.Raw((file9 != null && !String.IsNullOrEmpty(file9.StatusLampiran) && file9.StatusLampiran != "1" ? ((file9.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
+											</div>
+											@if (file9 != null && !String.IsNullOrEmpty(file9.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file9.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid9" value="@(file9 != null && !String.IsNullOrEmpty(file9.LampiranKembalianId)?file9.LampiranKembalianId:"")" />
+										</div>
+										@if (Model.STATUSPENGEMBALIAN == "0" || Model.STATUSPENGEMBALIAN == "3")
+										{
+											<div class="form-group">
+
+												<div class="col-sm-12">
+													<button type="submit" id="simpan" form="pengembalian_form" class="btn btn-primary">Simpan</button>
+													<button type="submit" form="pengembalian_form" class="btn btn-primary" id="proses">Kirim Berkas</button>
+												</div>
+											</div>
+										}
+										@*
+										<div class="col-sm-4">
+											<button type="button" class="btn btn-primary">Kembalikan</button>
+										</div>
+
+										<div class="col-sm-4">
+											<button type="button" class="btn btn-primary">Selesai</button>
+										</div>
+										</div>*@
+
+									</div>
+								</div>
+
+							</div>
+						}
+
+						@if (isPengembalianDaerah)
+						{
+							<div style="display: flex; flex-wrap: wrap;">
+
+								@* Surat Permohonan *@
+								<div class="panel panel-default x_panel">
+									<div class="panel-heading x_title">
+										Kirim Permohonan
+										<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small>
+									</div>
+									<div id="js-section-input-template-surat" class="panel-body ps-0 pe-0">
+										@*Panel content*@
+
+										<div class="form-group">
+											<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian</label>
+											<div class="col-sm-6">
+												<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratPermohonanPengembalian"></span>
+											</div>
+											@if (file13 != null && !String.IsNullOrEmpty(file13.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file13.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid13" value="@(file13 != null && !String.IsNullOrEmpty(file13.LampiranKembalianId)?file13.LampiranKembalianId:"")" />
+										</div>
+
+										<div class="form-group">
+											<label for="SuratPNBPBerulang" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan PNBP Berulang</label>
+											<div class="col-sm-6">
+												<input type="file" class="form-control max_5mb" id="SuratPNBPBerulang" name="SuratPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratPNBPBerulang"></span>
+											</div>
+											@if (file12 != null && !String.IsNullOrEmpty(file12.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file12.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid12" value="@(file12 != null && !String.IsNullOrEmpty(file12.LampiranKembalianId)?file12.LampiranKembalianId:"")" />
+										</div>
+
+										<div class="form-group">
+											<label for="SuratKuasaWajibBayar" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
+											<div class="col-sm-6">
+												<input type="file" class="form-control max_5mb" id="SuratKuasaWajibBayar" name="SuratKuasaWajibBayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<span id="cancel-SuratKuasaWajibBayar"></span>
+											</div>
+											@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
+											{
+												<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+													<a href="@file10.NamaFile" class="btn btn-default btn-xs" download>
+														<i class="fa fa-download"></i>
+													</a>
+												</div>
+											}
+											<input type="hidden" name="fileid10" value="@(file10 != null && !String.IsNullOrEmpty(file10.LampiranKembalianId)?file10.LampiranKembalianId:"")" />
+										</div>
+
+										@* input file template surat *@
+										@if (Model.STATUSPENGEMBALIAN == "2")
+										{
+											<div class="ln_solid"></div>
+											<div class="form-group">
+												<label for="SuratKeteranganPengeluaran" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan Pengeluaran<span class="text-danger">*</span></label>
+												<div class="col-sm-6">
+													<input type="file" class="form-control max_5mb" id="SuratKeteranganPengeluaran" name="SuratKeteranganPengeluaran" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+													<span id="cancel-SuratKeteranganPengeluaran"></span>
+												</div>
+												@if (file21 != null && !String.IsNullOrEmpty(file21.NamaFile))
+												{
+													<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+														<a href="@file21.NamaFile" class="btn btn-default btn-xs" download>
+															<i class="fa fa-download"></i>
+														</a>
+													</div>
+												}
+												<input type="hidden" name="fileid21" value="@(file21 != null && !String.IsNullOrEmpty(file21.LampiranKembalianId)?file21.LampiranKembalianId:"")" />
+											</div>
+											<div class="form-group">
+												<label for="SuratPernyataanTidakTerlayani" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani<span class="text-danger">*</span></label>
+												<div class="col-sm-6">
+													<input type="file" class="form-control max_5mb" id="SuratPernyataanTidakTerlayani" name="SuratPernyataanTidakTerlayani" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+													<span id="cancel-SuratPernyataanTidakTerlayani"></span>
+												</div>
+												@if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
+												{
+													<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+														<a href="@file11.NamaFile" class="btn btn-default btn-xs" download>
+															<i class="fa fa-download"></i>
+														</a>
+													</div>
+												}
+												<input type="hidden" name="fileid11" value="@(file11 != null && !String.IsNullOrEmpty(file11.LampiranKembalianId)?file11.LampiranKembalianId:"")" />
+											</div>
+											<div class="form-group">
+												<label for="SuratPengembalianPNBP" class="col-sm-4 control-label" style="text-align:left;">Surat Persetujuan Pengembalian PNBP<span class="text-danger">*</span></label>
+												<div class="col-sm-6">
+													<input type="file" class="form-control max_5mb" id="SuratPengembalianPNBP" name="SuratPengembalianPNBP" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+													<span id="cancel-SuratPengembalianPNBP"></span>
+												</div>
+												@if (file22 != null && !String.IsNullOrEmpty(file22.NamaFile))
+												{
+													<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+														<a href="@file22.NamaFile" class="btn btn-default btn-xs" download>
+															<i class="fa fa-download"></i>
+														</a>
+													</div>
+												}
+												<input type="hidden" name="fileid22" value="@(file22 != null && !String.IsNullOrEmpty(file22.LampiranKembalianId)?file22.LampiranKembalianId:"")" />
+											</div>
+											<div class="form-group">
+												<label for="SuratTanggungJawabMutlak" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tanggung Jawab Mutlak<span class="text-danger">*</span></label>
+												<div class="col-sm-6">
+													<input type="file" class="form-control max_5mb" id="SuratTanggungJawabMutlak" name="SuratTanggungJawabMutlak" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+													<span id="cancel-SuratTanggungJawabMutlak"></span>
+												</div>
+												@if (file20 != null && !String.IsNullOrEmpty(file20.NamaFile))
+												{
+													<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+														<a href="@file20.NamaFile" class="btn btn-default btn-xs" download>
+															<i class="fa fa-download"></i>
+														</a>
+													</div>
+												}
+												<input type="hidden" name="fileid20" value="@(file20 != null && !String.IsNullOrEmpty(file20.LampiranKembalianId)?file20.LampiranKembalianId:"")" />
+											</div>
+
+											<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
+												</div>
+											</div>
+										}
 
 										@if (Model.STATUSPENGEMBALIAN == "0")
 										{
@@ -584,7 +666,7 @@
 												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
 											</div>
 											<div>
-												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan</button>
+												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan Pengembalian PNBP</button>
 											</div>
 											<div>
 												<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
@@ -656,13 +738,16 @@
 <script>
     $(document).ready(function() {
         var statuspengembalian = @Model.STATUSPENGEMBALIAN;
-        //alert(statuspengembalian);
-        if (statuspengembalian == 0 || statuspengembalian == 3)
-         {
-             $("#pengembalian_form :input").prop("disabled", false);
-        }else{
+        if (statuspengembalian == 0 || statuspengembalian == 3) {
+			$("#pengembalian_form :input").prop("disabled", false);
+        } else{
 			$("#pengembalian_form :input:not(.js-btn-generate-surat)").prop("disabled", true);
-        }
+		}
+
+		$("#pengembalian_form :input[type='hidden']").prop("disabled", false);
+		if ($('#STATUSPENGEMBALIAN').val() == '2') {
+			$("#js-section-input-template-surat :input").prop("disabled", false);
+		}
     });
     $('.asd').keyup(function(event) {
 
@@ -728,10 +813,58 @@
         return true;
     }
 
-	$('#js-btn-simpan').on('click', () => $('#Stataus').val(0));
-	$('#js-btn-proses').on('click', () => $('#Stataus').val(2));
-    $('#simpan').click(function (e) { $('#Stataus').val('0'); });
-    $('#proses').click(function (e) { $('#Stataus').val('1'); });
+	$('#pengembalian_form').on('submit', (e) => prosesPengembalian(e));
+
+	$('#js-btn-simpan').on('click', () => $('#STATUSPENGEMBALIAN').val(0));
+	$('#js-btn-proses').on('click', () => $('#STATUSPENGEMBALIAN').val(2));
+	$('#simpan').click(function (e) { $('#STATUSPENGEMBALIAN').val('0'); });
+	$('#proses').click(function (e) { $('#STATUSPENGEMBALIAN').val('1'); });
+
+
+	function prosesPengembalian(e) {
+		e.preventDefault();
+		let frmData = new FormData($('#pengembalian_form')[0]);
+		$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+		$.ajax({
+			type: "POST",
+			url: '@Url.Action("PengajuanPengembalianDetailDaerah", "Pengembalian")',
+			data: frmData,
+			processData: false,
+			contentType: false,
+			success: function (data, textStatus, XMLHttpRequest) {
+				$.unblockUI();
+				if (data.Status) {
+					swal({
+						title: "Sukses",
+						text: "Berhasil",
+						type: "success",
+					}, function() {
+						$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+						window.location.href = window.location.href;
+					});
+				} else {
+					swal({
+						title: "Proses Gagal",
+						text: data.Pesan,
+						type: "warning",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				}
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				$.unblockUI();
+				swal({
+					title: "Proses Gagal",
+					text: "Terjadi kesalahan",
+					type: "error",
+					closeOnEsc: true,
+					allowOutsideClick: true,
+				});
+			},
+		})
+	}
 
     function cari_berkas() {
         //alert($('#nomorberkas').val());
@@ -773,17 +906,6 @@
         return addCommas($(this).val());
     });
 
-
-    $('#pengembalian_form').submit(function () {
-        //setTimeout(function () {
-        //    swal({
-        //        type: "success",
-        //        html: true,
-        //        title: "Data Berhasil Disimpan",
-        //        confirmButtonColor: "#4CAF50"
-        //    });
-        //}, 3000);
-    });
 
 	$('#js-form-sp2d').submit(function (e) {
 		e.preventDefault();

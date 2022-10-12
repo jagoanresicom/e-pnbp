@@ -710,11 +710,9 @@
 <script>
         $(document).ready(function() {
             var statuspengembalian = @Model.STATUSPENGEMBALIAN;
-            //alert(statuspengembalian);
-            if (statuspengembalian == 0 || statuspengembalian == 3 || statuspengembalian == 4)
-            {
+            if (statuspengembalian == 0 || statuspengembalian == 3 || statuspengembalian == 4) {
 				$("#pengembalian_form :input:not(.js-btn-generate-surat)").prop("disabled", true);
-            }else{
+            } else {
                 $("#pengembalian_form :input").prop("disabled", false);
 			}
 

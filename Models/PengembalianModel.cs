@@ -1385,6 +1385,25 @@ namespace Pnbp.Models
             return tr;
         }
 
+        public string GetStatusPengembalian(string pengembalianPnbpId)
+        {
+            string result = "";
+
+            string query = @"SELECT to_char(STATUSPENGEMBALIAN) FROM PENGEMBALIANPNBP WHERE PENGEMBALIANPNBPID = :pengembalianPnbpId";
+
+            ArrayList arrayListParameters = new ArrayList();
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("pengembalianPnbpId", pengembalianPnbpId));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                result = ctx.Database.SqlQuery<string>(query, parameters).FirstOrDefault();
+            }
+
+            return result;
+        }
+
+
         #endregion
 
 
@@ -1594,6 +1613,59 @@ namespace Pnbp.Models
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("namaFile", data.NamaFile));
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tipefile", data.TipeFile));
                         lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", data.Ekstensi));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.ReturnValue = data.LampiranKembalianId;
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public TransactionResult UpdateLampiranKembalian(LampiranKembalian data)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "";
+                        List<object> lstParams = new List<object>();
+
+                        sql = @"UPDATE LAMPIRANKEMBALIAN 
+                                SET 
+                                    NAMAFILE = :namaFile, 
+                                TANGGAL = SYSDATE, 
+                                JUDUL = 'Pengajuan',
+                                TIPEFILE = :tipefile,
+                                EKSTENSI = :ekstensi
+                                WHERE 
+                                LAMPIRANKEMBALIANID = :idLampiran";
+                        //sql = "UPDATE LAMPIRANKEMBALIAN LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) VALUES (:idLampiran, :idPengembalian, :namaFile, '1',SYSDATE,'Pengajuan',:tipefile, :ekstensi)";
+
+                        lstParams.Clear();
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("namaFile", data.NamaFile));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tipefile", data.TipeFile));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("ekstensi", data.Ekstensi));
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("idLampiran", data.LampiranKembalianId));
 
                         ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
 
