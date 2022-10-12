@@ -5978,8 +5978,6 @@
     <Content Include="Views\Pengembalian\mon_pengembalian.cshtml" />
     <Content Include="Views\Pemanfaatan\rl_kro.cshtml" />
     <Content Include="Views\Penerimaan\pn_provinsi.cshtml" />
-    <Content Include="Views\Pengembalian\pengembaliandaerah.cshtml" />
-    <Content Include="Views\Pengembalian\pengembalianpusat.cshtml" />
     <Content Include="Views\Pengembalian\pusat.cshtml" />
     <Content Include="Views\Pengembalian\daerah.cshtml" />
     <Content Include="Views\Administrasi\ManajemenDataV2.cshtml" />
@@ -5987,7 +5985,6 @@
     <Content Include="Views\Pengembalian\pusat.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalianPusat.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalianDaerah.cshtml" />
-    <Content Include="Views\Pengembalian\EntriPengembalian.cshtml" />
     <Content Include="Views\Pengembalian\DetailPengajuanPusat.cshtml" />
     <Content Include="Views\Pengembalian\DetailPengajuanDaerah.cshtml" />
   </ItemGroup>
