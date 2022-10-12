@@ -1499,6 +1499,42 @@ namespace Pnbp.Models
             return result;
         }
 
+        public string GetKotaKantorById(string kantorId)
+        {
+            string result = "";
+
+            string query = @"SELECT kota FROM kantor WHERE kantorId = :kantorId";
+
+            ArrayList arrayListParameters = new ArrayList();
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorId", kantorId));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                result = ctx.Database.SqlQuery<string>(query, parameters).FirstOrDefault();
+            }
+
+            return result;
+        }
+
+        public string GetJabatanPegawai(string pegawaiId)
+        {
+            string result = "";
+
+            string query = $@"SELECT namajabatan FROM {_schemaKKP}.SIAP_VW_PEGAWAI svp WHERE svp.NIPBARU = :nip";
+
+            ArrayList arrayListParameters = new ArrayList();
+            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("nip", pegawaiId));
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                result = ctx.Database.SqlQuery<string>(query, parameters).FirstOrDefault();
+            }
+
+            return result;
+        }
+
 
         #endregion
 
@@ -2060,10 +2096,10 @@ namespace Pnbp.Models
 
 
         #region BerkasKembalian
-        
+
         #endregion
 
-
+        
 
     }
 }

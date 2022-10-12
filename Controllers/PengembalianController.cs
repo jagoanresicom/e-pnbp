@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using Xceed.Words.NET;
 using Pnbp.Models;
 using Pnbp.Entities;
+using Xceed.Document.NET;
 
 namespace Pnbp.Controllers
 {
@@ -77,12 +78,14 @@ namespace Pnbp.Controllers
         {
 
             if (!String.IsNullOrEmpty(nomorsurat) && nomorsurat.ToLower() == "undefined") nomorsurat = "";
-            if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "";
+            if ((!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") || String.IsNullOrEmpty(nomorberkas))
+            {
+                nomorberkas = "..........(6)";
+            }
             if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "";
             if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "";
             if (!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") SetoranPnbp = "";
             if (!String.IsNullOrEmpty(JumlahBayar) && JumlahBayar.ToLower() == "undefined") JumlahBayar = "";
-
 
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
@@ -90,12 +93,40 @@ namespace Pnbp.Controllers
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian"), "surat-keterangan-pengeluaran.docx");
                 DocX doc = DocX.Load(filename);
 
+                Formatting formatting = new Formatting();
+                formatting.Bold = true;
+
+                string pegawaiId = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
+                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+               
+                string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
+                string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
+                string nip = pegawaiId;
+
+                if (String.IsNullOrEmpty(kotaKantor))
+                {
+                    kotaKantor = "..........(11)";
+                }
+                if (String.IsNullOrEmpty(nip))
+                {
+                    nip = "………………….. (15)";
+                }
+                if (String.IsNullOrEmpty(jabatanPegawai))
+                {
+                    jabatanPegawai = @"Direktur/Kepala Kantor Wilayah/
+Kepala Kantor……. (13)";
+                }
+
                 doc.ReplaceText("{NOMOR_SURAT}", nomorsurat);
-                doc.ReplaceText("{NOMOR_BERKAS}", nomorberkas);
+                doc.ReplaceText("{6}", nomorberkas, false, RegexOptions.None, formatting);
                 doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
                 doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
                 doc.ReplaceText("{JUMLAH_SETOR}", SetoranPnbp);
                 doc.ReplaceText("{JUMLAH_KELUAR}", JumlahBayar);
+                doc.ReplaceText("{11}", kotaKantor);
+                doc.ReplaceText("{13}", jabatanPegawai);
+                doc.ReplaceText("{12}", DateTime.Now.ToString("dd MMMM yyyy"));
+                doc.ReplaceText("{15}", nip);
 
                 doc.SaveAs(ms);
 
