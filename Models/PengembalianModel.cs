@@ -1535,6 +1535,74 @@ namespace Pnbp.Models
             return result;
         }
 
+        public string GetNamaLayananBerkasByNo(string nomorBerkas, string kantorId)
+        {
+            string result = "";
+
+            string query =
+                $@"SELECT NAMAPROSEDUR 
+                    FROM {_schemaKKP}.BERKAS 
+                    WHERE NOMOR = :Nomor AND TAHUN = :Tahun AND KANTORID = :KantorId";
+
+            try
+            {
+                var noTahun = nomorBerkas.Split('/');
+                decimal nomor = decimal.Parse(noTahun[0]);
+                decimal tahun = decimal.Parse(noTahun[1]);
+
+                query = sWhitespace.Replace(query, " ");
+                List<object> lstParams = new List<object>();
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Nomor", nomor));
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorId));
+
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<string>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
+        }
+
+        public string GetNamaLayananBerkasByNoKanwil(string nomorBerkas, string kantorId)
+        {
+            string result = "";
+
+            string query =
+                $@"SELECT NAMAPROSEDUR 
+                    FROM {_schemaKKP}.BERKAS 
+                    WHERE NOMORkanwil = :Nomor AND TAHUNkanwil = :Tahun AND KANTORID = :KantorId";
+
+            try
+            {
+                var noTahun = nomorBerkas.Split('/');
+                decimal nomor = decimal.Parse(noTahun[0]);
+                decimal tahun = decimal.Parse(noTahun[1]);
+
+                query = sWhitespace.Replace(query, " ");
+                List<object> lstParams = new List<object>();
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Nomor", nomor));
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorId));
+
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<string>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
+        }
+
 
         #endregion
 

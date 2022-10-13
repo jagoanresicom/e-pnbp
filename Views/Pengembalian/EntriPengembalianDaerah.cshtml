@@ -415,13 +415,22 @@
 		}
 
 		function generatePersetujuan() {
+			let params = [
+				"?namaBank=" + $('#NAMABANK').val(),
+				"&nomorRekening=" + $('#NOMORREKENING').val(),
+				"&namaRekening=" + $('#NAMAREKENING').val(),
+			];
 			var url = '@Url.Action("GeneratePersetujuan","Pengembalian")';
-			window.open(url, '_blank');
+			window.open(url + params.join(''), '_blank');
 		}
 
 		function generateTanggungJawab() {
+			let params = [
+				"?namaBank=" + $('#NAMABANK').val(),
+				"&permohonanPengembalian=" + $('#PERMOHONANPENGEMBALIAN').val(),
+			];
 			var url = '@Url.Action("GenerateTanggungJawab","Pengembalian")';
-			window.open(url, '_blank');
+			window.open(url + params.join(''), '_blank');
 		}
 
 		function generate_permohonan() {
@@ -445,16 +454,23 @@
 			var SetoranPnbp = $('#SetoranPnbp').val();
 			var JumlahBayar = $('#JumlahBayar').val();
 			var NamaProsedur = $('#NamaProsedur').val();
-			window.open(url + '?NomorSurat=' + nomorsurat + '&nomorberkas=' + nomorberkas + '&namapemohon=' + namapemohon + '&SetoranPnbp=' + SetoranPnbp + '&JumlahBayar=' + JumlahBayar + '&NamaProsedur=' + NamaProsedur, '_blank');
+			let params = [
+				"&atasNama=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&SetoranPnbp=" + $('#SETORANPNBP').val(),
+			];
+			window.open(url + '?NomorSurat=' + nomorsurat + '&nomorberkas=' + nomorberkas + '&namapemohon=' + namapemohon + '&JumlahBayar=' + JumlahBayar + '&NamaProsedur=' + NamaProsedur + params.join(''), '_blank');
 		}
 
 		function generate_tidak_terlayani() {
 			var url         = '@Url.Action("GenerateSuratPernyataanTidakTerlayani", "Pengembalian")';
 			var namapemohon = $('#namapemohon').val();
 			var AlamatPemohon = $('#AlamatPemohon').val();
-			var nomorberkas = $('#nomorberkas').val();
+			var nomorberkas = $('#NOMORBERKAS').val();
 			var NamaProsedur = $('#NamaProsedur').val();
-			window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker, '_blank');
+			let params = [
+				"&atasNama=" + $('#NAMAPEGAWAIPENGAJU').val(),
+			];
+			window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker + params.join(''), '_blank');
 		}
 
 	});

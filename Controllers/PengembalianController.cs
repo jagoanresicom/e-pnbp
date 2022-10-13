@@ -74,18 +74,8 @@ namespace Pnbp.Controllers
             return View();
         }
 
-        public ActionResult GenerateSuratKeteranganPengeluaran(string nomorsurat, string nomorberkas, string NamaProsedur, string namapemohon, string SetoranPnbp, string JumlahBayar)
+        public ActionResult GenerateSuratKeteranganPengeluaran(string nomorsurat, string nomorberkas, string NamaProsedur, string namapemohon, string SetoranPnbp, string JumlahBayar, string atasNama)
         {
-
-            if (!String.IsNullOrEmpty(nomorsurat) && nomorsurat.ToLower() == "undefined") nomorsurat = "";
-            if ((!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") || String.IsNullOrEmpty(nomorberkas))
-            {
-                nomorberkas = "..........(6)";
-            }
-            if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "";
-            if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "";
-            if (!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") SetoranPnbp = "";
-            if (!String.IsNullOrEmpty(JumlahBayar) && JumlahBayar.ToLower() == "undefined") JumlahBayar = "";
 
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
@@ -96,11 +86,20 @@ namespace Pnbp.Controllers
                 Formatting formatting = new Formatting();
                 formatting.Bold = true;
 
+                if (!String.IsNullOrEmpty(nomorsurat) && nomorsurat.ToLower() == "undefined") nomorsurat = "";
+                if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "";
+                if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "";
+                if (!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") SetoranPnbp = "";
+                if (!String.IsNullOrEmpty(JumlahBayar) && JumlahBayar.ToLower() == "undefined") JumlahBayar = "";
+
                 string pegawaiId = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
                 string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
-               
+
+                string tipe = OtorisasiUser.GetJenisKantorUser();
+
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
                 string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
+                string namaLayanan = "";
                 string nip = pegawaiId;
 
                 if (String.IsNullOrEmpty(kotaKantor))
@@ -113,19 +112,73 @@ namespace Pnbp.Controllers
                 }
                 if (String.IsNullOrEmpty(jabatanPegawai))
                 {
-                    jabatanPegawai = @"Direktur/Kepala Kantor Wilayah/
-Kepala Kantor……. (13)";
+                    jabatanPegawai = "Direktur/Kepala Kantor Wilayah/\nKepala Kantor……. (13)";
                 }
 
                 doc.ReplaceText("{NOMOR_SURAT}", nomorsurat);
-                doc.ReplaceText("{6}", nomorberkas, false, RegexOptions.None, formatting);
                 doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
                 doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
                 doc.ReplaceText("{JUMLAH_SETOR}", SetoranPnbp);
                 doc.ReplaceText("{JUMLAH_KELUAR}", JumlahBayar);
+                if ((!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") || String.IsNullOrEmpty(nomorberkas))
+                {
+                    nomorberkas = "..........(6)";
+                    doc.ReplaceText("{6}", nomorberkas);
+                }
+                else
+                {
+                    doc.ReplaceText("{6}", nomorberkas, false, RegexOptions.None, formatting);
+
+                    // get nama layanan berkas
+                    if (tipe == "Kantah")
+                    {
+                        namaLayanan = pengembalianmodel.GetNamaLayananBerkasByNo(nomorberkas, kantorId);
+
+                    }
+                    else if (tipe == "Kanwil")
+                    {
+                        namaLayanan = pengembalianmodel.GetNamaLayananBerkasByNoKanwil(nomorberkas, kantorId);
+                    }
+                }
+                if ((!String.IsNullOrEmpty(atasNama) && atasNama.ToLower() == "undefined") || String.IsNullOrEmpty(atasNama))
+                {
+                    doc.ReplaceText("{7}", "..........(7)");
+                }
+                else
+                {
+                    doc.ReplaceText("{7}", atasNama, false, RegexOptions.None, formatting);
+                }
+                if (String.IsNullOrEmpty(namaLayanan))
+                {
+                    doc.ReplaceText("{8}", "..........(8)");
+                }
+                else
+                {
+                    doc.ReplaceText("{8}", namaLayanan, false, RegexOptions.None, formatting);
+                }
+                if ((!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") || String.IsNullOrEmpty(SetoranPnbp))
+                {
+                    doc.ReplaceText("{9}", "..........(9)");
+                    doc.ReplaceText("{10}", "..........(10)");
+                }
+                else
+                {
+                    long SetoranPnbpAngka = long.Parse(SetoranPnbp.Replace(".", String.Empty));
+                    if (SetoranPnbpAngka == 0)
+                    {
+
+                        doc.ReplaceText("{9}", "..........(9)");
+                        doc.ReplaceText("{10}", "..........(10)");
+                    }
+                    else
+                    {
+                        doc.ReplaceText("{9}", SetoranPnbp, false, RegexOptions.None, formatting);
+                        doc.ReplaceText("{10}", Terbilang(SetoranPnbpAngka), false, RegexOptions.None, formatting);
+                    }
+                }
                 doc.ReplaceText("{11}", kotaKantor);
-                doc.ReplaceText("{13}", jabatanPegawai);
                 doc.ReplaceText("{12}", DateTime.Now.ToString("dd MMMM yyyy"));
+                doc.ReplaceText("{13}", jabatanPegawai);
                 doc.ReplaceText("{15}", nip);
 
                 doc.SaveAs(ms);
@@ -137,6 +190,47 @@ Kepala Kantor……. (13)";
                 Response.End();
             }
             return View();
+        }
+
+        private string Terbilang(long x)
+        {
+            string[] bilangan = { "", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas" };
+            string temp = "";
+
+            if (x < 12)
+            {
+                temp = " " + bilangan[x];
+            }
+            else if (x < 20)
+            {
+                temp = Terbilang(x - 10).ToString() + " belas";
+            }
+            else if (x < 100)
+            {
+                temp = Terbilang(x / 10) + " puluh" + Terbilang(x % 10);
+            }
+            else if (x < 200)
+            {
+                temp = " seratus" + Terbilang(x - 100);
+            }
+            else if (x < 1000)
+            {
+                temp = Terbilang(x / 100) + " ratus" + Terbilang(x % 100);
+            }
+            else if (x < 2000)
+            {
+                temp = " seribu" + Terbilang(x - 1000);
+            }
+            else if (x < 1000000)
+            {
+                temp = Terbilang(x / 1000) + " ribu" + Terbilang(x % 1000);
+            }
+            else if (x < 1000000000)
+            {
+                temp = Terbilang(x / 1000000) + " juta" + Terbilang(x % 1000000);
+            }
+
+            return temp;
         }
 
         public ActionResult GenerateSuratTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur)
@@ -169,7 +263,7 @@ Kepala Kantor……. (13)";
             return View();
         }
 
-        public ActionResult GenerateSuratPernyataanTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur)
+        public ActionResult GenerateSuratPernyataanTidakTerlayani(string namapemohon, string AlamatPemohon, string nomorberkas, string NamaProsedur, string atasNama)
         {
             if (!String.IsNullOrEmpty(namapemohon) && namapemohon.ToLower() == "undefined") namapemohon = "...............";
             if (!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") nomorberkas = "...............";
@@ -181,12 +275,45 @@ Kepala Kantor……. (13)";
             {
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-pernyataan-tidak-terlayani.docx");
                 DocX doc = DocX.Load(filename);
+                Formatting formatting = new Formatting();
+                formatting.Bold = true;
+
+                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
+                string tipe = OtorisasiUser.GetJenisKantorUser();
+                string namaLayanan = "";
 
                 doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
                 doc.ReplaceText("{ALAMAT}", AlamatPemohon);
                 doc.ReplaceText("{NOMOR_BERKAS}", nomorberkas);
                 doc.ReplaceText("{UNIT_KERJA}", (User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""));
                 doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
+
+                if ((!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") || String.IsNullOrEmpty(nomorberkas))
+                {
+                    nomorberkas = "………….. (7)";
+                    doc.ReplaceText("{7}", nomorberkas);
+                }
+                else
+                {
+                    doc.ReplaceText("{7}", nomorberkas, false, RegexOptions.None, formatting);
+
+                    // get nama layanan berkas
+                    if (tipe == "Kantah")
+                    {
+                        namaLayanan = pengembalianmodel.GetNamaLayananBerkasByNo(nomorberkas, kantorId);
+
+                    }
+                    else if (tipe == "Kanwil")
+                    {
+                        namaLayanan = pengembalianmodel.GetNamaLayananBerkasByNoKanwil(nomorberkas, kantorId);
+                    }
+                }
+
+                ReplaceDocText(doc, "{8}", "…………… (8)", namaLayanan, formatting);
+                ReplaceDocText(doc, "{9}", "…………… (9)", atasNama, formatting);
+                doc.ReplaceText("{11}", kotaKantor);
+                doc.ReplaceText("{12}", DateTime.Now.ToString("dd MMMM yyyy"));
 
                 doc.SaveAs(ms);
 
@@ -269,13 +396,51 @@ Kepala Kantor……. (13)";
             return View();
         }
 
-        public ActionResult GenerateTanggungJawab()
+        public ActionResult GenerateTanggungJawab(string namaBank, string permohonanPengembalian)
         {
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-pernyataan-tanggung-jawab-mutlak.docx");
                 DocX doc = DocX.Load(filename);
+                Formatting formatting = new Formatting();
+                formatting.Bold = true;
+                Formatting normalFormat = new Formatting();
+
+                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string nip = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
+                string namaPegawai = (HttpContext.User.Identity as InternalUserIdentity).NamaPegawai;
+                string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
+                string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
+
+                ReplaceDocText(doc, "{1}", "................. (1)", namaPegawai, normalFormat);
+                ReplaceDocText(doc, "{2}", "................. (2)", nip, normalFormat);
+                ReplaceDocText(doc, "{3}", "................. (3)", jabatanPegawai, normalFormat);
+                ReplaceDocText(doc, "{4}", "........ (4)", namaBank, formatting);
+                if ((!String.IsNullOrEmpty(permohonanPengembalian) && permohonanPengembalian.ToLower() == "undefined") || String.IsNullOrEmpty(permohonanPengembalian))
+                {
+                    doc.ReplaceText("{5}", "....... (5)");
+                    doc.ReplaceText("{6}", "....... (6)");
+                }
+                else
+                {
+                    long parsedAngka = long.Parse(permohonanPengembalian.Replace(".", String.Empty));
+                    if (parsedAngka == 0)
+                    {
+                        doc.ReplaceText("{5}", "....... (5)");
+                        doc.ReplaceText("{6}", "....... (6)");
+                    }
+                    else
+                    {
+                        doc.ReplaceText("{5}", permohonanPengembalian, false, RegexOptions.None, formatting);
+                        doc.ReplaceText("{6}", Terbilang(parsedAngka) + " rupiah", false, RegexOptions.None, formatting);
+                    }
+                }
+                doc.ReplaceText("{8}", kotaKantor);
+                doc.ReplaceText("{9}", DateTime.Now.ToString("dd MMMM yyyy"));
+                ReplaceDocText(doc, "{12}", "...................................... (12)", namaPegawai, normalFormat);
+                ReplaceDocText(doc, "{13}", "...................................... (13)", nip, normalFormat);
+
                 doc.SaveAs(ms);
 
                 Response.ContentType = "application/msword";
@@ -287,13 +452,42 @@ Kepala Kantor……. (13)";
             return View();
         }
 
-        public ActionResult GeneratePersetujuan()
+        private void ReplaceDocText(DocX doc, string search, string defaultValue, string replace, Formatting formatting)
+        {
+            if (String.IsNullOrEmpty(replace) || (!String.IsNullOrEmpty(replace) && replace.ToLower() == "undefined"))
+            {
+                doc.ReplaceText(search, defaultValue);
+            }
+            else
+            {
+                doc.ReplaceText(search, replace, false, RegexOptions.None, formatting);
+            }
+        }
+
+        public ActionResult GeneratePersetujuan(string namaRekening, string nomorRekening, string namaBank)
         {
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-persetujuan-pengembalian-pnbp.docx");
                 DocX doc = DocX.Load(filename);
+                Formatting normalFont = new Formatting();
+                Formatting boldFont = new Formatting();
+                boldFont.Bold = true;
+
+                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string nip = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
+                string namaPegawai = (HttpContext.User.Identity as InternalUserIdentity).NamaPegawai;
+                string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
+                string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
+
+                ReplaceDocText(doc, "{9}", "................... (9)", namaBank, boldFont);
+                ReplaceDocText(doc, "{10}", "................... (10)", nomorRekening, boldFont);
+                ReplaceDocText(doc, "{11}", "................... (11)", namaRekening, boldFont);
+                doc.ReplaceText("{2}", $"{kotaKantor}, {DateTime.Now.ToString("dd MMMM yyyy")}");
+                ReplaceDocText(doc, "{12}", "Jabatan .................... (12)", jabatanPegawai, normalFont);
+                ReplaceDocText(doc, "{13}", "Nama ....................... (13)", namaPegawai, normalFont);
+
                 doc.SaveAs(ms);
 
                 Response.ContentType = "application/msword";
