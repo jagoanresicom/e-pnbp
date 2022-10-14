@@ -461,6 +461,20 @@ namespace Pnbp.Entities
         public string StatusLampiran { get; set; }
     }
 
+    public class Pegawai
+    {
+        public string Nama { get; set; }
+        public string Nip { get; set; }
+        public string Jabatan { get; set; }
+    }
+
+    public class UnitKerja
+    {
+        public string Id { get; set; }
+        public string UnitKerjaId { get; set; }
+        public string Nama { get; set; }
+    }
+
     public class BerkasKembalian
     {
         public decimal? RNumber { get; set; }

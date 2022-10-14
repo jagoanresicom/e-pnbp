@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using Newtonsoft.Json.Linq;
+using Oracle.ManagedDataAccess.Client;
 using Pnbp.Entities;
 
 namespace Pnbp.Models
@@ -2167,7 +2168,64 @@ namespace Pnbp.Models
 
         #endregion
 
-        
+        public Pegawai GetKepalaKantor(string kantorId)
+        {
+            Pegawai result = null;
+
+            string query = $@"SELECT NVL(TRIM(PG.GELARDEPAN||' '||PG.NAMA||' '||PG.GELARBELAKANG),TRIM(RUP.GELARDEPAN||' '||RUP.NAMA||' '||RUP.GELARBELAKANG)) nama, jabatan, pg.pegawaiid nip
+                            FROM
+                                PROFILEPEGAWAI pp  
+                                JOIN PROFILE p ON p.profileid = pp.profileid
+                                JOIN pegawai pg ON pp.pegawaiid = pg.pegawaiid
+                                JOIN {_schemaKKP}.registeruserpertanahan rup ON rup.pegawaiid = pg.pegawaiid
+                            WHERE
+	                            (pp.statushapus is null or pp.statushapus = '0')
+	                            AND (pp.validsampai is null or TRUNC(CAST(pp.VALIDSAMPAI AS TIMESTAMP)) >= TRUNC(SYSDATE))
+	                            AND (pg.validsampai is null or TRUNC(CAST(pg.VALIDSAMPAI AS TIMESTAMP)) >= TRUNC(SYSDATE))
+	                            AND (p.validsampai is null or TRUNC(CAST(p.VALIDSAMPAI AS TIMESTAMP)) >= TRUNC(SYSDATE))
+	                            AND pp.KANTORID = :kantorId
+	                            AND p.profileid = 'N00000'";
+            query = sWhitespace.Replace(query, " ");
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    List<object> lstParams = new List<object>();
+                    lstParams.Add(new OracleParameter("kantorId", kantorId));
+                    result = ctx.Database.SqlQuery<Pegawai>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return result;
+        }
+
+        public UnitKerja GetUnitKerjaByPegawaiId(string pegawaiId)
+        {
+            UnitKerja result = null;
+
+            string query = @"SELECT u.unitkerjaid, namaunitkerja nama FROM registeruserpertanahan rup join unitkerja u on rup.unitkerjaid = u.unitkerjaid
+WHERE pegawaiid = :pegawaiId";
+            using (var ctx = new PnbpContext())
+            {
+                try
+                {
+                    List<object> lstparams = new List<object>();
+                    lstparams.Add(new OracleParameter("pegawaiId", pegawaiId));
+                    result = ctx.Database.SqlQuery<UnitKerja>(query, lstparams.ToArray()).FirstOrDefault();
+                }
+                catch (Exception e)
+                {
+                    _ = e.Message;
+                }
+            }
+
+            return result;
+        }
 
     }
 }

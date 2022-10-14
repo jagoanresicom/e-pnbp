@@ -83,8 +83,9 @@ namespace Pnbp.Controllers
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian"), "surat-keterangan-pengeluaran.docx");
                 DocX doc = DocX.Load(filename);
 
-                Formatting formatting = new Formatting();
-                formatting.Bold = true;
+                Formatting normalRegular = new Formatting();
+                Formatting boldRegular = new Formatting();
+                boldRegular.Bold = true;
 
                 if (!String.IsNullOrEmpty(nomorsurat) && nomorsurat.ToLower() == "undefined") nomorsurat = "";
                 if (!String.IsNullOrEmpty(NamaProsedur) && NamaProsedur.ToLower() == "undefined") NamaProsedur = "";
@@ -94,32 +95,37 @@ namespace Pnbp.Controllers
 
                 string pegawaiId = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
                 string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
-
+                Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
                 string tipe = OtorisasiUser.GetJenisKantorUser();
 
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
-                string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
                 string namaLayanan = "";
                 string nip = pegawaiId;
+
+                if (pegawai == null)
+                {
+                    doc.ReplaceText("{3}", "........................................... (3)");
+                    doc.ReplaceText("{4}", "........................................... (4)");
+                    doc.ReplaceText("{5}", "........................................... (5)");
+                    doc.ReplaceText("{13}", "Direktur/Kepala Kantor Wilayah/\nKepala Kantor……. (13)");
+                    doc.ReplaceText("{14}", "……………………….. (14)");
+                    doc.ReplaceText("{15}", "………………….. (15)");
+                }
+                else
+                {
+                    ReplaceDocText(doc, "{3}", "........................................... (3)", pegawai.Nama, normalRegular);
+                    ReplaceDocText(doc, "{4}", "........................................... (4)", pegawai.Nip, normalRegular);
+                    ReplaceDocText(doc, "{5}", "........................................... (5)", pegawai.Jabatan, normalRegular);
+                    ReplaceDocText(doc, "{13}", "Direktur/Kepala Kantor Wilayah/\nKepala Kantor……. (13)", pegawai.Jabatan, normalRegular);
+                    ReplaceDocText(doc, "{14}", "……………………….. (14)", pegawai.Nama, normalRegular);
+                    ReplaceDocText(doc, "{15}", "………………….. (15)", pegawai.Nip, normalRegular);
+                }
 
                 if (String.IsNullOrEmpty(kotaKantor))
                 {
                     kotaKantor = "..........(11)";
                 }
-                if (String.IsNullOrEmpty(nip))
-                {
-                    nip = "………………….. (15)";
-                }
-                if (String.IsNullOrEmpty(jabatanPegawai))
-                {
-                    jabatanPegawai = "Direktur/Kepala Kantor Wilayah/\nKepala Kantor……. (13)";
-                }
 
-                doc.ReplaceText("{NOMOR_SURAT}", nomorsurat);
-                doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
-                doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
-                doc.ReplaceText("{JUMLAH_SETOR}", SetoranPnbp);
-                doc.ReplaceText("{JUMLAH_KELUAR}", JumlahBayar);
                 if ((!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") || String.IsNullOrEmpty(nomorberkas))
                 {
                     nomorberkas = "..........(6)";
@@ -127,7 +133,7 @@ namespace Pnbp.Controllers
                 }
                 else
                 {
-                    doc.ReplaceText("{6}", nomorberkas, false, RegexOptions.None, formatting);
+                    doc.ReplaceText("{6}", nomorberkas, false, RegexOptions.None, boldRegular);
 
                     // get nama layanan berkas
                     if (tipe == "Kantah")
@@ -146,7 +152,7 @@ namespace Pnbp.Controllers
                 }
                 else
                 {
-                    doc.ReplaceText("{7}", atasNama, false, RegexOptions.None, formatting);
+                    doc.ReplaceText("{7}", atasNama, false, RegexOptions.None, boldRegular);
                 }
                 if (String.IsNullOrEmpty(namaLayanan))
                 {
@@ -154,7 +160,7 @@ namespace Pnbp.Controllers
                 }
                 else
                 {
-                    doc.ReplaceText("{8}", namaLayanan, false, RegexOptions.None, formatting);
+                    doc.ReplaceText("{8}", namaLayanan, false, RegexOptions.None, boldRegular);
                 }
                 if ((!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") || String.IsNullOrEmpty(SetoranPnbp))
                 {
@@ -172,14 +178,12 @@ namespace Pnbp.Controllers
                     }
                     else
                     {
-                        doc.ReplaceText("{9}", SetoranPnbp, false, RegexOptions.None, formatting);
-                        doc.ReplaceText("{10}", Terbilang(SetoranPnbpAngka), false, RegexOptions.None, formatting);
+                        doc.ReplaceText("{9}", "Rp. " + SetoranPnbp, false, RegexOptions.None, boldRegular);
+                        doc.ReplaceText("{10}", Terbilang(SetoranPnbpAngka) + " rupiah", false, RegexOptions.None, boldRegular);
                     }
                 }
                 doc.ReplaceText("{11}", kotaKantor);
                 doc.ReplaceText("{12}", DateTime.Now.ToString("dd MMMM yyyy"));
-                doc.ReplaceText("{13}", jabatanPegawai);
-                doc.ReplaceText("{15}", nip);
 
                 doc.SaveAs(ms);
 
@@ -275,19 +279,46 @@ namespace Pnbp.Controllers
             {
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-pernyataan-tidak-terlayani.docx");
                 DocX doc = DocX.Load(filename);
-                Formatting formatting = new Formatting();
-                formatting.Bold = true;
+                Formatting normalRegular = new Formatting();
+                Formatting boldRegular = new Formatting();
+                boldRegular.Bold = true;
 
                 string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
+                Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
                 string tipe = OtorisasiUser.GetJenisKantorUser();
                 string namaLayanan = "";
+                string jabatanUnitKerja = "";
+                if (pegawai != null && !String.IsNullOrEmpty(pegawai.Jabatan))
+                {
+                    UnitKerja unitKerja = pengembalianmodel.GetUnitKerjaByPegawaiId(pegawai.Nip);
+                    if (unitKerja != null)
+                    { 
+                        jabatanUnitKerja = $"{pegawai.Jabatan} {unitKerja.Nama}";
+                    }
+                }
 
-                doc.ReplaceText("{NAMA_PEMOHON}", namapemohon);
-                doc.ReplaceText("{ALAMAT}", AlamatPemohon);
-                doc.ReplaceText("{NOMOR_BERKAS}", nomorberkas);
-                doc.ReplaceText("{UNIT_KERJA}", (User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""));
-                doc.ReplaceText("{NAMA_PROSEDUR}", NamaProsedur);
+
+                if (pegawai == null)
+                {
+                    doc.ReplaceText("{3}", "........................................... (3)");
+                    doc.ReplaceText("{4}", "........................................... (4)");
+                    doc.ReplaceText("{5}", "........................................... (5)");
+                    doc.ReplaceText("{13}", "Direktur/Kepala Kantor Wilayah/\nKepala Kantor……. (13)");
+                    doc.ReplaceText("{14}", "……………………….. (14)");
+                    doc.ReplaceText("{15}", "………………….. (15)");
+                }
+                else
+                {
+                    doc.ReplaceText("{3}", pegawai.Nama);
+                    doc.ReplaceText("{4}", pegawai.Nip);
+                    doc.ReplaceText("{5}", pegawai.Jabatan);
+                    doc.ReplaceText("{13}", pegawai.Jabatan);
+                    doc.ReplaceText("{14}", pegawai.Nama);
+                    doc.ReplaceText("{15}", pegawai.Nip);
+                }
+
+                ReplaceDocText(doc, "{6}", "…………………………… (6)", jabatanUnitKerja, boldRegular);
 
                 if ((!String.IsNullOrEmpty(nomorberkas) && nomorberkas.ToLower() == "undefined") || String.IsNullOrEmpty(nomorberkas))
                 {
@@ -296,7 +327,7 @@ namespace Pnbp.Controllers
                 }
                 else
                 {
-                    doc.ReplaceText("{7}", nomorberkas, false, RegexOptions.None, formatting);
+                    doc.ReplaceText("{7}", nomorberkas, false, RegexOptions.None, boldRegular);
 
                     // get nama layanan berkas
                     if (tipe == "Kantah")
@@ -310,8 +341,8 @@ namespace Pnbp.Controllers
                     }
                 }
 
-                ReplaceDocText(doc, "{8}", "…………… (8)", namaLayanan, formatting);
-                ReplaceDocText(doc, "{9}", "…………… (9)", atasNama, formatting);
+                ReplaceDocText(doc, "{8}", "…………… (8)", namaLayanan, boldRegular);
+                ReplaceDocText(doc, "{9}", "…………… (9)", atasNama, boldRegular);
                 doc.ReplaceText("{11}", kotaKantor);
                 doc.ReplaceText("{12}", DateTime.Now.ToString("dd MMMM yyyy"));
 
@@ -403,20 +434,28 @@ namespace Pnbp.Controllers
             {
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-pernyataan-tanggung-jawab-mutlak.docx");
                 DocX doc = DocX.Load(filename);
-                Formatting formatting = new Formatting();
-                formatting.Bold = true;
-                Formatting normalFormat = new Formatting();
+                Formatting boldRegular = new Formatting();
+                boldRegular.Bold = true;
+                Formatting normalRegular = new Formatting();
 
                 string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
-                string nip = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
-                string namaPegawai = (HttpContext.User.Identity as InternalUserIdentity).NamaPegawai;
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
-                string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
+                Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
+                string namaPegawai = "";
+                string jabatanPegawai = "";
+                string nip = "";
 
-                ReplaceDocText(doc, "{1}", "................. (1)", namaPegawai, normalFormat);
-                ReplaceDocText(doc, "{2}", "................. (2)", nip, normalFormat);
-                ReplaceDocText(doc, "{3}", "................. (3)", jabatanPegawai, normalFormat);
-                ReplaceDocText(doc, "{4}", "........ (4)", namaBank, formatting);
+                if (pegawai != null) 
+                {
+                    namaPegawai = pegawai.Nama;
+                    jabatanPegawai = pegawai.Jabatan;
+                    nip = pegawai.Nip;
+                }
+
+                ReplaceDocText(doc, "{1}", "................. (1)", namaPegawai, normalRegular);
+                ReplaceDocText(doc, "{2}", "................. (2)", nip, normalRegular);
+                ReplaceDocText(doc, "{3}", "................. (3)", jabatanPegawai, normalRegular);
+                ReplaceDocText(doc, "{4}", "........ (4)", namaBank, boldRegular);
                 if ((!String.IsNullOrEmpty(permohonanPengembalian) && permohonanPengembalian.ToLower() == "undefined") || String.IsNullOrEmpty(permohonanPengembalian))
                 {
                     doc.ReplaceText("{5}", "....... (5)");
@@ -432,14 +471,15 @@ namespace Pnbp.Controllers
                     }
                     else
                     {
-                        doc.ReplaceText("{5}", permohonanPengembalian, false, RegexOptions.None, formatting);
-                        doc.ReplaceText("{6}", Terbilang(parsedAngka) + " rupiah", false, RegexOptions.None, formatting);
+                        doc.ReplaceText("{5}", permohonanPengembalian, false, RegexOptions.None, boldRegular);
+                        doc.ReplaceText("{6}", Terbilang(parsedAngka) + " rupiah", false, RegexOptions.None, boldRegular);
                     }
                 }
                 doc.ReplaceText("{8}", kotaKantor);
                 doc.ReplaceText("{9}", DateTime.Now.ToString("dd MMMM yyyy"));
-                ReplaceDocText(doc, "{12}", "...................................... (12)", namaPegawai, normalFormat);
-                ReplaceDocText(doc, "{13}", "...................................... (13)", nip, normalFormat);
+                ReplaceDocText(doc, "{10}", "......................... (10)", jabatanPegawai, normalRegular);
+                ReplaceDocText(doc, "{12}", "...................................... (12)", namaPegawai, normalRegular);
+                ReplaceDocText(doc, "{13}", "...................................... (13)", nip, normalRegular);
 
                 doc.SaveAs(ms);
 
@@ -464,29 +504,41 @@ namespace Pnbp.Controllers
             }
         }
 
-        public ActionResult GeneratePersetujuan(string namaRekening, string nomorRekening, string namaBank)
+        public ActionResult GeneratePersetujuan(string namaRekening, string nomorRekening, string namaBank, string namaPemohon, string alamatPemohon, string permohonanPengembalian)
         {
             DateTime dateTime = DateTime.UtcNow.Date;
             using (MemoryStream ms = new MemoryStream())
             {
                 string filename = Path.Combine(Server.MapPath(@"~/Format/pengembalian/"), "surat-persetujuan-pengembalian-pnbp.docx");
                 DocX doc = DocX.Load(filename);
-                Formatting normalFont = new Formatting();
-                Formatting boldFont = new Formatting();
-                boldFont.Bold = true;
+                Formatting normalRegular = new Formatting();
+                Formatting boldRegular = new Formatting();
+                boldRegular.Bold = true;
 
                 string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
-                string nip = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
-                string namaPegawai = (HttpContext.User.Identity as InternalUserIdentity).NamaPegawai;
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
-                string jabatanPegawai = pengembalianmodel.GetJabatanPegawai(kantorId);
+                Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
+                string namaPegawai = "";
+                string jabatanPegawai = "";
+                string nip = "";
 
-                ReplaceDocText(doc, "{9}", "................... (9)", namaBank, boldFont);
-                ReplaceDocText(doc, "{10}", "................... (10)", nomorRekening, boldFont);
-                ReplaceDocText(doc, "{11}", "................... (11)", namaRekening, boldFont);
+                if (pegawai != null)
+                {
+                    namaPegawai = pegawai.Nama;
+                    jabatanPegawai = pegawai.Jabatan;
+                    nip = pegawai.Nip;
+                }
+
+                ReplaceDocText(doc, "{3}", "......................... (3)", namaPemohon, normalRegular);
+                ReplaceDocText(doc, "{5}", "............ ..................... (5)", namaPemohon, normalRegular);
+                ReplaceDocText(doc, "{6}", "............ ..................... (6)", alamatPemohon, normalRegular);
+                ReplaceDocText(doc, "{7}", "............ ..................... (5)", "Rp. " + permohonanPengembalian, normalRegular);
+                ReplaceDocText(doc, "{9}", "................... (9)", namaBank, boldRegular);
+                ReplaceDocText(doc, "{10}", "................... (10)", nomorRekening, boldRegular);
+                ReplaceDocText(doc, "{11}", "................... (11)", namaRekening, boldRegular);
                 doc.ReplaceText("{2}", $"{kotaKantor}, {DateTime.Now.ToString("dd MMMM yyyy")}");
-                ReplaceDocText(doc, "{12}", "Jabatan .................... (12)", jabatanPegawai, normalFont);
-                ReplaceDocText(doc, "{13}", "Nama ....................... (13)", namaPegawai, normalFont);
+                ReplaceDocText(doc, "{12}", "Jabatan .................... (12)", jabatanPegawai, normalRegular);
+                ReplaceDocText(doc, "{13}", "Nama ....................... (13)", namaPegawai, normalRegular);
 
                 doc.SaveAs(ms);
 

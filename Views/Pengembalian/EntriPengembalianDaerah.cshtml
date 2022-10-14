@@ -419,6 +419,9 @@
 				"?namaBank=" + $('#NAMABANK').val(),
 				"&nomorRekening=" + $('#NOMORREKENING').val(),
 				"&namaRekening=" + $('#NAMAREKENING').val(),
+				"&namaPemohon=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&alamatPemohon=" + $('#ALAMATPEMOHON').val(),
+				"&permohonanPengembalian=" + $('#PERMOHONANPENGEMBALIAN').val(),
 			];
 			var url = '@Url.Action("GeneratePersetujuan","Pengembalian")';
 			window.open(url + params.join(''), '_blank');
