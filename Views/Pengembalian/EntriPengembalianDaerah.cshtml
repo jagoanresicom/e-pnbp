@@ -264,18 +264,38 @@
 		function cariBerkas() {
 			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
 			$.ajax({
-				url: '@Url.Action("GetBerkasDataByID", "Pengembalian")',
+				url: '@Url.Action("GetBerkasByNoTahun", "Pengembalian")',
 				type: 'POST',
 				data: { noberkas: $('#js-form-entri [name="NOMORBERKAS"]').val()},
 				success: function (res) {
-					$('#BERKASID').val(res.BERKASID);
-					$('#NAMAPEGAWAIPENGAJU').val(res.NAMA);
-					$('#ALAMATPEMOHON').val(res.ALAMAT);
-					$('#NPWP').val(res.NPWP);
-					$('#KODEBILLING').val(res.KODEBILLING);
-					$('#NTPN').val(res.NTPN);
-					$('#SETORANPNBP').val(addCommas(res.PENERIMAAN));
-				}
+					if (res.Success) {
+						let data = res.Data;
+						$('#BERKASID').val(data.BERKASID);
+						$('#NAMAPEGAWAIPENGAJU').val(data.NAMA);
+						$('#ALAMATPEMOHON').val(data.ALAMAT);
+						$('#NPWP').val(data.NPWP);
+						$('#KODEBILLING').val(data.KODEBILLING);
+						$('#NTPN').val(data.NTPN);
+						$('#SETORANPNBP').val(addCommas(data.PENERIMAAN));
+					} else {
+						swal({
+							title: "Perhatian",
+							text: res.Message,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
 			}).always(() => {
 				$.unblockUI();
 			});

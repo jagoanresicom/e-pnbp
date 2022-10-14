@@ -9,6 +9,7 @@ namespace Pnbp.Entities
     {
         public bool Status { get; set; }
         public string Pesan { get; set; }
+        public dynamic Data { get; set; }
         public string ReturnValue { get; set; }
         public string ReturnValue2 { get; set; }
     }

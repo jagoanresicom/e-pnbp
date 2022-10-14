@@ -2540,6 +2540,43 @@ namespace Pnbp.Controllers
             return View();
         }
 
+        [HttpPost]
+        public JsonResult GetBerkasByNoTahun(FormCollection form)
+        {
+            CommonResponse response = new CommonResponse() { Success = false, Message = "" };
+
+            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            var noberkas = (form.AllKeys.Contains("noberkas") ? form["noberkas"] : "");
+
+            if (string.IsNullOrEmpty(noberkas))
+            {
+                response.Message = "Harap untuk mengisi kolom Nomor Berkas";
+                return Json(response, JsonRequestBehavior.AllowGet);
+            }
+
+            string tipe = OtorisasiUser.GetJenisKantorUser();
+            GetDataBerkasForm result = null;
+
+            if (tipe == "Kantah")
+            {
+                result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorid);
+            }
+            else if (tipe == "Kanwil")
+            {
+                result = pengembalianmodel.GetDataBerkasByNoKanwil(noberkas, kantorid);
+            }
+
+            if (result == null)
+            {
+                response.Message = "Berkas tidak ditemukan";
+                return Json(response, JsonRequestBehavior.AllowGet);
+            }
+
+            response.Success = true;
+            response.Data = result;
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
         //public ActionResult PengajuanPengembalianDetail(string pengembalianpnbpid)
         //{
         //    return Json(pengembalianpnbpid, JsonRequestBehavior.AllowGet);

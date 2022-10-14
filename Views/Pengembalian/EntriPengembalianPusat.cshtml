@@ -419,34 +419,33 @@
     });
 
     function cari_berkas() {
-        //alert($('#nomorberkas').val());
         $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
         $.ajax({
-            url: '@Url.Action("GetBerkasDataByID", "Pengembalian")',
+            url: '@Url.Action("GetBerkasByNoTahun", "Pengembalian")',
             type: 'post',
             data: {noberkas:$('#nomorberkas').val()},
-            success: function (res) {
-                //console.log(res.length);
-                //if (res.length != '') {
-                //console.log(res);
-                $.unblockUI();
-                    $('#namapemohon').val(res.NAMA);
-                    $('#AlamatPemohon').val(res.ALAMAT);
-                    $('#Nppwp').val(res.NPWP);
-                    $('#KodeBiling').val(res.KODEBILLING);
-                    $('#Ntpn').val(res.NTPN);
-                    $('#NamaProsedur').val(res.NAMAPROSEDUR);
-                    $('#SetoranPnbp').val(addCommas(res.PENERIMAAN));
-
-                //} else {
-
-                    //alert("DATA TIDAK DITEMUKAN..");
-                    //ALERT(RES.length);
-                //}
-
+			success: function (res) {
+				$.unblockUI();
+				if (res.Success) {
+					let data = res.Data;
+					$('#namapemohon').val(data.NAMA);
+					$('#AlamatPemohon').val(data.ALAMAT);
+					$('#Nppwp').val(data.NPWP);
+					$('#KodeBiling').val(data.KODEBILLING);
+					$('#Ntpn').val(data.NTPN);
+					$('#NamaProsedur').val(data.NAMAPROSEDUR);
+					$('#SetoranPnbp').val(addCommas(data.PENERIMAAN));
+				} else {
+					swal({
+						title: "Perhatian",
+						text: res.Message,
+						type: "warning",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				}
             }
         }).fail(function() {
-            console.log("error");
             $.unblockUI();
             $('#namapemohon').val('');
             $('#AlamatPemohon').val('');
