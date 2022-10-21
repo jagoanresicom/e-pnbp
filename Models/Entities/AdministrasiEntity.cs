@@ -910,6 +910,7 @@ namespace Pnbp.Entities
         public string PERMOHONANPENGEMBALIAN { get; set; }
         public string NOMORSURAT { get; set; }
         public string STATUSPENGEMBALIAN { get; set; }
+        public string STATUSSIMPAN { get; set; }
         public string NPWPPEGAWAIPENGAJU { get; set; }
         public string TANGGALPENGAJU { get; set; }
         public string TIPEPENGEMBALIAN { get; set; }

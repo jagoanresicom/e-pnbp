@@ -2264,7 +2264,15 @@ namespace Pnbp.Controllers
             string pegawaiid = userIdentity.PegawaiId;
             string namapegawai = userIdentity.NamaPegawai;
 
-            tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN);
+            if (String.IsNullOrEmpty(data.PENGEMBALIANPNBPID))
+            {
+                tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN);
+            }
+            else
+            { 
+                tr = pengembalianmodel.UpdatePengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN);
+            }
+
             if (tr.Status && !String.IsNullOrEmpty(tr.ReturnValue))
             {
                 string pengembalianId = tr.ReturnValue;
@@ -2628,7 +2636,12 @@ namespace Pnbp.Controllers
 
         public ActionResult DetailPengajuan(string pengembalianpnbpid)
         {
-            Entities.DetailDataBerkas data = new Entities.DetailDataBerkas();
+            Entities.DetailDataBerkas data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
+            if (!String.IsNullOrEmpty(data.STATUSSIMPAN) && data.STATUSSIMPAN == "1")
+            {
+                return RedirectToAction("Daerah", new { pengembalianpnbpid });
+            }
+
             Entities.LampiranKembalianTrain file1 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file2 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file3 = new Entities.LampiranKembalianTrain();
@@ -2645,7 +2658,7 @@ namespace Pnbp.Controllers
             Entities.LampiranKembalianTrain file20 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file21 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file22 = new Entities.LampiranKembalianTrain();
-            data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
+
             file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN");
             file2 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN");
             file3 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI PENERIMAAN NEGARA");
@@ -3564,9 +3577,19 @@ namespace Pnbp.Controllers
             return View("EntriPengembalianPusat", data);
         }
 
-        public ActionResult Daerah()
+        public ActionResult Daerah(string pengembalianPnbpId)
         {
             DetailDataBerkas data = new DetailDataBerkas();
+            if (!String.IsNullOrEmpty(pengembalianPnbpId))
+            {
+                data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianPnbpId);
+                this.ViewData["step"] = 0;
+                if (!String.IsNullOrEmpty(data.STATUSSIMPAN) && data.STATUSSIMPAN == "1")
+                {
+                    this.ViewData["step"] = 1;
+                }
+            }
+
             return View("EntriPengembalianDaerah", data);
         }
 

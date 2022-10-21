@@ -1046,7 +1046,7 @@ namespace Pnbp.Models
             return tr;
         }
 
-        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian)
+        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian, string statusSimpan)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1071,10 +1071,10 @@ namespace Pnbp.Models
                         sql =
                             "INSERT INTO pengembalianpnbp ( " +
                             "            pengembalianpnbpid, tanggalpengaju, kantorid, namakantor, " +
-                            "            pegawaiidpengaju, namapegawaipengaju, tipepengembalian, statuspengembalian) VALUES " +
+                            "            pegawaiidpengaju, namapegawaipengaju, tipepengembalian, statuspengembalian, statussimpan) VALUES " +
                             "( " +
                             "            :PengembalianPnbpId, TO_DATE(SYSDATE,'DD/MM/YYYY'), :KantorId, :NamaKantor, " +
-                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', :statusPengembalian)";
+                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', :statusPengembalian, :statusSimpan)";
                         arrayListParameters.Clear();
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", pengembalianPnbpId));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalPengaju", data.TANGGALPENGAJU));
@@ -1083,6 +1083,7 @@ namespace Pnbp.Models
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PegawaiIdPengaju", pegawaiid));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPegawaiPengaju", namapegawai));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusPengembalian", statusPengembalian));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusSimpan", statusSimpan));
                         parameters = arrayListParameters.OfType<object>().ToArray();
                         ctx.Database.ExecuteSqlCommand(sql, parameters);
 
@@ -1139,6 +1140,117 @@ namespace Pnbp.Models
 
                         tc.Commit();
                         tr.ReturnValue = pengembalianPnbpId;
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public Entities.TransactionResult UpdatePengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian, string statusSimpan)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        ArrayList arrayListParameters = new ArrayList();
+
+                        string sql = "";
+                        object[] parameters = null;
+
+                        string namakantor = GetNamaKantor(kantoriduser);
+
+                        sql =
+                            "UPDATE pengembalianpnbp " +
+                            "            SET kantorid = :KantorId, namakantor = :NamaKantor, " +
+                            "            pegawaiidpengaju = :PegawaiIdPengaju, namapegawaipengaju = :NamaPegawaiPengaju, tipepengembalian = '1', statuspengembalian = :statusPengembalian, statussimpan =: statusSimpan WHERE pengembalianpnbpid = :PengembalianPnbpId";
+
+                        arrayListParameters.Clear();
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantoriduser));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaKantor", namakantor));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PegawaiIdPengaju", pegawaiid));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPegawaiPengaju", namapegawai));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusPengembalian", statusPengembalian));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusSimpan", statusSimpan));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", data.PENGEMBALIANPNBPID));
+                        parameters = arrayListParameters.OfType<object>().ToArray();
+                        ctx.Database.ExecuteSqlCommand(sql, parameters);
+
+                        // Insert BERKASKEMBALIAN
+                        sql =
+                            @"UPDATE berkaskembalian  
+                                SET 
+                                    berkasid = :BerkasId, 
+                                    namaprosedur = :NamaProsedur, 
+                                    kodebilling = :KodeBilling, 
+                                    tanggalkodebilling = TO_DATE(:TanggalKodeBilling,'DD/MM/YYYY HH24:MI'), 
+                                    ntpn = :Ntpn, 
+                                    tanggalbayar = TO_DATE(:TanggalBayar,'DD/MM/YYYY HH24:MI'), 
+                                    jumlahbayar = :JumlahBayar, 
+                                    namabankpersepsi = :NamaBankPersepsi, 
+                                    pemilikid = :PemilikId, 
+                                    namapemohon = :NamaPemohon,            
+                                    nikpemohon = :NikPemohon, 
+                                    alamatpemohon = :AlamatPemohon, 
+                                    emailpemohon = :EmailPemohon, 
+                                    nomortelepon = :NomorTelepon, 
+                                    nomorberkas = :NomorBerkas,   
+                                    nomorrekening = :NomorRekening, 
+                                    namabank = :NamaBank, 
+                                    namacabang = :NamaCabang, 
+                                    setoranpnbp = :SetoranPnbp, 
+                                    npwp = :Npwp, 
+                                    namarekening = :NamaRekening, 
+                                    permohonanpengembalian = :PermohonanPengembalian 
+                                WHERE 
+                                    pengembalianpnbpid = :PengembalianPnbpId";
+
+                        arrayListParameters.Clear();
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("BerkasId", data.BERKASID));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaProsedur", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", data.KODEBILLING));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalKodeBilling", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Ntpn", data.NTPN));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalBayar", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("JumlahBayar", data.JUMLAHBAYAR));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaBankPersepsi", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PemilikId", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", data.NAMAPEGAWAIPENGAJU));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NikPemohon", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("AlamatPemohon", data.ALAMATPEMOHON));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("EmailPemohon", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorTelepon", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorBerkas", data.NOMORBERKAS));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorRekening", data.NOMORREKENING));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaBank", data.NAMABANK));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaCabang", ""));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("SetoranPnbp", data.SETORANPNBP));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Npwp", npwpberkas));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaRekening", data.NAMAREKENING));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PermohonanPengembalian", data.PERMOHONANPENGEMBALIAN));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", data.PENGEMBALIANPNBPID));
+
+                        parameters = arrayListParameters.OfType<object>().ToArray();
+                        ctx.Database.ExecuteSqlCommand(sql, parameters);
+
+                        tc.Commit();
+                        tr.ReturnValue = data.PENGEMBALIANPNBPID;
                         tr.Status = true;
                         tr.Pesan = "Data berhasil disimpan";
                     }
@@ -2136,7 +2248,8 @@ namespace Pnbp.Models
                     TO_CHAR(BERKASKEMBALIAN.SETORANPNBP) SETORANPNBP,
                     TO_CHAR(BERKASKEMBALIAN.PERMOHONANPENGEMBALIAN) PERMOHONANPENGEMBALIAN,
                     TO_CHAR(BERKASKEMBALIAN.NOMORSURAT) NOMORSURAT,
-                    PENGEMBALIANPNBP.TIPEPENGEMBALIAN
+                    PENGEMBALIANPNBP.TIPEPENGEMBALIAN,
+                    PENGEMBALIANPNBP.STATUSSIMPAN
                     FROM PENGEMBALIANPNBP
                     LEFT JOIN BERKASKEMBALIAN ON PENGEMBALIANPNBP.PENGEMBALIANPNBPID = BERKASKEMBALIAN.PENGEMBALIANPNBPID)
                     SELECT * FROM AA 
