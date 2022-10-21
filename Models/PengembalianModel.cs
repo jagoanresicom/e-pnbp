@@ -2030,20 +2030,29 @@ namespace Pnbp.Models
                 FROM AA 
                 GROUP BY NOTAHUNBERKAS, NAMAPROSEDUR, NAMA, ALAMAT, NPWP, NOMOR, BERKASID, STATUSBERKAS, TAHUN, KODEBILLING, NTPN, KANTORID";
 
-            var noTahun = NoTahun.Split('/');
-            decimal nomor = decimal.Parse(noTahun[0]);
-            decimal tahun = decimal.Parse(noTahun[1]);
-
-            query = sWhitespace.Replace(query, " ");
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Nomor", nomor));
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
-
-            using (var ctx = new PnbpContext())
+            try
             {
-                var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query, arrayListParameters.ToArray()).FirstOrDefault();
-                return records;
+                var noTahun = NoTahun.Split('/');
+                decimal nomor = decimal.Parse(noTahun[0]);
+                decimal tahun = decimal.Parse(noTahun[1]);
+
+                query = sWhitespace.Replace(query, " ");
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Nomor", nomor));
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
+
+                using (var ctx = new PnbpContext())
+                {
+                    var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query, arrayListParameters.ToArray()).FirstOrDefault();
+                    return records;
+                }
             }
+            catch (Exception e)
+            {
+                _ = e.Message;
+            }
+
+            return null;
         }
 
         public Entities.GetDataBerkasForm GetDataBerkasByNoKanwil(string NoTahun, string kantorid)
