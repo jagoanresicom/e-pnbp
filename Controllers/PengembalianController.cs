@@ -3580,10 +3580,10 @@ namespace Pnbp.Controllers
         public ActionResult Daerah(string pengembalianPnbpId)
         {
             DetailDataBerkas data = new DetailDataBerkas();
+            this.ViewData["step"] = 0;
             if (!String.IsNullOrEmpty(pengembalianPnbpId))
             {
                 data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianPnbpId);
-                this.ViewData["step"] = 0;
                 if (!String.IsNullOrEmpty(data.STATUSSIMPAN) && data.STATUSSIMPAN == "1")
                 {
                     this.ViewData["step"] = 1;
