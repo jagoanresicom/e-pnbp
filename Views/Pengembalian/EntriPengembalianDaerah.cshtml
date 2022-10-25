@@ -515,12 +515,17 @@
 		}
 
 		$('#js-btn-cari-berkas').on('click', () => cariBerkas());
-		$('#js-btn-simpan').on('click', () => $('#STATUSPENGEMBALIAN').val(0));
+		$('#js-btn-simpan').on('click', () => {
+			$('#STATUSPENGEMBALIAN').val(0)
+			$('#STATUSSIMPAN').val('');
+		});
 		$('#js-btn-simpan-step-2').on('click', () => {
 			$('#STATUSPENGEMBALIAN').val(0);
 			$('#STATUSSIMPAN').val(1);
 		});
-		$('#js-btn-proses').on('click', () => $('#STATUSPENGEMBALIAN').val(2));
+		$('#js-btn-proses').on('click', () => {
+			$('#STATUSPENGEMBALIAN').val(2);
+		});
 		$('#js-form-entri').on('submit', (e) => {
 			e.preventDefault();
 			window.setTimeout(() => {

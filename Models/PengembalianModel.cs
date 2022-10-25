@@ -1208,6 +1208,8 @@ namespace Pnbp.Models
                             "            SET kantorid = :KantorId, namakantor = :NamaKantor, " +
                             "            pegawaiidpengaju = :PegawaiIdPengaju, namapegawaipengaju = :NamaPegawaiPengaju, tipepengembalian = '1', statuspengembalian = :statusPengembalian, statussimpan =: statusSimpan WHERE pengembalianpnbpid = :PengembalianPnbpId";
 
+                        statusSimpan = (statusPengembalian == "2" ? null : statusSimpan);
+
                         arrayListParameters.Clear();
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantoriduser));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaKantor", namakantor));
@@ -1275,6 +1277,66 @@ namespace Pnbp.Models
 
                         parameters = arrayListParameters.OfType<object>().ToArray();
                         ctx.Database.ExecuteSqlCommand(sql, parameters);
+
+                        tc.Commit();
+                        tr.ReturnValue = data.PENGEMBALIANPNBPID;
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public Entities.TransactionResult UpdateDataBerkasPengembalian(DetailDataBerkas data, string npwpberkas)
+        {
+            Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        ArrayList arrayListParameters = new ArrayList();
+
+                        string sql = "";
+
+                        sql =
+                            @"UPDATE berkaskembalian  
+                                SET 
+                                    jumlahbayar = :JumlahBayar, 
+                                    nomorrekening = :NomorRekening, 
+                                    namabank = :NamaBank, 
+                                    setoranpnbp = :SetoranPnbp, 
+                                    npwp = :Npwp, 
+                                    permohonanpengembalian = :permohonanPengembalian,
+                                    namarekening = :NamaRekening
+                                WHERE 
+                                    pengembalianpnbpid = :PengembalianPnbpId";
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("JumlahBayar", data.JUMLAHBAYAR));
+                        lstParams.Add(new OracleParameter("NomorRekening", data.NOMORREKENING));
+                        lstParams.Add(new OracleParameter("NamaBank", data.NAMABANK));
+                        lstParams.Add(new OracleParameter("SetoranPnbp", data.SETORANPNBP));
+                        lstParams.Add(new OracleParameter("Npwp", npwpberkas));
+                        lstParams.Add(new OracleParameter("permohonanPengembalian", data.PERMOHONANPENGEMBALIAN));
+                        lstParams.Add(new OracleParameter("NamaRekening", data.NAMAREKENING));
+                        lstParams.Add(new OracleParameter("PengembalianPnbpId", data.PENGEMBALIANPNBPID));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
 
                         tc.Commit();
                         tr.ReturnValue = data.PENGEMBALIANPNBPID;
@@ -2280,7 +2342,7 @@ namespace Pnbp.Models
                     PENGEMBALIANPNBP.STATUSSIMPAN
                     FROM PENGEMBALIANPNBP
                     LEFT JOIN BERKASKEMBALIAN ON PENGEMBALIANPNBP.PENGEMBALIANPNBPID = BERKASKEMBALIAN.PENGEMBALIANPNBPID
-                    JOIN {_schemaKKP}.BERKAS b ON b.BERKASID = BERKASKEMBALIAN.BERKASID
+                    LEFT JOIN {_schemaKKP}.BERKAS b ON b.BERKASID = BERKASKEMBALIAN.BERKASID
                     )
                     SELECT * FROM AA 
                     WHERE PENGEMBALIANPNBPID = :PengembalianPnbpId";
