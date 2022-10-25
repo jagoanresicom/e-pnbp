@@ -2254,9 +2254,18 @@ namespace Pnbp.Controllers
             }
 
             // filter input
-            data.SETORANPNBP = data.SETORANPNBP.Replace(".", String.Empty);
-            data.JUMLAHBAYAR = data.JUMLAHBAYAR.Replace(".", String.Empty);
-            data.PERMOHONANPENGEMBALIAN = data.PERMOHONANPENGEMBALIAN.Replace(".", String.Empty);
+            if (!String.IsNullOrEmpty(data.SETORANPNBP))
+            { 
+                data.SETORANPNBP = data.SETORANPNBP.Replace(".", String.Empty);
+            }
+            if (!String.IsNullOrEmpty(data.JUMLAHBAYAR))
+            { 
+                data.JUMLAHBAYAR = data.JUMLAHBAYAR.Replace(".", String.Empty);
+            }
+            if (!String.IsNullOrEmpty(data.PERMOHONANPENGEMBALIAN))
+            {
+                data.PERMOHONANPENGEMBALIAN = data.PERMOHONANPENGEMBALIAN.Replace(".", String.Empty);
+            }
 
             var userIdentity = (HttpContext.User.Identity as Entities.InternalUserIdentity);
             string userid = userIdentity.UserId;
@@ -2582,6 +2591,20 @@ namespace Pnbp.Controllers
 
             response.Success = true;
             response.Data = result;
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult CekBerkasPengembalian(string berkasId)
+        {
+            CommonResponse response = new CommonResponse() { Success = true, Message = "" };
+
+            BerkasKembalian berkasKembalian = pengembalianmodel.GetBerkasKembalianPnbpById(berkasId);
+            if (berkasKembalian != null) {
+                response.Success = false;
+                response.Message = $"Permohonan pengembalian untuk berkas <b>{berkasKembalian.NomorBerkas}</b> sudah pernah dilakukan. Cek status permohonan di menu <b>Monitoring</b>.";
+            }
+
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 

@@ -325,7 +325,6 @@
 				data: { noberkas: $('#js-form-entri [name="NOMORBERKAS"]').val()},
 				success: function (res) {
 					if (res.Success) {
-						$('#step-1 .js-smartwizard-next').removeClass('disabled');
 						let data = res.Data;
 						$('#BERKASID').val(data.BERKASID);
 						$('#NAMAPEGAWAIPENGAJU').val(data.NAMA);
@@ -334,7 +333,9 @@
 						$('#KODEBILLING').val(data.KODEBILLING);
 						$('#NTPN').val(data.NTPN);
 						$('#SETORANPNBP').val(addCommas(data.PENERIMAAN));
+						cekBerkasPengembalian(data.BERKASID);
 					} else {
+						$.unblockUI();
 						$('#step-1 .js-smartwizard-next').addClass('disabled');
 						$('[href="#step-2"]').parent().removeClass();
 						resetFormDataBerkas();
@@ -348,6 +349,7 @@
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
 					swal({
 						title: "Proses Gagal",
 						text: "Terjadi kesalahan",
@@ -356,8 +358,42 @@
 						allowOutsideClick: true,
 					});
 				},
-			}).always(() => {
-				$.unblockUI();
+			})
+		}
+
+		function cekBerkasPengembalian(berkasId) {
+
+			$.ajax({
+				url: '@Url.Action("CekBerkasPengembalian", "Pengembalian")',
+				type: 'POST',
+				data: { berkasId },
+				success: function (res) {
+					if (res.Success) {
+						$('#step-1 .js-smartwizard-next').removeClass('disabled');
+					} else {
+						$.unblockUI();
+						$('#step-1 .js-smartwizard-next').addClass('disabled');
+						$('[href="#step-2"]').parent().removeClass();
+						swal({
+							title: "Perhatian",
+							text: res.Message,
+							html: true,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
 			});
 		}
 

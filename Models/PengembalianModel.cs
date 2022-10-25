@@ -188,6 +188,33 @@ namespace Pnbp.Models
             return data;
         }
 
+        public BerkasKembalian GetBerkasKembalianPnbpById(string berkasid)
+        {
+            BerkasKembalian data = new BerkasKembalian();
+
+            ArrayList arrayListParameters = new ArrayList();
+
+            string query =
+                @"SELECT
+                      berkasid, nomorberkas
+                  FROM
+                      berkaskembalian
+                  WHERE
+                      berkasid = :BerkasId";
+
+            arrayListParameters.Add(new OracleParameter("BerkasId", berkasid));
+
+            query = sWhitespace.Replace(query, " ");
+
+            using (var ctx = new PnbpContext())
+            {
+                object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                data = ctx.Database.SqlQuery<BerkasKembalian>(query, parameters).FirstOrDefault();
+            }
+
+            return data;
+        }
+
         #endregion
 
 
