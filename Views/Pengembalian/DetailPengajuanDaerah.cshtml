@@ -911,7 +911,6 @@
             data: {noberkas:$('#nomorberkas').val()},
             success: function (res) {
                 //if (res.length > 0) {
-                    console.log(res);
                     $('#namapemohon').val(res.NAMA);
                     $('#AlamatPemohon').val(res.ALAMAT);
                     $('#Nppwp').val(res.NPWP);
@@ -1001,7 +1000,6 @@
             var jml = permohonanpengembalian;
             $('#PermohonanPengembalian').val(addCommas(jml));
         }
-        console.log(JumlahBayar);
 
     });
 
@@ -1017,7 +1015,6 @@
             var jml = permohonanpengembalian;
             $('#PermohonanPengembalian').val(addCommas(jml));
         }
-        console.log(parseInt(JumlahBayar));
 
     });
 
