@@ -68,7 +68,7 @@
 								<div class="form-group">
 									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Atas Nama</label>
 									<div class="col-sm-8">
-										@Html.TextBoxFor(m => m.NAMAPEGAWAIPENGAJU, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
+										@Html.TextBoxFor(m => m.NAMAPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
 									</div>
 								</div>
 								<div class="form-group">
@@ -105,7 +105,14 @@
 							<div class="col-md-offset-3 col-md-6">
 								<div class="row">
 									<div class="col-md-offset-4 col-md-8">
-										<button type="button" class="js-smartwizard-next btn btn-success disabled">Selanjutnya</button>
+										@if (ViewData["step"].ToString() != "0")
+										{
+											<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+										}
+										else
+										{
+											<button type="button" class="js-smartwizard-next btn btn-success disabled">Selanjutnya</button>
+										}
 									</div>
 								</div>
 							</div>
@@ -327,7 +334,7 @@
 					if (res.Success) {
 						let data = res.Data;
 						$('#BERKASID').val(data.BERKASID);
-						$('#NAMAPEGAWAIPENGAJU').val(data.NAMA);
+						$('#NAMAPEMOHON').val(data.NAMA);
 						$('#ALAMATPEMOHON').val(data.ALAMAT);
 						$('#NPWP').val(data.NPWP);
 						$('#KODEBILLING').val(data.KODEBILLING);
@@ -368,10 +375,10 @@
 				type: 'POST',
 				data: { berkasId },
 				success: function (res) {
+					$.unblockUI();
 					if (res.Success) {
 						$('#step-1 .js-smartwizard-next').removeClass('disabled');
 					} else {
-						$.unblockUI();
 						$('#step-1 .js-smartwizard-next').addClass('disabled');
 						$('[href="#step-2"]').parent().removeClass();
 						swal({
@@ -399,7 +406,7 @@
 
 		function resetFormDataBerkas() {
 			$('#BERKASID').val('');
-			$('#NAMAPEGAWAIPENGAJU').val('');
+			$('#NAMAPEMOHON').val('');
 			$('#ALAMATPEMOHON').val('');
 			$('#NPWP').val('');
 			$('#KODEBILLING').val('');
@@ -438,10 +445,10 @@
 					if (data.Status) {
 						swal({
 							title: "Sukses",
-							text: "Berhasil",
+							text: "Data berhasil disimpan",
 							type: "success",
 							closeOnEsc: true,
-							allowOutsideClick: true,
+							allowOutsideClick: false,
 						}, function () {
 							window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
 						});
@@ -549,7 +556,7 @@
 				"?namaBank=" + $('#NAMABANK').val(),
 				"&nomorRekening=" + $('#NOMORREKENING').val(),
 				"&namaRekening=" + $('#NAMAREKENING').val(),
-				"&namaPemohon=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&namaPemohon=" + $('#NAMAPEMOHON').val(),
 				"&alamatPemohon=" + $('#ALAMATPEMOHON').val(),
 				"&permohonanPengembalian=" + $('#PERMOHONANPENGEMBALIAN').val(),
 			];
@@ -588,7 +595,7 @@
 			var JumlahBayar = $('#JumlahBayar').val();
 			var NamaProsedur = $('#NamaProsedur').val();
 			let params = [
-				"&atasNama=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&atasNama=" + $('#NAMAPEMOHON').val(),
 				"&SetoranPnbp=" + $('#SETORANPNBP').val(),
 			];
 			window.open(url + '?NomorSurat=' + nomorsurat + '&nomorberkas=' + nomorberkas + '&namapemohon=' + namapemohon + '&JumlahBayar=' + JumlahBayar + '&NamaProsedur=' + NamaProsedur + params.join(''), '_blank');
@@ -601,7 +608,7 @@
 			var nomorberkas = $('#NOMORBERKAS').val();
 			var NamaProsedur = $('#NamaProsedur').val();
 			let params = [
-				"&atasNama=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&atasNama=" + $('#NAMAPEMOHON').val(),
 			];
 			window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker + params.join(''), '_blank');
 		}

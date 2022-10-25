@@ -896,6 +896,7 @@ namespace Pnbp.Entities
     {
         public string PENGEMBALIANPNBPID { get; set; }
         public string NAMAPEGAWAIPENGAJU { get; set; }
+        public string NAMAPEMOHON { get; set; }
         public string ALAMATPEMOHON { get; set; }
         public string BERKASID { get; set; }
         public string NOMORBERKAS { get; set; }

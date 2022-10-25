@@ -1143,7 +1143,7 @@ namespace Pnbp.Models
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PemilikId", data.PemilikId));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PemilikId", ""));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", data.NamaPemohon));
-                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", data.NAMAPEGAWAIPENGAJU));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", data.NAMAPEMOHON));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NikPemohon", data.NikPemohon));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NikPemohon", ""));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("AlamatPemohon", data.ALAMATPEMOHON));
@@ -1258,7 +1258,7 @@ namespace Pnbp.Models
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("JumlahBayar", data.JUMLAHBAYAR));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaBankPersepsi", ""));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PemilikId", ""));
-                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", data.NAMAPEGAWAIPENGAJU));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPemohon", data.NAMAPEMOHON));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NikPemohon", ""));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("AlamatPemohon", data.ALAMATPEMOHON));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("EmailPemohon", ""));
@@ -2256,12 +2256,13 @@ namespace Pnbp.Models
             ArrayList arrayListParameters = new ArrayList();
 
             string query =
-                @"WITH AA AS(SELECT 
+                $@"WITH AA AS(SELECT 
                     TO_CHAR(PENGEMBALIANPNBP.PENGEMBALIANPNBPID) PENGEMBALIANPNBPID,
                     TO_CHAR(PENGEMBALIANPNBP.STATUSPENGEMBALIAN) STATUSPENGEMBALIAN,
                     TO_CHAR(PENGEMBALIANPNBP.NAMAPEGAWAIPENGAJU) NAMAPEGAWAIPENGAJU,
                     TO_CHAR(PENGEMBALIANPNBP.NPWPPEGAWAIPENGAJU) NPWPPEGAWAIPENGAJU,
                     TO_CHAR(pengembalianpnbp.TANGGALPENGAJU, 'dd-mm-yyyy') TANGGALPENGAJU,
+                    b.NAMAPEMILIK NAMAPEMOHON,
                     TO_CHAR(BERKASKEMBALIAN.ALAMATPEMOHON) ALAMATPEMOHON,
                     TO_CHAR(BERKASKEMBALIAN.BERKASID) BERKASID,
                     TO_CHAR(BERKASKEMBALIAN.NOMORBERKAS) NOMORBERKAS,
@@ -2278,7 +2279,9 @@ namespace Pnbp.Models
                     PENGEMBALIANPNBP.TIPEPENGEMBALIAN,
                     PENGEMBALIANPNBP.STATUSSIMPAN
                     FROM PENGEMBALIANPNBP
-                    LEFT JOIN BERKASKEMBALIAN ON PENGEMBALIANPNBP.PENGEMBALIANPNBPID = BERKASKEMBALIAN.PENGEMBALIANPNBPID)
+                    LEFT JOIN BERKASKEMBALIAN ON PENGEMBALIANPNBP.PENGEMBALIANPNBPID = BERKASKEMBALIAN.PENGEMBALIANPNBPID
+                    JOIN {_schemaKKP}.BERKAS b ON b.BERKASID = BERKASKEMBALIAN.BERKASID
+                    )
                     SELECT * FROM AA 
                     WHERE PENGEMBALIANPNBPID = :PengembalianPnbpId";
 
