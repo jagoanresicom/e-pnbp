@@ -1,5 +1,7 @@
 ﻿@model Pnbp.Entities.DetailDataBerkas
 
+<link href='@Url.Content("~/resources/css/smart_wizard.css")' rel="stylesheet" />
+<link href='@Url.Content("~/resources/css/smart_wizard_theme_dots.css")' rel="stylesheet" />
 <style>
 	/*panel style overwrite*/
 	.panel-heading {
@@ -16,196 +18,274 @@
 		margin-top: 10px;
 	}
 
-	.panel-body__template-surat, .panel-body__template-surat > div {
-		display: grid;
+	/* top nav z-layer smartwizard overlay fix */
+	.main_container .top_nav {
+		position: relative;
+		z-index: 1;
 	}
+
+	.sw-theme-default .sw-toolbar-bottom {
+		visibility: hidden;
+	}
+
 </style>
 
 <form class="form-horizontal" method="post" enctype="multipart/form-data" id="js-form-entri">
 
 	<input type="hidden" name="satker" id="satker" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" />
+	@Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
 	@Html.HiddenFor(m => m.STATUSPENGEMBALIAN)
+	@Html.HiddenFor(m => m.STATUSSIMPAN)
 
-	<div id="dynamic_content">
+	<div id="smartwizard">
+		<ul style="padding:0">
+			<li><a href="#step-1"><span class="step-no">1</span></a></li>
+			<li><a href="#step-2"><span class="step-no">2</span></a></li>
+			<li><a href="#step-3"><span class="step-no">3</span></a></li>
+			<li><a href="#step-4"><span class="step-no">4</span></a></li>
+		</ul>
+		<div>
 
-		@if (!string.IsNullOrEmpty(Model.BERKASID))
-		{
-			<div class="text-right" style="margin-bottom:8px;">
-				<a href="@Url.Action("mon_pengembalian","Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
-			</div>
-		}
-		<div class="clearfix"></div>
+			<div id="step-1">
+				@* STEP 1 *@
 
-		<div class="row" style="padding-top: 10px;">
-			<div class="col-md-4">
-
-				@* section panel 1 *@
 				<div class="panel panel-default x_panel">
 					<div class="panel-heading x_title">
 						Data Berkas
-						<ul class="nav navbar-right panel_toolbox">
-							<li>
-								<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-							</li>
-							<li>
-								<a class="close-link"><i class="fa fa-close"></i></a>
-							</li>
-						</ul>
 					</div>
-					<div class="panel-body form-horizontal x_content">
-						@* form *@
-						@Html.HiddenFor(m => m.BERKASID)
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
-							<div class="col-sm-6">
-								@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
+					<div class="panel-body form-horizontal x_content pb-4">
+
+						<div class="row">
+							<div class="col-md-offset-3 col-md-6">
+								@Html.HiddenFor(m => m.BERKASID)
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
+									<div class="col-sm-8" style="display: flex;">
+										@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
+										<div class="ps-3"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" style="margin-right:0px;"><span class="fa fa-search"></span></button></button></div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Atas Nama</label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.NAMAPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Alamat</label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.ALAMATPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Alamat Pemohon" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.NPWP, new { @Value = "", @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })
+										@*@Html.TextBoxFor(m => m.NPWP, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })*@
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Kode Biling</label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.KODEBILLING, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Kode Billing" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NTPN</label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.NTPN, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NTPN" })
+									</div>
+								</div>
 							</div>
-							<div class="col-sm-2 text-left"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" style="margin-left:0px;"><span class="fa fa-search"></span></button></button></div>
-						</div>
-						<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Atas Nama</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.NAMAPEGAWAIPENGAJU, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
+
+							<div class="col-md-12">
+								<div class="ln_solid"></div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Alamat</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.ALAMATPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Alamat Pemohon" })
+
+							<div class="col-md-offset-3 col-md-6">
+								<div class="row">
+									<div class="col-md-offset-4 col-md-8">
+										@if (ViewData["step"].ToString() != "0")
+										{
+											<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+										}
+										else
+										{
+											<button type="button" class="js-smartwizard-next btn btn-success disabled">Selanjutnya</button>
+										}
+									</div>
+								</div>
 							</div>
+
 						</div>
-						<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.NPWP, new { @Value = "", @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })
-								@*@Html.TextBoxFor(m => m.NPWP, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })*@
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Kode Biling</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.KODEBILLING, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Kode Billing" })
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NTPN</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.NTPN, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NTPN" })
-							</div>
-						</div>
-						@* end form 1 *@
+
 					</div>
 				</div>
 
+				@* END STEP 1 *@
 			</div>
-			<div class="col-md-4">
+
+			<div id="step-2">
+				@* STEP 2 *@
 
 				<div class="panel panel-default x_panel">
 					<div class="panel-heading x_title">
 						Data Pengembalian
-						<ul class="nav navbar-right panel_toolbox ">
-							<li>
-								<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-							</li>
-							<li>
-								<a class="close-link"><i class="fa fa-close"></i></a>
-							</li>
-						</ul>
 					</div>
-					<div class="panel-body form-horizontal x_content">
-						@*Panel content*@
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Setoran PNBP</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.SETORANPNBP, new { @class = "form-control input-md js-input-currency text-right", @required = "required" })
+					<div class="panel-body form-horizontal x_content pb-4">
+						
+						<div class="row">
+							<div class="col-md-offset-3 col-md-6">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Setoran PNBP<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.SETORANPNBP, new { @class = "form-control input-md js-input-currency text-right", @data_required_proses = "true" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Jumlah Biaya Layanan yang sudah dikeluarkan<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.JUMLAHBAYAR, new { @class = "form-control input-md js-input-currency text-right", @data_required_proses = "true" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Permohonan Pengembalian</label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.PERMOHONANPENGEMBALIAN, new { @class = "form-control input-md js-input-currency text-right", @readonly = "readonly" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="npwpberkas" class="col-sm-4 control-label" style="text-align:left;">NPWP<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										<input type="text" name="npwpberkas" id="npwpberkas" class="form-control npwp" data-mask="00.000.000.0-000.000" placeholder="NPWP" value="@Model.NPWP"  data-required-proses="true"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Rekening<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.NAMAREKENING, new { @class = "form-control input-md", @data_required_proses = "true" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Rekening<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.NOMORREKENING, new { @class = "form-control input-md", @data_required_proses = "true" })
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Bank<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										@Html.TextBoxFor(m => m.NAMABANK, new { @class = "form-control input-md", @data_required_proses = "true" })
+									</div>
+								</div>
 							</div>
 						</div>
+
+						<div class="ln_solid"></div>
 						<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Jumlah Biaya Layanan yang sudah dikeluarkan</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.JUMLAHBAYAR, new { @class = "form-control input-md js-input-currency text-right", @required = "required" })
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Permohonan Pengembalian</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.PERMOHONANPENGEMBALIAN, new { @class = "form-control input-md js-input-currency text-right", @required = "required" })
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="npwpberkas" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
-							<div class="col-sm-8">
-								<input type="text" name="npwpberkas" id="npwpberkas" class="form-control npwp" data-mask="00.000.000.0-000.000" placeholder="NPWP" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Rekening</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.NAMAREKENING, new { @class = "form-control input-md", @required = "required" })
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Rekening</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.NOMORREKENING, new { @class = "form-control input-md", @required = "required" })
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Bank</label>
-							<div class="col-sm-8">
-								@Html.TextBoxFor(m => m.NAMABANK, new { @class = "form-control input-md", @required = "required" })
+							<div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-4">
+								<button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
+								<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+								<button type="submit" id="js-btn-simpan-step-2" class="btn btn-primary">Simpan</button>
 							</div>
 						</div>
 
 					</div>
 				</div>
 
+				@* END STEP 2 *@
 			</div>
-			<div class="col-md-4">
+
+			<div id="step-3">
+				@* STEP 3 *@
+
+				@*template surat*@
+				<div class="panel panel-default x_panel">
+					<div class="panel-heading x_title">
+						Template Surat
+					</div>
+					<div class="panel-body x_content pb-4">
+						@*Panel content*@
+
+						<div class="panel-body__template-surat">
+
+							<div class="row">
+								<div class="col-md-offset-3 col-md-6" style="display:grid;">
+									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
+									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
+									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan Pengembalian PNBP</button>
+									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
+								</div>
+								<div class="col-md-12">
+									<div class="ln_solid"></div>
+									<div class="form-group">
+										<div class="text-center">
+											<button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
+											<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+										</div>
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+				@* END STEP 3 *@
+			</div>
+
+			<div id="step-4">
+				@* step 4 *@
 
 				@*kirim permohonan*@
 				<div class="panel panel-default x_panel">
 					<div class="panel-heading x_title">
 						Kirim Permohonan
-						<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi.pdf maksimal 5MB</small>
+						<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi .pdf maksimal 5MB</small>
 					</div>
 					<div class="panel-body pe-0 ps-0">
 
 						@* Upload Request Baru *@
-						<div class="form-group">
-							<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian</label>
-							<div class="col-sm-8">
-								<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-								<span id="cancel-SuratPermohonanPengembalian"></span>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang</label>
-							<div class="col-sm-8">
-								<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-								<span id="cancel-SuratPernyataanPNBPBerulang"></span>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
-							@*<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar<span class="text-danger">*</span></label>*@
-							<div class="col-sm-8">
-								<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
-								<span id="cancel-SuratWajibBayar"></span>
+						<div class="row">
+							<div class="col-md-offset-3 col-md-6">
+								<div class="form-group">
+									<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" data-required-proses="true">
+										<span id="cancel-SuratPermohonanPengembalian"></span>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
+									<div class="col-sm-8">
+										<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" data-required-proses="true">
+										<span id="cancel-SuratPernyataanPNBPBerulang"></span>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
+									@*<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar<span class="text-danger">*</span></label>*@
+									<div class="col-sm-8">
+										<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+										<span id="cancel-SuratWajibBayar"></span>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-offset-4 col-sm-8">
+										<p>Kolom bertanda (<span class="text-danger">*</span>) wajib diisi.</p>
+									</div>
+								</div>
 							</div>
 						</div>
 
 						<div class="ln_solid"></div>
 						@*<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>*@
 						<div class="form-group">
-							<div class="col-sm-12">
+							<div class="col-md-offset-4 col-md-8">
 								@* dari EntriPengembalianPusat.cshtml *@
+								<button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
 								<button type="submit" id="js-btn-simpan" class="btn btn-primary">Simpan</button>
 								<button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
 							</div>
@@ -214,52 +294,40 @@
 					</div>
 				</div>
 
-				@*template surat*@
-				<div class="panel panel-default x_panel">
-					<div class="panel-heading x_title">
-						Template Surat
-						<ul class="nav navbar-right panel_toolbox">
-							<li>
-								<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-							</li>
-							<li>
-								<a class="close-link"><i class="fa fa-close"></i></a>
-							</li>
-						</ul>
-					</div>
-					<div class="panel-body x_content">
-						@*Panel content*@
-
-						<div class="panel-body__template-surat">
-							<div>
-								<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
-							</div>
-							<div>
-								<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
-							</div>
-							<div>
-								<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan Pengembalian PNBP</button>
-							</div>
-							<div>
-								<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
+				@* end 4 *@
 			</div>
 
 		</div>
 	</div>
+
 </form>
 
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
+<script src='@Url.Content("~/resources/js/jquery.smartWizard.js")'></script>
 <script>
 	$(document).ready(function () {
+
+        $('#smartwizard').smartWizard({
+            selected: @Html.Raw(Json.Encode(ViewData["step"])),
+            theme: 'default',
+            transitionEffect: 'fade',
+            showStepURLhash: false,
+            keyNavigation: false,
+            toolbarSettings: {
+                showNextButton: false,
+                showPreviousButton: false
+            }
+		});
+
+		$('.js-smartwizard-next').on('click', (event) => {
+			if ($(event.target).hasClass('disabled'))
+				return;
+			$('#smartwizard').smartWizard('next');
+		});
+
+		$('.js-smartwizard-prev').on('click', () => {
+			$('#smartwizard').smartWizard('prev');
+		});
 
 		function cariBerkas() {
 			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
@@ -271,13 +339,18 @@
 					if (res.Success) {
 						let data = res.Data;
 						$('#BERKASID').val(data.BERKASID);
-						$('#NAMAPEGAWAIPENGAJU').val(data.NAMA);
+						$('#NAMAPEMOHON').val(data.NAMA);
 						$('#ALAMATPEMOHON').val(data.ALAMAT);
 						$('#NPWP').val(data.NPWP);
 						$('#KODEBILLING').val(data.KODEBILLING);
 						$('#NTPN').val(data.NTPN);
 						$('#SETORANPNBP').val(addCommas(data.PENERIMAAN));
+						cekBerkasPengembalian(data.BERKASID);
 					} else {
+						$.unblockUI();
+						$('#step-1 .js-smartwizard-next').addClass('disabled');
+						$('[href="#step-2"]').parent().removeClass();
+						resetFormDataBerkas();
 						swal({
 							title: "Perhatian",
 							text: res.Message,
@@ -288,6 +361,7 @@
 					}
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
 					swal({
 						title: "Proses Gagal",
 						text: "Terjadi kesalahan",
@@ -296,9 +370,53 @@
 						allowOutsideClick: true,
 					});
 				},
-			}).always(() => {
-				$.unblockUI();
+			})
+		}
+
+		function cekBerkasPengembalian(berkasId) {
+
+			$.ajax({
+				url: '@Url.Action("CekBerkasPengembalian", "Pengembalian")',
+				type: 'POST',
+				data: { berkasId },
+				success: function (res) {
+					$.unblockUI();
+					if (res.Success) {
+						$('#step-1 .js-smartwizard-next').removeClass('disabled');
+					} else {
+						$('#step-1 .js-smartwizard-next').addClass('disabled');
+						$('[href="#step-2"]').parent().removeClass();
+						swal({
+							title: "Perhatian",
+							text: res.Message,
+							html: true,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
 			});
+		}
+
+		function resetFormDataBerkas() {
+			$('#BERKASID').val('');
+			$('#NAMAPEMOHON').val('');
+			$('#ALAMATPEMOHON').val('');
+			$('#NPWP').val('');
+			$('#KODEBILLING').val('');
+			$('#NTPN').val('');
+			$('#SETORANPNBP').val('');
 		}
 
 		function addCommas(nStr) {
@@ -332,10 +450,10 @@
 					if (data.Status) {
 						swal({
 							title: "Sukses",
-							text: "Berhasil",
+							text: "Data berhasil disimpan",
 							type: "success",
 							closeOnEsc: true,
-							allowOutsideClick: true,
+							allowOutsideClick: false,
 						}, function () {
 							window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
 						});
@@ -397,9 +515,41 @@
 		}
 
 		$('#js-btn-cari-berkas').on('click', () => cariBerkas());
-		$('#js-btn-simpan').on('click', () => $('#STATUSPENGEMBALIAN').val(0));
-		$('#js-btn-proses').on('click', () => $('#STATUSPENGEMBALIAN').val(2));
-		$('#js-form-entri').on('submit', (e) => simpanPengembalian(e));
+		$('#js-btn-simpan').on('click', () => {
+			$('#STATUSPENGEMBALIAN').val(0)
+			$('#STATUSSIMPAN').val('');
+		});
+		$('#js-btn-simpan-step-2').on('click', () => {
+			$('#STATUSPENGEMBALIAN').val(0);
+			$('#STATUSSIMPAN').val(1);
+		});
+		$('#js-btn-proses').on('click', () => {
+			$('#STATUSPENGEMBALIAN').val(2);
+		});
+		$('#js-form-entri').on('submit', (e) => {
+			e.preventDefault();
+			window.setTimeout(() => {
+				let isValid = true;
+				if ($('#STATUSPENGEMBALIAN').val() == "2") {
+					isValid = isValidProsesPengembalian();
+				}
+				if (isValid) {
+					simpanPengembalian(e);
+				} else {
+					swal({
+						title: 'Perhatian',
+						text: 'Periksa kembali inputan Anda. Masih terdapat isian wajib yang belum diisi.',
+						type: 'warning',
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				}
+			}, 5);
+		});
+
+		function isValidProsesPengembalian() {
+			return $('[data-required-proses="true"]').get().every(node => $(node).val() != '');
+		}
 
 		// init input currency
 		$('.js-input-currency').on('keyup', (e) => {
@@ -408,6 +558,7 @@
 		$('.js-input-currency').on('keydown', (e) => {
 			return isNumberKey(event)
 		});
+		$('.js-input-currency').each((index, node) => node.value = convertRupiah(node.value));
 
 		// generate surat
 		$('.js-btn-generate-surat').on('click', generateSuratHandler);
@@ -439,7 +590,7 @@
 				"?namaBank=" + $('#NAMABANK').val(),
 				"&nomorRekening=" + $('#NOMORREKENING').val(),
 				"&namaRekening=" + $('#NAMAREKENING').val(),
-				"&namaPemohon=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&namaPemohon=" + $('#NAMAPEMOHON').val(),
 				"&alamatPemohon=" + $('#ALAMATPEMOHON').val(),
 				"&permohonanPengembalian=" + $('#PERMOHONANPENGEMBALIAN').val(),
 			];
@@ -478,7 +629,7 @@
 			var JumlahBayar = $('#JumlahBayar').val();
 			var NamaProsedur = $('#NamaProsedur').val();
 			let params = [
-				"&atasNama=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&atasNama=" + $('#NAMAPEMOHON').val(),
 				"&SetoranPnbp=" + $('#SETORANPNBP').val(),
 			];
 			window.open(url + '?NomorSurat=' + nomorsurat + '&nomorberkas=' + nomorberkas + '&namapemohon=' + namapemohon + '&JumlahBayar=' + JumlahBayar + '&NamaProsedur=' + NamaProsedur + params.join(''), '_blank');
@@ -491,10 +642,27 @@
 			var nomorberkas = $('#NOMORBERKAS').val();
 			var NamaProsedur = $('#NamaProsedur').val();
 			let params = [
-				"&atasNama=" + $('#NAMAPEGAWAIPENGAJU').val(),
+				"&atasNama=" + $('#NAMAPEMOHON').val(),
 			];
 			window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker + params.join(''), '_blank');
 		}
+
+		function hitungPermohonanPengembalian() {
+			let setoranPnbp = parseInt($('#SETORANPNBP').val().replace(/\./g, ''));
+			let jumlahBayar = parseInt($('#JUMLAHBAYAR').val().replace(/\./g, ''));
+			if (isNaN(setoranPnbp)) {
+				setoranPnbp = 0;
+			}
+			if (isNaN(jumlahBayar)) {
+				jumlahBayar = 0;
+			}
+			let permohonanPengembalian = setoranPnbp - jumlahBayar;
+			permohonanPengembalian = Math.max(0, permohonanPengembalian);
+			$('#PERMOHONANPENGEMBALIAN').val(convertRupiah(permohonanPengembalian.toString()));
+		}
+
+		$('#SETORANPNBP').on('input', () => hitungPermohonanPengembalian());
+		$('#JUMLAHBAYAR').on('input', () => hitungPermohonanPengembalian());
 
 	});
 </script>

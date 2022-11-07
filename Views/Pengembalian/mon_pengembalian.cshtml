@@ -257,39 +257,35 @@
 				"render": function (data, type, row) {
 					let isPusat = ($('#jeniskantor').val() == 'Pusat');
 					let html = '';
+					let url = '@Url.Action("DetailPengajuan", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
 
 					switch (data.StatusPengembalian) {
 						case 1:
 							if (data.LabelTipePengembalian == "Pusat" && isPusat) {
-								html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+								html += '<a href="' + url + '" class="btn btn-success btn-edit"><i class="fa fa-pencil"></i> Edit</a>';
 							} else if ((data.LabelTipePengembalian == "Daerah" && !isPusat)) {
-								html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
+								html += '<a href="' + url + '" class="btn btn-success">Selesai</a>';
 							} else {
-								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+								html += '<a href="' + url + '" class="btn btn-primary"><i class="fa fa-eye"></i> Lihat</a>';
 							}
 							break;
 						case 3:
 						case 0:
-							html += '<button type="button" class="btn btn-success btn-edit --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
+							html += '<a href="' + url + '" class="btn btn-success btn-edit"><i class="fa fa-pencil"></i> Edit</a>';
 							break;
 						case 2:
 							if ((data.LabelTipePengembalian == "Pusat" && isPusat) || (data.LabelTipePengembalian == "Daerah" && !isPusat)) {
-								html += '<button type="button" class="btn btn-success --js-btn-edit">Selesai</button>';
+								html += '<a href="' + url + '" class="btn btn-success">Selesai</a>';
 							} else {
-								html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+								html += '<a href="' + url + '" class="btn btn-primary"><i class="fa fa-eye"></i> Lihat</a>';
 							}
 							break;
 						case 4:
-							html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-eye --js-btn-edit"></i> Lihat</button>';
+							html += '<a href="' + url + '" class="btn btn-primary"><i class="fa fa-eye"></i> Lihat</a>';
 							break;
 						default:
 							break;
 					}
-
-					//if (isPusat) {
-					//	html += '<button type="button" class="btn btn-success --js-btn-selesai">Selesai</button>';
-					//}
-					//html += '<button type="button" class="btn btn-primary --js-btn-edit"><i class="fa fa-pencil --js-btn-edit"></i> Edit</button>';
 
 					html = '<div class="text-center d-flex justify-content-center" style="gap:6px">' + html + '</div>';
 					return html;
@@ -330,20 +326,11 @@
 			var data = dTable.row($(this).closest('tr')).data();
 			if (e.target.classList.contains('--js-btn-selesai')) {
 				selesai(e);
-			} else if (e.target.classList.contains('--js-btn-edit')) {
-				redirectEdit(e, data);
 			}
 		});
 
-
 		function selesai(e) {
 			showmsg('Informasi', 'Fitur belum tersedia');
-		}
-
-		function redirectEdit(e, data) {
-			window.location.href = '@Url.Action("DetailPengajuan", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
-			e.preventDefault();
-			return false;
 		}
 
 		function formatAngka(data) {

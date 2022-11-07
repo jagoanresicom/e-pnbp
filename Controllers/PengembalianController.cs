@@ -2254,9 +2254,18 @@ namespace Pnbp.Controllers
             }
 
             // filter input
-            data.SETORANPNBP = data.SETORANPNBP.Replace(".", String.Empty);
-            data.JUMLAHBAYAR = data.JUMLAHBAYAR.Replace(".", String.Empty);
-            data.PERMOHONANPENGEMBALIAN = data.PERMOHONANPENGEMBALIAN.Replace(".", String.Empty);
+            if (!String.IsNullOrEmpty(data.SETORANPNBP))
+            { 
+                data.SETORANPNBP = data.SETORANPNBP.Replace(".", String.Empty);
+            }
+            if (!String.IsNullOrEmpty(data.JUMLAHBAYAR))
+            { 
+                data.JUMLAHBAYAR = data.JUMLAHBAYAR.Replace(".", String.Empty);
+            }
+            if (!String.IsNullOrEmpty(data.PERMOHONANPENGEMBALIAN))
+            {
+                data.PERMOHONANPENGEMBALIAN = data.PERMOHONANPENGEMBALIAN.Replace(".", String.Empty);
+            }
 
             var userIdentity = (HttpContext.User.Identity as Entities.InternalUserIdentity);
             string userid = userIdentity.UserId;
@@ -2264,7 +2273,15 @@ namespace Pnbp.Controllers
             string pegawaiid = userIdentity.PegawaiId;
             string namapegawai = userIdentity.NamaPegawai;
 
-            tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN);
+            if (String.IsNullOrEmpty(data.PENGEMBALIANPNBPID))
+            {
+                tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN);
+            }
+            else
+            { 
+                tr = pengembalianmodel.UpdatePengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN);
+            }
+
             if (tr.Status && !String.IsNullOrEmpty(tr.ReturnValue))
             {
                 string pengembalianId = tr.ReturnValue;
@@ -2577,6 +2594,20 @@ namespace Pnbp.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public JsonResult CekBerkasPengembalian(string berkasId)
+        {
+            CommonResponse response = new CommonResponse() { Success = true, Message = "" };
+
+            BerkasKembalian berkasKembalian = pengembalianmodel.GetBerkasKembalianPnbpById(berkasId);
+            if (berkasKembalian != null) {
+                response.Success = false;
+                response.Message = $"Permohonan pengembalian untuk berkas <b>{berkasKembalian.NomorBerkas}</b> sudah pernah dilakukan. Cek status permohonan di menu <b>Monitoring</b>.";
+            }
+
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
         //public ActionResult PengajuanPengembalianDetail(string pengembalianpnbpid)
         //{
         //    return Json(pengembalianpnbpid, JsonRequestBehavior.AllowGet);
@@ -2628,7 +2659,12 @@ namespace Pnbp.Controllers
 
         public ActionResult DetailPengajuan(string pengembalianpnbpid)
         {
-            Entities.DetailDataBerkas data = new Entities.DetailDataBerkas();
+            Entities.DetailDataBerkas data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
+            if (!String.IsNullOrEmpty(data.STATUSSIMPAN) && data.STATUSSIMPAN == "1")
+            {
+                return RedirectToAction("Daerah", new { pengembalianpnbpid });
+            }
+
             Entities.LampiranKembalianTrain file1 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file2 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file3 = new Entities.LampiranKembalianTrain();
@@ -2645,7 +2681,7 @@ namespace Pnbp.Controllers
             Entities.LampiranKembalianTrain file20 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file21 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file22 = new Entities.LampiranKembalianTrain();
-            data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
+
             file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN");
             file2 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN");
             file3 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI PENERIMAAN NEGARA");
@@ -3387,6 +3423,20 @@ namespace Pnbp.Controllers
                 var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "");
                 var NomorSurat = ((form.AllKeys.Contains("NomorSurat")) ? form["NomorSurat"] : "");
 
+                // filter input
+                if (!String.IsNullOrEmpty(SetoranPnbp))
+                {
+                    SetoranPnbp = SetoranPnbp.Replace(".", String.Empty);
+                }
+                if (!String.IsNullOrEmpty(BiayaLayanan))
+                {
+                    BiayaLayanan = BiayaLayanan.Replace(".", String.Empty);
+                }
+                if (!String.IsNullOrEmpty(PermohonanPengembalian))
+                {
+                    PermohonanPengembalian = PermohonanPengembalian.Replace(".", String.Empty);
+                }
+
                 // validasi lampiran
                 var fileid13 = ((form.AllKeys.Contains("fileid13")) ? form["fileid13"] : "");
                 var fileid12 = ((form.AllKeys.Contains("fileid12")) ? form["fileid12"] : "");
@@ -3424,20 +3474,47 @@ namespace Pnbp.Controllers
                     db.Database.ExecuteSqlCommand(insert_target_berkas);
                 }
 
-                //log insert Audit Trail
                 string log_id = NewGuID();
+                List<object> lstParams = new List<object>();
+
+                if (Status == "0")
+                {
+                    Int32 setoranPnbp = 0;
+                    Int32 biayaLayanan = 0;
+                    Int32.TryParse(SetoranPnbp, out setoranPnbp);
+                    Int32.TryParse(BiayaLayanan, out biayaLayanan);
+
+                    DetailDataBerkas data = new DetailDataBerkas()
+                    {
+                        JUMLAHBAYAR = BiayaLayanan,
+                        NOMORREKENING = NomorRekening,
+                        NAMABANK = NamaBank,
+                        SETORANPNBP = SetoranPnbp,
+                        NAMAREKENING = NamaRekening,
+                        PERMOHONANPENGEMBALIAN = (setoranPnbp - biayaLayanan).ToString(),
+                        PENGEMBALIANPNBPID = pengembalianid,
+                    };
+                    tr = pengembalianmodel.UpdateDataBerkasPengembalian(data, npwpberkas);
+                }
+                else if (Status == "2")
+                {
+                    string query = $"UPDATE PENGEMBALIANPNBP SET STATUSPENGEMBALIAN = '2', STATUSSIMPAN = NULL WHERE PENGEMBALIANPNBPID = :pengembalianId";
+                    lstParams.Clear();
+                    lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("pengembalianId", pengembalianid));
+                    db.Database.ExecuteSqlCommand(query, lstParams.ToArray());
+                }
+
+                //log insert Audit Trail
                 if (Status == "0")
                 {
                     string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Disimpan', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetail", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
                     db.Database.ExecuteSqlCommand(insert_log_aktivitas);
                 }
-                else if (Status == "1")
-                {
-                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Dikirim', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetail", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
-                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
-                }
-                //log insert Audit Trail
-
+                //else if (Status == "1")
+                //{
+                //    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Dikirim', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetail", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
+                //    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                //}
 
                 //Lampiran Pengembalian
                 UploadFileSuratPermohonanPengembalianPNBP(pengembalianid, fileid13);
@@ -3564,9 +3641,19 @@ namespace Pnbp.Controllers
             return View("EntriPengembalianPusat", data);
         }
 
-        public ActionResult Daerah()
+        public ActionResult Daerah(string pengembalianPnbpId)
         {
             DetailDataBerkas data = new DetailDataBerkas();
+            this.ViewData["step"] = 0;
+            if (!String.IsNullOrEmpty(pengembalianPnbpId))
+            {
+                data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianPnbpId);
+                if (!String.IsNullOrEmpty(data.STATUSSIMPAN) && data.STATUSSIMPAN == "1")
+                {
+                    this.ViewData["step"] = 1;
+                }
+            }
+
             return View("EntriPengembalianDaerah", data);
         }
 
