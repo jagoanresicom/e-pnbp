@@ -70,7 +70,7 @@
                                     <th>Tipe</th>
                                     <th class="numeric">Anggaran (Rp)</th>
                                     <th class="numeric">Alokasi (Rp)</th>
-                                    <th style="text-align:center; width:5%;">Entri</th>
+                                    @*<th style="text-align:center; width:5%;">Entri</th>*@
                                 </tr>
                             </thead>
 
@@ -83,7 +83,7 @@
                                         <td>@item.Tipe</td>
                                         <td class="numeric">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
                                         <td class="numeric">@item.JUMLAHALOKASI.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
-                                        @if (ViewBag.IsAksesEdit == "Y")
+                                        @*@if (ViewBag.IsAksesEdit == "Y")
                                         {
 									        <td style="text-align:center;cursor: pointer;" onclick="editDataManfaat('@item.Manfaatid');">
 										        <i class="fa fa-pencil"></i>
@@ -94,7 +94,7 @@
                                             <td style="text-align:center;cursor: not-allowed;" class="disabled">
                                                 <i class="fa fa-pencil"></i>
                                             </td>
-                                        }
+                                        }*@
                                     </tr>
                                 }
 
