@@ -517,11 +517,13 @@
 		$('#js-btn-cari-berkas').on('click', () => cariBerkas());
 		$('#js-btn-simpan').on('click', () => {
 			$('#STATUSPENGEMBALIAN').val(0)
-			$('#STATUSSIMPAN').val('');
+			$('#STATUSSIMPAN').val(2);
 		});
 		$('#js-btn-simpan-step-2').on('click', () => {
 			$('#STATUSPENGEMBALIAN').val(0);
-			$('#STATUSSIMPAN').val(1);
+			if ($('#STATUSSIMPAN').val() != '2') {
+				$('#STATUSSIMPAN').val(1);
+			}
 		});
 		$('#js-btn-proses').on('click', () => {
 			$('#STATUSPENGEMBALIAN').val(2);
