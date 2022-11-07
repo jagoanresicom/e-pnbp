@@ -794,7 +794,7 @@ namespace Pnbp.Models
 	                LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
 	                LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
 	                WHERE
-	                    sb.KDSATKER = '430210' AND
+                        sb.KDSATKER = '430210' AND
 	                    sb.KDSATKER != '524465'  AND sb.SUMBER_DANA = 'D'
 	                GROUP BY
 	                    s.KANTORID, 
@@ -809,6 +809,8 @@ namespace Pnbp.Models
                 )
                 WHERE programid IS NOT NULL
                 ";
+                //sb.KDSATKER = '430210' AND
+
 
                 result = db.Database.SqlQuery<Entities.DataProsesAlokasi>(query).ToList();
 
@@ -1516,7 +1518,7 @@ namespace Pnbp.Models
                     s.NAMA_SATKER AS NamaSatker, 
                     to_char(ta.PAGU) AS pagu, 
                     to_char(ta.alokasi) AS alokasi, 
-                    (CASE WHEN pagu > alokasi THEN 1 ELSE 0 end) valid
+                    (CASE WHEN pagu >= alokasi THEN 1 ELSE 0 end) valid
                 FROM {tableName} ta
                 LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
                 WHERE ta.KDSATKER != '524465'

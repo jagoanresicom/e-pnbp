@@ -222,6 +222,7 @@
 							allowEscapeKey: true,
 						});
                     }
+                    disable = false;
 
                     $('#btn-alokasi').prop('disabled', disable);
                     $('#btn-reset-alokasi').prop('disabled', disable);
@@ -274,6 +275,8 @@
                     }
                 }
 
+                disable = false;
+
                 $('#btn-alokasi').prop('disabled', disable);
                 $('#btn-reset-alokasi').prop('disabled', disable);
 
@@ -304,6 +307,8 @@
                     $('#notes').show();
                     console.log("Kode Sapn Not Valid");
                 }
+                $('#btn-alokasi').prop('disabled', false);
+
                 $.unblockUI();
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {

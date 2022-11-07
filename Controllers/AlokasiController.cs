@@ -1475,6 +1475,7 @@ namespace Pnbp.Controllers
             var index = 0;
             foreach (var rw in data)
             {
+                index++;
                 dt.Rows.Add(index, rw.KodeSatker, rw.Amount);
             }
 

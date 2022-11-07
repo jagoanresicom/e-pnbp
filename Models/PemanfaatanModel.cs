@@ -1084,7 +1084,7 @@ namespace Pnbp.Models
 		                            ROW_NUMBER() over (ORDER BY kdsatker) RNUMBER,
 		                            KDSATKER KodeKRO,
                                     u.kantorid,
-                                    nama_satker KRO,
+                                    u.nama_satker KRO,
 		                            sum(pagu) pagu,
                                     sum(alokasi) alokasi,
                                     COUNT(1) OVER() TOTAL
@@ -1110,7 +1110,7 @@ namespace Pnbp.Models
                 lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
             }
 
-            subQuery += " GROUP BY (kdsatker,nama_satker, u.kantorid) ";
+            subQuery += " GROUP BY (kdsatker, u.nama_satker, u.kantorid) ";
 
             string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
 
