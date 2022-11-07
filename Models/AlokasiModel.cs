@@ -959,7 +959,8 @@ namespace Pnbp.Models
                         FROM ALOKASISATKERSUMMARY a 
                         WHERE tahun = extract(year from sysdate) AND MP = (SELECT * FROM (
                             SELECT a2.mp FROM ALOKASISATKERSUMMARY a2 WHERE a2.tahun = extract(year from sysdate) ORDER BY a2.MP DESC
-                        ) WHERE rownum = 1)";
+                        ) WHERE rownum = 1)
+                        ORDER BY revisi DESC";
 
                     var getLastAlokasiSummary = db.Database.SqlQuery<Entities.AlokasiSatkerSummary>(queryLastAlokasiSummary).FirstOrDefault();
                     if (getLastAlokasiSummary != null)
@@ -1163,7 +1164,7 @@ namespace Pnbp.Models
 
                     totalRevisi.Add(new Entities.AlokasiSatkerRevisi
                     {
-                        Revisi = 0,
+                        Revisi = -1,
                         Alokasi = result.Sum(y => y.Pagu)
                     });
 
@@ -1172,7 +1173,7 @@ namespace Pnbp.Models
                         var totalAlokasiSaatIni = result.Sum(y => y.Alokasi);
                         var alokasiSaatIni = new Entities.AlokasiSatkerRevisi
                         {
-                            Revisi = (totalRevisi.Count + 1),
+                            Revisi = 0,
                             Alokasi = totalAlokasiSaatIni
                         };
                         totalRevisi.Add(alokasiSaatIni);
