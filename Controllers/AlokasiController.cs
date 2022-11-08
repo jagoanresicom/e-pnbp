@@ -1419,9 +1419,18 @@ namespace Pnbp.Controllers
         [HttpPost]
         public ActionResult ProsesAlokasi()
         {
-            var user = (HttpContext.User.Identity as Entities.InternalUserIdentity);
             var alm = new Models.AlokasiModel();
+
+            if (!IsValidAlokasiSaatIni())
+            { 
+                return Json(new { 
+                    success = false,
+                    message = "Masih terdapat nilai <b>Alokasi Saat Ini</b> yang melebihi nilai <b>Pagu</b>. Cek kembali data yang akan dialokasikan.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             var isProcessAlokasiSuccess = alm.ProsesAlokasi();
+
             return Json(new { success = isProcessAlokasiSuccess }, JsonRequestBehavior.AllowGet);
         }
 
@@ -1508,7 +1517,8 @@ namespace Pnbp.Controllers
             {
                 string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
                 satker satker = _manfaatanModel.GetSatkerByKantorId(kantorId);
-                result = alm.GetSummaryAlokasiDaerah(tahun, satker.kode);
+                string currentYear = DateTime.Now.Year.ToString();
+                result = alm.GetSummaryAlokasiDaerah(currentYear, satker.kode);
             }
 
             return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
@@ -1536,6 +1546,23 @@ namespace Pnbp.Controllers
             }
 
             return Json(new { success = true, data = new { valid = valid, data = result } }, JsonRequestBehavior.AllowGet);
+        }
+
+        private bool IsValidAlokasiSaatIni()
+        {
+            var alm = new Models.AlokasiModel();
+            bool isRevisi = false;
+            var result = alm.GetAlokasiSaatIni(isRevisi);
+            bool valid = false;
+            if (result != null && result.Count > 0)
+            {
+                if (result.Find(x => x.Valid == 0) == null)
+                {
+                    valid = true;
+                }
+            }
+
+            return valid;
         }
 
     }
