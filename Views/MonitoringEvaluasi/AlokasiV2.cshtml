@@ -40,7 +40,7 @@
 				<div class="x_content">
 					@using (Html.BeginForm("Export", "Penerimaan", FormMethod.Post, new { id = "frmFindData", @class = "form-horizontal form-label-left" }))
 					{
-						<div class="form-group">
+						<div class="form-group mt-4">
 							<label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<select name="tahun" id="tahun" class="select2_single form-control input-md">
@@ -101,7 +101,7 @@
 						*@
 					}
 				</div>
-				<div style="text-align:center;">
+				<div class="mb-3 row">
 					<div style="text-align:center;">
 						<div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3">
 							<button id="find-btn" type="button" class="btn btn-success">Cari</button>
@@ -141,7 +141,7 @@
 							</div>
 						</div>*@
 
-						<form class="form-horizontal form-label-left pnbp-group-table" id="frmdatasatker" method="post" data-name="alokasi">
+						<form class="form-horizontal form-label-left pnbp-group-table px-3" id="frmdatasatker" method="post" data-name="alokasi">
 							<div class="form-group" id="group_alokasi">
 								<div class="row text-center">
 									<label class="control-label"><h2><b>Riwayat MP</b></h2></label>
