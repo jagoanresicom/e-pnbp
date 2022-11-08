@@ -1,4 +1,13 @@
 ﻿@model Pnbp.Entities.DetailDataBerkas
+@{
+	var fileSuratPermohonan = ViewBag.fileSuratPermohonan;
+	var fileSuratPNBPBerulang = ViewBag.fileSuratPNBPBerulang;
+	var fileSuratWajibBayar = ViewBag.fileSuratWajibBayar;
+
+	var isExistsFileSuratPermohonan = (fileSuratPermohonan != null && !String.IsNullOrEmpty(fileSuratPermohonan.NamaFile));
+	var isExistsfileSuratPNBPBerulang= (fileSuratPNBPBerulang != null && !String.IsNullOrEmpty(fileSuratPNBPBerulang.NamaFile));
+	var isExistsfileSuratWajibBayar = (fileSuratWajibBayar != null && !String.IsNullOrEmpty(fileSuratWajibBayar.NamaFile));
+}
 
 <link href='@Url.Content("~/resources/css/smart_wizard.css")' rel="stylesheet" />
 <link href='@Url.Content("~/resources/css/smart_wizard_theme_dots.css")' rel="stylesheet" />
@@ -61,8 +70,16 @@
 								<div class="form-group">
 									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
 									<div class="col-sm-8" style="display: flex;">
-										@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
-										<div class="ps-3"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" style="margin-right:0px;"><span class="fa fa-search"></span></button></button></div>
+										@if (String.IsNullOrEmpty(Model.BERKASID))
+										{
+											@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
+											<div class="ps-3"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" style="margin-right:0px;"><span class="fa fa-search"></span></button></div>
+										}
+										else
+										{
+											@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @readonly = "readonly", @required = "required", @placeholder = "Nomor/Tahun" })
+											<div class="ps-3"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" disabled style="margin-right:0px;"><span class="fa fa-search"></span></button></div>
+										}
 									</div>
 								</div>
 								<div class="form-group">
@@ -125,7 +142,7 @@
 				@* END STEP 1 *@
 			</div>
 
-			<div id="step-2">
+			<div id="step-2" class="js-form-pristine">
 				@* STEP 2 *@
 
 				<div class="panel panel-default x_panel">
@@ -221,7 +238,7 @@
 									<div class="form-group">
 										<div class="text-center">
 											<button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
-											<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+											<button type="button" class="js-smartwizard-next btn btn-success disabled">Selanjutnya</button>
 										</div>
 									</div>
 								</div>
@@ -236,7 +253,7 @@
 				@* END STEP 3 *@
 			</div>
 
-			<div id="step-4">
+			<div id="step-4" class="js-form-pristine">
 				@* step 4 *@
 
 				@*kirim permohonan*@
@@ -252,25 +269,48 @@
 							<div class="col-md-offset-3 col-md-6">
 								<div class="form-group">
 									<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
-										<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" data-required-proses="true">
+									<div class="col-sm-7">
+										<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
 										<span id="cancel-SuratPermohonanPengembalian"></span>
 									</div>
+									@if (isExistsFileSuratPermohonan)
+									{
+										<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+											<a href="@fileSuratPermohonan.NamaFile" class="btn btn-default btn-xs" download>
+												<i class="fa fa-download"></i>
+											</a>
+										</div>
+									}
 								</div>
 								<div class="form-group">
 									<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
-										<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" data-required-proses="true">
+									<div class="col-sm-7">
+										<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
 										<span id="cancel-SuratPernyataanPNBPBerulang"></span>
 									</div>
+									@if (isExistsfileSuratPNBPBerulang)
+									{
+										<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+											<a href="@fileSuratPNBPBerulang.NamaFile" class="btn btn-default btn-xs" download>
+												<i class="fa fa-download"></i>
+											</a>
+										</div>
+									}
 								</div>
 								<div class="form-group">
 									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
-									@*<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar<span class="text-danger">*</span></label>*@
-									<div class="col-sm-8">
+									<div class="col-sm-7">
 										<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
 										<span id="cancel-SuratWajibBayar"></span>
 									</div>
+									@if (isExistsfileSuratWajibBayar)
+									{
+										<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+											<a href="@fileSuratWajibBayar.NamaFile" class="btn btn-default btn-xs" download>
+												<i class="fa fa-download"></i>
+											</a>
+										</div>
+									}
 								</div>
 								<div class="form-group">
 									<div class="col-md-offset-4 col-sm-8">
@@ -307,8 +347,20 @@
 <script>
 	$(document).ready(function () {
 
+		let isSubmit = false;
+		let currentStep = @Html.Raw(Json.Encode(ViewData["step"]));
+		if (currentStep == 3) {
+			$('#step-3 .js-smartwizard-next').removeClass('disabled');
+		}
+
+		window.onbeforeunload = function (e) {
+			if (isFormDirty() && !isSubmit) {
+				return ' ';
+			}
+		};
+
         $('#smartwizard').smartWizard({
-            selected: @Html.Raw(Json.Encode(ViewData["step"])),
+			selected: currentStep,
             theme: 'default',
             transitionEffect: 'fade',
             showStepURLhash: false,
@@ -328,6 +380,34 @@
 		$('.js-smartwizard-prev').on('click', () => {
 			$('#smartwizard').smartWizard('prev');
 		});
+
+		function isFormDirty() {
+			var hasChanges = false;
+
+			$(".js-form-pristine :input:not(:button):not([type=hidden])").each(function () {
+				if ((this.type == "text" || this.type == "textarea" || this.type == "hidden") && this.defaultValue != this.value) {
+					hasChanges = true;
+					return false;
+				} else {
+					if ((this.type == "radio" || this.type == "checkbox") && this.defaultChecked != this.checked) {
+						hasChanges = true;
+						return false;
+					}
+					else {
+						if ((this.type == "select-one" || this.type == "select-multiple")) {
+							for (var x = 0; x < this.length; x++) {
+								if (this.options[x].selected != this.options[x].defaultSelected) {
+									hasChanges = true;
+									return false;
+								}
+							}
+						}
+					}
+				}
+			});
+
+			return hasChanges;
+		}
 
 		function cariBerkas() {
 			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
@@ -455,12 +535,14 @@
 							closeOnEsc: true,
 							allowOutsideClick: false,
 						}, function () {
+							isSubmit = true;
 							window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
 						});
 					} else {
 						swal({
 							title: "Proses Gagal",
 							text: data.Pesan,
+							html: true,
 							type: "warning",
 							closeOnEsc: true,
 							allowOutsideClick: true,
@@ -565,26 +647,20 @@
 		// generate surat
 		$('.js-btn-generate-surat').on('click', generateSuratHandler);
 
+		let downloadedTemplate = [];
 		function generateSuratHandler(e) {
-			switch (e.target.dataset.template) {
-				case 'permohonan-pengembalian': generate_permohonan(); break;
-				case 'pernyataan-pnbp-berutang': generatePNBPTerutang(); break;
+			let tipe = e.target.dataset.template;
+			switch (tipe) {
 				case 'keterangan-pengeluaran': generate_keterangan(); break;
 				case 'pernyataan-tidak-terlayani': generate_tidak_terlayani(); break;
-				case 'wajib-bayar': generateWajibBayar(); break;
 				case 'persetujuan': generatePersetujuan(); break;
 				case 'tanggung-jawab': generateTanggungJawab(); break;
 			}
-		}
 
-		function generatePNBPTerutang() {
-			var url = '@Url.Action("GeneratePNBPTerutang","Pengembalian")';
-			window.open(url, '_blank');
-		}
-
-		function generateWajibBayar() {
-			var url = '@Url.Action("GenerateWajibBayar","Pengembalian")';
-			window.open(url, '_blank');
+			if (!downloadedTemplate.includes(tipe))
+				downloadedTemplate.push(tipe);
+			if (downloadedTemplate.length >= 4)
+				$('#step-3 .js-smartwizard-next').removeClass('disabled');
 		}
 
 		function generatePersetujuan() {
@@ -607,19 +683,6 @@
 			];
 			var url = '@Url.Action("GenerateTanggungJawab","Pengembalian")';
 			window.open(url + params.join(''), '_blank');
-		}
-
-		function generate_permohonan() {
-			var url = '@Url.Action("GeneratePermohonanPengembalian","Pengembalian")';
-			var namapemohon = $('#namapemohon').val();
-			var NomorSurat = $('#NomorSurat').val();
-			var PermohonanPengembalian = $('#PermohonanPengembalian').val();
-			var AlamatPemohon = $('#AlamatPemohon').val();
-			var npwpberkas = $('#npwpberkas').val();
-			var NamaRekening = $('#NamaRekening').val();
-			var NomorRekening = $('#NomorRekening').val();
-			var TanggalPengaju = $('#tanggalpengaju').val();
-			window.open(url + '?namapemohon=' + namapemohon + '&NomorSurat=' + NomorSurat + '&PermohonanPengembalian=' + PermohonanPengembalian + '&AlamatPemohon=' + AlamatPemohon + '&npwpberkas=' + npwpberkas + '&NamaRekening=' + NamaRekening + '&NomorRekening=' + NomorRekening + '&tanggalpengaju='+ TanggalPengaju,'_blank');
 		}
 
 		function generate_keterangan() {
@@ -667,4 +730,41 @@
 		$('#JUMLAHBAYAR').on('input', () => hitungPermohonanPengembalian());
 
 	});
+
+	$('body').on('change', 'input:file', function () {
+		let status = true
+		if (['application/pdf'].includes(this.accept)) {
+			if (!["application/pdf", ".zip", ".rar", ".7zip"].includes($(this)[0].files[0].type)) {
+				alert('Format FIle Tidak Sesuai')
+				status = false
+			}
+		}
+
+		if ($(this).hasClass("max_5mb")) {
+			if ($(this)[0].files[0].size > 5000000) {
+				swal({
+					type: "error",
+					html: true,
+					title: "Gagal<br><small>Ukuran File Lebih Dari 5MB</small>",
+					confirmButtonColor: "#4CAF50"
+				});
+				status = false
+			}
+		}
+
+		if (status) {
+			$('#cancel-' + this.id).html('<a href="javascript:void(0)" class="text-danger" onclick="cancelDoc(\'' + this.id + '\')" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
+		} else {
+			$(this).val('')
+			$('#cancel-' + (this.id)).html('')
+			$('#label-' + (this.id)).html('Test')
+		}
+	})
+
+	const cancelDoc = (x) => {
+		$('#' + x).val('')
+		$('#cancel-' + x).html('')
+		$('#label-' + x).html('Test')
+	}
+
 </script>

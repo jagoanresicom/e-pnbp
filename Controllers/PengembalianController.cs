@@ -1187,19 +1187,25 @@ namespace Pnbp.Controllers
         {
             TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
 
-            //var filePath = ((form.AllKeys.Contains("SuratPernyataanPNBPBerulang")) ? form["SuratPernyataanPNBPBerulang"] : "NULL");
             var fileContent = Request.Files["SuratPernyataanPNBPBerulang"];
+            var tipeFile = "SURAT PERNYATAAN PNBP BERULANG";
 
-            var file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianId, "SURAT PERNYATAAN PNBP BERULANG");
+            if (fileContent == null || fileContent.ContentLength == 0)
+            {
+                return tr;
+            }
+
+
+            var fileData = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianId, tipeFile);
 
             LampiranKembalian dataLampiran = new LampiranKembalian()
             {
                 PengembalianPnbpId = pengembalianId,
-                TipeFile = "SURAT PERNYATAAN PNBP BERULANG",
+                TipeFile = tipeFile,
             };
-            if (file1 != null)
+            if (fileData != null)
             {
-                dataLampiran.LampiranKembalianId = file1.LampiranKembalianId;
+                dataLampiran.LampiranKembalianId = fileData.LampiranKembalianId;
             }
 
             //Insert SURATPERMOHONAN
@@ -1232,13 +1238,13 @@ namespace Pnbp.Controllers
                         LampiranKembalianId = dataLampiran.LampiranKembalianId,
                         PengembalianPnbpId = pengembalianId,
                         NamaFile = filePath,
-                        TipeFile = "SURAT PERNYATAAN PNBP BERULANG",
+                        TipeFile = tipeFile,
                         Ekstensi = Extension,
                     };
                 }
             }
 
-            if (file1 == null)
+            if (fileData == null)
             {
                 tr = pengembalianmodel.InsertLampiranKembalian(dataLampiran);
             }
@@ -1259,15 +1265,20 @@ namespace Pnbp.Controllers
             string tipeFile = "SURAT WAJIB BAYAR";
             string fileNamePrefix = "SuratWajibBayar";
 
-            var file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianId, tipeFile);
+            if (fileContent == null || fileContent.ContentLength == 0)
+            {
+                return tr;
+            }
+            
+            var fileData = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianId, tipeFile);
             LampiranKembalian dataLampiran = new LampiranKembalian()
             {
                 PengembalianPnbpId = pengembalianId,
                 TipeFile = tipeFile,
             };
-            if (file1 != null)
+            if (fileData != null)
             {
-                dataLampiran.LampiranKembalianId = file1.LampiranKembalianId;
+                dataLampiran.LampiranKembalianId = fileData.LampiranKembalianId;
             }
 
             //Insert SURATPERMOHONAN
@@ -1304,7 +1315,7 @@ namespace Pnbp.Controllers
                 }
             }
 
-            if (file1 == null)
+            if (fileData == null)
             {
                 tr = pengembalianmodel.InsertLampiranKembalian(dataLampiran);
             }
@@ -1751,16 +1762,21 @@ namespace Pnbp.Controllers
             string tipeFile = "SURAT PERMOHONAN PENGEMBALIAN";
             string fileNamePrefix = "SuratPermohonanPengembalian_";
 
-            var file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianId, "SURAT PERMOHONAN");
+            if (fileContent == null || fileContent.ContentLength == 0)
+            {
+                return tr;
+            }
+
+            var fileData = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianId, tipeFile);
             LampiranKembalian dataLampiran = new LampiranKembalian()
             {
                 LampiranKembalianId = RandomString(32),
                 PengembalianPnbpId = pengembalianId,
                 TipeFile = tipeFile,
             };
-            if (file1 != null)
+            if (fileData != null)
             {
-                dataLampiran.LampiranKembalianId = file1.LampiranKembalianId;
+                dataLampiran.LampiranKembalianId = fileData.LampiranKembalianId;
             }
 
             //Insert SURATPERMOHONAN
@@ -1797,7 +1813,7 @@ namespace Pnbp.Controllers
                 }
             }
 
-            if (file1 == null)
+            if (fileData == null)
             {
                 tr = pengembalianmodel.InsertLampiranKembalian(dataLampiran);
             }
@@ -2281,11 +2297,33 @@ namespace Pnbp.Controllers
                 tr.Pesan = "Harap lakukan pencarian berkas terlebih dahulu";
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
+
             string[] acceptedStatusPengembalian = {"0", "2"};
             if (String.IsNullOrEmpty(data.STATUSPENGEMBALIAN) || !acceptedStatusPengembalian.Any(x => (x == data.STATUSPENGEMBALIAN))) 
             {
                 tr.Pesan = "Status pengembalian tidak valid";
                 return Json(tr, JsonRequestBehavior.AllowGet);
+            }
+
+            // validasi file wajib
+            if (data.STATUSPENGEMBALIAN == "2")
+            {
+                var fileDataSurat1 = pengembalianmodel.GetlampiranPengajuanKembalian(data.PENGEMBALIANPNBPID, "SURAT PERMOHONAN PENGEMBALIAN");
+                var fileDataSurat2 = pengembalianmodel.GetlampiranPengajuanKembalian(data.PENGEMBALIANPNBPID, "SURAT PERNYATAAN PNBP BERULANG");
+
+                var fileContent1 = Request.Files["SuratPermohonanPengembalian"];
+                if (fileDataSurat1 == null && (fileContent1 == null || fileContent1.ContentLength == 0))
+                {
+                    tr.Pesan = "Silahkan unggah file <b>Surat Permohonan Pengembalian</b> terlebih dahulu";
+                    return Json(tr, JsonRequestBehavior.AllowGet);
+                }
+
+                var fileContent2 = Request.Files["SuratPernyataanPNBPBerulang"];
+                if (fileDataSurat2 == null && (fileContent2 == null || fileContent2.ContentLength == 0))
+                {
+                    tr.Pesan = "Silahkan unggah file <b>Surat Pernyataan PNBP Berulang</b> terlebih dahulu";
+                    return Json(tr, JsonRequestBehavior.AllowGet);
+                }
             }
 
             // filter input
@@ -3695,57 +3733,14 @@ namespace Pnbp.Controllers
 
                 try
                 {
-                    Entities.LampiranKembalianTrain file1 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file2 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file3 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file4 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file5 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file6 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file7 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file8 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file9 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file10 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file11 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file12 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file13 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file20 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file21 = new Entities.LampiranKembalianTrain();
-                    Entities.LampiranKembalianTrain file22 = new Entities.LampiranKembalianTrain();
+                    Entities.LampiranKembalianTrain fileSuratPermohonan = new Entities.LampiranKembalianTrain();
+                    Entities.LampiranKembalianTrain fileSuratWajibBayar = new Entities.LampiranKembalianTrain();
+                    Entities.LampiranKembalianTrain fileSuratPNBPBerulang = new Entities.LampiranKembalianTrain();
 
                     string pengembalianpnbpid = pengembalianPnbpId;
-                    file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN");
-                    file10 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT WAJIB BAYAR");
-                    file12 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN PNBP BERULANG");
-
-                    //file2 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN");
-                    //file3 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI PENERIMAAN NEGARA");
-                    //file4 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERINTAH SETOR");
-                    //file5 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT BUKTI SETOR");
-                    //file6 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI KEPEMILIKAN REK TUJUAN");
-                    //file7 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "NPWP");
-                    //file8 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "BUKTI DOMISILI PEMOHON");
-                    //file9 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KUASA BERMATERAI");
-                    //file11 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN TIDAK TERLAYANI");
-                    //file13 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN PENGEMBALIAN");
-                    //file20 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN TANGGUNG JAWAB MUTLAK");
-                    //file21 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN PENGELUARAN");
-                    //file22 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERSETUJUAN PENGEMBALIAN PNBP");
-                    ViewData["file1"] = file1;
-                    //ViewData["file2"] = file2;
-                    //ViewData["file3"] = file3;
-                    //ViewData["file4"] = file4;
-                    //ViewData["file5"] = file5;
-                    //ViewData["file6"] = file6;
-                    //ViewData["file7"] = file7;
-                    //ViewData["file8"] = file8;
-                    //ViewData["file9"] = file9;
-                    ViewData["file10"] = file10;
-                    //ViewData["file11"] = file11;
-                    ViewData["file12"] = file12;
-                    //ViewData["file13"] = file13;
-                    //ViewData["file20"] = file20;
-                    //ViewData["file21"] = file21;
-                    //ViewData["file22"] = file22;
+                    ViewData["fileSuratPermohonan"] = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN PENGEMBALIAN");
+                    ViewData["fileSuratPNBPBerulang"] = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN PNBP BERULANG");
+                    ViewData["fileSuratWajibBayar"] = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT WAJIB BAYAR");
                 }
                 catch (Exception e) 
                 {
