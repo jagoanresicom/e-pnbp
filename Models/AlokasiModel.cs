@@ -1513,16 +1513,19 @@ namespace Pnbp.Models
             try
             {
                 string query = $@"
-                SELECT 
-                    (row_number() OVER (ORDER BY s.KODESATKER)) no,
-                    s.KODESATKER AS kodesatker, 
-                    s.NAMA_SATKER AS NamaSatker, 
-                    to_char(ta.PAGU) AS pagu, 
-                    to_char(ta.alokasi) AS alokasi, 
-                    (CASE WHEN pagu >= alokasi THEN 1 ELSE 0 end) valid
-                FROM {tableName} ta
-                LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
-                WHERE ta.KDSATKER != '524465'
+                SELECT * FROM
+                (
+                    SELECT 
+                        (row_number() OVER (ORDER BY s.KODESATKER)) no,
+                        s.KODESATKER AS kodesatker, 
+                        s.NAMA_SATKER AS NamaSatker, 
+                        to_char(ta.PAGU) AS pagu, 
+                        to_char(ta.alokasi) AS alokasi, 
+                        (CASE WHEN pagu >= alokasi THEN 1 ELSE 0 end) valid
+                    FROM {tableName} ta
+                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
+                    WHERE ta.KDSATKER != '524465'
+                ) ORDER BY valid
                 ";
 
                 result = db.Database.SqlQuery<Entities.TempAlokasi>(query).ToList();
