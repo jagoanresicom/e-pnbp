@@ -1471,6 +1471,73 @@ namespace Pnbp.Models
             return result;
         }
 
+        public List<Entities.AlokasiSatkerSummary> GetSummaryAlokasiDaerah(string tahun, string kodeSatker)
+        {
+            PnbpContext db = new PnbpContext();
+            List<Entities.AlokasiSatkerSummary> result = new List<Entities.AlokasiSatkerSummary>();
+
+            try
+            {
+                string query = @"
+                    WITH grp AS (
+                        SELECT a.mp, max(a.revisi) revisi, a.tahun  
+                        FROM ALOKASISATKERSUMMARY a 
+                        GROUP BY a.mp, a.tahun
+                    )
+                    SELECT 
+                        (row_number() OVER (ORDER BY ass.MP)) no,
+                        ass.ALOKASISATKERSUMMARYID, 
+                        ass.PAGU, 
+                        ass.ALOKASI, 
+                        sr.amount BELANJA,
+                        TO_CHAR(ass.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                        TO_CHAR(ass.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                        ass.MP
+                    FROM 
+	                    grp 
+	                    LEFT JOIN AlokasiSatkerSummary ass ON 
+	                    grp.mp = ass.MP AND 
+	                    grp.revisi = ass.revisi AND 
+	                    grp.tahun = ass.tahun 
+	                    JOIN alokasisatker t ON t.ALOKASISATKERSUMMARYID = ass.ALOKASISATKERSUMMARYID
+	                    LEFT JOIN (
+	  	                    SELECT 
+	  		                    KDSATKER,
+	  		                    SUM(amount) amount
+	  	                    FROM SPAN_REALISASI
+	  	                    WHERE 
+	  		                    SUMBERDANA = 'D'
+	      	                    AND tahun = :tahun 
+	                        GROUP BY 
+	                          KDSATKER
+	                    ) sr ON sr.KDSATKER = t.KDSATKER 
+                    WHERE 
+	                    t.KDSATKER = :kodeSatker
+                ";
+
+                List<object> lstparams = new List<object>();
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeSatker", kodeSatker));
+
+                if (!String.IsNullOrEmpty(tahun))
+                {
+                    query += " AND grp.tahun = :tahun ";
+                    lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+                }
+
+                query += " ORDER BY ass.MP ";
+
+                var parameters = lstparams.ToArray();
+                result = db.Database.SqlQuery<Entities.AlokasiSatkerSummary>(query, parameters).ToList();
+            }
+            catch (Exception e)
+            {
+                _ = e.StackTrace;
+            }
+
+            return result;
+        }
+
         public List<Entities.AlokasiSatkerSummary> GetSummaryAlokasiRevisi()
         {
             PnbpContext db = new PnbpContext();

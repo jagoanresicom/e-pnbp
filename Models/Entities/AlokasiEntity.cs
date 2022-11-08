@@ -348,6 +348,7 @@ namespace Pnbp.Entities
         public Decimal Mp { get; set; }
         public Decimal Pagu { get; set; }
         public Decimal Alokasi { get; set; }
+        public Decimal Belanja { get; set; }
         public Decimal Tahun { get; set; }
         public string TanggalBuat { get; set; }
         public string TanggalUbah { get; set; }

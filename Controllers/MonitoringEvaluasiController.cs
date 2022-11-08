@@ -521,8 +521,13 @@ namespace Pnbp.Controllers
             //var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
             //ViewData["get_propinsi"] = get_propinsi;
             //ViewData["pelayanan"] = pelayanan;
+            string jenisKantorUser = OtorisasiUser.GetJenisKantorUser();
+            if (jenisKantorUser == "Pusat")
+            {
+                return View("AlokasiV2");
+            }
 
-            return View("AlokasiV2");
+            return View("AlokasiDaerah");
         }
 
         public ActionResult AlokasiSummaryDetail(string id)

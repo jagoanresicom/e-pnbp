@@ -5988,6 +5988,7 @@
     <Content Include="Views\Pengembalian\EntriPengembalianDaerah.cshtml" />
     <Content Include="Views\Pengembalian\DetailPengajuanPusat.cshtml" />
     <Content Include="Views\Pengembalian\DetailPengajuanDaerah.cshtml" />
+    <Content Include="Views\MonitoringEvaluasi\AlokasiDaerah.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

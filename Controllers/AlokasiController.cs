@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 using System.Configuration;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
+using Pnbp.Entities;
 
 namespace Pnbp.Controllers
 {
     [AccessDeniedAuthorize]
     public class AlokasiController : Controller
     {
+        private static Models.PemanfaatanModel _manfaatanModel = new Models.PemanfaatanModel();
+
         private string ConstructViewString(string viewName, object objModel, Dictionary<string, object> addViewData)
         {
             string strView = "";
@@ -1492,8 +1495,21 @@ namespace Pnbp.Controllers
 
         public ActionResult SummaryAlokasi(string tahun)
         {
+            string jenisKantorUser = OtorisasiUser.GetJenisKantorUser();
+
             var alm = new Models.AlokasiModel();
-            var result =  alm.GetSummaryAlokasi(tahun);
+            List<AlokasiSatkerSummary> result = new List<AlokasiSatkerSummary>();
+
+            if (jenisKantorUser == "Pusat")
+            {
+                result = alm.GetSummaryAlokasi(tahun);
+            }
+            else 
+            {
+                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                satker satker = _manfaatanModel.GetSatkerByKantorId(kantorId);
+                result = alm.GetSummaryAlokasiDaerah(tahun, satker.kode);
+            }
 
             return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
         }
