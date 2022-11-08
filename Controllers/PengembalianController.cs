@@ -2788,7 +2788,18 @@ namespace Pnbp.Controllers
             ViewData["file20"] = file20;
             ViewData["file21"] = file21;
             ViewData["file22"] = file22;
-            
+
+            bool bisaSelesaikan = true;
+            List<LampiranKembalianTrain> lstFileCheck = new List<LampiranKembalianTrain> { file10, file11, file12, file13, file20, file21, file22 };
+            foreach (var fileData in lstFileCheck)
+            {
+                if (fileData == null || String.IsNullOrEmpty(fileData.NamaFile))
+                {
+                    bisaSelesaikan = false;
+                    break;
+                }
+            }
+
             HakAksesModel model = new HakAksesModel();
             string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
             int tipekantor = model.GetTipeKantor(kantoriduser);
@@ -2802,6 +2813,8 @@ namespace Pnbp.Controllers
 
             string viewName = (tipekantor == 1 ? "DetailPengajuanPusat" : "DetailPengajuanDaerah");
             //string viewName = (tipekantor == 1 ? "PengajuanPengembalianDetailPusat" : "PengajuanPengembalianDetail");
+            
+            ViewBag.BisaSelesaikan = (bisaSelesaikan ? "TRUE" : "FALSE");
             return View(viewName, data);
         }
 
