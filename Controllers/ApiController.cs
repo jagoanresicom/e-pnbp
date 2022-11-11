@@ -85,7 +85,37 @@ namespace Pnbp.Controllers
 
             return Datahasil; //Json(new { status = status, code = code, result = Datahasil }, JsonRequestBehavior.AllowGet);
         }
-        
+
+        [HttpGet]
+        public JsonResult ListRealisasiSatker(string tahun, string kodeProvinsi)
+        {
+            var ctx = new PnbpContext();
+
+            List<Entities.Api> Datahasil = new List<Entities.Api>();
+
+            Entities.TransactionResult tr = Pnbp.Models.HomeModel.ListRealisasiSatker(tahun, kodeProvinsi);
+            List<Entities.RealisasiSatkerResponse> responseData = new List<Entities.RealisasiSatkerResponse>();
+
+            if (tr.Status)
+            {
+                foreach (Entities.RealisasiSatker data in tr.Data)
+                {
+                    responseData.Add(new Entities.RealisasiSatkerResponse() {
+                        kodeSatker = data.kodeSatker,
+                        namaSatker = data.namaSatker,
+                        realisasi = "Rp. " + data.realisasi?.ToString("N0", new System.Globalization.CultureInfo("id-ID")),
+                        jumlahLayanan = data.jumlahLayanan,
+                        kodeProvinsi = data.kodeProvinsi,
+                        bulan = data.bulan,
+                        tahun = data.tahun,
+                    });
+                    
+                }
+            }
+
+            return Json(new { success = tr.Status, result = responseData, message = tr.Pesan }, JsonRequestBehavior.AllowGet);
+        }
+
 
         public static string getIPAddress()
         {

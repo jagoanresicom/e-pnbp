@@ -36,6 +36,88 @@ namespace Pnbp.Models
             return _result;
         }
 
+        public static Entities.TransactionResult ListRealisasiSatker(string tahun, string kodeProvinsi)
+        {
+            var tr = new Entities.TransactionResult()
+            {
+                Status = false,
+                Data = null,
+            };
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    Regex sWhitespace = new Regex(@"\s+");
+                    List<object> lstparams = new List<object>();
+
+                    string queryCondsString = "";
+                    List<string> queryConds = new List<string>();
+                    if (!string.IsNullOrEmpty(tahun))
+                    {
+                        queryConds.Add(" sr.TAHUN = :tahun ");
+                        lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+                    }
+                    if (!string.IsNullOrEmpty(kodeProvinsi))
+                    {
+                        queryConds.Add(" prov.kode = :kodeProvinsi");
+                        lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeProvinsi", kodeProvinsi));
+                    }
+                    if (queryConds.Count > 0)
+                    {
+                        queryCondsString = " AND " + string.Join(" AND ", queryConds);
+                    }
+
+                    string query = $@"SELECT
+	                                kodesatker,
+	                                namasatker,
+	                                SUM(realisasi) realisasi,
+	                                COUNT(DISTINCT OUTPUT) jumlahlayanan,
+	                                kodeprovinsi,
+	                                bulan,
+	                                tahun
+                                FROM
+	                                (
+	                                SELECT
+		                                sr.KDSATKER kodesatker,
+		                                s.NAMA_SATKER namasatker,
+		                                amount realisasi,
+		                                OUTPUT,
+		                                prov.kode kodeprovinsi,
+		                                SUBSTR(sr.TANGGAL, 4, 3) bulan,
+		                                sr.tahun
+	                                FROM
+		                                SPAN_REALISASI sr
+	                                JOIN satker s ON
+		                                s.KODESATKER = sr.KDSATKER
+	                                JOIN kantor k ON
+		                                k.kodesatker = s.KODESATKER
+	                                JOIN wilayah w ON
+		                                k.kode = w.kode
+	                                JOIN wilayah prov ON
+		                                prov.wilayahid = w.induk
+	                                WHERE
+		                                SUMBERDANA = 'D'
+		                                AND KDSATKER != '524465'
+                                        {queryCondsString}
+		                                )
+                                GROUP BY
+	                                (kodesatker,namasatker,kodeprovinsi,bulan,tahun)
+                                ORDER BY namasatker";
+                    query = sWhitespace.Replace(query, " ");
+
+                    tr.Data = ctx.Database.SqlQuery<Entities.RealisasiSatker>(query, lstparams.ToArray()).ToList();
+                    tr.Status = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                tr.Pesan = "Terjadi kesalahan";
+            }
+
+            return tr;
+        }
+
         public static List<Entities.RekapAlokasi> dtRekapAlokasi(string pTahun, string pTipe)
         {
             var _result = new List<Entities.RekapAlokasi>();
