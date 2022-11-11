@@ -202,6 +202,7 @@
     </Compile>
     <Compile Include="Models\BerandaPenerimaanModel.cs" />
     <Compile Include="Models\Entities\CommonResponseEntity.cs" />
+    <Compile Include="Models\Entities\RealisasiSatker.cs" />
     <Compile Include="Models\Entities\ApiEntity.cs" />
     <Compile Include="Models\Entities\AuditTrailEntity.cs" />
     <Compile Include="Models\Entities\KodeSpan.cs" />
@@ -5935,7 +5936,6 @@
     <Content Include="Views\Pemanfaatan\DataManfaatDetailV2.cshtml" />
     <Content Include="Views\Pemanfaatan\EditDataManfaatV2.cshtml" />
     <Content Include="Views\Alokasi\ImportAlokasiSummaryDetail.cshtml" />
-    <Content Include="Views\Alokasi\RekapAlokasilsV2.cshtml" />
     <Content Include="Views\MonitoringEvaluasi\AlokasiV2.cshtml" />
     <Content Include="Views\MonitoringEvaluasi\AlokasiSummaryDetail.cshtml" />
     <Content Include="Views\Pemanfaatan\ListDataManfaatKROV2.cshtml" />
@@ -5971,7 +5971,6 @@
     <Content Include="V2\resources\fonts\ProximaNovaCond-Black.otf" />
     <Content Include="V2\resources\fonts\ProximaNovaCond-Bold.otf" />
     <Content Include="V2\resources\fonts\ProximaNovaCond-Reg.otf" />
-    <Content Include="Views\Pemanfaatan\DaftarBelanjaKRO.cshtml" />
     <Content Include="Views\Penerimaan\pn_layanan.cshtml" />
     <Content Include="Views\Penerimaan\pn_satker.cshtml" />
     <Content Include="Views\Pemanfaatan\rl_satker.cshtml" />
