@@ -696,8 +696,28 @@
 	</div>
 </form>
 
-@if (!isPreviewMode && Model.STATUSPENGEMBALIAN == "2")
+@if (!isPreviewMode && Model.STATUSPENGEMBALIAN == "2" && ViewBag.BisaSelesaikan == "TRUE")
 {
+	<style>
+		#btn-selesai-form-selesaikan.--use-focus-outline:focus {
+			outline: 2px solid #84c2f7;
+			outline-offset: 3px;
+			transition: outline-offset 250ms;
+		}
+	</style>
+	<script>
+		$(document).ready(function () {
+			$([document.documentElement, document.body]).animate({
+				scrollTop: $("#js-form-selesaikan").offset().top
+			}, 300);
+			window.setTimeout(() => {
+				$('#btn-selesai-form-selesaikan').focus();
+				$('#btn-selesai-form-selesaikan').on('blur', (e) => {
+					$(e.target).removeClass('--use-focus-outline');
+				})
+			}, 300)
+		});
+	</script>
 	<div class="row" style="margin-top: 2rem;">
 		<div class="col-md-12">
 
@@ -753,7 +773,7 @@
 								</div>
 								<div class="form-group mt-4">
 									<div class="col-md-offset-4 col-md-8">
-										<button class="btn btn-success" @(ViewBag.BisaSelesaikan == "TRUE" ? "" : "disabled	")>Selesai</button>
+										<button id="btn-selesai-form-selesaikan" class="btn btn-success --use-focus-outline" @(ViewBag.BisaSelesaikan == "TRUE" ? "" : "disabled	")>Selesai</button>
 									</div>
 								</div>
 							</div>
