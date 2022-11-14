@@ -3795,7 +3795,7 @@ namespace Pnbp.Controllers
 
             string namakantor = f.CariNamaKantor;
             string judul = f.CariJudul;
-            string nomorberkas = f.CariNomorBerkas;
+            string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
             string kodebilling = f.CariKodeBilling;
             string ntpn = f.CariNTPN;
             string namapemohon = f.CariNamaPemohon;
