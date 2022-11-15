@@ -900,6 +900,7 @@ namespace Pnbp.Entities
         public string ALAMATPEMOHON { get; set; }
         public string BERKASID { get; set; }
         public string NOMORBERKAS { get; set; }
+        public string NOMORTELEPON { get; set; }
         public string KODEBILLING { get; set; }
         public string NTPN { get; set; }
         public string JUMLAHBAYAR { get; set; }

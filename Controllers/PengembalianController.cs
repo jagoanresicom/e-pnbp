@@ -2348,11 +2348,11 @@ namespace Pnbp.Controllers
 
             if (String.IsNullOrEmpty(data.PENGEMBALIANPNBPID))
             {
-                tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN);
+                tr = pengembalianmodel.InsertPengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN, data.NOMORTELEPON);
             }
             else
             { 
-                tr = pengembalianmodel.UpdatePengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN);
+                tr = pengembalianmodel.UpdatePengembalianDaerah(data, userid, kantoriduser, pegawaiid, namapegawai, npwpberkas, data.STATUSPENGEMBALIAN, data.STATUSSIMPAN, data.NOMORTELEPON);
             }
 
             if (tr.Status && !String.IsNullOrEmpty(tr.ReturnValue))
@@ -2755,6 +2755,7 @@ namespace Pnbp.Controllers
             Entities.LampiranKembalianTrain file20 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file21 = new Entities.LampiranKembalianTrain();
             Entities.LampiranKembalianTrain file22 = new Entities.LampiranKembalianTrain();
+            Entities.LampiranKembalianTrain fileSP2D = new Entities.LampiranKembalianTrain();
 
             file1 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERMOHONAN");
             file2 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN");
@@ -2772,6 +2773,7 @@ namespace Pnbp.Controllers
             file20 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERNYATAAN TANGGUNG JAWAB MUTLAK");
             file21 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT KETERANGAN PENGELUARAN");
             file22 = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SURAT PERSETUJUAN PENGEMBALIAN PNBP");
+            fileSP2D = pengembalianmodel.GetlampiranPengajuanKembalian(pengembalianpnbpid, "SP2D");
             ViewData["file1"] = file1;
             ViewData["file2"] = file2;
             ViewData["file3"] = file3;
@@ -2788,6 +2790,7 @@ namespace Pnbp.Controllers
             ViewData["file20"] = file20;
             ViewData["file21"] = file21;
             ViewData["file22"] = file22;
+            ViewData["fileSP2D"] = fileSP2D;
 
             bool bisaSelesaikan = true;
             List<LampiranKembalianTrain> lstFileCheck = new List<LampiranKembalianTrain> { file10, file11, file12, file13, file20, file21, file22 };

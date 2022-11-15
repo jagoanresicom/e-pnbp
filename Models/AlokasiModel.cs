@@ -1480,42 +1480,58 @@ namespace Pnbp.Models
             {
                 string query = @"
                     WITH grp AS (
-                        SELECT a.mp, max(a.revisi) revisi, a.tahun  
-                        FROM ALOKASISATKERSUMMARY a 
-                        GROUP BY a.mp, a.tahun
-                    )
+                        SELECT a.mp, max(a.revisi) revisi, a.tahun 
+                        FROM 
+                            alokasisatker a1 
+                            JOIN ALOKASISATKERSUMMARY a on a1.ALOKASISATKERSUMMARYID = a.ALOKASISATKERSUMMARYID 
+                        GROUP BY 
+                            a.mp, a.tahun
+                    ), 
+                    pagusatker AS (
+                        select 
+                        KDSATKER, 
+                        SUM(amount) totalpagu 
+                        from 
+                        span_belanja 
+                        where 
+                        KDSATKER = :kodeSatker 
+                        and SUMBER_DANA = 'D' 
+                        and TAHUN = EXTRACT(YEAR FROM sysdate) 
+                        GROUP BY kdsatker
+                    ) 
                     SELECT 
-                        (row_number() OVER (ORDER BY ass.MP)) no,
+                        (row_number() OVER (ORDER BY ass.MP)) no, 
                         ass.ALOKASISATKERSUMMARYID, 
-                        ass.PAGU, 
+                        ps.totalpagu PAGU, 
                         ass.ALOKASI, 
-                        sr.amount BELANJA,
-                        TO_CHAR(ass.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
-                        TO_CHAR(ass.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
-                        ass.MP
+                        sr.amount BELANJA, 
+                        TO_CHAR(ass.TANGGALBUAT, 'DD-MM-YYYY') as TANGGALBUAT, 
+                        TO_CHAR(ass.TANGGALUBAH, 'DD-MM-YYYY') as TANGGALUBAH, 
+                        ass.MP 
                     FROM 
-	                    grp 
-	                    LEFT JOIN AlokasiSatkerSummary ass ON 
-	                    grp.mp = ass.MP AND 
-	                    grp.revisi = ass.revisi AND 
-	                    grp.tahun = ass.tahun 
-	                    JOIN alokasisatker t ON t.ALOKASISATKERSUMMARYID = ass.ALOKASISATKERSUMMARYID
-	                    LEFT JOIN (
-	  	                    SELECT 
-	  		                    KDSATKER,
-	  		                    SUM(amount) amount
-	  	                    FROM SPAN_REALISASI
-	  	                    WHERE 
-	  		                    SUMBERDANA = 'D'
-	      	                    AND tahun = :tahun 
-	                        GROUP BY 
-	                          KDSATKER
-	                    ) sr ON sr.KDSATKER = t.KDSATKER 
+                        grp 
+                        LEFT JOIN AlokasiSatkerSummary ass ON grp.mp = ass.MP 
+                        AND grp.revisi = ass.revisi 
+                        AND grp.tahun = ass.tahun 
+                        JOIN alokasisatker t ON t.ALOKASISATKERSUMMARYID = ass.ALOKASISATKERSUMMARYID 
+                        JOIN pagusatker ps on ps.kdsatker = t.KDSATKER 
+                        LEFT JOIN (
+                        SELECT 
+                            KDSATKER, 
+                            SUM(amount) amount 
+                        FROM 
+                            SPAN_REALISASI 
+                        WHERE 
+                            SUMBERDANA = 'D' 
+                            AND tahun = :tahun 
+                        GROUP BY 
+                            KDSATKER
+                        ) sr ON sr.KDSATKER = t.KDSATKER 
                     WHERE 
-	                    t.KDSATKER = :kodeSatker
-                ";
+                        t.KDSATKER = :kodeSatker ";
 
                 List<object> lstparams = new List<object>();
+                lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeSatker", kodeSatker));
                 lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
                 lstparams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeSatker", kodeSatker));
 

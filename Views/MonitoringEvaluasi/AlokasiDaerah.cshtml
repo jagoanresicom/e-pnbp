@@ -212,9 +212,9 @@
 					+ "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
 					+ "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
 					+ "<td class='text-right'>" + addCommas(data[x].Belanja) + "</td>"
-					+ "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "</td>"
-					+ "<td class='text-right'>" + ((data[x].Belanja / data[x].Alokasi) * 100).toFixed(2) + "</td>"
-					+ "<td class='text-right'>" + ((data[x].Belanja / data[x].Pagu) * 100).toFixed(2) + "</td>"
+					+ "<td class='text-right'>" + parseFloat(((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2)).toLocaleString('id') + "</td>"
+					+ "<td class='text-right'>" + cetakPersentaseBelanjaAlokasi(data[x]) + "</td>"
+					+ "<td class='text-right'>" + parseFloat(((data[x].Belanja / data[x].Pagu) * 100).toFixed(2)).toLocaleString('id') + "</td>"
 					+ "</tr>";
 			});
 			$("#index").val(i);
@@ -223,6 +223,14 @@
 		}
 
 		$("#summaryalokasisatker>tbody").html(html);
+	}
+
+	function cetakPersentaseBelanjaAlokasi(data) {
+		let persentase = ((data.Belanja / data.Alokasi) * 100).toFixed(2);
+		if (persentase > 100) {
+			return '<b style="color:red;">' + parseFloat(persentase).toLocaleString('id') + '</b>';
+		}
+		return parseFloat(persentase).toLocaleString('id');
 	}
 
 	function addCommas(nStr) {

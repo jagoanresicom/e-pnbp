@@ -1073,7 +1073,7 @@ namespace Pnbp.Models
             return tr;
         }
 
-        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian, string statusSimpan)
+        public Entities.TransactionResult InsertPengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian, string statusSimpan, string nomorTelepon)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1098,10 +1098,10 @@ namespace Pnbp.Models
                         sql =
                             "INSERT INTO pengembalianpnbp ( " +
                             "            pengembalianpnbpid, tanggalpengaju, kantorid, namakantor, " +
-                            "            pegawaiidpengaju, namapegawaipengaju, tipepengembalian, statuspengembalian, statussimpan) VALUES " +
+                            "            pegawaiidpengaju, namapegawaipengaju, tipepengembalian, statuspengembalian, statussimpan, nomorTelepon) VALUES " +
                             "( " +
                             "            :PengembalianPnbpId, TO_DATE(SYSDATE,'DD/MM/YYYY'), :KantorId, :NamaKantor, " +
-                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', :statusPengembalian, :statusSimpan)";
+                            "            :PegawaiIdPengaju, :NamaPegawaiPengaju, '1', :statusPengembalian, :statusSimpan, :nomorTelepon)";
                         arrayListParameters.Clear();
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", pengembalianPnbpId));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalPengaju", data.TANGGALPENGAJU));
@@ -1111,6 +1111,7 @@ namespace Pnbp.Models
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPegawaiPengaju", namapegawai));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusPengembalian", statusPengembalian));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusSimpan", statusSimpan));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("nomorTelepon", nomorTelepon));
                         parameters = arrayListParameters.OfType<object>().ToArray();
                         ctx.Database.ExecuteSqlCommand(sql, parameters);
 
@@ -1186,7 +1187,7 @@ namespace Pnbp.Models
             return tr;
         }
 
-        public Entities.TransactionResult UpdatePengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian, string statusSimpan)
+        public Entities.TransactionResult UpdatePengembalianDaerah(Entities.DetailDataBerkas data, string userid, string kantoriduser, string pegawaiid, string namapegawai, string npwpberkas, string statusPengembalian, string statusSimpan, string nomorTelepon)
         {
             Entities.TransactionResult tr = new Entities.TransactionResult() { Status = false, Pesan = "" };
 
@@ -1206,7 +1207,7 @@ namespace Pnbp.Models
                         sql =
                             "UPDATE pengembalianpnbp " +
                             "            SET kantorid = :KantorId, namakantor = :NamaKantor, " +
-                            "            pegawaiidpengaju = :PegawaiIdPengaju, namapegawaipengaju = :NamaPegawaiPengaju, tipepengembalian = '1', statuspengembalian = :statusPengembalian, statussimpan =: statusSimpan WHERE pengembalianpnbpid = :PengembalianPnbpId";
+                            "            pegawaiidpengaju = :PegawaiIdPengaju, namapegawaipengaju = :NamaPegawaiPengaju, tipepengembalian = '1', statuspengembalian = :statusPengembalian, statussimpan =: statusSimpan, nomortelepon = :nomorTelepon WHERE pengembalianpnbpid = :PengembalianPnbpId";
 
                         statusSimpan = (statusPengembalian == "2" ? null : statusSimpan);
 
@@ -1217,6 +1218,7 @@ namespace Pnbp.Models
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaPegawaiPengaju", namapegawai));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusPengembalian", statusPengembalian));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("statusSimpan", statusSimpan));
+                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("nomorTelepon", nomorTelepon));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", data.PENGEMBALIANPNBPID));
                         parameters = arrayListParameters.OfType<object>().ToArray();
                         ctx.Database.ExecuteSqlCommand(sql, parameters);
@@ -2339,7 +2341,8 @@ namespace Pnbp.Models
                     TO_CHAR(BERKASKEMBALIAN.PERMOHONANPENGEMBALIAN) PERMOHONANPENGEMBALIAN,
                     TO_CHAR(BERKASKEMBALIAN.NOMORSURAT) NOMORSURAT,
                     PENGEMBALIANPNBP.TIPEPENGEMBALIAN,
-                    PENGEMBALIANPNBP.STATUSSIMPAN
+                    PENGEMBALIANPNBP.STATUSSIMPAN,
+                    PENGEMBALIANPNBP.NOMORTELEPON
                     FROM PENGEMBALIANPNBP
                     LEFT JOIN BERKASKEMBALIAN ON PENGEMBALIANPNBP.PENGEMBALIANPNBPID = BERKASKEMBALIAN.PENGEMBALIANPNBPID
                     LEFT JOIN {_schemaKKP}.BERKAS b ON b.BERKASID = BERKASKEMBALIAN.BERKASID

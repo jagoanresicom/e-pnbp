@@ -20,6 +20,7 @@
 	var file20 = ViewBag.file20;
 	var file21 = ViewBag.file21;
 	var file22 = ViewBag.file22;
+	var fileSP2D = ViewBag.fileSP2D;
 
 	var isExistsFile11 = (file11 != null && !String.IsNullOrEmpty(file11.NamaFile));
 	var isExistsFile12 = (file12 != null && !String.IsNullOrEmpty(file12.NamaFile));
@@ -248,6 +249,12 @@
 											@*<input type="text" class="form-control" id="NamaBank" name="NamaBank" placeholder="Nama Bank">*@
 											@*@Html.TextBoxFor(model => model.NamaBank, new { @class = "form-control", @id = "NamaBank", @placeholder = "Nama Bank" })*@
 											<input type="text" name="NamaBank" id="NamaBank" class="form-control" value="@Model.NAMABANK" required />
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nomor Telepon</label>
+										<div class="col-sm-8">
+											<input type="text" name="NamaBank" id="NamaBank" class="form-control" value="@Model.NOMORTELEPON" />
 										</div>
 									</div>
 
@@ -498,8 +505,15 @@
 								@* Surat Permohonan *@
 								<div class="panel panel-default x_panel">
 									<div class="panel-heading x_title">
-										Kirim Permohonan
-										<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi .pdf maksimal 5MB</small>
+										@if (isPengembalianDaerah && Model.STATUSPENGEMBALIAN == "4")
+										{
+											<div>Berkas Pengembalian</div>
+										}
+										else
+										{
+											<div>Kirim Permohonan</div>
+											<br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi .pdf maksimal 5MB</small>
+										}
 									</div>
 									<div id="js-section-input-template-surat" class="panel-body ps-0 pe-0">
 										@*Panel content*@
@@ -556,7 +570,7 @@
 										</div>
 
 										@* input file template surat *@
-										@if (Model.STATUSPENGEMBALIAN == "2")
+										@if (Model.STATUSPENGEMBALIAN == "2" || Model.STATUSPENGEMBALIAN == "4")
 										{
 											<div class="ln_solid"></div>
 											<div class="form-group">
@@ -624,12 +638,34 @@
 												<input type="hidden" name="fileid20" value="@(file20 != null && !String.IsNullOrEmpty(file20.LampiranKembalianId)?file20.LampiranKembalianId:"")" />
 											</div>
 
-											<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>
-											<div class="form-group">
-												<div class="col-sm-12">
-													<button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
+											if (Model.STATUSPENGEMBALIAN == "4")
+											{
+												<div class="ln_solid"></div>
+												<div class="form-group">
+													<label for="FileSP2D" class="col-sm-4 control-label" style="text-align:left;">SP2D<span class="text-danger">*</span></label>
+													<div class="col-sm-6">
+														<input type="file" class="form-control max_5mb" id="FileSP2D" name="FileSP2D" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+														<span id="cancel-FileSP2D"></span>
+													</div>
+													@if (fileSP2D != null && !String.IsNullOrEmpty(fileSP2D.NamaFile))
+													{
+														<div class="col-sm-1 text-left" style="margin-left:0px !important;">
+															<a href="@fileSP2D.NamaFile" class="btn btn-default btn-xs" download>
+																<i class="fa fa-download"></i>
+															</a>
+														</div>
+													}
 												</div>
-											</div>
+											}
+											else
+											{
+												<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>
+												<div class="form-group">
+													<div class="col-sm-12">
+														<button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
+													</div>
+												</div>
+											}
 										}
 
 										@if (Model.STATUSPENGEMBALIAN == "0")
@@ -648,7 +684,7 @@
 								</div>
 
 								@*template surat*@
-								<div class="panel panel-default x_panel">
+								<div class="panel panel-default x_panel" style="display:none;">
 									<div class="panel-heading x_title">
 										Template Surat
 										@*<ul class="nav navbar-right panel_toolbox">
