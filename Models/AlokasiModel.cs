@@ -1502,9 +1502,10 @@ namespace Pnbp.Models
                     SELECT 
                         (row_number() OVER (ORDER BY ass.MP)) no, 
                         ass.ALOKASISATKERSUMMARYID, 
-                        ps.totalpagu PAGU, 
-                        ass.ALOKASI, 
-                        sr.amount BELANJA, 
+                        --NVL(p.totalpagu, 0) PAGU, 
+                        NVL(t.pagu, 0) PAGU, 
+                        NVL(t.ALOKASI, 0) alokasi, 
+                        NVL(sr.amount, 0) BELANJA, 
                         TO_CHAR(ass.TANGGALBUAT, 'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(ass.TANGGALUBAH, 'DD-MM-YYYY') as TANGGALUBAH, 
                         ass.MP 
