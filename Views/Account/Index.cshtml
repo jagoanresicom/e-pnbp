@@ -8,67 +8,67 @@
 
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Aplikasi Pengelolaan PNBP</title>
-    <link rel="shortcut icon" href="../../favicon.ico" />
+	<meta name="viewport" content="width=device-width" />
+	<title>Aplikasi Pengelolaan PNBP</title>
+	<link rel="shortcut icon" href="../../favicon.ico" />
 
-    <link href="/resources/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/resources/css/icheck-bootstrap.css" rel="stylesheet" type="text/css">
-    <link href="/resources/css/login.css" rel="stylesheet" type="text/css" />
-    <script src="../resources/js/jquery-1.10.2.js"></script>
-    <script src="../resources/js/bootstrap.min.js"></script>
+	<link href="/resources/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="/resources/css/icheck-bootstrap.css" rel="stylesheet" type="text/css">
+	<link href="/resources/css/login.css" rel="stylesheet" type="text/css" />
+	<script src='@Url.Content("~/resources/js/jquery-1.10.2.js")'></script>
+	<script src='@Url.Content("~/resources/js/bootstrap.min.js")'></script>
 
-    <style type="text/css">
-        .field-validation-error {
-            color: #ff0000;
-        }
+	<style type="text/css">
+		.field-validation-error {
+			color: #ff0000;
+		}
 
-        .field-validation-valid {
-            display: none;
-        }
+		.field-validation-valid {
+			display: none;
+		}
 
-        .input-validation-error {
-            border: 1px solid #ff0000 !important;
-            background-color: #ffeeee !important;
-        }
+		.input-validation-error {
+			border: 1px solid #ff0000 !important;
+			background-color: #ffeeee !important;
+		}
 
-        .validation-summary-errors {
-            font-weight: bold !important;
-            color: #ff0000 !important;
-        }
+		.validation-summary-errors {
+			font-weight: bold !important;
+			color: #ff0000 !important;
+		}
 
-        .validation-summary-valid {
-            display: none;
-        }
+		.validation-summary-valid {
+			display: none;
+		}
 
-        body {
-            background: url(/resources/images/2.jpg);
-            /*-webkit-background-size: cover;
-          -moz-background-size: cover;
-          -o-background-size: cover;
-          background-size: cover;*/
-        }
-    </style>
+		body {
+			background: url(/resources/images/2.jpg);
+			/*-webkit-background-size: cover;
+		  -moz-background-size: cover;
+		  -o-background-size: cover;
+		  background-size: cover;*/
+		}
+	</style>
 
-    <script type="text/javascript">
-        function showPassword() {
+	<script type="text/javascript">
+		function showPassword() {
 
-            var key_attr = $('#password').attr('type');
-            console.log(key_attr);
-            if (key_attr != 'text') {
+			var key_attr = $('#password').attr('type');
+			console.log(key_attr);
+			if (key_attr != 'text') {
 
-                //$('#showpassword').addClass('show');
-                $('#password').attr('type', 'text');
+				//$('#showpassword').addClass('show');
+				$('#password').attr('type', 'text');
 
-            } else {
+			} else {
 
-                //$('#showpassword').removeClass('show');
-                $('#password').attr('type', 'password');
+				//$('#showpassword').removeClass('show');
+				$('#password').attr('type', 'password');
 
-            }
+			}
 
-        }
-    </script>
+		}
+	</script>
 </head>
 <body style="">
     <div class="login-container">
