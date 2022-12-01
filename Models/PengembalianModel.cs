@@ -1123,12 +1123,12 @@ namespace Pnbp.Models
                             "            nikpemohon, alamatpemohon, emailpemohon, nomortelepon, nomorberkas, " +
                             "            nomorrekening, namabank, namacabang, setoranpnbp, npwp, namarekening, permohonanpengembalian) VALUES " +
                             "( " +
-                            "            :BerkasId, :PengembalianPnbpId, :NamaProsedur, :KodeBilling, TO_DATE(:TanggalKodeBilling,'DD/MM/YYYY HH24:MI'), " +
+                            "            RAWTOHEX(SYS_GUID()), :PengembalianPnbpId, :NamaProsedur, :KodeBilling, TO_DATE(:TanggalKodeBilling,'DD/MM/YYYY HH24:MI'), " +
                             "            :Ntpn, TO_DATE(:TanggalBayar,'DD/MM/YYYY HH24:MI'), :JumlahBayar, :NamaBankPersepsi, :PemilikId, :NamaPemohon, " +
                             "            :NikPemohon, :AlamatPemohon, :EmailPemohon, :NomorTelepon, :NomorBerkas, " +
                             "            :NomorRekening, :NamaBank, :NamaCabang, :setoranpnbp, :npwp, :namarekening, :permohonanpengembalian)";
                         arrayListParameters.Clear();
-                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("BerkasId", data.BERKASID));
+                        //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("BerkasId", data.BERKASID));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PengembalianPnbpId", pengembalianPnbpId));
                         //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaProsedur", data.NamaProsedur));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaProsedur", ""));
@@ -1227,7 +1227,6 @@ namespace Pnbp.Models
                         sql =
                             @"UPDATE berkaskembalian  
                                 SET 
-                                    berkasid = :BerkasId, 
                                     namaprosedur = :NamaProsedur, 
                                     kodebilling = :KodeBilling, 
                                     tanggalkodebilling = TO_DATE(:TanggalKodeBilling,'DD/MM/YYYY HH24:MI'), 
@@ -1241,7 +1240,6 @@ namespace Pnbp.Models
                                     alamatpemohon = :AlamatPemohon, 
                                     emailpemohon = :EmailPemohon, 
                                     nomortelepon = :NomorTelepon, 
-                                    nomorberkas = :NomorBerkas,   
                                     nomorrekening = :NomorRekening, 
                                     namabank = :NamaBank, 
                                     namacabang = :NamaCabang, 
@@ -1253,7 +1251,7 @@ namespace Pnbp.Models
                                     pengembalianpnbpid = :PengembalianPnbpId";
 
                         arrayListParameters.Clear();
-                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("BerkasId", data.BERKASID));
+                        //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("BerkasId", data.BERKASID));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaProsedur", ""));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", data.KODEBILLING));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("TanggalKodeBilling", ""));
@@ -1267,7 +1265,6 @@ namespace Pnbp.Models
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("AlamatPemohon", data.ALAMATPEMOHON));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("EmailPemohon", ""));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorTelepon", ""));
-                        arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorBerkas", data.NOMORBERKAS));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorRekening", data.NOMORREKENING));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaBank", data.NAMABANK));
                         arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaCabang", ""));
