@@ -108,5 +108,37 @@
 
             return CurrentAdminRole;
         }
+
+        public static bool IsAuthorizedPengembalian()
+        {
+            bool isAuthorized = false;
+
+            try
+            {
+                string pegawaiid = (HttpContext.Current.User.Identity as Pnbp.Entities.InternalUserIdentity).PegawaiId;
+                string kantorid = (HttpContext.Current.User.Identity as Pnbp.Entities.InternalUserIdentity).KantorId;
+                string jenisKantor = GetJenisKantor(kantorid);
+
+                Pnbp.Models.HakAksesModel model = new Pnbp.Models.HakAksesModel();
+
+                if (jenisKantor == "Kantah")
+                {
+                    string roles = "'KepalaSubBagianTataUsaha'";
+                    isAuthorized = model.CheckValidUserProfileRoles(pegawaiid, kantorid, roles);
+                }
+                else if (jenisKantor == "Kanwil")
+                { 
+                    string roles = "'KasubagKeuangan','KasubagKEUANGAN'";
+                    isAuthorized = model.CheckValidUserProfileRoles(pegawaiid, kantorid, roles);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return isAuthorized;
+        }
     }
 }

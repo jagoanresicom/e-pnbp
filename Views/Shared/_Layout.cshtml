@@ -1,5 +1,6 @@
 ﻿@{
 	string jenisKantorUser = OtorisasiUser.GetJenisKantorUser();
+	bool isAuthorizedPengembalian = OtorisasiUser.IsAuthorizedPengembalian();
 }
 
 <!DOCTYPE html>
@@ -333,7 +334,7 @@
 								<li>
 									<a><i class="fa fa-file-text-o"></i>Pengembalian<span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu">
-										@if (jenisKantorUser == "Kanwil" || jenisKantorUser == "Kantah")
+										@if (isAuthorizedPengembalian)
 										{
 											<li><a href="@Url.Action("pusat", "Pengembalian")">Pusat</a></li>
 											<li><a href="@Url.Action("daerah", "Pengembalian")">Daerah</a></li>
