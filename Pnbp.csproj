@@ -201,6 +201,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BerandaPenerimaanModel.cs" />
+    <Compile Include="Models\Entities\CommonSearchOptionsEntity.cs" />
     <Compile Include="Models\Entities\CommonResponseEntity.cs" />
     <Compile Include="Models\Entities\RealisasiSatker.cs" />
     <Compile Include="Models\Entities\ApiEntity.cs" />
