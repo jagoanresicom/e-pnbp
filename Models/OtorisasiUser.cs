@@ -128,7 +128,7 @@
                 }
                 else if (jenisKantor == "Kanwil")
                 { 
-                    string roles = "'KasubagKeuangan','KasubagKEUANGAN'";
+                    string roles = "'KepalaUrusanKeuangan'";
                     isAuthorized = model.CheckValidUserProfileRoles(pegawaiid, kantorid, roles);
                 }
 

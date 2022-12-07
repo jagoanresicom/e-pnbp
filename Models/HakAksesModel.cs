@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Pnbp.Entities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -222,15 +223,27 @@ namespace Pnbp.Models
             return result;
         }
 
-        public bool CheckValidUserProfileRoles(string pegawaiid, string kantorid, string roles)
+        public bool CheckValidUserProfileRoles(string pegawaiid, string kantorid, string roles, CommonSearchOptions searchOptions = null)
         {
             bool result = false;
+            if (searchOptions == null)
+            {
+                searchOptions = new CommonSearchOptions()
+                {
+                    CekKantor = true,
+                };
+            }
 
-            string query = "SELECT count(*) FROM profilepegawai pp JOIN PROFILE p ON p.profileid = pp.profileid WHERE pegawaiid = :PegawaiId AND kantorid = :KantorId AND rolename IN (" + roles + ") AND (pp.VALIDSAMPAI IS NULL OR TRUNC(pp.VALIDSAMPAI) > TRUNC(SYSDATE))";
+            string query = "SELECT count(*) FROM profilepegawai pp JOIN PROFILE p ON p.profileid = pp.profileid WHERE pegawaiid = :PegawaiId AND rolename IN (" + roles + ") AND (pp.VALIDSAMPAI IS NULL OR TRUNC(pp.VALIDSAMPAI) > TRUNC(SYSDATE))";
 
             ArrayList arrayListParameters = new ArrayList();
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("PegawaiId", pegawaiid));
-            arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
+
+            if (searchOptions.CekKantor)
+            {
+                query += " AND kantorid = :KantorId ";
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
+            }
 
             using (var ctx = new PnbpContext())
             {
