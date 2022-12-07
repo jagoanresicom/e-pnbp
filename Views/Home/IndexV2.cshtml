@@ -407,8 +407,9 @@
 				plotShadow: false,
 				type: 'pie'
 			},
+			colors: ['#3498db', '#26b99a'],
 			title: {
-				text: 'Total Penerimaan <small>(banding target)</small>'
+				text: 'Total Penerimaan <small>(banding Target)</small>'
 			},
 			//tooltip: {
 			//	pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -476,7 +477,8 @@
 				plotShadow: false,
 				type: 'pie'
 			},
-			colors: ['#3498db', '#455c73', '#9b59b6', '#bdc3c7', '#26b99a'],
+			colors: ['#3498db', '#26b99a'],
+			//colors: ['#3498db', '#455c73', '#9b59b6', '#bdc3c7', '#26b99a'],
 			title: {
 				text: 'Total Belanja <small>(banding Pagu)</small>'
 			},
@@ -514,7 +516,7 @@
 	function loadPenerimaanJenisLayanan(seriesData) {
 		Highcharts.chart('js-chart-penerimaan-layanan', {
 			chart: {
-				type: 'spline',
+				type: 'areaspline',
 				height: '300',
 			},
 			title: {
@@ -557,6 +559,8 @@
 
 			plotOptions: {
 				series: {
+					lineColor: '#25dfb7',
+					fillColor: '#3bdbb98c',
 					dataLabels: {
 						enabled: true,
 						formatter: function (e) {
@@ -565,21 +569,16 @@
 					},
 					enableMouseTracking: true,
 					marker: {
+						fillColor: '#26b99a',
 						enabled: true,
 						radius: 2.5
 					}
 				},
 			},
-
-			colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
-
-			// Define the data points. All series have a year of 1970/71 in order
-			// to be compared on the same x axis. Note that in JavaScript, months start
-			// at 0 for January, 1 for February etc.
+			colors: ['#26b99a'],
 			series: [
 				{
 					name: "Tahun 2022",
-					//data: seriesData,
 					data: seriesData,
 				},
 			]
@@ -590,7 +589,7 @@
 	function loadPenerimaanJenisLayananKKPR(seriesData) {
 		Highcharts.chart('js-chart-penerimaan-layanan-kkpr', {
 			chart: {
-				type: 'spline',
+				type: 'areaspline',
 				height: '300',
 			},
 			title: {
@@ -614,9 +613,10 @@
 					return 'Rp. ' + formatAngka(this.y);
 				},
 			},
-
 			plotOptions: {
 				series: {
+					lineColor: '#25dfb7',
+					fillColor: '#3bdbb98c',
 					dataLabels: {
 						enabled: true,
 						formatter: function (e) {
@@ -625,14 +625,13 @@
 					},
 					enableMouseTracking: true,
 					marker: {
+						fillColor: '#26b99a',
 						enabled: true,
 						radius: 2.5
 					}
 				},
 			},
-
-			colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
-
+			colors: ['#26b99a'],
 			series: [
 				{
 					name: "Tahun 2022",
