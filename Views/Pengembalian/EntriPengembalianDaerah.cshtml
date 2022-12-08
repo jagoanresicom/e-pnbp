@@ -30,7 +30,7 @@
 	/* top nav z-layer smartwizard overlay fix */
 	.main_container .top_nav {
 		position: relative;
-		z-index: 1;
+		z-index: 6;
 	}
 
 	.sw-theme-default .sw-toolbar-bottom {
@@ -65,11 +65,11 @@
 					<div class="panel-body form-horizontal x_content pb-4">
 
 						<div class="row">
-							<div class="col-md-offset-3 col-md-6">
+							<div class="col-md-offset-3 col-md-6 col-xs-12">
 								@Html.HiddenFor(m => m.BERKASID)
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
-									<div class="col-sm-8" style="display: flex;">
+									<label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Nomor Berkas</label>
+									<div class="col-xs-8" style="display: flex;">
 										@if (String.IsNullOrEmpty(Model.BERKASID))
 										{
 											@Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
@@ -83,45 +83,45 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Atas Nama</label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Atas Nama</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NAMAPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Alamat</label>
-									<div class="col-sm-8">
+									<label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Alamat</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.ALAMATPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Alamat Pemohon" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">NPWP</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NPWP, new { @Value = "", @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })
 										@*@Html.TextBoxFor(m => m.NPWP, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })*@
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Kode Biling</label>
-									<div class="col-sm-8">
+									<label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Kode Biling</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.KODEBILLING, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Kode Billing" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">NTPN</label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">NTPN</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NTPN, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NTPN" })
 									</div>
 								</div>
 							</div>
 
-							<div class="col-md-12">
+							<div class="col-xs-12">
 								<div class="ln_solid"></div>
 							</div>
 
-							<div class="col-md-offset-3 col-md-6">
+							<div class="col-md-offset-3 col-md-6 col-xs-12">
 								<div class="row">
-									<div class="col-md-offset-4 col-md-8">
+									<div class="col-xs-offset-4 col-xs-8">
 										@if (ViewData["step"].ToString() != "0")
 										{
 											<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
@@ -154,50 +154,50 @@
 						<div class="row">
 							<div class="col-md-offset-3 col-md-6">
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Setoran PNBP<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
+									<label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Setoran PNBP<span class="text-danger">*</span></label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.SETORANPNBP, new { @class = "form-control input-md js-input-currency text-right", @data_required_proses = "true" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Jumlah Biaya Layanan yang sudah dikeluarkan<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Jumlah Biaya Layanan yang sudah dikeluarkan<span class="text-danger">*</span></label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.JUMLAHBAYAR, new { @class = "form-control input-md js-input-currency text-right", @data_required_proses = "true" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Permohonan Pengembalian</label>
-									<div class="col-sm-8">
+									<label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Permohonan Pengembalian</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.PERMOHONANPENGEMBALIAN, new { @class = "form-control input-md js-input-currency text-right", @readonly = "readonly" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="npwpberkas" class="col-sm-4 control-label" style="text-align:left;">NPWP<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
+									<label for="npwpberkas" class="col-xs-4 control-label" style="text-align:left;">NPWP<span class="text-danger">*</span></label>
+									<div class="col-xs-8">
 										<input type="text" name="npwpberkas" id="npwpberkas" class="form-control npwp" data-mask="00.000.000.0-000.000" placeholder="NPWP" value="@Model.NPWP" data-required-proses="true" />
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Rekening<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Nama Rekening<span class="text-danger">*</span></label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NAMAREKENING, new { @class = "form-control input-md", @data_required_proses = "true" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Rekening<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
+									<label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Nomor Rekening<span class="text-danger">*</span></label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NOMORREKENING, new { @class = "form-control input-md", @data_required_proses = "true" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nama Bank<span class="text-danger">*</span></label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Nama Bank<span class="text-danger">*</span></label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NAMABANK, new { @class = "form-control input-md", @data_required_proses = "true" })
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nomor Telepon Pemohon</label>
-									<div class="col-sm-8">
+									<label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Nomor Telepon Pemohon</label>
+									<div class="col-xs-8">
 										@Html.TextBoxFor(m => m.NOMORTELEPON, new { @class = "form-control input-md", @maxlength = "12" })
 									</div>
 								</div>
@@ -206,7 +206,7 @@
 
 						<div class="ln_solid"></div>
 						<div class="form-group">
-							<div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-4">
+							<div class="text-center">
 								<button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
 								<button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
 								<button type="button" id="js-btn-simpan-step-2" class="btn btn-primary">Simpan</button>
@@ -233,13 +233,13 @@
 						<div class="panel-body__template-surat">
 
 							<div class="row">
-								<div class="col-md-offset-3 col-md-6" style="display:grid;">
+								<div class="col-md-offset-3 col-md-6 col-xs-12" style="display:grid;">
 									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
 									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
 									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan Pengembalian PNBP</button>
 									<button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
 								</div>
-								<div class="col-md-12">
+								<div class="col-xs-12">
 									<div class="ln_solid"></div>
 									<div class="form-group">
 										<div class="text-center">
@@ -274,7 +274,7 @@
 						<div class="row">
 							<div class="col-md-offset-3 col-md-6">
 								<div class="form-group">
-									<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
+									<label for="SuratPermohonanPengembalian" class="col-sm-4 col-xs-12 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
 									<div class="col-sm-7">
 										@*<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">*@
 										<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/pdf">
@@ -290,7 +290,7 @@
 									}
 								</div>
 								<div class="form-group">
-									<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
+									<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 col-xs-12 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
 									<div class="col-sm-7">
 										<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/pdf">
 										<span id="cancel-SuratPernyataanPNBPBerulang"></span>
@@ -305,7 +305,7 @@
 									}
 								</div>
 								<div class="form-group">
-									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
+									<label for="inputEmail3" class="col-sm-4 col-xs-12 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
 									<div class="col-sm-7">
 										<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/pdf">
 										<span id="cancel-SuratWajibBayar"></span>
@@ -330,7 +330,7 @@
 						<div class="ln_solid"></div>
 						@*<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>*@
 						<div class="form-group">
-							<div class="col-md-offset-4 col-md-8">
+							<div class="text-center">
 								@* dari EntriPengembalianPusat.cshtml *@
 								<button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
 								<button type="button" id="js-btn-simpan" class="btn btn-primary">Simpan</button>
