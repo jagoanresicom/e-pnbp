@@ -1,6 +1,6 @@
 ﻿@model Pnbp.Entities.FilterPenerimaan
 @{
-	ViewBag.Judul = "Alokasi";
+	ViewBag.Judul = "Detail Alokasi";
 	var lsbulan = new List<SelectListItem>();
 	lsbulan.Add(new SelectListItem { Value = "1", Text = "Januari" });
 	lsbulan.Add(new SelectListItem { Value = "2", Text = "Februari" });
@@ -55,7 +55,7 @@
 		<div class="col-md-12 col-sm-12 col-xs-12">
 			<div class="x_panel">
 				<div class="x_title">
-					<h2>Detail Alokasi</h2>
+					<h2>@ViewBag.Judul</h2>
 					<div class="clearfix"></div>
 				</div>
 				<div class="x_content">
@@ -140,7 +140,7 @@
 
 	<div class="x_panel">
 
-		<form class="form-horizontal form-label-left pnbp-group-table" id="frmdatasatker" method="post" data-name="alokasi">
+		<form class="form-horizontal form-label-left pnbp-group-table px-3" id="frmdatasatker" method="post" data-name="alokasi">
 			<div class="form-group pnbp-table-container" id="group_alokasi" style="margin-top:10px;">
 				<table id="alokasisatker" class="table table-striped table-bordered">
 					<thead>
@@ -149,6 +149,7 @@
 							<th>Kode Satker</th>
 							<th>Nama Satker</th>
 							<th>Pagu</th>
+							<th>Belanja</th>
 							@*<th>Alokasi Saat Ini</th>*@
 						</tr>
 					</thead>
@@ -170,6 +171,7 @@
 				<th>Kode Satker</th>
 				<th>Nama Satker</th>
 				<th>Pagu</th>
+				<th>Belanja</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -285,6 +287,9 @@
 
 
     function addCommas(nStr) {
+        if (nStr === undefined)
+            return '';
+
         nStr += '';
         x = nStr.split(',');
         x1 = x[0];
@@ -401,6 +406,7 @@
                     + "<td class='text-left'>" + data[x].KodeSatker + " </td>"
                     + "<td class='text-left'>" + data[x].NamaSatker + " </td>"
                     + "<td class='text-right'>" + addCommas(data[x].Pagu) + "</td>"
+                    + "<td class='text-right'>" + addCommas(data[x].Belanja) + "</td>"
                     + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "</td>"
                     ;
 

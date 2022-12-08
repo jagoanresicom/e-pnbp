@@ -276,7 +276,8 @@
 								<div class="form-group">
 									<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
 									<div class="col-sm-7">
-										<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+										@*<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">*@
+										<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/pdf">
 										<span id="cancel-SuratPermohonanPengembalian"></span>
 									</div>
 									@if (isExistsFileSuratPermohonan)
@@ -291,7 +292,7 @@
 								<div class="form-group">
 									<label for="SuratPernyataanPNBPBerulang" class="col-sm-4 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
 									<div class="col-sm-7">
-										<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+										<input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/pdf">
 										<span id="cancel-SuratPernyataanPNBPBerulang"></span>
 									</div>
 									@if (isExistsfileSuratPNBPBerulang)
@@ -306,7 +307,7 @@
 								<div class="form-group">
 									<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
 									<div class="col-sm-7">
-										<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+										<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/pdf">
 										<span id="cancel-SuratWajibBayar"></span>
 									</div>
 									@if (isExistsfileSuratWajibBayar)
@@ -416,11 +417,12 @@
 		}
 
 		function cariBerkas() {
+			let noBerkas = $('#js-form-entri [name="NOMORBERKAS"]').val();
 			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
 			$.ajax({
 				url: '@Url.Action("GetBerkasByNoTahun", "Pengembalian")',
 				type: 'POST',
-				data: { noberkas: $('#js-form-entri [name="NOMORBERKAS"]').val()},
+				data: { noberkas: noBerkas},
 				success: function (res) {
 					if (res.Success) {
 						let data = res.Data;
@@ -431,7 +433,7 @@
 						$('#KODEBILLING').val(data.KODEBILLING);
 						$('#NTPN').val(data.NTPN);
 						$('#SETORANPNBP').val(addCommas(data.PENERIMAAN));
-						cekBerkasPengembalian(data.BERKASID);
+						cekBerkasPengembalian(noBerkas);
 					} else {
 						$.unblockUI();
 						$('#step-1 .js-smartwizard-next').addClass('disabled');
@@ -459,12 +461,12 @@
 			})
 		}
 
-		function cekBerkasPengembalian(berkasId) {
+		function cekBerkasPengembalian(noBerkas) {
 
 			$.ajax({
 				url: '@Url.Action("CekBerkasPengembalian", "Pengembalian")',
 				type: 'POST',
-				data: { berkasId },
+				data: { noBerkas },
 				success: function (res) {
 					$.unblockUI();
 					if (res.Success) {
@@ -543,7 +545,7 @@
 						}, function () {
 							isSubmit = true;
 							let pengembalianPnbpId = $('#js-form-entri [name="PENGEMBALIANPNBPID"]').val();
-							if (pengembalianPnbpId && pengembalianPnbpId.trim().length > 0) {
+							if (pengembalianPnbpId && pengembalianPnbpId.trim().length > 0 && $('#STATUSPENGEMBALIAN').val() == 0) {
 								window.location.reload();
 							} else {
 								window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';

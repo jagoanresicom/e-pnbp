@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.Streaming;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -424,6 +425,123 @@ namespace Pnbp.Controllers
                     {
                         wb.SaveAs(stream);
                         return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Penerimaan" + DateTime.Now.ToString("dd-mm-yyyy") + ".xlsx");
+                    }
+                }
+            }
+        }
+
+        [Authorize]
+        public ActionResult ExportBelanja(string pTahun)
+        {
+            {
+                string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+
+                PnbpContext db = new PnbpContext();
+                Pnbp.Models.AdmModel _pm = new Models.AdmModel();
+                Entities.FilterManajemenData _frm = new Entities.FilterManajemenData();
+                _frm.tahun = (!string.IsNullOrEmpty(pTahun)) ? pTahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+                DataTable dt = new DataTable(pTahun);
+                dt.Columns.AddRange(new DataColumn[7] {
+                    new DataColumn("No",typeof(int)),
+                    new DataColumn("Kode_KRO"),
+                    new DataColumn("Kode_Satker"),
+                    new DataColumn("Nama_Satker"),
+                    new DataColumn("Pagu", typeof(decimal)),
+                    new DataColumn("Realisasi", typeof(decimal)),
+                    new DataColumn("Nama_Provinsi"),
+                });
+
+                //List<Entities.Penerimaan> result = _pm.GetPenerimaanNasional(pTahun);
+                //string query =
+                //  @"
+                //       SELECT 
+		              //              ROW_NUMBER() over (ORDER BY kdsatker) urutan,
+		              //              KDSATKER KodeKRO,
+		              //              KDSATKER KodeSatker,
+                //                    u.nama_satker NamaSatker,
+		              //              alsk.pagu pagu,
+                //                    alsk.alokasi alokasi,
+                //                    prov.nama namaprovinsi
+	               //             FROM 
+                //                    alokasisatker alsk
+                //                    JOIN AlokasiSatkerSummary ass ON alsk.ALOKASISATKERSUMMARYID = ass.ALOKASISATKERSUMMARYID 
+                //                    JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
+                //                    JOIN kkpwebdev.kantor k ON k.kodesatker = u.KODESATKER
+                //                    LEFT JOIN wilayah w ON k.kode = w.kode
+                //                    LEFT JOIN wilayah prov ON prov.wilayahid = w.induk
+                //                WHERE 
+                //                    alsk.tahun = 2022";
+                
+                string query = @"
+                       WITH realisasi AS (
+	                SELECT
+		                sum(amount) belanja,
+		                kegiatan,
+		                OUTPUT
+	                FROM
+		                SPAN_REALISASI sr
+	                JOIN SATKER s ON
+		                s.KODESATKER = sr.KDSATKER
+	                WHERE
+		                SUMBERDANA = 'D'
+		                AND sr.tahun = :tahun
+	                GROUP BY
+		                (kegiatan,
+		                OUTPUT) 
+                )
+                select ROW_NUMBER() over (ORDER BY kodesatker) urutan, sum(realisasi) realisasi, kodekro,pagu,nama_satker NamaSatker,kodesatker,namaprovinsi
+                FROM (
+                SELECT
+		                p.kode KodeKRO,
+		                amount pagu,
+		                NVL(r.belanja, 0) Realisasi,
+		                s.NAMA_SATKER,
+		                s.KODESATKER,
+		                case
+			                when w.tipewilayahid = 1 then w.nama
+			                when prov.tipewilayahid = 1 then prov.nama
+		                end namaprovinsi
+	                FROM
+		                pnbp.span_belanja sb
+	                JOIN pnbp.satker s ON
+		                s.kodesatker = sb.KDSATKER
+	                LEFT JOIN wilayah w on w.kode = s.kode
+	                left join wilayah prov on prov.WILAYAHID = w.induk
+	                LEFT JOIN pnbp.program p ON
+		                sb.kegiatan || '.' || sb.OUTPUT = p.kode
+	                LEFT JOIN realisasi r ON
+		                p.kode = r.kegiatan || '.' || r.OUTPUT
+	                WHERE
+		                sb.tahun = :tahun
+		                AND sb.sumber_dana = 'D'
+		                AND p.statusaktif = 1
+		                and s.statusaktif = 1
+		                AND p.tahun = :tahun
+                )
+                GROUP BY
+                (kodekro,pagu,nama_satker,kodesatker,namaprovinsi)
+                order by kodesatker, kodekro";
+
+                List<object> lstparams = new List<object>();
+                lstparams.Add(new OracleParameter("pTahun", pTahun));
+                lstparams.Add(new OracleParameter("pTahun", pTahun));
+                lstparams.Add(new OracleParameter("pTahun", pTahun));
+                var get = db.Database.SqlQuery<Entities.RekapBelanja>(query, lstparams.ToArray()).ToList();
+                //return Json(pTahun, JsonRequestBehavior.AllowGet);
+
+                foreach (var rw in get)
+                {
+                    dt.Rows.Add(rw.urutan, rw.KodeKRO, rw.KodeSatker, rw.NamaSatker, rw.Pagu, rw.Realisasi, rw.NamaProvinsi);
+                }
+
+                using (XLWorkbook wb = new XLWorkbook())
+                {
+                    wb.Worksheets.Add(dt);
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        wb.SaveAs(stream);
+                        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Belanja" + DateTime.Now.ToString("dd-mm-yyyy") + ".xlsx");
                     }
                 }
             }

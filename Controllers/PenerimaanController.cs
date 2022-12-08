@@ -1003,12 +1003,15 @@ namespace Pnbp.Controllers
             var ctx = new PnbpContext();
 
             var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("select kantorId, kode, replace(nama,'Kantor Wilayah ', '') as nama from kantor where tipekantorid=2").ToList();
-            //ViewData["get_propinsi"] = get_propinsi;
 
-            return View();
+            //ViewData["get_propinsi"] = get_propinsi;
+            Entities.FilterPenerimaan fn = new Entities.FilterPenerimaan();
+            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+
+            return View(fn);
         }
 
-        public ActionResult pn_satker(string pid)
+        public ActionResult pn_satker(string pid, string tahun, string bulan)
         {
             List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
             Models.PenerimaanModel model = new Models.PenerimaanModel();
@@ -1019,14 +1022,19 @@ namespace Pnbp.Controllers
             ViewData["provinsi_id"] = pid;
             if (!String.IsNullOrEmpty(pid))
             { 
-                ViewData["nama_wilayah"] = model.GetNamaProvinsiBySatkerInduk(pid);
+                //ViewData["nama_wilayah"] = model.GetNamaProvinsiBySatkerInduk(pid);
+                ViewData["nama_wilayah"] = model.GetNamaProvinsiByWilayahId(pid);
             }
+
+            Entities.FilterPenerimaan fn = new Entities.FilterPenerimaan();
+            fn.tahun = string.IsNullOrEmpty(tahun) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : tahun;
+            fn.bulan = string.IsNullOrEmpty(bulan) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : bulan;
             //return Json(get_propinsi, JsonRequestBehavior.AllowGet);
 
-            return View();
+            return View(fn);
         }
 
-        public ActionResult pn_layanan(string pid)
+        public ActionResult pn_layanan(string pid, string tahun, string bulan)
         {
             Models.PenerimaanModel model = new Models.PenerimaanModel();
             List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
@@ -1040,7 +1048,11 @@ namespace Pnbp.Controllers
                 ViewData["nama_satker"] = model.GetNamaKantorByKantorId(pid);
             }
 
-            return View();
+            Entities.FilterPenerimaan fn = new Entities.FilterPenerimaan();
+            fn.tahun = string.IsNullOrEmpty(tahun) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : tahun;
+            fn.bulan = string.IsNullOrEmpty(bulan) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : bulan;
+
+            return View(fn);
         }
 
         [HttpPost]
@@ -1061,8 +1073,8 @@ namespace Pnbp.Controllers
                 satker,
                 tipekantorid,
                 kantorid,
-                req.Start,
-                req.Length
+                req.Start + 1,
+                req.Length - 1
             );
 
             Entities.DaftarTotal daftarTotal = model.pn_provinsi_sum(
@@ -1141,8 +1153,8 @@ namespace Pnbp.Controllers
                 satker,
                 tipekantorid,
                 kantorid,
-                req.Start,
-                req.Length
+                req.Start + 1,
+                req.Length - 1
             );
 
             Entities.DaftarTotal daftarTotal = model.pn_satker_sum(
@@ -1221,7 +1233,7 @@ namespace Pnbp.Controllers
             }
 
             tahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
-            var data = model.pn_layanan(tahun, bulan, tipekantorid, kantorid, layanan, req.Start, req.Length);
+            var data = model.pn_layanan(tahun, bulan, tipekantorid, kantorid, layanan, req.Start + 1, req.Length - 1);
 
             Entities.DaftarTotal daftarTotal = model.pn_layanan_sum(
                 tahun,

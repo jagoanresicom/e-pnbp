@@ -31,7 +31,8 @@
 
 	bool isPreviewMode = (!String.IsNullOrEmpty(ViewBag.PreviewMode) && ViewBag.PreviewMode == "TRUE");
 	bool isPengembalianDaerah = (Model.TIPEPENGEMBALIAN == "1");
-	string formSubmitURL = (isPengembalianDaerah ? Url.Action("PengajuanPengembalianDetailDaerah", "Pengembalian") : Url.Action("PengajuanPengembalianDetail", "Pengembalian"));
+	//string formSubmitURL = (isPengembalianDaerah ? Url.Action("PengajuanPengembalianDetailDaerah", "Pengembalian") : Url.Action("PengajuanPengembalianDetail", "Pengembalian"));
+	string formSubmitURL = (isPengembalianDaerah ? Url.Action("PengajuanPengembalianDetailDaerah", "Pengembalian") : Url.Action("PengajuanPengembalianDetailV2", "Pengembalian"));
 }
 
 <style>
@@ -254,7 +255,7 @@
 									<div class="form-group">
 										<label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Nomor Telepon</label>
 										<div class="col-sm-8">
-											<input type="text" name="NamaBank" id="NamaBank" class="form-control" value="@Model.NOMORTELEPON" />
+											@Html.TextBoxFor(model => model.NOMORTELEPON, new { @class = "form-control" })
 										</div>
 									</div>
 
@@ -283,7 +284,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Wajib Bayar</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" placeholder="Surat Wajib Bayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" placeholder="Surat Wajib Bayar" accept="application/pdf">
 												<span id="cancel-SuratWajibBayar"></span>
 												@Html.Raw((file10 != null && !String.IsNullOrEmpty(file10.StatusLampiran) && file10.StatusLampiran != "1" ? ((file10.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -303,7 +304,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="TidakTerlayani" name="TidakTerlayani" placeholder="Surat Pernyataan Tidak Terlayani" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="TidakTerlayani" name="TidakTerlayani" placeholder="Surat Pernyataan Tidak Terlayani" accept="application/pdf">
 												<span id="cancel-TidakTerlayani"></span>
 												@Html.Raw((file11 != null && !String.IsNullOrEmpty(file11.StatusLampiran) && file11.StatusLampiran != "1" ? ((file11.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -322,7 +323,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="SuratPermohhonan" name="SuratPermohonan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="SuratPermohhonan" name="SuratPermohonan" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-SuratPermohhonan"></span>
 												@Html.Raw((file1 != null && !String.IsNullOrEmpty(file1.StatusLampiran) && file1.StatusLampiran != "1" ? ((file1.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -339,7 +340,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="SuratKeterangan" name="SuratKeterangan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="SuratKeterangan" name="SuratKeterangan" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-SuratKeterangan"></span>
 												@Html.Raw((file2 != null && !String.IsNullOrEmpty(file2.StatusLampiran) && file2.StatusLampiran != "1" ? ((file2.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -356,7 +357,7 @@
 										<div class="form-group" style="display:none;">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Penerimaan Negara</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="BuktiPenerimaan" name="BuktiPenerimaan" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="BuktiPenerimaan" name="BuktiPenerimaan" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-BuktiPenerimaan"></span>
 												@Html.Raw((file3 != null && !String.IsNullOrEmpty(file3.StatusLampiran) && file3.StatusLampiran != "1" ? ((file3.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -373,7 +374,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Perintah Setor</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="SuratPerintah" name="SuratPerintah" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="SuratPerintah" name="SuratPerintah" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-SuratPerintah"></span>
 												@Html.Raw((file4 != null && !String.IsNullOrEmpty(file4.StatusLampiran) && file4.StatusLampiran != "1" ? ((file4.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -390,7 +391,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Bukti Setor</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="BuktiSetor" name="BuktiSetor" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="BuktiSetor" name="BuktiSetor" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-BuktiSetor"></span>
 												@Html.Raw((file5 != null && !String.IsNullOrEmpty(file5.StatusLampiran) && file5.StatusLampiran != "1" ? ((file5.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -407,7 +408,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Kepemilikan Rek.Tujuan</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="BuktiRek" name="BuktiRek" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="BuktiRek" name="BuktiRek" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-BuktiRek"></span>
 												@Html.Raw((file6 != null && !String.IsNullOrEmpty(file6.StatusLampiran) && file6.StatusLampiran != "1" ? ((file6.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -424,7 +425,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="NpwpFile" name="NpwpFile" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="NpwpFile" name="NpwpFile" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-NpwpFile"></span>
 												@Html.Raw((file7 != null && !String.IsNullOrEmpty(file7.StatusLampiran) && file7.StatusLampiran != "1" ? ((file7.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -441,7 +442,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Bukti Domisili Pemohon</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="BuktiDomisili" name="BuktiDomisili" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="BuktiDomisili" name="BuktiDomisili" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-BuktiDomisili"></span>
 												@Html.Raw((file8 != null && !String.IsNullOrEmpty(file8.StatusLampiran) && file8.StatusLampiran != "1" ? ((file8.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -458,7 +459,7 @@
 										<div class="form-group">
 											<label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Bermaterai</label>
 											<div class="col-sm-7">
-												<input type="file" class="form-control max_5mb" id="SuratKuasa" name="SuratKuasa" placeholder="Nomor Berkas" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="SuratKuasa" name="SuratKuasa" placeholder="Nomor Berkas" accept="application/pdf">
 												<span id="cancel-SuratKuasa"></span>
 												@Html.Raw((file9 != null && !String.IsNullOrEmpty(file9.StatusLampiran) && file9.StatusLampiran != "1" ? ((file9.StatusLampiran == "2") ? "<span style='color: green;'><i class='fa fa-check'></i> File Sesuai</span>" : "<span style='color: red;'><i class='fa fa-close'></i> File tidak sesuai!</span>") : ""))
 											</div>
@@ -521,7 +522,7 @@
 										<div class="form-group">
 											<label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
 											<div class="col-sm-6">
-												<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" @(isExistsFile13 ?? "required")>
+												<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/pdf" @(!isExistsFile13 ? "required=required" : "")>
 												<span id="cancel-SuratPermohonanPengembalian"></span>
 											</div>
 											@if (isExistsFile13)
@@ -538,7 +539,7 @@
 										<div class="form-group">
 											<label for="SuratPNBPBerulang" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
 											<div class="col-sm-6">
-												<input type="file" class="form-control max_5mb" id="SuratPNBPBerulang" name="SuratPNBPBerulang" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" @(isExistsFile12 ?? "required")>
+												<input type="file" class="form-control max_5mb" id="SuratPNBPBerulang" name="SuratPNBPBerulang" accept="application/pdf" @(!isExistsFile12 ? "required=required" : "")>
 												<span id="cancel-SuratPNBPBerulang"></span>
 											</div>
 											@if (file12 != null && !String.IsNullOrEmpty(file12.NamaFile))
@@ -555,7 +556,7 @@
 										<div class="form-group">
 											<label for="SuratKuasaWajibBayar" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
 											<div class="col-sm-6">
-												<input type="file" class="form-control max_5mb" id="SuratKuasaWajibBayar" name="SuratKuasaWajibBayar" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+												<input type="file" class="form-control max_5mb" id="SuratKuasaWajibBayar" name="SuratKuasaWajibBayar" accept="application/pdf">
 												<span id="cancel-SuratKuasaWajibBayar"></span>
 											</div>
 											@if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
@@ -576,7 +577,7 @@
 											<div class="form-group">
 												<label for="SuratKeteranganPengeluaran" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan Pengeluaran<span class="text-danger">*</span></label>
 												<div class="col-sm-6">
-													<input type="file" class="form-control max_5mb" id="SuratKeteranganPengeluaran" name="SuratKeteranganPengeluaran" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" @(isExistsFile21 ?? "required")>
+													<input type="file" class="form-control max_5mb" id="SuratKeteranganPengeluaran" name="SuratKeteranganPengeluaran" accept="application/pdf" @(!isExistsFile21 ? "required=required" : "")>
 													<span id="cancel-SuratKeteranganPengeluaran"></span>
 												</div>
 												@if (file21 != null && !String.IsNullOrEmpty(file21.NamaFile))
@@ -592,7 +593,7 @@
 											<div class="form-group">
 												<label for="SuratPernyataanTidakTerlayani" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani<span class="text-danger">*</span></label>
 												<div class="col-sm-6">
-													<input type="file" class="form-control max_5mb" id="SuratPernyataanTidakTerlayani" name="SuratPernyataanTidakTerlayani" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" @(isExistsFile11 ?? "required")>
+													<input type="file" class="form-control max_5mb" id="SuratPernyataanTidakTerlayani" name="SuratPernyataanTidakTerlayani" accept="application/pdf" @(!isExistsFile11 ? "required=required" : "")>
 													<span id="cancel-SuratPernyataanTidakTerlayani"></span>
 												</div>
 												@if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
@@ -608,7 +609,7 @@
 											<div class="form-group">
 												<label for="SuratPengembalianPNBP" class="col-sm-4 control-label" style="text-align:left;">Surat Persetujuan Pengembalian PNBP<span class="text-danger">*</span></label>
 												<div class="col-sm-6">
-													<input type="file" class="form-control max_5mb" id="SuratPengembalianPNBP" name="SuratPengembalianPNBP" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" @(isExistsFile22 ?? "required")>
+													<input type="file" class="form-control max_5mb" id="SuratPengembalianPNBP" name="SuratPengembalianPNBP" accept="application/pdf" @(!isExistsFile22 ? "required=required" : "")>
 													<span id="cancel-SuratPengembalianPNBP"></span>
 												</div>
 												@if (file22 != null && !String.IsNullOrEmpty(file22.NamaFile))
@@ -624,7 +625,7 @@
 											<div class="form-group">
 												<label for="SuratTanggungJawabMutlak" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tanggung Jawab Mutlak<span class="text-danger">*</span></label>
 												<div class="col-sm-6">
-													<input type="file" class="form-control max_5mb" id="SuratTanggungJawabMutlak" name="SuratTanggungJawabMutlak" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf" @(isExistsFile20 ?? "required")>
+													<input type="file" class="form-control max_5mb" id="SuratTanggungJawabMutlak" name="SuratTanggungJawabMutlak" accept="application/pdf" @(!isExistsFile20 ? "required=required" : "")>
 													<span id="cancel-SuratTanggungJawabMutlak"></span>
 												</div>
 												@if (file20 != null && !String.IsNullOrEmpty(file20.NamaFile))
@@ -635,7 +636,7 @@
 														</a>
 													</div>
 												}
-												<input type="hidden" name="fileid20" value="@(file20 != null && !String.IsNullOrEmpty(file20.LampiranKembalianId)?file20.LampiranKembalianId:"")" />
+												<input type="hidden" name="fileid20" required value="@(file20 != null && !String.IsNullOrEmpty(file20.LampiranKembalianId)?file20.LampiranKembalianId:"")" />
 											</div>
 
 											if (Model.STATUSPENGEMBALIAN == "4")
@@ -644,7 +645,7 @@
 												<div class="form-group">
 													<label for="FileSP2D" class="col-sm-4 control-label" style="text-align:left;">SP2D<span class="text-danger">*</span></label>
 													<div class="col-sm-6">
-														<input type="file" class="form-control max_5mb" id="FileSP2D" name="FileSP2D" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+														<input type="file" class="form-control max_5mb" id="FileSP2D" name="FileSP2D" accept="application/pdf">
 														<span id="cancel-FileSP2D"></span>
 													</div>
 													@if (fileSP2D != null && !String.IsNullOrEmpty(fileSP2D.NamaFile))
@@ -771,7 +772,7 @@
 									<div class="form-group">
 										<label for="FileSuratPengembalian" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Unggah File</label>
 										<div class="col-sm-8" style="min-height: 53px;">
-											<input type="file" name="FileSuratPengembalian" id="FileSuratPengembalian" class="form-control" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<input type="file" name="FileSuratPengembalian" id="FileSuratPengembalian" class="form-control" required accept="application/pdf">
 											<span id="cancel-FileSuratPengembalian"></span>
 										</div>
 									</div>
@@ -783,7 +784,7 @@
 									<div class="form-group">
 										<label for="FileSPTJM" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Unggah File</label>
 										<div class="col-sm-8" style="min-height: 53px;">
-											<input type="file" name="FileSPTJM" id="FileSPTJM" class="form-control" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+											<input type="file" name="FileSPTJM" id="FileSPTJM" class="form-control" required accept="application/pdf">
 											<span id="cancel-FileSPTJM"></span>
 										</div>
 									</div>
@@ -803,7 +804,7 @@
 								<div class="form-group">
 									<label for="FileSP2D" class="col-sm-4 control-label" style="text-align:left;font-weight: normal;">Unggah File</label>
 									<div class="col-sm-8" style="min-height: 53px;">
-										<input type="file" name="FileSP2D" id="FileSP2D" class="form-control" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">
+										<input type="file" name="FileSP2D" id="FileSP2D" class="form-control" required accept="application/pdf">
 										<span id="cancel-FileSP2D"></span>
 									</div>
 								</div>
@@ -912,6 +913,69 @@
 	$('#js-btn-proses').on('click', () => $('#STATUSPENGEMBALIAN').val(2));
 	$('#simpan').click(function (e) { $('#STATUSPENGEMBALIAN').val('0'); });
 	$('#proses').click(function (e) { $('#STATUSPENGEMBALIAN').val('1'); });
+
+	$('#pengembalian_form').on('submit', (e) => {
+		if ($('#js-tipepengembalian').val() != "1") {
+			e.preventDefault();
+			submitPengembalian(e);
+		}
+	});
+
+	function submitPengembalian(e) {
+		e.preventDefault();
+		$('#PermohonanPengembalian').removeAttr('disabled')
+		let frmData = new FormData($('#pengembalian_form')[0]);
+		$('#PermohonanPengembalian').attr('disabled', 'disabled')
+		$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+		$.ajax({
+			type: "POST",
+			url: '@Url.Action("PengajuanPengembalianDetailV2", "Pengembalian")',
+			//url: '@Url.Action("PengajuanPengembalianForm", "Pengembalian")',
+			data: frmData,
+			processData: false,
+			contentType: false,
+			success: function (data, textStatus, XMLHttpRequest) {
+				if (data.Status) {
+					swal({
+						title: "Sukses",
+						text: "Data berhasil disimpan",
+						type: "success",
+						closeOnEsc: true,
+						allowOutsideClick: false,
+					}, function () {
+						let pengembalianPnbpId = $('[name="pengembalianpnbpid"]').val();
+						if (pengembalianPnbpId && pengembalianPnbpId.trim().length > 0) {
+							window.location.reload();
+						} else {
+							window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
+						}
+					});
+				} else {
+					swal({
+						title: "Proses Gagal",
+						text: data.Pesan,
+						html: true,
+						type: "warning",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				}
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				swal({
+					title: "Proses Gagal",
+					text: "Terjadi kesalahan",
+					type: "error",
+					closeOnEsc: true,
+					allowOutsideClick: true,
+				});
+			},
+		}).always(() => {
+			$.unblockUI();
+		});
+
+	}
 
 
 	function prosesPengembalian(e) {
@@ -1044,35 +1108,39 @@
 
 	});
 
-    $('#SetoranPnbp').keyup(function (event) {
-        var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);
-        var SetoranPnbp = parseInt(($('#SetoranPnbp').val() != '') ? $('#SetoranPnbp').val().replace(/\./g, ""): 0);
+	function hitungPermohonanPengembalian() {
+		let setoranPnbp = parseInt($('#SetoranPnbp').val().replace(/\./g, ''));
+		let jumlahBayar = parseInt($('#JumlahBayar').val().replace(/\./g, ''));
+		if (isNaN(setoranPnbp)) {
+			setoranPnbp = 0;
+		}
+		if (isNaN(jumlahBayar)) {
+			jumlahBayar = 0;
+		}
+		let permohonanPengembalian = setoranPnbp - jumlahBayar;
+		permohonanPengembalian = Math.max(0, permohonanPengembalian);
+		$('#PermohonanPengembalian').val(convertRupiah(permohonanPengembalian.toString()));
+	}
 
-        if (Number(SetoranPnbp) < Number(JumlahBayar)) {
-            var jml = '';
-            $('#PermohonanPengembalian').val( jml);
-        } else {
-            var permohonanpengembalian = (Number(SetoranPnbp) - Number(JumlahBayar));
-            var jml = permohonanpengembalian;
-            $('#PermohonanPengembalian').val(addCommas(jml));
-        }
+	$('#SetoranPnbp').on('input', () => hitungPermohonanPengembalian());
+	$('#JumlahBayar').on('input', () => hitungPermohonanPengembalian());
+	hitungPermohonanPengembalian();
 
-    });
+	function convertRupiah(angka, prefix) {
+		var number_string = angka.replace(/[^,\d]/g, "").toString(),
+			split = number_string.split(","),
+			sisa = split[0].length % 3,
+			rupiah = split[0].substr(0, sisa),
+			ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-    $('#JumlahBayar').keyup(function (event) {
-        var JumlahBayar = parseInt(($('#JumlahBayar').val() != '') ? $('#JumlahBayar').val().replace(/\./g, ""): 0);
-        var SetoranPnbp = parseInt(($('#SetoranPnbp').val() != '') ? $('#SetoranPnbp').val().replace(/\./g, ""): 0);
+		if (ribuan) {
+			separator = sisa ? "." : "";
+			rupiah += separator + ribuan.join(".");
+		}
 
-        if (Number(SetoranPnbp) < Number(JumlahBayar)) {
-            var jml = '';
-            $('#PermohonanPengembalian').val(jml);
-        } else {
-            var permohonanpengembalian = (Number(SetoranPnbp) - Number(JumlahBayar));
-            var jml = permohonanpengembalian;
-            $('#PermohonanPengembalian').val(addCommas(jml));
-        }
-
-    });
+		rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+		return prefix == undefined ? rupiah : rupiah ? prefix + rupiah : "";
+	}
 
 	// generate surat
 	$('.js-btn-generate-surat').on('click', generateSuratHandler);

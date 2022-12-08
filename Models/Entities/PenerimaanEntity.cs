@@ -228,6 +228,7 @@ namespace Pnbp.Entities
         public int urutan { get; set; }
         public string namaprosedur { get; set; }
         public int jumlah { get; set; }
+        public decimal? jumlahFisik { get; set; }
         public int? nilaitarget { get; set; }
         public int RecordsTotal { get; set; }
     }
@@ -240,6 +241,15 @@ namespace Pnbp.Entities
         public Decimal? totalfisik { get; set; }
         public Decimal? totalpagu{ get; set; }
         public Decimal? totalalokasi{ get; set; }
+        public Decimal? totalrealisasi{ get; set; }
+        public Decimal? totaltarget{ get; set; }
+    }
+
+    public class RekapPenerimaanJenisLayanan
+    {
+        [Key]
+        public Decimal? totalpenerimaan { get; set; }
+        public string bulan { get; set; }
     }
 
     public class RekapPenerimaanDetail

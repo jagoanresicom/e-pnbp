@@ -7,6 +7,9 @@ using System.Web.Mvc;
 using System.Net;
 using System.Text;
 using System.IO;
+using Pnbp.Entities;
+using Pnbp.Models;
+using System.Globalization;
 
 namespace Pnbp.Controllers
 {
@@ -106,7 +109,7 @@ namespace Pnbp.Controllers
             //ViewBag.bulanNonOps = dsboard.bulanNonOps.ToList();
 
             //return Json(persentase_belanja, JsonRequestBehavior.AllowGet);
-            return View();
+            return View("IndexV2");
         }
 
         public JsonResult GetTotalPenerimaan()
@@ -134,6 +137,390 @@ namespace Pnbp.Controllers
             return Json(new { totalPenerimaan }, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetTotalPenerimaanV2()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            DaftarTotal total = model.GetTotalPenerimaan(currentYear);
+
+            List<ChartData> data = new List<ChartData>() { };
+            data.Add(new ChartData()
+            {
+                name = "Target",
+                y = total.totalpenerimaan / 2,
+            });
+            data.Add(new ChartData()
+            {
+                name = "Total Penerimaan",
+                y = total.totalpenerimaan,
+            });
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetTotalPenerimaanSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            DaftarTotal total = model.GetTotalPenerimaanSummary();
+
+            if (total == null || total.totaltarget == 0 || total.totalpenerimaan == 0)
+            {
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            List<ChartData> data = new List<ChartData>() { };
+            data.Add(new ChartData()
+            {
+                name = "Target",
+                y = total.totaltarget,
+                legendIndex = 2,
+            });
+            data.Add(new ChartData()
+            {
+                name = "Total Penerimaan",
+                y = total.totalpenerimaan,
+                legendIndex = 1,
+            });
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetTotalBelanjaV2()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PemanfaatanModel model = new PemanfaatanModel();
+            DaftarTotal total = model.GetTotalBelanjaBandingPagu(currentYear);
+
+            List<ChartData> data = new List<ChartData>() { };
+            data.Add(new ChartData()
+            {
+                name = "Pagu",
+                y = total.totalpagu,
+            });
+            data.Add(new ChartData()
+            {
+                name = "Total Belanja",
+                y = total.totalrealisasi,
+            });
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetTotalBelanjaV3()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            List<ChartData> data = new List<ChartData>() { };
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PemanfaatanModel model = new PemanfaatanModel();
+            DaftarTotal total = model.GetTotalBelanjaBandingPaguSummary();
+
+            if (total == null)
+            {
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            data.Add(new ChartData()
+            {
+                name = "Pagu",
+                y = total.totalpagu,
+                legendIndex = 2,
+            });
+            data.Add(new ChartData()
+            {
+                name = "Total Belanja",
+                y = total.totalrealisasi,
+                legendIndex = 1,
+            });
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ListPenerimaanLayananTertinggi()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+            
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<StatistikPenerimaan> res = model.ListPenerimaanLayanan(currentYear, 1, 4);
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (StatistikPenerimaan item in res)
+            {
+                data.Add(new ChartData()
+                {
+                    name = item.namaprosedur,
+                    y = item.penerimaan,
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ListPenerimaanLayananTertinggiSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+            
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<StatistikPenerimaan> res = model.ListPenerimaanLayananTertinggiSummary();
+
+            if (res.Count == 0)
+            {
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (StatistikPenerimaan item in res)
+            {
+                data.Add(new ChartData()
+                {
+                    name = item.namaprosedur,
+                    y = item.penerimaan,
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetPenerimaanJenisLayanan()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<RekapPenerimaanJenisLayanan> res = model.GetRekapPenerimaanJenisLayanan(currentYear);
+
+            resp.Success = true;
+            resp.Data = res;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetPenerimaanPertanahanSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<RekapPenerimaanJenisLayanan> res = model.GetRekapPenerimaanPertanahanSummary();
+
+            if (res.Count == 0)
+            {
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            resp.Success = true;
+            resp.Data = res;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetPenerimaanKKPRSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<RekapPenerimaanJenisLayanan> res = model.GetRekapPenerimaanKKPRSummary();
+
+            if (res.Count == 0)
+            {
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            resp.Success = true;
+            resp.Data = res;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public JsonResult ListPenerimaanFisikTertinggi()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<DaftarRekapPenerimaanDetail> res = model.ListFisikPenerimaanSatker(currentYear, 1, 5);
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (DaftarRekapPenerimaanDetail item in res)
+            {
+                data.Add(new ChartData()
+                {
+                    name = item.nama_satker,
+                    y = item.jumlah,
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ListPenerimaanFisikTertinggiSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PenerimaanModel model = new PenerimaanModel();
+            List<DaftarRekapPenerimaanDetail> res = model.ListFisikPenerimaanSatkerSummary();
+
+            if (res.Count == 0)
+            {
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (DaftarRekapPenerimaanDetail item in res)
+            {
+                data.Add(new ChartData()
+                {
+                    name = item.nama_satker,
+                    y = item.jumlahFisik,
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ListBelanjaProvinsiTertinggi()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+            
+            PemanfaatanModel model = new PemanfaatanModel();
+            var res = model.ListBelanjaProvinsi(currentYear, 1, 5);
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (BelanjaKRO item in res)
+            { 
+                data.Add(new ChartData()
+                {
+                    name = item.KodeKRO,
+                    y = item.PersentaseRealisasiBelanja,
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ListBelanjaSatkerTertinggiSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PemanfaatanModel model = new PemanfaatanModel();
+            List<BelanjaKRO> res = model.ListBelanjaSatkerSummary();
+
+            if (res.Count == 0) 
+            { 
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (BelanjaKRO item in res)
+            {
+                data.Add(new ChartData()
+                {
+                    name = item.KodeKRO,
+                    y = float.Parse(item.PersentaseRealisasiBelanja, CultureInfo.InvariantCulture),
+                    data1 = item.Realisasi,
+                    data2 = item.TotalPagu
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ListBelanjaProvinsiTertinggiSummary()
+        {
+            CommonResponse resp = new CommonResponse() { Success = false, Data = null, Message = "" };
+
+            string currentYear = DateTime.Now.Year.ToString();
+
+            PemanfaatanModel model = new PemanfaatanModel();
+            List<BelanjaKRO> res = model.ListBelanjaProvinsiSummary();
+
+            if (res.Count == 0) 
+            { 
+                resp.Message = "kosong";
+                return Json(resp, JsonRequestBehavior.AllowGet);
+            }
+
+            List<ChartData> data = new List<ChartData>() { };
+            foreach (BelanjaKRO item in res)
+            {
+                data.Add(new ChartData()
+                {
+                    name = item.KodeKRO,
+                    y = float.Parse(item.PersentaseRealisasiBelanja, CultureInfo.InvariantCulture),
+                    data1 = item.Realisasi,
+                    data2 = item.TotalPagu
+                });
+            }
+
+            resp.Success = true;
+            resp.Data = data;
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetTotalBelanja()
         {
             var ctx = new PnbpContext();
@@ -141,10 +528,10 @@ namespace Pnbp.Controllers
             var total_belanja = ctx
                 .Database
                 .SqlQuery<Entities.TotalBelanja>(
-                //$@"
-                //    SELECT SUM (Amount) as jumlah 
-                //    FROM SPAN_REALISASI 
-                //    WHERE SUMBERDANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}"
+                    //$@"
+                    //    SELECT SUM (Amount) as jumlah 
+                    //    FROM SPAN_REALISASI 
+                    //    WHERE SUMBERDANA = 'D' and KDSATKER != '524465' AND TAHUN = {currentYear}"
                     $@" 
                         SELECT 
                             TO_NUMBER(VALUE) as jumlah 

@@ -312,8 +312,8 @@ namespace Pnbp.Controllers
                 {
                     doc.ReplaceText("{3}", pegawai.Nama);
                     doc.ReplaceText("{4}", pegawai.Nip);
-                    doc.ReplaceText("{5}", pegawai.Jabatan);
-                    doc.ReplaceText("{13}", pegawai.Jabatan);
+                    doc.ReplaceText("{5}", string.IsNullOrEmpty(pegawai.Jabatan) ? "" : pegawai.Jabatan);
+                    doc.ReplaceText("{13}", string.IsNullOrEmpty(pegawai.Jabatan) ? "" : pegawai.Jabatan);
                     doc.ReplaceText("{14}", pegawai.Nama);
                     doc.ReplaceText("{15}", pegawai.Nip);
                 }
@@ -1167,6 +1167,533 @@ namespace Pnbp.Controllers
             return RedirectToAction("mon_pengembalian");
             //return RedirectToAction("PengajuanPengembalianIndex");
             //mati
+        }
+
+        [HttpPost]
+        public JsonResult PengajuanPengembalianFormV2(FormCollection form)
+        {
+            Entities.TransactionResult resp = new Entities.TransactionResult() { Status = false, Pesan = "" };
+            
+            try
+            {
+                //return Json(form, JsonRequestBehavior.AllowGet);
+                var ctx = new PnbpContext();
+                PnbpContext db = new PnbpContext();
+                string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+                string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+                string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
+                string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+
+                var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
+
+                BerkasKembalian berkasKembalian = pengembalianmodel.GetBerkasKembalianPnbpByNomorBerkas(NomorBerkas);
+                if (berkasKembalian != null)
+                {
+                    resp.Pesan = $"Permohonan pengembalian untuk berkas <b>{berkasKembalian.NomorBerkas}</b> sudah pernah dilakukan. Cek status permohonan di menu <b>Monitoring</b>.";
+                    return Json(resp, JsonRequestBehavior.AllowGet);
+                }
+
+                var AtasNama = ((form.AllKeys.Contains("NamaPemohon")) ? form["NamaPemohon"] : "").Replace("'", "");
+                var Alamat = ((form.AllKeys.Contains("AlamatPemohon")) ? form["AlamatPemohon"] : "").Replace("'", "");
+                var NPWP = ((form.AllKeys.Contains("Npwp")) ? form["Npwp"] : "NULL");
+                var KodeBiling = ((form.AllKeys.Contains("KodeBilling")) ? form["KodeBilling"] : "");
+                var NTPN = ((form.AllKeys.Contains("Ntpn")) ? form["Ntpn"] : "NULL");
+                var SetoranPnbp = ((form.AllKeys.Contains("SetoranPnbp")) ? form["SetoranPnbp"] : "");
+                var jumlahbayar = ((form.AllKeys.Contains("JumlahBayar")) ? form["JumlahBayar"] : "");
+                var PermohonanPengembalian = ((form.AllKeys.Contains("PermohonanPengembalian")) ? form["PermohonanPengembalian"] : "");
+
+                var NamaRekening = ((form.AllKeys.Contains("NamaRekening")) ? form["NamaRekening"] : "").Replace("'", "");
+                var npwpberkas = ((form.AllKeys.Contains("npwpberkas")) ? form["npwpberkas"] : "");
+                var NomorRekening = ((form.AllKeys.Contains("NomorRekening")) ? form["NomorRekening"] : "");
+                var NamaBank = ((form.AllKeys.Contains("NamaBank")) ? form["NamaBank"] : "").Replace("'", ""); ;
+                var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "NULL");
+                //return Json(AtasNama, JsonRequestBehavior.AllowGet);
+                var NomorSurat = ((form.AllKeys.Contains("NomorSurat")) ? form["NomorSurat"] : "");
+                var NomorTelepon = ((form.AllKeys.Contains("NomorTelepon")) ? form["NomorTelepon"] : "");
+                //var pengembalianid = RandomString(32);
+                var pengembalianidberkas = RandomString(32);
+                var pengembalianid = NewGuID();
+                //var pengembalianidberkas = NewGuID();
+                var TanggalPengajuan = ConvertDateNow();
+
+                //mati
+                string id = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                string insert_target = "INSERT INTO PENGEMBALIANPNBP (PENGEMBALIANPNBPID, KANTORID, NAMAPEGAWAIPENGAJU, STATUSPENGEMBALIAN,NAMAKANTOR,PEGAWAIIDPENGAJU,TANGGALPENGAJU,NPWPPEGAWAIPENGAJU,tipepengembalian,NOMORTELEPON) " +
+                                                "VALUES ('" + pengembalianid + "','" + kantoriduser + "','" + AtasNama + "','" + Status + "' ,'" + namakantor + "','" + pegawaiid + "'," + TanggalPengajuan + ",'" + NPWP + "','2', '" + NomorTelepon + "')";
+                //return Json(insert_target, JsonRequestBehavior.AllowGet);
+                db.Database.ExecuteSqlCommand(insert_target);
+                string insert_target_berkas = "INSERT INTO BERKASKEMBALIAN (BERKASID, PENGEMBALIANPNBPID, NOMORBERKAS, ALAMATPEMOHON,KODEBILLING,NTPN,JUMLAHBAYAR,NOMORREKENING,NAMABANK,NAMAREKENING,NPWP,NOMORSURAT,SETORANPNBP,PERMOHONANPENGEMBALIAN,NAMAPEMOHON) " +
+                                                "VALUES ('" + pengembalianidberkas + "','" + pengembalianid + "','" + NomorBerkas + "','" + Alamat + "','" + KodeBiling + "','" + NTPN + "'," + jumlahbayar.Replace(".", String.Empty) + ",'" + NomorRekening + "','" + NamaBank + "','" + NamaRekening + "','" + npwpberkas + "','" + NomorSurat + "','" + SetoranPnbp.Replace(".", String.Empty) + "','" + PermohonanPengembalian.Replace(".", String.Empty) + "','" + AtasNama + "')";
+                db.Database.ExecuteSqlCommand(insert_target_berkas);
+                //mati
+
+                //log insert Audit Trail
+                string log_id = NewGuID();
+                if (Status == "1")
+                {
+                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_NOMOR_SURAT, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID, LOG_TIPE) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Dikirim', '" + NomorSurat + "' , '" + pegawaiid + "', SYSDATE, '" + Url.Action("InputPengajuan", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "', 'PENGEMBALIANPNBP')";
+                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                }
+                //log insert Audit Trail
+
+                //Lampiran Pengembalian
+                var file_id = GetSequence("LAMPIRANPENGEMBALIANPNBP");
+
+                //Surat Wajib Bayar
+                var file_name10 = ((form.AllKeys.Contains("SuratWajibBayar")) ? form["SuratWajibBayar"] : "NULL");
+                var fileContent10 = Request.Files["SuratWajibBayar"];
+                //Insert suratwajibbayar
+                if (fileContent10 != null && fileContent10.ContentLength > 0)
+                {
+                    string id10 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent10.InputStream;
+                    var FileSizeByte = fileContent10.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent10.FileName);
+                    var fileName = "SuratWajibBayar" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name10 = fileName;
+                        string insert_lampiran10 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id10 + "','" + pengembalianid + "','" + Filefilepath + "','1',SYSDATE,'Pengajuan','SURAT WAJIB BAYAR','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran10);
+                    }
+                }
+                else
+                {
+                    string id10 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran10 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + id10 + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT WAJIB BAYAR')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran10);
+                    //return Json("disini coy", JsonRequestBehavior.AllowGet);
+                }
+                //Surat Wajib Bayar
+
+                //Surat Pernyataan Tidak Terlayani
+                var file_name11 = ((form.AllKeys.Contains("TidakTerlayani")) ? form["TidakTerlayani"] : "NULL");
+                var fileContent11 = Request.Files["TidakTerlayani"];
+                //Insert Surat Pernyataan Tidak Terlayani
+                if (fileContent11 != null && fileContent11.ContentLength > 0)
+                {
+                    string id11 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent11.InputStream;
+                    var FileSizeByte = fileContent11.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent11.FileName);
+                    var fileName = "SuratPernyataanTidakTerlayani" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name11 = fileName;
+                        string insert_lampiran11 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id11 + "','" + pengembalianid + "','" + Filefilepath + "','1',SYSDATE,'Pengajuan','SURAT PERNYATAAN TIDAK TERLAYANI','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran11);
+                    }
+                }
+                else
+                {
+                    string id11 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran11 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + id11 + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT PERNYATAAN TIDAK TERLAYANI')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran11);
+                    //return Json("disini coy", JsonRequestBehavior.AllowGet);
+                }
+                //Surat Pernyataan Tidak Terlayani
+
+                var file_name1 = ((form.AllKeys.Contains("SuratPermohonan")) ? form["SuratPermohonan"] : "NULL");
+                var fileContent = Request.Files["SuratPermohonan"];
+                //Insert SURATPERMOHONAN
+                if (fileContent != null && fileContent.ContentLength > 0)
+                {
+                    string id1 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent.InputStream;
+                    var FileSizeByte = fileContent.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent.FileName);
+                    var fileName = "SuratPermohonan_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name1 = fileName;
+                        string insert_lampiran1 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id1 + "','" + pengembalianid + "','" + Filefilepath + "','1',SYSDATE,'Pengajuan','SURAT PERMOHONAN','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran1);
+                    }
+                }
+                else
+                {
+                    string id1 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran1 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + id1 + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT PERMOHONAN')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran1);
+                    //return Json("disini coy", JsonRequestBehavior.AllowGet);
+                }
+
+                var file_name2 = ((form.AllKeys.Contains("SuratKeterangan")) ? form["SuratKeterangan"] : "NULL");
+                var fileContent2 = Request.Files["SuratKeterangan"];
+                //Insert SURATPERMOHONAN
+                if (fileContent2 != null && fileContent2.ContentLength > 0)
+                {
+                    string id2 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent2.InputStream;
+                    var FileSizeByte = fileContent2.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent2.FileName);
+                    var fileName = "SuratKeterangan_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath2 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name2 = fileName;
+                        string insert_lampiran2 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id2 + "','" + pengembalianid + "','" + Filefilepath2 + "','1',SYSDATE,'Pengajuan','SURAT KETERANGAN','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran2);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT KETERANGAN')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name3 = ((form.AllKeys.Contains("BuktiPenerimaan")) ? form["BuktiPenerimaan"] : "NULL");
+                var fileContent3 = Request.Files["BuktiPenerimaan"];
+                //Insert SURATPERMOHONAN
+                if (fileContent3 != null && fileContent3.ContentLength > 0)
+                {
+                    string id3 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent3.InputStream;
+                    var FileSizeByte = fileContent3.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent3.FileName);
+                    var fileName = "BuktiPenerimaan_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath3 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name3 = fileName;
+                        string insert_lampiran3 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id3 + "','" + pengembalianid + "','" + Filefilepath3 + "','1',SYSDATE,'Pengajuan','BUKTI PENERIMAAN NEGARA','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran3);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','BUKTI PENERIMAAN NEGARA')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name4 = ((form.AllKeys.Contains("SuratPerintah")) ? form["SuratPerintah"] : "NULL");
+                var fileContent4 = Request.Files["SuratPerintah"];
+                //Insert SURATPERMOHONAN
+                if (fileContent4 != null && fileContent4.ContentLength > 0)
+                {
+                    string id4 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent4.InputStream;
+                    var FileSizeByte = fileContent4.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent4.FileName);
+                    var fileName = "SuratPerintah_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath4 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name4 = fileName;
+                        string insert_lampiran4 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id4 + "','" + pengembalianid + "','" + Filefilepath4 + "','1',SYSDATE,'Pengajuan','SURAT PERINTAH SETOR','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran4);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT PERINTAH SETOR')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name5 = ((form.AllKeys.Contains("BuktiSetor")) ? form["BuktiSetor"] : "NULL");
+                var fileContent5 = Request.Files["BuktiSetor"];
+                //Insert SURATPERMOHONAN
+                if (fileContent5 != null && fileContent5.ContentLength > 0)
+                {
+                    string id5 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent5.InputStream;
+                    var FileSizeByte = fileContent5.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent5.FileName);
+                    var fileName = "BuktiSetor_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath5 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name5 = fileName;
+                        string insert_lampiran5 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id5 + "','" + pengembalianid + "','" + Filefilepath5 + "','1',SYSDATE,'Pengajuan','SURAT BUKTI SETOR','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran5);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT BUKTI SETOR')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name6 = ((form.AllKeys.Contains("BuktiRek")) ? form["BuktiRek"] : "NULL");
+                var fileContent6 = Request.Files["BuktiRek"];
+                //Insert SURATPERMOHONAN
+                if (fileContent6 != null && fileContent6.ContentLength > 0)
+                {
+                    string id6 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent6.InputStream;
+                    var FileSizeByte = fileContent6.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent6.FileName);
+                    var fileName = "BuktiRek_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath6 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name6 = fileName;
+                        string insert_lampiran6 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id6 + "','" + pengembalianid + "','" + Filefilepath6 + "','1',SYSDATE,'Pengajuan','BUKTI KEPEMILIKAN REK TUJUAN','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran6);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','BUKTI KEPEMILIKAN REK TUJUAN')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name7 = ((form.AllKeys.Contains("NpwpFile")) ? form["NpwpFile"] : "NULL");
+                var fileContent7 = Request.Files["NpwpFile"];
+                //Insert SURATPERMOHONAN
+                if (fileContent7 != null && fileContent7.ContentLength > 0)
+                {
+                    string id7 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent7.InputStream;
+                    var FileSizeByte = fileContent7.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent7.FileName);
+                    var fileName = "NpwpFile_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath7 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name7 = fileName;
+                        string insert_lampiran7 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id7 + "','" + pengembalianid + "','" + Filefilepath7 + "','1',SYSDATE,'Pengajuan','NPWP','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran7);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','NPWP')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name8 = ((form.AllKeys.Contains("BuktiDomisili")) ? form["BuktiDomisili"] : "NULL");
+                var fileContent8 = Request.Files["BuktiDomisili"];
+                //Insert SURATPERMOHONAN
+                if (fileContent8 != null && fileContent8.ContentLength > 0)
+                {
+                    string id8 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent8.InputStream;
+                    var FileSizeByte = fileContent8.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent8.FileName);
+                    var fileName = "BuktiDomisili_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath8 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name8 = Filefilepath8;
+                        string insert_lampiran8 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id8 + "','" + pengembalianid + "','" + Filefilepath8 + "','1',SYSDATE,'Pengajuan','BUKTI DOMISILI PEMOHON','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran8);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','BUKTI DOMISILI PEMOHON')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                var file_name9 = ((form.AllKeys.Contains("SuratKuasa")) ? form["SuratKuasa"] : "NULL");
+                var fileContent9 = Request.Files["SuratKuasa"];
+                //Insert SURATPERMOHONAN
+                if (fileContent9 != null && fileContent9.ContentLength > 0)
+                {
+                    string id9 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent9.InputStream;
+                    var FileSizeByte = fileContent9.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent9.FileName);
+                    var fileName = "SuratKuasa_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name9 = Filefilepath9;
+
+                        string insert_lampiran9 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, NAMAFILE, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE,EKSTENSI) " +
+                                              "VALUES ('" + id9 + "','" + pengembalianid + "','" + Filefilepath9 + "','1',SYSDATE,'Pengajuan','SURAT KUASA BERMATERAI','" + Extension + "')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran9);
+                    }
+                }
+                else
+                {
+                    string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT KUASA BERMATERAI')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran);
+                }
+
+                TransactionResult tr = UploadFileSuratPernyataanPNBPBerulang(pengembalianid);
+
+                //mati
+                if (ModelState.IsValid)
+                {
+                    resp.Status = true;
+                    resp.Pesan = "Data Berhasil Disimpan";
+                    return Json(resp, JsonRequestBehavior.AllowGet);
+                }
+
+            }
+            catch (Exception e)
+            {
+                _ = e.Message;
+                resp.Pesan = "Terjadi kesalahan. " + e.Message;
+            }
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -2669,11 +3196,11 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
-        public JsonResult CekBerkasPengembalian(string berkasId)
+        public JsonResult CekBerkasPengembalian(string noBerkas)
         {
             CommonResponse response = new CommonResponse() { Success = true, Message = "" };
 
-            BerkasKembalian berkasKembalian = pengembalianmodel.GetBerkasKembalianPnbpById(berkasId);
+            BerkasKembalian berkasKembalian = pengembalianmodel.GetBerkasKembalianPnbpByNomorBerkas(noBerkas);
             if (berkasKembalian != null) {
                 response.Success = false;
                 response.Message = $"Permohonan pengembalian untuk berkas <b>{berkasKembalian.NomorBerkas}</b> sudah pernah dilakukan. Cek status permohonan di menu <b>Monitoring</b>.";
@@ -2793,7 +3320,7 @@ namespace Pnbp.Controllers
             ViewData["fileSP2D"] = fileSP2D;
 
             bool bisaSelesaikan = true;
-            List<LampiranKembalianTrain> lstFileCheck = new List<LampiranKembalianTrain> { file10, file11, file12, file13, file20, file21, file22 };
+            List<LampiranKembalianTrain> lstFileCheck = new List<LampiranKembalianTrain> { file11, file12, file13, file20, file21, file22 };
             foreach (var fileData in lstFileCheck)
             {
                 if (fileData == null || String.IsNullOrEmpty(fileData.NamaFile))
@@ -3481,6 +4008,552 @@ namespace Pnbp.Controllers
             //return RedirectToAction("PengajuanPengembalianIndex");
             return RedirectToAction("mon_pengembalian");
         }
+
+        [HttpPost]
+        public JsonResult PengajuanPengembalianDetailV2(FormCollection form)
+        {
+            Entities.TransactionResult resp = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            try
+            {
+                //return Json(form, JsonRequestBehavior.AllowGet);
+                var ctx = new PnbpContext();
+                PnbpContext db = new PnbpContext();
+                var pengembalianpnbpid = ((form.AllKeys.Contains("pengembalianpnbpid")) ? form["pengembalianpnbpid"] : "");
+                var fileid1 = ((form.AllKeys.Contains("fileid1")) ? form["fileid1"] : "");
+                var fileid2 = ((form.AllKeys.Contains("fileid2")) ? form["fileid2"] : "");
+                var fileid3 = ((form.AllKeys.Contains("fileid3")) ? form["fileid3"] : "");
+                var fileid4 = ((form.AllKeys.Contains("fileid4")) ? form["fileid4"] : "");
+                var fileid5 = ((form.AllKeys.Contains("fileid5")) ? form["fileid5"] : "");
+                var fileid6 = ((form.AllKeys.Contains("fileid6")) ? form["fileid6"] : "");
+                var fileid7 = ((form.AllKeys.Contains("fileid7")) ? form["fileid7"] : "");
+                var fileid8 = ((form.AllKeys.Contains("fileid8")) ? form["fileid8"] : "");
+                var fileid9 = ((form.AllKeys.Contains("fileid9")) ? form["fileid9"] : "");
+                var fileid10 = ((form.AllKeys.Contains("fileid10")) ? form["fileid10"] : "");
+                var fileid11 = ((form.AllKeys.Contains("fileid11")) ? form["fileid11"] : "");
+                string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+                string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
+                string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
+                string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+
+                var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
+                var AtasNama = ((form.AllKeys.Contains("NamaPemohon")) ? form["NamaPemohon"] : "");
+                var Alamat = ((form.AllKeys.Contains("AlamatPemohon")) ? form["AlamatPemohon"] : "");
+                var NPWP = ((form.AllKeys.Contains("Npwp")) ? form["Npwp"] : "NULL");
+                var npwpberkas = ((form.AllKeys.Contains("npwpberkas")) ? form["npwpberkas"] : "NULL");
+                var KodeBiling = ((form.AllKeys.Contains("KodeBilling")) ? form["KodeBilling"] : "");
+                var NTPN = ((form.AllKeys.Contains("Ntpn")) ? form["Ntpn"] : "NULL");
+                var SetoranPnbp = ((form.AllKeys.Contains("SetoranPnbp")) ? form["SetoranPnbp"] : "");
+                var BiayaLayanan = ((form.AllKeys.Contains("JumlahBayar")) ? form["JumlahBayar"] : "");
+                var PermohonanPengembalian = ((form.AllKeys.Contains("PermohonanPengembalian")) ? form["PermohonanPengembalian"] : "");
+                var NamaRekening = ((form.AllKeys.Contains("NamaRekening")) ? form["NamaRekening"] : "");
+                var NomorRekening = ((form.AllKeys.Contains("NomorRekening")) ? form["NomorRekening"] : "");
+                var NamaBank = ((form.AllKeys.Contains("NamaBank")) ? form["NamaBank"] : "");
+                var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "");
+                var NomorSurat = ((form.AllKeys.Contains("NomorSurat")) ? form["NomorSurat"] : "");
+                var NomorTelepon = ((form.AllKeys.Contains("NOMORTELEPON")) ? form["NOMORTELEPON"] : "");
+                //var pengembalianid = RandomString(32);
+                //var pengembalianidberkas = RandomString(32);
+                var pengembalianid = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                var pengembalianidberkas = db.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                var TanggalPengajuan = ConvertDateNow();
+
+                string id = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                //string insert_target = "UPDATE PNBPTRAIN.PENGEMBALIANPNBP SET NAMAPEGAWAIPENGAJU='"+AtasNama+"', STATUSPENGEMBALIAN='"+ Status + "',NAMAKANTOR='"+namakantor+"',PEGAWAIIDPENGAJU='"+pegawaiid+"',TANGGALPENGAJU='"+TanggalPengajuan+"' WHERE PENGEMBALIANPNBPID = '"+ pengembalianpnbpid + "'";
+                string insert_target = "UPDATE PENGEMBALIANPNBP SET NAMAPEGAWAIPENGAJU='" + AtasNama + "' , STATUSPENGEMBALIAN='" + Status + "',NAMAKANTOR='" + namakantor + "',PEGAWAIIDPENGAJU='" + pegawaiid + "',NPWPPEGAWAIPENGAJU='" + NPWP + "', NOMORTELEPON = '" + NomorTelepon +"' WHERE PENGEMBALIANPNBPID = '" + pengembalianpnbpid + "'";
+                db.Database.ExecuteSqlCommand(insert_target);
+                string insert_target_berkas = "UPDATE BERKASKEMBALIAN SET JUMLAHBAYAR='" + BiayaLayanan.Replace(".", String.Empty) + "',NOMORREKENING='" + NomorRekening + "',NAMABANK='" + NamaBank + "',NAMAREKENING='" + NamaRekening + "',NPWP='" + npwpberkas + "',NOMORSURAT='" + NomorSurat + "',SETORANPNBP='" + SetoranPnbp.Replace(".", String.Empty) + "',PERMOHONANPENGEMBALIAN='" + PermohonanPengembalian.Replace(".", String.Empty) + "' WHERE PENGEMBALIANPNBPID='" + pengembalianpnbpid + "'";
+                db.Database.ExecuteSqlCommand(insert_target_berkas);
+
+                //log insert Audit Trail
+                string log_id = NewGuID();
+                if (Status == "0")
+                {
+                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Disimpan', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetail", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
+                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                }
+                else if (Status == "1")
+                {
+                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Dikirim', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetail", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
+                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                }
+                //log insert Audit Trail
+
+
+                //Lampiran Pengembalian
+                var file_id = GetSequence("LAMPIRANPENGEMBALIANPNBP");
+
+                //Surat Wajib Bayar
+                var file_name10 = ((form.AllKeys.Contains("SuratWajibBayar")) ? form["SuratWajibBayar"] : "NULL");
+                var fileContent10 = Request.Files["SuratWajibBayar"];
+                //Insert suratwajibbayar
+                if (fileContent10 != null && fileContent10.ContentLength > 0)
+                {
+                    string id10 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent10.InputStream;
+                    var FileSizeByte = fileContent10.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent10.FileName);
+                    var fileName = "SuratWajibBayar" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name10 = fileName;
+                        string insert_lampiran10 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid10 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran10);
+                    }
+                }
+                else
+                {
+                    string id10 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran10 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + id10 + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT WAJIB BAYAR')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran10);
+                    //return Json("disini coy", JsonRequestBehavior.AllowGet);
+                }
+                //Surat Wajib Bayar
+
+                //Surat Pernyataan Tidak Terlayani
+                var file_name11 = ((form.AllKeys.Contains("TidakTerlayani")) ? form["TidakTerlayani"] : "NULL");
+                var fileContent11 = Request.Files["TidakTerlayani"];
+                //Insert Surat Pernyataan Tidak Terlayani
+                if (fileContent11 != null && fileContent11.ContentLength > 0 && !String.IsNullOrEmpty(fileid11))
+                {
+                    string id11 = RandomString(32);
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent11.InputStream;
+                    var FileSizeByte = fileContent11.ContentLength;
+                    var FileSize = FileSizeByte / 50000;
+                    var Extension = System.IO.Path.GetExtension(fileContent11.FileName);
+                    var fileName = "SuratPernyataanTidakTerlayani" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name11 = fileName;
+                        string insert_lampiran11 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid11 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran11);
+                    }
+                }
+                else
+                {
+                    string id11 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran11 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                              "VALUES ('" + id11 + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT PERNYATAAN TIDAK TERLAYANI')";
+                    db.Database.ExecuteSqlCommand(insert_lampiran11);
+                    //return Json("disini coy", JsonRequestBehavior.AllowGet);
+                }
+                //Surat Pernyataan Tidak Terlayani
+
+                var file_name1 = ((form.AllKeys.Contains("SuratPermohonan")) ? form["SuratPermohonan"] : "NULL");
+                var fileContent = Request.Files["SuratPermohonan"];
+                //Insert SURATPERMOHONAN
+                if (fileContent != null && fileContent.ContentLength > 0)
+                {
+                    string id1 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent.InputStream;
+                    var FileSizeByte = fileContent.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent.FileName);
+                    var fileName = "SuratPermohonan_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name1 = fileName;
+                        string insert_lampiran1 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid1 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran1);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid1))
+                    {
+                        string id1 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran1 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + id1 + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT PERMOHONAN')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran1);
+                    }
+                }
+
+                var file_name2 = ((form.AllKeys.Contains("SuratKeterangan")) ? form["SuratKeterangan"] : "");
+                var fileContent2 = Request.Files["SuratKeterangan"];
+                //Insert SURATPERMOHONAN
+                if (fileContent2 != null && fileContent2.ContentLength > 0)
+                {
+                    string id2 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent2.InputStream;
+                    var FileSizeByte = fileContent2.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent2.FileName);
+                    var fileName = "SuratKeterangan_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath2 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name2 = fileName;
+                        string insert_lampiran2 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath2 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid2 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran2);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid2))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT KETERANGAN')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name3 = ((form.AllKeys.Contains("BuktiPenerimaan")) ? form["BuktiPenerimaan"] : "");
+                var fileContent3 = Request.Files["BuktiPenerimaan"];
+                //Insert SURATPERMOHONAN
+                if (fileContent3 != null && fileContent3.ContentLength > 0)
+                {
+                    string id3 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent3.InputStream;
+                    var FileSizeByte = fileContent3.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent3.FileName);
+                    var fileName = "BuktiPenerimaan_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath3 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name3 = fileName;
+                        string insert_lampiran3 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE = '" + Filefilepath3 + "', STATUSLAMPIRAN = '1', TANGGAL = SYSDATE, EKSTENSI = '" + Extension + "' WHERE LAMPIRANKEMBALIANID = '" + fileid3 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran3);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid3))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','BUKTI PENERIMAAN NEGARA')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name4 = ((form.AllKeys.Contains("SuratPerintah")) ? form["SuratPerintah"] : "");
+                var fileContent4 = Request.Files["SuratPerintah"];
+                //Insert SURATPERMOHONAN
+                if (fileContent4 != null && fileContent4.ContentLength > 0)
+                {
+                    string id4 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent4.InputStream;
+                    var FileSizeByte = fileContent4.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent4.FileName);
+                    var fileName = "SuratPerintah_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath4 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name4 = fileName;
+                        string insert_lampiran4 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath4 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid4 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran4);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid4))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT PERINTAH SETOR')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name5 = ((form.AllKeys.Contains("BuktiSetor")) ? form["BuktiSetor"] : "");
+                var fileContent5 = Request.Files["BuktiSetor"];
+                //Insert SURATPERMOHONAN
+                if (fileContent5 != null && fileContent5.ContentLength > 0)
+                {
+                    string id5 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent5.InputStream;
+                    var FileSizeByte = fileContent5.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent5.FileName);
+                    var fileName = "BuktiSetor_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath5 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name5 = fileName;
+                        string insert_lampiran5 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath5 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid5 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran5);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid5))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT BUKTI SETOR')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name6 = ((form.AllKeys.Contains("BuktiRek")) ? form["BuktiRek"] : "");
+                var fileContent6 = Request.Files["BuktiRek"];
+                //Insert SURATPERMOHONAN
+                if (fileContent6 != null && fileContent6.ContentLength > 0)
+                {
+                    string id6 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent6.InputStream;
+                    var FileSizeByte = fileContent6.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent6.FileName);
+                    var fileName = "BuktiRek_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath6 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name6 = fileName;
+                        string insert_lampiran6 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath6 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid6 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran6);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid6))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','BUKTI KEPEMILIKAN REK TUJUAN')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name7 = ((form.AllKeys.Contains("NpwpFile")) ? form["NpwpFile"] : "");
+                var fileContent7 = Request.Files["NpwpFile"];
+                //Insert SURATPERMOHONAN
+                if (fileContent7 != null && fileContent7.ContentLength > 0)
+                {
+                    string id7 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent7.InputStream;
+                    var FileSizeByte = fileContent7.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent7.FileName);
+                    var fileName = "NpwpFile_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath7 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name7 = fileName;
+                        string insert_lampiran7 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath7 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid7 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran7);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid7))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','NPWP')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name8 = ((form.AllKeys.Contains("BuktiDomisili")) ? form["BuktiDomisili"] : "");
+                var fileContent8 = Request.Files["BuktiDomisili"];
+                //Insert SURATPERMOHONAN
+                if (fileContent8 != null && fileContent8.ContentLength > 0)
+                {
+                    string id8 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent8.InputStream;
+                    var FileSizeByte = fileContent8.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent8.FileName);
+                    var fileName = "BuktiDomisili_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath8 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name8 = Filefilepath8;
+                        string insert_lampiran8 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath8 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid8 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran8);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid8))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','BUKTI DOMISILI PEMOHON')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                var file_name9 = ((form.AllKeys.Contains("SuratKuasa")) ? form["SuratKuasa"] : "");
+                var fileContent9 = Request.Files["SuratKuasa"];
+                //Insert SURATPERMOHONAN
+                if (fileContent9 != null && fileContent9.ContentLength > 0)
+                {
+                    string id9 = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    var tgl = DateTime.Now.ToString("yyMMddHHmmssff");
+                    var stream = fileContent9.InputStream;
+                    var FileSizeByte = fileContent9.ContentLength;
+                    var FileSize = FileSizeByte / 3000;
+                    var Extension = System.IO.Path.GetExtension(fileContent9.FileName);
+                    var fileName = "SuratKuasa_" + tgl + "" + Extension;
+                    string folderPath = Server.MapPath("~/Uploads/pengembalian/");
+                    //Check whether Directory (Folder) exists.
+                    if (!Directory.Exists(folderPath))
+                    {
+                        //If Dir3ectory (Folder) does not exists. Create it.
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var path = Path.Combine(Server.MapPath("~/Uploads/pengembalian/"), fileName);
+                    var Filefilepath9 = "/Uploads/pengembalian/" + fileName;
+                    using (var fileStream = System.IO.File.Create(path))
+                    {
+                        stream.CopyTo(fileStream);
+                        file_name9 = Filefilepath9;
+
+                        string insert_lampiran9 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE='" + Filefilepath9 + "', STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI='" + Extension + "' WHERE LAMPIRANKEMBALIANID='" + fileid9 + "'";
+                        db.Database.ExecuteSqlCommand(insert_lampiran9);
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(fileid9))
+                    {
+                        string idd = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) " +
+                                                  "VALUES ('" + idd + "','" + pengembalianid + "','1',SYSDATE,'Pengajuan','SURAT KUASA BERMATERAI')";
+                        db.Database.ExecuteSqlCommand(insert_lampiran);
+                    }
+                }
+
+                if (ModelState.IsValid)
+                {
+                    resp.Status = true;
+                    resp.Pesan = "Data Berhasil Disimpan";
+                    return Json(resp, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+
+                }
+            }
+            catch (Exception e)
+            {
+                resp.Pesan = "Terjadi kesalahan. " + e.Message;
+            }
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
+
 
         [HttpPost]
         public JsonResult PengajuanPengembalianDetailDaerah(FormCollection form)

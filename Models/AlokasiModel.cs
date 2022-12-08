@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Threading.Tasks;
+using Oracle.ManagedDataAccess.Client;
+using Pnbp.Entities;
 
 namespace Pnbp.Models
 {
@@ -780,6 +782,239 @@ namespace Pnbp.Models
 
             try
             {
+                var queryCheckSummary = "select count(*) from alokasisatkersummary where tahun = extract(year from sysdate)";
+                var countSummary = db.Database.SqlQuery<int>(queryCheckSummary).FirstOrDefault();
+
+                bool successInsert = true;
+                string qInsertOrUpdate = "";
+
+                if (countSummary > 0) // update data ke manfaat
+                {
+                    qInsertOrUpdate = $@"MERGE INTO MANFAAT MT
+                                        using (
+                                            SELECT * FROM (
+	                                            SELECT 
+                                                    s.KANTORID as kantorid, 
+	                                                k.TIPE AS tipe, 
+	                                                p.PROGRAMID as programid, sb.kegiatan ||'.' ||sb.OUTPUT as kode, sum(sb.amount) as amount
+                                                FROM span_belanja sb
+                                                    LEFT JOIN satker s ON sb.KDSATKER = s.KODESATKER and s.statusaktif = 1 
+                                                    LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
+                                                    LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
+                                                WHERE
+                                                    sb.KDSATKER = '430210' AND
+                                                    sb.KDSATKER != '524465' AND sb.SUMBER_DANA = 'D' 
+                                                    GROUP BY
+	                                                    s.KANTORID, 
+	                                                    k.tipe,
+	                                                    s.NAMA_SATKER, 
+	                                                    sb.kdsatker, 
+	                                                    sb.kegiatan, 
+	                                                    sb.OUTPUT, 
+	                                                    p.PROGRAMID,
+	                                                    p.NAMA
+                                                ) WHERE programid IS NOT NULL
+                                            ) t2
+                                            ON (t2.programid = mt.programid
+                                            AND t2.KANTORID =  mt.kantorid
+                                            AND t2.tipe = mt.tipe
+                                            AND t2.kode = mt.kode
+                                            AND mt.tahun = extract(year from sysdate))
+                                        WHEN MATCHED THEN UPDATE SET
+                                            NILAIANGGARAN = t2.amount";
+                        
+                }
+                else // insert data ke manfaat
+                {
+                    qInsertOrUpdate = $@"INSERT INTO MANFAAT
+                                        (
+                                            MANFAATID, 
+                                            TAHUN, 
+                                            KANTORID, 
+                                            NAMAKANTOR, 
+                                            PROGRAMID, 
+                                            NAMAPROGRAM, 
+                                            TIPE, 
+                                            NILAIANGGARAN,
+                                            KODE,
+                                            KODESATKER,
+                                            USERINSERT,
+                                            INSERTDATE,
+                                            statusaktif
+                                        )
+                                        SELECT * FROM (
+                                            select 
+    	                                        sys_guid() , 
+                                                (extract(year from sysdate)), 
+                                                s.KANTORID as kantorid, 
+                                                s.NAMA_SATKER as namasatker, 
+                                                p.PROGRAMID as programid, 
+                                                p.nama AS programnama,
+                                                k.TIPE AS tipe, 
+                                                sum(sb.amount) as amount,
+                                                sb.kegiatan || '.' || sb.OUTPUT, 
+                                                sb.KDSATKER as kodesatker, 
+                                                'SYSTEM_PNBP',
+                                                sysdate,
+                                                1
+                                            from span_belanja sb
+                                            left JOIN satker s ON sb.KDSATKER = s.KODESATKER and s.statusaktif = 1 
+                                            LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
+                                            LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
+                                            WHERE
+                                                sb.KDSATKER = '430210' AND
+                                                sb.KDSATKER != '524465' AND sb.SUMBER_DANA = 'D'
+                                            GROUP BY
+                                                s.KANTORID, 
+                                                k.tipe,
+                                                s.NAMA_SATKER, 
+                                                sb.kdsatker, 
+                                                sb.kegiatan, 
+                                                sb.OUTPUT, 
+                                                p.PROGRAMID,
+                                                p.NAMA
+                                            ORDER BY sb.kdsatker
+                                        )
+                                        WHERE programid IS NOT NULL";
+
+                }
+
+                var row = db.Database.ExecuteSqlCommand(qInsertOrUpdate);
+                if (row <= 0)
+                {
+                    successInsert = false;
+                }
+
+                if (successInsert)
+                {
+                    var queryLastAlokasiSummary = @"SELECT 
+                            ALOKASISATKERSUMMARYID, 
+                            PAGU, 
+                            ALOKASI, 
+                            TO_CHAR(TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                            TO_CHAR(TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                            MP 
+                        FROM ALOKASISATKERSUMMARY a 
+                        WHERE tahun = extract(year from sysdate) AND MP = (SELECT * FROM (
+                            SELECT a2.mp FROM ALOKASISATKERSUMMARY a2 WHERE a2.tahun = extract(year from sysdate) ORDER BY a2.MP DESC
+                        ) WHERE rownum = 1)";
+
+                    AlokasiSatkerSummary getLastAlokasiSummary = db.Database.SqlQuery<Entities.AlokasiSatkerSummary>(queryLastAlokasiSummary).FirstOrDefault();
+                    var mp = getLastAlokasiSummary == null ? 1 : (getLastAlokasiSummary.Mp + 1);
+
+                    var isSuccessProccessMove = true;
+                    var queryAlokasiSatkerSummary = $@"
+                        INSERT INTO ALOKASISATKERSUMMARY(ALOKASISATKERSUMMARYID, PAGU, ALOKASI, MP)
+                        SELECT '{idTrx}', sum(pagu), sum(alokasi), {mp} ALOKASI FROM TEMP_ALOKASI
+                        ";
+                    var rowSummary = db.Database.ExecuteSqlCommand(queryAlokasiSatkerSummary);
+                    if (rowSummary <= 0)
+                    {
+                        isSuccessProccessMove = false;
+                    }
+                    else
+                    {
+                        if (getLastAlokasiSummary != null)
+                        { 
+                            #region update belanja MP sebelumnya
+                            if (mp > 1)
+                            {
+                                decimal currentYearRealisasi = GetCurrentYearRealisasi();
+                                string queryUpdateAlokasiSummary = $@"
+                                    UPDATE ALOKASISATKERSUMMARY SET BELANJA = {currentYearRealisasi}
+                                    WHERE ALOKASISATKERSUMMARYID = '{getLastAlokasiSummary.AlokasiSatkerSummaryId}'
+                                ";
+                                var rowUpdateAlokasiSummary = db.Database.ExecuteSqlCommand(queryUpdateAlokasiSummary);
+                                if (rowUpdateAlokasiSummary <= 0)
+                                {
+                                    isSuccessProccessMove = false;
+                                }
+                            }
+                            #endregion
+
+                            #region simpan belanja per satker MP sebelumnya
+                            if (isSuccessProccessMove)
+                            {
+                                string qSimpanBelanjaSatker = $@"
+                                    INSERT INTO REALISASISATKERSUMMARY(ALOKASISATKERSUMMARYid,amount,kdsatker)
+	                                select '{getLastAlokasiSummary.AlokasiSatkerSummaryId}',sum(amount), kdsatker from span_realisasi
+                                        where 
+                                    SUMBERDANA  = 'D'
+                                    AND tahun = extract(year from sysdate)
+                                    group by kdsatker
+                                ";
+
+                                var rowSimpanBelanjaSatker = db.Database.ExecuteSqlCommand(qSimpanBelanjaSatker);
+                                if (rowSimpanBelanjaSatker <= 0)
+                                {
+                                    isSuccessProccessMove = false;
+                                }
+                            }
+                        }
+                        #endregion
+
+                        if (isSuccessProccessMove)
+                        { 
+                            var queryMoveAlokasi = $@"
+                                INSERT INTO ALOKASISATKER(ALOKASISATKERID, KDSATKER, PAGU, ALOKASI, ALOKASISATKERSUMMARYID)
+                                SELECT sys_guid(), KDSATKER, PAGU, ALOKASI, '{idTrx}' FROM TEMP_ALOKASI
+                                ";
+                            var rowMoveAlokasi = db.Database.ExecuteSqlCommand(queryMoveAlokasi);
+                            if (rowMoveAlokasi <= 0)
+                            {
+                                isSuccessProccessMove = false;
+                            }
+                        }
+                    }
+
+                    if (isSuccessProccessMove)
+                    {
+                        // clear
+                        var queryDelete = @"delete from TEMP_ALOKASI";
+                        var rowDelete = db.Database.ExecuteSqlCommand(queryDelete);
+                        if (rowDelete <= 0)
+                        {
+                            isProcessAlokasiSuccess = false;
+                            trx.Rollback();
+                        }
+                        else
+                        {
+                            trx.Commit();
+                        }
+                    }
+                    else
+                    {
+                        isProcessAlokasiSuccess = false;
+                        trx.Rollback();
+                    }
+                }
+                else
+                {
+                    isProcessAlokasiSuccess = false;
+                    trx.Rollback();
+                }
+            }
+            catch (Exception e)
+            {
+                isProcessAlokasiSuccess = false;
+                _ = e.StackTrace;
+                trx.Rollback();
+            }
+
+            return isProcessAlokasiSuccess;
+        }
+
+        public bool ProsesAlokasiOld()
+        {
+            var db = new PnbpContext();
+            var trx = db.Database.BeginTransaction();
+            List<Entities.DataProsesAlokasi> result = new List<Entities.DataProsesAlokasi>();
+            var isProcessAlokasiSuccess = true;
+
+            var idTrx = NewGuID();
+
+            try
+            {
                 string query = @"
                 SELECT * FROM (
 	                select 
@@ -795,7 +1030,7 @@ namespace Pnbp.Models
 	                LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
 	                WHERE
                         sb.KDSATKER = '430210' AND
-	                    sb.KDSATKER != '524465'  AND sb.SUMBER_DANA = 'D'
+                        sb.KDSATKER != '524465'  AND sb.SUMBER_DANA = 'D'
 	                GROUP BY
 	                    s.KANTORID, 
 	                    k.tipe,
@@ -816,7 +1051,7 @@ namespace Pnbp.Models
 
                 var queryCheckSummary = "select count(*) from alokasisatkersummary where tahun = extract(year from sysdate)";
                 var countSummary = db.Database.SqlQuery<int>(queryCheckSummary).FirstOrDefault();
-
+                
                 bool successInsert = true;
                 foreach (var item in result)
                 {
@@ -1274,22 +1509,48 @@ namespace Pnbp.Models
             List<Entities.AlokasiSatkerV2> result = new List<Entities.AlokasiSatkerV2>();
             var db = new PnbpContext();
             string id = search.id;
+            List<object> lstparams = new List<object>();
 
             try
             {
-                string query = $@"SELECT 
+                string qBelanja = @"select sum(amount) belanjasatker, kdsatker from span_realisasi
+	                    where 
+		                    SUMBERDANA  = 'D'
+		                    and tahun = extract(year from sysdate)
+		                    group by kdsatker";
+
+
+                var currentMPCheckQuery = @"select ALOKASISATKERSUMMARYID from ALOKASISATKERSUMMARY a 
+                                            WHERE
+	                                            mp = (SELECT MAX(mp) from ALOKASISATKERSUMMARY)
+	                                            AND ALOKASISATKERSUMMARYID = :alokasiSatkerSummaryId";
+                List<object> lstParamsCheck = new List<object>();
+                lstParamsCheck.Add(new OracleParameter("alokasiSatkerSummaryId", search.id));
+                var currentMPCheck = db.Database.SqlQuery<string>(currentMPCheckQuery, lstParamsCheck.ToArray()).FirstOrDefault();
+
+                if (string.IsNullOrEmpty(currentMPCheck))
+                {
+                    qBelanja = @"select amount belanjasatker, KDSATKER from REALISASISATKERSUMMARY 
+	                    where 
+		                    ALOKASISATKERSUMMARYID = :alokasiSatkerSummaryId ";
+                    lstparams.Add(new OracleParameter("alokasiSatkerSummaryId", search.id));
+                }
+
+                string query = $@"WITH belanja as ({qBelanja})
+                    SELECT 
                         a.ALOKASISATKERID,
                         a.KDSATKER as KodeSatker,
                         s.NAMA_SATKER as NamaSatker, 
                         a.PAGU,
                         a.ALOKASI,
+	                    NVL(b.belanjasatker, 0) belanja,
                         a.TAHUN,
                         TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH 
                     FROM ALOKASISATKER a 
-                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER";
+                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER
+	                LEFT JOIN belanja b on b.kdsatker = a.kdsatker ";
 
-                List<object> lstparams = new List<object>();
                 if (!String.IsNullOrEmpty(search.satker) && search.satker != "--Pilih Satker--")
                 {
                     query += " WHERE s.kantorid = :kantorId ";
@@ -1440,6 +1701,7 @@ namespace Pnbp.Models
                         ass.ALOKASISATKERSUMMARYID, 
                         ass.PAGU, 
                         ass.ALOKASI, 
+                        NVL(ass.BELANJA, 0) BELANJA, 
                         TO_CHAR(ass.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(ass.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
                         ass.MP 
@@ -1462,6 +1724,37 @@ namespace Pnbp.Models
 
                 var parameters = lstparams.ToArray();
                 result = db.Database.SqlQuery<Entities.AlokasiSatkerSummary>(query, parameters).ToList();
+            }
+            catch (Exception e)
+            {
+                _ = e.StackTrace;
+            }
+
+            return result;
+        }
+
+        public decimal GetCurrentYearRealisasi(string kodeSatker = null)
+        {
+            PnbpContext db = new PnbpContext();
+            decimal result = 0;
+            List<object> lstparams = new List<object>();
+
+            try
+            {
+                string query = @"
+                    select NVL(sum(amount),0) 
+                    from span_realisasi
+                    where SUMBERDANA  = 'D'
+                    and KDSATKER != '524465'
+                    and TAHUN = EXTRACT(YEAR FROM sysdate) ";
+
+                if (!string.IsNullOrEmpty(kodeSatker))
+                {
+                    query += " AND KDSATKER = :kodeSatker ";
+                    lstparams.Add(new OracleParameter("kodeSatker", kodeSatker));
+                }
+
+                result = db.Database.SqlQuery<decimal>(query, lstparams.ToArray()).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -1505,7 +1798,7 @@ namespace Pnbp.Models
                         --NVL(p.totalpagu, 0) PAGU, 
                         NVL(t.pagu, 0) PAGU, 
                         NVL(t.ALOKASI, 0) alokasi, 
-                        NVL(sr.amount, 0) BELANJA, 
+                        NVL(ass.BELANJA, 0) BELANJA, 
                         TO_CHAR(ass.TANGGALBUAT, 'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(ass.TANGGALUBAH, 'DD-MM-YYYY') as TANGGALUBAH, 
                         ass.MP 

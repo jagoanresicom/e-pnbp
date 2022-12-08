@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Pnbp.Entities;
 
 namespace Pnbp.Controllers
 {
@@ -1148,6 +1149,12 @@ namespace Pnbp.Controllers
             }
 
             Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_kro_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, KantorId, kodeKRO);
+            AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
+            if (latestAlokasi != null)
+            {
+                AlokasiSatkerSummary latestAlokasiProvinsi = _manfaatanModel.GetLatestAlokasiSatker(latestAlokasi.AlokasiSatkerSummaryId, KantorId);
+                daftarTotal.totalalokasi = latestAlokasiProvinsi.Alokasi;
+            }
 
             var dTableResult = result.Select(x =>
             {
@@ -1161,6 +1168,8 @@ namespace Pnbp.Controllers
                     x.WilayahId,
                     x.RNumber,
                     x.Pagu,
+                    x.Realisasi,
+                    daftarTotal.totalpagu,
                     daftarTotal.totalalokasi,
                 };
             });
@@ -1186,16 +1195,17 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
             List<Entities.BelanjaKRO> result = _manfaatanModel.rl_satker(reqTahun, kodesatker, satker, namaprogram, nilaianggaran, true, from, to, WilayahId);
+
             //List<Entities.BelanjaKRO> resultSumList = _manfaatanModel.rl_satker_sum(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
 
             //var resultSum = resultSumList.First();
 
-            foreach (var item in result)
-            {
+            //foreach (var item in result)
+            //{
                 //item.PersentaseAlokasi = ((item.Alokasi / resultSum.TotalAlokasi) * 100)?.ToString();
                 //var persenAlokasi = ((item.Pagu / resultSum.TotalPagu) * 100);
                 //item.PersentaseAlokasi = string.Format("{0:#,##0.##}", persenAlokasi) + " %"; ;
-            }
+            //}
 
             decimal? total = 0;
             if (result.Count > 0)
@@ -1203,7 +1213,16 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
 
+            //DaftarTotal daftarTotal = new DaftarTotal() { };
             Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_satker_sum(reqTahun, kodesatker, satker, namaprogram, nilaianggaran, true, WilayahId);
+            AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
+            if (latestAlokasi != null)
+            {
+                AlokasiSatkerSummary latestAlokasiProvinsi = _manfaatanModel.GetLatestAlokasiProvinsi(latestAlokasi.AlokasiSatkerSummaryId, WilayahId);
+                daftarTotal.totalalokasi = latestAlokasiProvinsi.Alokasi;
+            }
+            daftarTotal.totalrealisasi = _manfaatanModel.GetRealisasi(reqTahun, WilayahId);
+
 
             var dTableResult = result.Select(x =>
             {
@@ -1219,8 +1238,10 @@ namespace Pnbp.Controllers
                     x.WilayahId,
                     x.RNumber,
                     x.Pagu,
+                    x.Realisasi,
                     daftarTotal.totalpagu,
                     daftarTotal.totalalokasi,
+                    daftarTotal.totalrealisasi,
                 };
             });
 
@@ -1246,10 +1267,13 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_provinsi(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true, from, to);
+            AlokasiSatkerSummary alskSummary = _manfaatanModel.GetLastAlokasiSatkerSummary();
+            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_provinsi(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true, from, to, alskSummary);
 
+            decimal? totalrel = 0;
             foreach (var item in result)
             {
+                totalrel += item.Realisasi;
             }
 
             decimal? total = 0;
@@ -1258,7 +1282,14 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
 
-            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_provinsi_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true);
+            //Entities.DaftarTotal daftarTotal = new DaftarTotal() { };
+            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_provinsi_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true, alskSummary);
+            AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
+            if (latestAlokasi != null)
+            {
+                daftarTotal.totalalokasi = latestAlokasi.Alokasi;
+            }
+            daftarTotal.totalrealisasi = _manfaatanModel.GetRealisasi(reqTahun);
 
             var dTableResult = result.Select(x =>
             {
@@ -1274,8 +1305,10 @@ namespace Pnbp.Controllers
                     x.WilayahId,
                     x.RNumber,
                     x.Pagu,
+                    x.Realisasi,
                     daftarTotal.totalpagu,
                     daftarTotal.totalalokasi,
+                    daftarTotal.totalrealisasi,
                 };
             });
 

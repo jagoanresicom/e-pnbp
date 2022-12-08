@@ -1,32 +1,39 @@
 ﻿@model Pnbp.Entities.FilterPenerimaan
 @{
-    var lsbulan = new List<SelectListItem>();
-    lsbulan.Add(new SelectListItem { Value = "1", Text = "Januari" });
-    lsbulan.Add(new SelectListItem { Value = "2", Text = "Februari" });
-    lsbulan.Add(new SelectListItem { Value = "3", Text = "Maret" });
-    lsbulan.Add(new SelectListItem { Value = "4", Text = "April" });
-    lsbulan.Add(new SelectListItem { Value = "5", Text = "Mei" });
-    lsbulan.Add(new SelectListItem { Value = "6", Text = "Juni" });
-    lsbulan.Add(new SelectListItem { Value = "7", Text = "Juli" });
-    lsbulan.Add(new SelectListItem { Value = "8", Text = "Agustus" });
-    lsbulan.Add(new SelectListItem { Value = "9", Text = "September" });
-    lsbulan.Add(new SelectListItem { Value = "10", Text = "Oktober" });
-    lsbulan.Add(new SelectListItem { Value = "11", Text = "November" });
-    lsbulan.Add(new SelectListItem { Value = "12", Text = "Desember" });
+	var lsTahun = new List<SelectListItem>();
+	for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
+	{
+		lsTahun.Add(new SelectListItem { Value = i.ToString(), Text = i.ToString() });
+	}
+}
+@{
+	var lsbulan = new List<SelectListItem>();
+	lsbulan.Add(new SelectListItem { Value = "1", Text = "Januari" });
+	lsbulan.Add(new SelectListItem { Value = "2", Text = "Februari" });
+	lsbulan.Add(new SelectListItem { Value = "3", Text = "Maret" });
+	lsbulan.Add(new SelectListItem { Value = "4", Text = "April" });
+	lsbulan.Add(new SelectListItem { Value = "5", Text = "Mei" });
+	lsbulan.Add(new SelectListItem { Value = "6", Text = "Juni" });
+	lsbulan.Add(new SelectListItem { Value = "7", Text = "Juli" });
+	lsbulan.Add(new SelectListItem { Value = "8", Text = "Agustus" });
+	lsbulan.Add(new SelectListItem { Value = "9", Text = "September" });
+	lsbulan.Add(new SelectListItem { Value = "10", Text = "Oktober" });
+	lsbulan.Add(new SelectListItem { Value = "11", Text = "November" });
+	lsbulan.Add(new SelectListItem { Value = "12", Text = "Desember" });
 }
 
 <script src='@Url.Content("~/resources/js/infiniteScroll.js")'></script>
 <style>
-    .panel-container {
-        padding: 16px;
-    }
+	.panel-container {
+		padding: 16px;
+	}
 
-    .dataTables_processing[style="display: block;"] {
-        display: flex !important;
-        justify-content: center;
-        align-items: center;
-        min-height: 37px;
-    }
+	.dataTables_processing[style="display: block;"] {
+		display: flex !important;
+		justify-content: center;
+		align-items: center;
+		min-height: 37px;
+	}
 
 	.thead-row-no-border-bottom th {
 		border-bottom: 0px !important;
@@ -36,37 +43,38 @@
 
 <div class="" id="dynamic_content">
 
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel panel-container">
-                <div class="x_title">
-                    <h2>Penerimaan Satuan Kerja @ViewBag.nama_wilayah</h2>
-                    <ul class="nav navbar-right panel_toolbox hide">
-                        <li>
-                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                        </li>
-                        <li>
-                            <a class="close-link"><i class="fa fa-close"></i></a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel panel-container">
+				<div class="x_title">
+					@if (String.IsNullOrEmpty(ViewBag.nama_wilayah))
+					{
+						<h2>Penerimaan Satuan Kerja</h2>
+					}
+					else
+					{
+						<h2>Penerimaan Provinsi @ViewBag.nama_wilayah</h2>
+					}
+					<ul class="nav navbar-right panel_toolbox hide">
+						<li>
+							<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+						</li>
+						<li>
+							<a class="close-link"><i class="fa fa-close"></i></a>
+						</li>
+					</ul>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
 					<form class="form-horizontal form-label-left" id="js-frm-pencarian" role="form" method="post" enctype="multipart/form-data">
 						<div class="row">
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
 								<div class="col-md-4 col-sm-4 col-xs-12">
-									<select name="tahun" class="select2_single form-control input-md text-">
-										<option value="" class="text-left">-- Pilih Tahun --</option>
-										@for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
-										{
-											<option value="@i" class="text-left">@i</option>
-										}
-									</select>
+									@Html.DropDownListFor(model => model.tahun, lsTahun, new { @class = "select2_single form-control input-md" })
 								</div>
 							</div>
 							<div class="form-group">
@@ -85,10 +93,10 @@
 
 						<div class="row">
 							<label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
-                                <button onclick="history.back()" class="btn btn-info">Kembali</button>
-                            </div>
+							<div class="col-md-6 col-sm-6 col-xs-12">
+								<button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
+								<button type="button" onclick="history.back()" class="btn btn-info">Kembali</button>
+							</div>
 						</div>
 						<br>
 
@@ -108,20 +116,20 @@
 							</table>
 						</div>
 					</form>
-                </div>
-            </div>
-        </div>
-    </div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </div>
 
 
 <div id='myModalDocViewer' class='modal'>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div id='myModalContent'></div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div id='myModalContent'></div>
+		</div>
+	</div>
 </div>
 
 
@@ -176,6 +184,7 @@
             "processing": true,
             "serverSide": true,
             "scrollX": false,
+			"deferLoading": 0,
             "ajax": {
 			    url: '@Url.Action("pn_satker_list", "Penerimaan")',
                 type: "POST",
@@ -193,9 +202,9 @@
 			    }
 			},
 			"headerCallback": function (thead, data, start, end, display) {
-				let totalfisik = 0;
-				let totaloperasional = 0;
-				let totalpenerimaan = 0;
+				let totalfisik = '';
+				let totaloperasional = '';
+				let totalpenerimaan = '';
 				if (data.length > 0) {
 					totalfisik = formatAngka(data[0].totalfisik);
 					totaloperasional = formatAngka(data[0].totaloperasional);
@@ -218,12 +227,22 @@
 					"mData": "Name",
                     "width": "10%",
 					"className": "centertaligncolumn",
-                    "mRender": function (data, type, row) {
-                        return "<a class='centertaligncolumn' href='/Penerimaan/pn_layanan?pid=" + row.kantorid + "'><i class='fa fa-eye'></i></a>";
+					"mRender": function (data, type, row) {
+						let paramTahun = "", paramBulan = "";
+						let tahun = $('#js-frm-pencarian [name="tahun"]').val();
+						let bulan = $('#js-frm-pencarian [name="bulan"]').val();
+						if (tahun != '') {
+							paramTahun = "&tahun=" + tahun;
+						}
+						if (bulan != '') {
+							paramBulan = "&bulan=" + bulan;
+						}
+						return "<a class='centertaligncolumn' href='/Penerimaan/pn_layanan?pid=" + row.kantorid + paramTahun + paramBulan + "'><i class='fa fa-eye'></i></a>";
                     }
                 }
             ],
-	    });
+		});
+		$('.dataTables_empty').html('Silakan lakukan pencarian untuk memulai');
 
 		function formatAngka(data) {
 			let formattedString = formatangka(data);

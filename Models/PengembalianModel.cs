@@ -188,7 +188,7 @@ namespace Pnbp.Models
             return data;
         }
 
-        public BerkasKembalian GetBerkasKembalianPnbpById(string berkasid)
+        public BerkasKembalian GetBerkasKembalianPnbpByNomorBerkas(string noBerkas)
         {
             BerkasKembalian data = new BerkasKembalian();
 
@@ -200,9 +200,9 @@ namespace Pnbp.Models
                   FROM
                       berkaskembalian
                   WHERE
-                      berkasid = :BerkasId";
+                      nomorBerkas = TRIM(:nomorBerkas)";
 
-            arrayListParameters.Add(new OracleParameter("BerkasId", berkasid));
+            arrayListParameters.Add(new OracleParameter("nomorBerkas", noBerkas));
 
             query = sWhitespace.Replace(query, " ");
 
@@ -2326,7 +2326,7 @@ namespace Pnbp.Models
                     TO_CHAR(PENGEMBALIANPNBP.NAMAPEGAWAIPENGAJU) NAMAPEGAWAIPENGAJU,
                     TO_CHAR(PENGEMBALIANPNBP.NPWPPEGAWAIPENGAJU) NPWPPEGAWAIPENGAJU,
                     TO_CHAR(pengembalianpnbp.TANGGALPENGAJU, 'dd-mm-yyyy') TANGGALPENGAJU,
-                    b.NAMAPEMILIK NAMAPEMOHON,
+                    BERKASKEMBALIAN.NAMAPEMOHON,
                     TO_CHAR(BERKASKEMBALIAN.ALAMATPEMOHON) ALAMATPEMOHON,
                     TO_CHAR(BERKASKEMBALIAN.BERKASID) BERKASID,
                     TO_CHAR(BERKASKEMBALIAN.NOMORBERKAS) NOMORBERKAS,
@@ -2389,7 +2389,7 @@ namespace Pnbp.Models
         {
             Pegawai result = null;
 
-            string query = $@"SELECT NVL(TRIM(PG.GELARDEPAN||' '||PG.NAMA||' '||PG.GELARBELAKANG),TRIM(RUP.GELARDEPAN||' '||RUP.NAMA||' '||RUP.GELARBELAKANG)) nama, jabatan, pg.pegawaiid nip
+            string query = $@"SELECT NVL(TRIM(PG.GELARDEPAN||' '||PG.NAMA||' '||PG.GELARBELAKANG),TRIM(RUP.GELARDEPAN||' '||RUP.NAMA||' '||RUP.GELARBELAKANG)) nama, NVL(jabatan, '') jabatan, pg.pegawaiid nip
                             FROM
                                 PROFILEPEGAWAI pp  
                                 JOIN PROFILE p ON p.profileid = pp.profileid

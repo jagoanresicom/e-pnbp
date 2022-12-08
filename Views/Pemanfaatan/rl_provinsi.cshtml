@@ -77,12 +77,12 @@
 								<thead>
 									<tr>
 										<th>No</th>
-										<th>Provinsi</th>
-										<th>Pagu</th>
-										<th>Alokasi</th>
-										@*<th>Realisasi</th>
-										<th>%Pagu</th>
-										<th>%Alokasi</th>*@
+										<th class="text-center">Provinsi</th>
+										<th class="text-center">Pagu</th>
+										@*<th class="text-center">Alokasi</th>*@
+										<th class="text-center">Realisasi</th>
+										@*<th>%Pagu</th>*@
+										@*<th>%Alokasi</th>*@
 										<th>Aksi</th>
 									</tr>
 								</thead>
@@ -170,23 +170,25 @@
 			    }
 			},
 			"headerCallback": function (thead, data, start, end, display) {
-				let totalpagu = 0;
-				let totalalokasi = 0;
+				let totalpagu = 0, totalalokasi = 0, totalrealisasi = 0;
 				if (data.length > 0) {
 					totalpagu = formatAngka(data[0].totalpagu);
 					totalalokasi = formatAngka(data[0].totalalokasi);
+					totalrealisasi = formatAngka(data[0].totalrealisasi);
 				}
-				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="2" class="numeric">Total</th><th class="text-center">${totalpagu}</th><th class="text-center">${totalalokasi}</th><th class="disabled"></th></tr>`)
+				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="2" class="numeric">Total</th><th class="text-right">${totalpagu}</th><th class="text-right">${totalrealisasi}</th><th class="disabled"></th></tr>`)
+				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="2" class="numeric">Total Alokasi</th><th class="text-right">${totalalokasi}</th><th class="text-right"></th><th class="disabled"></th></tr>`)
 				if ($(thead).hasClass('thead-row-no-border-bottom')) {
-					$(thead).remove();
+					$('.thead-row-no-border-bottom').last().remove()
+					$('.thead-row-no-border-bottom').last().remove()
 				}
 			},
 			"columns": [
 				{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "KodeKRO", "className": "centertaligncolumn", "width": "5%" },
-				{ "data": "Pagu", "className": "centertaligncolumn", "width": "5%", "render": formatAngka },
-				{ "data": "Alokasi", "className": "centertaligncolumn", "width": "5%", "render": formatAngka },
-				//{ "data": "Realisasi", "className": "centertaligncolumn", "width": "5%", "render": formatAngka },
+				{ "data": "KodeKRO", "className": "", "width": "5%" },
+				{ "data": "Pagu", "className": "text-right", "width": "5%", "render": formatAngka },
+				//{ "data": "Alokasi", "className": "text-right", "width": "5%", "render": formatAngka },
+				{ "data": "Realisasi", "className": "text-right", "width": "5%", "render": formatAngka },
 				//{ "data": "PersentaseAlokasi", "className": "centertaligncolumn", "width": "5%" },
 				//{ "data": "PersentasePagu", "className": "centertaligncolumn", "width": "5%" },
 				{
@@ -201,9 +203,12 @@
 		});
 
 		function formatAngka(data) {
+			if (data === undefined) {
+				return '';
+			}
 			let formattedString = formatangka(data);
 			if (formattedString == 'null') {
-				formattedString = '';
+				return '';
 			}
 			return formattedString;
 		}

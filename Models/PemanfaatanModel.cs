@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 using System.Collections;
 using System.Configuration;
 using System.Web.Mvc;
+using Pnbp.Entities;
+using Oracle.ManagedDataAccess.Client;
 
 namespace Pnbp.Models
 {
@@ -982,21 +984,43 @@ namespace Pnbp.Models
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
 
             List<object> lstParams = new List<object>();
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
-            string subQuery = @"
+            string qKantor = "";
+            if (!String.IsNullOrEmpty(kantorId))
+            {
+                qKantor += " and s.kantorid = :kantorId ";
+                lstParams.Add(new OracleParameter("kantorId", kantorId));
+            }
+
+            string subQuery = $@"
+	                            WITH realisasi AS (
+		                            select sum(amount) belanja, kegiatan, output 
+                                    from SPAN_REALISASI sr 
+	                                    join SATKER s on s.KODESATKER = sr.KDSATKER 
+		                            where SUMBERDANA  = 'D'
+		                                and sr.tahun = :tahun
+{qKantor}
+		                            group by (kegiatan, output)
+	                            )
 	                            SELECT 
 	                                ROW_NUMBER() over (ORDER BY p.kode) RNUMBER,
 	                                p.kode KodeKRO,
-                                    sum(amount) alokasi,
+                                    sum(amount) pagu,
+                                    NVL(r.belanja,0) Realisasi,
                                     p.nama kro,
                                     COUNT(1) OVER() TOTAL
                                 FROM 
                                     pnbp.span_belanja sb
                                     JOIN pnbp.satker s ON s.kodesatker = sb.KDSATKER 
-                                    JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
+                                    LEFT JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode
+                                    LEFT JOIN realisasi r ON p.kode = r.kegiatan || '.' || r.OUTPUT 
                                 WHERE 
                                     sb.tahun = :tahun
-                                ";
+                                    AND sb.sumber_dana = 'D'
+                                    AND p.statusaktif = 1
+                                    and p.tahun = :tahun ";
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
             if (!String.IsNullOrEmpty(kantorId))
@@ -1008,10 +1032,10 @@ namespace Pnbp.Models
             if (!String.IsNullOrEmpty(kodeKRO))
             {
                 subQuery += " and lower(p.kode) LIKE '%'||:kodeKRO||'%'";
-                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeKRO", kodeKRO));
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeKRO", kodeKRO.ToLower()));
             }
 
-            subQuery += " GROUP BY (p.kode, nama)  ";
+            subQuery += " GROUP BY (p.kode, nama,r.belanja)  ";
 
             string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
 
@@ -1036,14 +1060,14 @@ namespace Pnbp.Models
 
             string query = @"
 	                            SELECT 
-                                    sum(amount) totalalokasi
+                                    sum(amount) totalpagu
                                 FROM 
                                     pnbp.span_belanja sb
                                     JOIN pnbp.satker s ON s.kodesatker = sb.KDSATKER 
                                     JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
                                 WHERE 
-                                    sb.tahun = :tahun
-                                ";
+                                    sb.tahun = :tahun AND sumber_dana = 'D' AND KDSATKER <> '524465' ";
+            
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
             if (!String.IsNullOrEmpty(kantorId))
@@ -1080,37 +1104,49 @@ namespace Pnbp.Models
             List<object> lstParams = new List<object>();
 
             string subQuery = $@"
+	                            WITH realisasi AS (
+		                            select sum(amount) belanja, kdsatker from SPAN_REALISASI sr 
+		                            where SUMBERDANA  = 'D'
+		                            and tahun = EXTRACT (year from sysdate)
+		                            group by (kdsatker)
+	                            )
 	                            SELECT 
-		                            ROW_NUMBER() over (ORDER BY kdsatker) RNUMBER,
-		                            KDSATKER KodeKRO,
-                                    u.kantorid,
-                                    u.nama_satker KRO,
-		                            sum(pagu) pagu,
-                                    sum(alokasi) alokasi,
+		                            ROW_NUMBER() over (ORDER BY sb.kdsatker) RNUMBER,
+		                            sb.KDSATKER KodeKRO,
+		                            NVL(r.belanja, 0) Realisasi,
+                                    s.kantorid,
+                                    s.nama_satker KRO,
+		                            sum(sb.amount) pagu,
                                     COUNT(1) OVER() TOTAL
 	                            FROM 
-                                    alokasisatker alsk
-                                    JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
-                                    JOIN { _schemaKKP}.kantor k ON k.kodesatker = u.KODESATKER
-                                    JOIN wilayah w ON k.kode = w.kode
-                                    JOIN wilayah prov ON prov.wilayahid = w.induk
+		                            span_belanja sb
+	                                JOIN satker s ON
+		                                s.KODESATKER  = sb.KDSATKER
+	                                LEFT JOIN wilayah w ON
+		                                s.kode = w.kode
+                                    LEFT JOIN wilayah prov ON prov.wilayahid = w.induk
+	                                LEFT JOIN realisasi r on r.kdsatker = sb.KDSATKER
                                 WHERE 
-                                    prov.tipewilayahid = 1
-                                    AND alsk.tahun = :tahun ";
+                                    sb.tahun = :tahun AND
+		                            sb.SUMBER_DANA = 'D' AND
+		                            sb.KDSATKER <> '524465' ";
+
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
             if (!String.IsNullOrEmpty(namasatker))
             {
-                subQuery += " and lower(u.nama_satker) like '%'||:param4||'%' ";
+                subQuery += " and lower(s.nama_satker) like '%'||:param4||'%' ";
                 lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", namasatker.ToLower()));
             }
 
             if (!String.IsNullOrEmpty(wilayahId))
             {
-                subQuery += " and prov.wilayahid= :wilayahId ";
+                subQuery += " and (prov.wilayahid= :wilayahId OR w.wilayahid= :wilayahId)";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
                 lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
             }
 
-            subQuery += " GROUP BY (kdsatker, u.nama_satker, u.kantorid) ";
+            subQuery += " GROUP BY (sb.kdsatker, r.belanja, s.nama_satker, s.kantorid) ";
 
             string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
 
@@ -1134,28 +1170,33 @@ namespace Pnbp.Models
             List<object> lstParams = new List<object>();
 
             string query = $@"
-	                            SELECT 
-		                            sum(pagu) totalpagu,
-                                    sum(alokasi) totalalokasi
-	                            FROM 
-                                    alokasisatker alsk
-                                    JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
-                                    JOIN { _schemaKKP}.kantor k ON k.kodesatker = u.KODESATKER
-                                    JOIN wilayah w ON k.kode = w.kode
-                                    JOIN wilayah prov ON prov.wilayahid = w.induk
-                                WHERE 
-                                    prov.tipewilayahid = 1
-                                    AND alsk.tahun = :tahun ";
+                            WITH grp as (
+	                            select * from (
+		                            select mp, max(revisi) revisi, tahun from AlokasiSatkerSummary
+		                            group by (mp, tahun)
+		                            order by mp desc
+	                            ) where rownum= 1
+                            )
+	                        SELECT 
+		                        sum(sb.amount) totalpagu
+	                        FROM 
+		                        span_belanja sb
+	                            JOIN satker s ON
+		                            s.KODESATKER  = sb.KDSATKER
+	                            LEFT JOIN wilayah w ON
+		                            s.kode = w.kode
+                                LEFT JOIN wilayah prov ON prov.wilayahid = w.induk
+                            WHERE 
+                                sb.tahun = :tahun AND
+		                        sb.SUMBER_DANA = 'D' AND
+		                        sb.KDSATKER <> '524465' AND
+                                s.STATUSAKTIF = 1 ";
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
-            if (!String.IsNullOrEmpty(namasatker))
-            {
-                query += " and lower(u.nama_satker) like '%'||:param4||'%' ";
-                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param4", namasatker.ToLower()));
-            }
 
             if (!String.IsNullOrEmpty(wilayahId))
             {
-                query += " and prov.wilayahid= :wilayahId ";
+                query += " and (prov.wilayahid= :wilayahId OR w.wilayahid= :wilayahId)";
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
                 lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
             }
 
@@ -1174,38 +1215,82 @@ namespace Pnbp.Models
             return result;
         }
 
-        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, int from, int to)
+        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, int from, int to, AlokasiSatkerSummary alskSummary)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
 
             List<object> lstParams = new List<object>();
 
             string subQuery = $@"
+                            WITH realisasi AS (
+                                select sum(realisasi) amount, wilayahid from (
+	                            select 
+		                            amount realisasi,
+		                            case
+			                            when w.tipewilayahid = 1 then w.wilayahid
+			                            when p.tipewilayahid = 1 then p.wilayahid
+		                            end wilayahid
+	                            from SPAN_REALISASI sr 
+	                            join satker s on s.KODESATKER = sr.KDSATKER 
+	                            join wilayah w on w.kode = s.KODE 
+	                            left join wilayah p on p.wilayahid = w.induk
+	                            where sr.SUMBERDANA ='D'
+	                            and sr.tahun = :tahun
+	                            and sr.KDSATKER <> '524465'
+	                            ) 
+	                            group by wilayahid
+                            ),
+                            belanja AS (
+	                            SELECT
+		                            sum(pagu) pagu,
+		                            wilayahid
+	                            FROM
+		                            (
+		                            SELECT
+			                            amount pagu,
+			                            CASE
+				                            WHEN w.tipewilayahid = 1 THEN w.wilayahid
+				                            WHEN p.tipewilayahid = 1 THEN p.wilayahid
+			                            END wilayahid
+		                            FROM
+			                            SPAN_BELANJA sr
+		                            JOIN satker s ON
+			                            s.KODESATKER = sr.KDSATKER
+		                            JOIN wilayah w ON
+			                            w.kode = s.KODE
+		                            JOIN wilayah p ON
+			                            p.wilayahid = w.induk
+		                            WHERE
+			                            sr.SUMBER_DANA = 'D'
+			                            AND sr.tahun = :tahun
+			                            AND sr.KDSATKER <> '524465' 
+                            )
+	                            GROUP BY
+		                            wilayahid 
+                            )
                                 SELECT 
-                                    ROW_NUMBER() over(ORDER BY prov.nama) RNUMBER,
-                                    prov.nama KodeKRO,
-                                    prov.wilayahid,
-                                    sum(pagu) pagu,
-                                    sum(alokasi) alokasi,
+                                    ROW_NUMBER() over(ORDER BY w.nama) RNUMBER,
+                                    w.nama KodeKRO,
+                                    w.wilayahid,
+		                            sum(sb.pagu) pagu,
+                                    r.amount realisasi,
                                     COUNT(1) OVER() TOTAL
                                 FROM 
-                                    alokasisatker alsk
-                                    JOIN {_schemaKKP}.kantor k ON k.kodesatker = alsk.KDSATKER
-                                    JOIN wilayah w ON k.kode = w.kode
-                                    JOIN wilayah prov ON prov.wilayahid = w.induk
-                                WHERE 
-                                    prov.tipewilayahid = 1
-                                    AND alsk.tahun = :tahun";
+		                            belanja sb
+	                                JOIN wilayah w ON
+		                            sb.wilayahid = w.wilayahid
+                                    LEFT JOIN realisasi r on r.wilayahid = w.wilayahid ";
 
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
-
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
             if (!String.IsNullOrEmpty(provinsi))
             {
-                subQuery += " and lower(prov.nama) like '%'||:param5||'%' ";
+                subQuery += " WHERE lower(w.nama) like '%'||:param5||'%' ";
                 lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
             }
-           subQuery += " GROUP BY(prov.wilayahid, prov.nama) ";
+
+            subQuery += " GROUP BY (w.nama,w.wilayahid,r.amount) ";
 
             string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
 
@@ -1223,26 +1308,201 @@ namespace Pnbp.Models
             return records;
         }
 
-        public Entities.DaftarTotal rl_provinsi_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi)
+        public List<Entities.BelanjaKRO> ListBelanjaProvinsi(string tahun, int from, int to)
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            List<object> lstParams = new List<object>();
+
+            string subQuery = $@"
+                                WITH realisasi AS (
+                                    select sum(realisasi) amount, wilayahid from (
+	                                select 
+		                                amount realisasi,
+		                                case
+			                                when w.tipewilayahid = 1 then w.wilayahid
+			                                when p.tipewilayahid = 1 then p.wilayahid
+		                                end wilayahid
+	                                from SPAN_REALISASI sr 
+	                                join satker s on s.KODESATKER = sr.KDSATKER 
+	                                join wilayah w on w.kode = s.KODE 
+	                                left join wilayah p on p.wilayahid = w.induk
+	                                where sr.SUMBERDANA ='D'
+	                                and sr.tahun = :tahun
+	                                and sr.KDSATKER <> '524465'
+	                                ) 
+	                                group by wilayahid
+                                ),
+                                belanja AS (
+	                                SELECT
+		                                sum(pagu) pagu,
+		                                wilayahid
+	                                FROM
+		                                (
+		                                SELECT
+			                                amount pagu,
+			                                CASE
+				                                WHEN w.tipewilayahid = 1 THEN w.wilayahid
+				                                WHEN p.tipewilayahid = 1 THEN p.wilayahid
+			                                END wilayahid
+		                                FROM
+			                                SPAN_BELANJA sr
+		                                JOIN satker s ON
+			                                s.KODESATKER = sr.KDSATKER
+		                                JOIN wilayah w ON
+			                                w.kode = s.KODE
+		                                JOIN wilayah p ON
+			                                p.wilayahid = w.induk
+		                                WHERE
+			                                sr.SUMBER_DANA = 'D'
+			                                AND sr.tahun = :tahun
+			                                AND sr.KDSATKER <> '524465' 
+                                    )
+	                                GROUP BY
+		                                wilayahid 
+                                )
+                                SELECT 
+                                    w.nama KodeKRO,
+		                            sum(sb.pagu) pagu,
+                                    r.amount realisasi,
+                                    COUNT(1) OVER() TOTAL
+                                FROM 
+		                            belanja sb
+	                                JOIN wilayah w ON
+		                            sb.wilayahid = w.wilayahid
+                                    LEFT JOIN realisasi r on r.wilayahid = w.wilayahid ";
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
+            subQuery += " GROUP BY (w.nama,w.wilayahid,r.amount) order by r.amount DESC";
+
+            string query = @"SELECT * FROM (SELECT
+		                        ROW_NUMBER() OVER(ORDER BY persentase DESC) RNUMBER,
+		                        persentase PersentaseRealisasiBelanja,
+		                        kodeKRO
+	                        FROM (
+	                        SELECT
+		                        KodeKRO,
+		                        (realisasi/pagu*100) persentase
+	                        FROM 
+	                        ( {0} )) 
+	                        ORDER BY
+		                        persentase DESC ) 
+                            WHERE RNUMBER BETWEEN :startCnt AND :limitCnt ";
+
+            query = string.Format(query, subQuery);
+            query = sWhitespace.Replace(query, " ");
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
+
+            using (var ctx = new PnbpContext())
+            {
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+
+        public List<Entities.BelanjaKRO> ListBelanjaProvinsiSummary()
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            List<object> lstParams = new List<object>();
+
+            string query = @"SELECT 
+                                VALUE PersentaseRealisasiBelanja, 
+                                VALUE4 kodeKRO, 
+                                to_number(value2) realisasi, 
+                                to_number(value3) Totalpagu 
+                            FROM DASHBOARD_SUMMARY ds 
+                            where kode = 'BELANJA_PROVINSI_TERTINGGI' ";
+
+            using (var ctx = new PnbpContext())
+            {
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+        public List<Entities.BelanjaKRO> ListBelanjaSatkerSummary()
+        {
+            List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
+
+            List<object> lstParams = new List<object>();
+
+            string query = @"SELECT 
+                                VALUE PersentaseRealisasiBelanja, 
+                                VALUE4 kodeKRO,
+                                to_number(value2) realisasi, 
+                                to_number(value3) Totalpagu 
+                            FROM 
+                                DASHBOARD_SUMMARY ds 
+                            where 
+                                kode = 'BELANJA_SATKER_TERTINGGI' ";
+
+            using (var ctx = new PnbpContext())
+            {
+                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+            }
+
+            return records;
+        }
+
+        public AlokasiSatkerSummary GetLastAlokasiSatkerSummary()
+        {
+            AlokasiSatkerSummary result = null;
+            List<object> lstParams = new List<object>();
+
+            string query = $@"
+                            SELECT 
+                                a.mp, max(a.revisi) revisi, a.tahun  
+                            FROM 
+                                ALOKASISATKERSUMMARY a 
+                            WHERE 
+                                tahun = EXTRACT(year from sysdate)
+                            GROUP BY 
+                                a.mp, a.tahun
+                            order by 
+                                mp desc";
+
+            using (var ctx = new PnbpContext())
+            {
+                result = ctx.Database.SqlQuery<AlokasiSatkerSummary>(query, lstParams.ToArray()).FirstOrDefault();
+            }
+
+            return result;
+        }
+
+        public Entities.DaftarTotal rl_provinsi_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, AlokasiSatkerSummary alskSummary)
         {
             Entities.DaftarTotal result = null;
             List<object> lstParams = new List<object>();
 
             string query = $@"
+                                WITH grp as (
+	                                select * from (
+		                                select mp, max(revisi) revisi, tahun from AlokasiSatkerSummary
+		                                group by (mp, tahun)
+		                                order by mp desc
+	                                ) where rownum= 1
+                                )
                                 SELECT 
-                                    sum(pagu) totalpagu,
-                                    sum(alokasi) totalalokasi
+		                            sum(sb.amount) totalpagu
                                 FROM 
-                                    alokasisatker alsk
-                                    JOIN {_schemaKKP}.kantor k ON k.kodesatker = alsk.KDSATKER
-                                    JOIN wilayah w ON k.kode = w.kode
-                                    JOIN wilayah prov ON prov.wilayahid = w.induk
+		                            span_belanja sb
+	                                JOIN satker s ON
+		                            s.KODESATKER  = sb.KDSATKER
                                 WHERE 
-                                    prov.tipewilayahid = 1
-                                    AND alsk.tahun = :tahun";
+                                    sb.tahun = :tahun AND
+		                            sb.SUMBER_DANA = 'D' AND
+		                            sb.KDSATKER <> '524465'
+                                    and s.STATUSAKTIF = 1";
 
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
-
 
             if (!String.IsNullOrEmpty(provinsi))
             {
@@ -1255,6 +1515,271 @@ namespace Pnbp.Models
                 using (var ctx = new PnbpContext())
                 {
                     result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+        public Entities.DaftarTotal GetTotalBelanjaBandingPagu(string tahun)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstParams = new List<object>();
+
+            string query = $@"
+                            WITH realisasi AS (
+                                select sum(realisasi) amount from (
+	                            select 
+		                            amount realisasi,
+		                            case
+			                            when w.tipewilayahid = 1 then w.wilayahid
+			                            when p.tipewilayahid = 1 then p.wilayahid
+		                            end wilayahid
+	                            from SPAN_REALISASI sr 
+	                            join satker s on s.KODESATKER = sr.KDSATKER 
+	                            join wilayah w on w.kode = s.KODE 
+	                            left join wilayah p on p.wilayahid = w.induk
+	                            where sr.SUMBERDANA ='D'
+	                            and sr.tahun = 2022
+	                            and sr.KDSATKER <> '524465'
+	                            ) 
+                            ),
+                            belanja AS (
+	                            SELECT
+		                            sum(pagu) pagu
+	                            FROM
+		                            (
+		                            SELECT
+			                            amount pagu
+		                            FROM
+			                            SPAN_BELANJA sr
+		                            WHERE
+			                            sr.SUMBER_DANA = 'D'
+			                            AND sr.tahun = 2022
+			                            AND sr.KDSATKER <> '524465' 
+                                    )
+                            )
+                            SELECT 
+                                sb.pagu totalpagu, realisasi.amount totalrealisasi
+                            FROM 
+                                belanja sb, realisasi ";
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+        public Entities.DaftarTotal GetTotalBelanjaBandingPaguSummary()
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstParams = new List<object>();
+
+            string query = $@"
+                                select TO_NUMBER(data1.value) totalpagu, TO_NUMBER(data2.value) totalrealisasi  from (
+	                                select value 
+	                                from DASHBOARD_SUMMARY ds 
+	                                WHERE kode = 'TOTAL_BELANJA_PAGU' AND LABEL = 'TOTAL_PAGU'
+                                ) data1 ,
+                                (
+	                                select value 
+	                                from DASHBOARD_SUMMARY ds 
+	                                WHERE kode = 'TOTAL_BELANJA_PAGU' AND LABEL = 'TOTAL_BELANJA'
+                                ) data2 ";
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<Entities.DaftarTotal>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+        public Decimal? GetRealisasi(string tahun, string wilayahId = null)
+        {
+            Entities.DaftarTotal result = null;
+            List<object> lstParams = new List<object>();
+            Decimal? total = 0;
+
+            string query = $@"
+                            select NVL(sum(realisasi), 0) FROM (
+	                            select 
+		                            amount realisasi,
+		                            case
+			                            when w.tipewilayahid = 1 then w.wilayahid
+			                            when p.tipewilayahid = 1 then p.wilayahid
+		                            end wilayahid
+	                            from SPAN_REALISASI sr 
+	                            join satker s on s.KODESATKER = sr.KDSATKER 
+	                            join wilayah w on w.kode = s.KODE 
+	                            left join wilayah p on p.wilayahid = w.induk
+	                            where sr.SUMBERDANA ='D'
+	                            and sr.tahun = :tahun
+	                            and sr.KDSATKER <> '524465'
+                            ) ";
+
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
+
+            if (!string.IsNullOrEmpty(wilayahId))
+            {
+                query += " WHERE wilayahid = :wilayahId "; 
+                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("wilayahId", wilayahId));
+            }
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    total = ctx.Database.SqlQuery<Decimal?>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return total;
+        }
+
+        public AlokasiSatkerSummary GetLatestAlokasi(string tahun)
+        {
+            AlokasiSatkerSummary result = null;
+            List<object> lstParams = new List<object>();
+
+            var query = @"SELECT 
+                            ALOKASISATKERSUMMARYID, 
+                            PAGU, 
+                            ALOKASI, 
+                            TO_CHAR(TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
+                            TO_CHAR(TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
+                            MP 
+                        FROM ALOKASISATKERSUMMARY a 
+                        WHERE tahun = :tahun AND MP = (SELECT * FROM (
+                            SELECT a2.mp FROM ALOKASISATKERSUMMARY a2 WHERE a2.tahun = extract(year from sysdate) ORDER BY a2.MP DESC
+                        ) WHERE rownum = 1)";
+
+
+            lstParams.Add(new OracleParameter("tahun", tahun));
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<AlokasiSatkerSummary>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+        public AlokasiSatkerSummary GetLatestAlokasiProvinsi(string alokasiSatkerSummaryId, string wilayahId)
+        {
+            AlokasiSatkerSummary result = null;
+            List<object> lstParams = new List<object>();
+
+            var query = @"select NVL(sum(alokasi), 0) alokasi from (
+                            select 
+	                            a.alokasi,
+	                            case
+		                            when w.tipewilayahid = 1 then w.wilayahid
+		                            when prov.tipewilayahid = 1 then prov.wilayahid
+	                            end wilayahid
+                            from alokasisatker a
+                            join ALOKASISATKERSUMMARY a2 on a.ALOKASISATKERSUMMARYID = a2.ALOKASISATKERSUMMARYID 
+                            join satker s on a.KDSATKER =s.KODESATKER 
+                            left join wilayah w on w.kode = s.kode
+                            left join wilayah prov on prov.WILAYAHID = w.induk
+                            where a2.ALOKASISATKERSUMMARYid = :alokasiSatkerSummaryId
+                            and s.statusaktif = 1 
+                            ) ";
+
+
+            lstParams.Add(new OracleParameter("alokasiSatkerSummaryId", alokasiSatkerSummaryId));
+
+            if (!string.IsNullOrEmpty(wilayahId))
+            { 
+                query += " where wilayahid = :wilayahId ";
+                lstParams.Add(new OracleParameter("wilayahId", wilayahId));
+            }
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<AlokasiSatkerSummary>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return result;
+        }
+
+        public AlokasiSatkerSummary GetLatestAlokasiSatker(string alokasiSatkerSummaryId, string kantorId)
+        {
+            AlokasiSatkerSummary result = null;
+            List<object> lstParams = new List<object>();
+
+            var query = @"select NVL(sum(alokasi), 0) alokasi from (
+                            select 
+	                            a.alokasi,
+	                            case
+		                            when w.tipewilayahid = 1 then w.wilayahid
+		                            when prov.tipewilayahid = 1 then prov.wilayahid
+	                            end wilayahid
+                            from alokasisatker a
+                            join ALOKASISATKERSUMMARY a2 on a.ALOKASISATKERSUMMARYID = a2.ALOKASISATKERSUMMARYID 
+                            join satker s on a.KDSATKER =s.KODESATKER 
+                            left join wilayah w on w.kode = s.kode
+                            left join wilayah prov on prov.WILAYAHID = w.induk
+                            where a2.ALOKASISATKERSUMMARYid = :alokasiSatkerSummaryId  
+                            and s.statusaktif = 1 ";
+
+
+            lstParams.Add(new OracleParameter("alokasiSatkerSummaryId", alokasiSatkerSummaryId));
+
+            if (!string.IsNullOrEmpty(kantorId))
+            {
+                query += " AND s.kantorId = :kantorId ";
+                lstParams.Add(new OracleParameter("kantorId", kantorId));
+            }
+
+            query += " ) ";
+
+            try
+            {
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<AlokasiSatkerSummary>(query, lstParams.ToArray()).FirstOrDefault();
                 }
             }
             catch (Exception e)

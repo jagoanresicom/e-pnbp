@@ -192,6 +192,7 @@ namespace Pnbp.Entities
         public decimal? TotalPagu { get; set; }
         public string PersentasePagu { get; set; }
         public string PersentaseAlokasi { get; set; }
+        public string PersentaseRealisasiBelanja { get; set; }
     }
 
     public class DataPaguAlokasi
@@ -634,6 +635,19 @@ namespace Pnbp.Entities
         public decimal penerimaan { get; set; }
         public decimal operasional { get; set; }
         public int urutan { get; set; }
+    }
+
+    public class RekapBelanja
+    {
+        [Key]
+        public int urutan { get; set; }
+        public string KodeKRO { get; set; }
+        public string KodeSatker { get; set; }
+        public string NamaSatker { get; set; }
+        public decimal Pagu { get; set; }
+        public decimal Alokasi { get; set; }
+        public decimal Realisasi { get; set; }
+        public string NamaProvinsi { get; set; }
     }
 
     public class Renaksi

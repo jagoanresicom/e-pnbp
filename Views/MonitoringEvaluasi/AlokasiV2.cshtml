@@ -153,6 +153,7 @@
 											<th>MP</th>
 											<th>Total Pagu</th>
 											<th>Total Alokasi</th>
+											<th>Total Belanja</th>
 											<th>Aksi</th>
 										</tr>
 									</thead>
@@ -306,6 +307,7 @@
 					+ "<td class='text-left'>MP " + data[x].Mp + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
 					+ "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
 					+ "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
+					+ "<td class='text-right'>" + addCommas(data[x].Belanja) + "</td>"
 					//+ "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
 					+ "<td class='text-center' onclick='showDetailAlokasiSummary("
 					+ "\"" + data[x].AlokasiSatkerSummaryId + "\""

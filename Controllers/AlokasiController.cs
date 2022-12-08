@@ -1430,6 +1430,7 @@ namespace Pnbp.Controllers
             }
 
             var isProcessAlokasiSuccess = alm.ProsesAlokasi();
+            //var isProcessAlokasiSuccess = alm.ProsesAlokasiOld();
 
             return Json(new { success = isProcessAlokasiSuccess }, JsonRequestBehavior.AllowGet);
         }
@@ -1512,6 +1513,10 @@ namespace Pnbp.Controllers
             if (jenisKantorUser == "Pusat")
             {
                 result = alm.GetSummaryAlokasi(tahun);
+                if (result.Count > 0)
+                {
+                    result[result.Count - 1].Belanja = alm.GetCurrentYearRealisasi();
+                }
             }
             else 
             {
@@ -1519,6 +1524,10 @@ namespace Pnbp.Controllers
                 satker satker = _manfaatanModel.GetSatkerByKantorId(kantorId);
                 string currentYear = DateTime.Now.Year.ToString();
                 result = alm.GetSummaryAlokasiDaerah(currentYear, satker.kode);
+                if (result != null)
+                {
+                    result[result.Count - 1].Belanja = alm.GetCurrentYearRealisasi(satker.kode);
+                }
             }
 
             return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);

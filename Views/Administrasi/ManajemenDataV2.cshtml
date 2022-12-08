@@ -61,6 +61,12 @@
                                         </div>
 
                                         <div class="row" style="margin-top: 8px">
+                                            <label class="col-sm-4" style="margin-left:20px">Belanja</label>
+                                            <a href="javascript:void(0);" class="btn btn-success" style="margin-left:7px" onclick="exportBelanja();"><span class="fa fa-floppy-o"></span> Unduh</a>
+                                            @*<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> Unduh </button>*@
+                                        </div>
+
+                                        <div class="row" style="margin-top: 8px">
                                             <label class="col-sm-4" style="margin-left:20px">Rencana Aksi</label>
                                             <a href="javascript:void(0);" class="btn btn-success" style="margin-left:7px" onclick="exportRenaksi();"><span class="fa fa-floppy-o"></span> Unduh</a>
                                             @*<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> Unduh </button>*@
@@ -171,7 +177,7 @@
         $('#CariKodeSatker').select2({
             placeholder: "Pilih Satker"
         });
-    
+
         createPagingPengajuan();
 
         $(window).scroll(function () {
@@ -358,6 +364,14 @@
         }
         window.location.replace('@Url.Action("ExportPenerimaan", "Administrasi")?pTahun=' + year);
         //window.location.href = + "Administrasi/ExportPenerimaan/";
+    }
+
+    function exportBelanja() {
+        var year = $('#year').val();
+        if(year == ''){
+            year = new Date().getFullYear();
+        }
+        window.location.replace('@Url.Action("ExportBelanja", "Administrasi")?pTahun=' + year);
     }
 
     function exportRenaksi() {

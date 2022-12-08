@@ -1,0 +1,833 @@
+﻿@model  Pnbp.Entities.CharDashboard
+@{}
+<style>
+	.control-label {
+		padding-top: 8px;
+		padding-right: 0px;
+	}
+
+
+	.loader {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+		.loader.inactive {
+			display: none;
+		}
+
+	.loader-wheel {
+		animation: spin 1s infinite linear;
+		border: 2px solid rgba(30, 30, 30, 0.5);
+		border-left: 4px solid #fff;
+		border-radius: 50%;
+		height: 50px;
+		margin-bottom: 10px;
+		width: 50px;
+		margin: 30px auto;
+	}
+
+	.loader-text {
+		color: #fff;
+		font-family: arial, sans-serif;
+	}
+
+		.loader-text:after {
+			content: 'Loading';
+			animation: load 2s linear infinite;
+		}
+
+	@@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	@@keyframes load {
+		0% {
+			content: 'Loading';
+		}
+
+		33% {
+			content: 'Loading.';
+		}
+
+		67% {
+			content: 'Loading..';
+		}
+
+		100% {
+			content: 'Loading...';
+		}
+	}
+</style>
+<link rel="stylesheet" href="~/resources/css/ajax-loader.css" />
+
+<script src='@Url.Content("~/resources/js/jquery.min.js")'></script>
+<script src='@Url.Content("~/resources/js/echarts.min.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/highcharts.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/highcharts-more.js")'</script>
+<script src='@Url.Content("~/resources/js/highcharts/highcharts-3d.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/data.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/drilldown.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/exporting.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/offline-exporting.js")'></script>
+
+<style>
+	.highcharts-figure,
+	.highcharts-data-table table {
+		min-width: 320px;
+		max-width: 800px;
+		margin: 1em auto;
+	}
+
+	.highcharts-data-table table {
+		font-family: Verdana, sans-serif;
+		border-collapse: collapse;
+		border: 1px solid #ebebeb;
+		margin: 10px auto;
+		text-align: center;
+		width: 100%;
+		max-width: 500px;
+	}
+
+	.highcharts-data-table caption {
+		padding: 1em 0;
+		font-size: 1.2em;
+		color: #555;
+	}
+
+	.highcharts-data-table th {
+		font-weight: 600;
+		padding: 0.5em;
+	}
+
+	.highcharts-data-table td,
+	.highcharts-data-table th,
+	.highcharts-data-table caption {
+		padding: 0.5em;
+	}
+
+	.highcharts-data-table thead tr,
+	.highcharts-data-table tr:nth-child(even) {
+		background: #f8f8f8;
+	}
+
+	.highcharts-data-table tr:hover {
+		background: #f1f7ff;
+	}
+
+	input[type="number"] {
+		min-width: 50px;
+	}
+
+	.chart--loading, .chart--no-data {
+		position: relative;
+	}
+	.chart--loading:after {
+		position: absolute;
+		left: 0;
+		top: 0;
+		content: 'Sedang memuat ...';
+		display: flex;
+		width: 100%;
+		height: 100%;
+		background: #ebebeb9e;
+		justify-content: center;
+		align-items: center;
+		font-weight: bold;
+		color: #383838;
+	}
+	.chart--no-data:after {
+		position: absolute;
+		left: 0;
+		top: 0;
+		content: 'Tidak ada data untuk ditampilkan saat ini';
+		display: flex;
+		width: 100%;
+		height: 100%;
+		background: #ebebeb9e;
+		justify-content: center;
+		align-items: center;
+		font-weight: bold;
+		color: #383838;
+	}
+</style>
+
+<div class="row">
+	<div class="col-sm-12">
+
+		<div class="row">
+			<div class="col-sm-6">
+				<figure class="highcharts-figure">
+					<div id="js-chart-penerimaan" class="chart--loading"></div>
+				</figure>
+			</div>
+			<div class="col-sm-6">
+				<figure class="highcharts-figure">
+					<div id="js-chart-belanja" class="chart--loading"></div>
+				</figure>
+			</div>
+		</div>
+
+		@*spline chart*@
+		<div class="row mb-2">
+			<div class="col-sm-12">
+				<div id="js-chart-penerimaan-layanan" class="chart--loading"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div id="js-chart-penerimaan-layanan-kkpr" class="chart--loading"></div>
+				@*<figure class="highcharts-figure">
+					<div id="js-chart-penerimaan-layanan-kkpr" class="chart--loading"></div>
+				</figure>*@
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6">
+				<figure class="highcharts-figure">
+					<div id="js-chart-penerimaan-fisik" class="chart--loading"></div>
+				</figure>
+			</div>
+			<div class="col-sm-6">
+				<figure class="highcharts-figure">
+					<div id="js-chart-penerimaan-tertinggi" class="chart--loading"></div>
+				</figure>
+			</div>
+			<div class="col-sm-6">
+				<figure class="highcharts-figure">
+					<div id="js-chart-belanja-tertinggi" class="chart--loading"></div>
+				</figure>
+			</div>
+			<div class="col-sm-6">
+				<figure class="highcharts-figure">
+					<div id="js-chart-belanja-tertinggi-satker" class="chart--loading"></div>
+				</figure>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+<script src="@Url.Content("~/resources/js/spinner.js")"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+		// preload chart
+		loadPenerimaan([]);
+		loadTotalBelanja([]);
+		loadPenerimaanJenisLayanan([]);
+		loadPenerimaanJenisLayananKKPR([]);
+		loadBarChartV3([], 'js-chart-penerimaan-fisik', 'Penerimaan Fisik Tertinggi');
+		loadBarChartV2([], 'js-chart-penerimaan-tertinggi', 'Penerimaan Layanan Tertinggi');
+		loadBarChart([], 'js-chart-belanja-tertinggi', 'Belanja Provinsi Tertinggi');
+		loadBarChart([], 'js-chart-belanja-tertinggi-satker', 'Belanja Satuan Kerja Tertinggi');
+
+		getTotalPenerimaan();
+		getTotalBelanja();
+		getPenerimaanLayananPertanahan();
+		getPenerimaanLayananKKPR();
+		getPenerimaanFisikTertinggi();
+		getPenerimaanLayananTertinggi();
+		getBelanjaTertinggi();
+		getBelanjaSatkerTertinggi();
+
+		function getTotalPenerimaan() {
+			$.ajax({
+				url: '@Url.Action("GetTotalPenerimaanSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-penerimaan').removeClass('chart--loading')
+					if (response.Success) {
+						loadPenerimaan(response.Data);
+					} else if (response.Message == "kosong") {
+						$('#js-chart-penerimaan').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+		function getTotalBelanja() {
+			$.ajax({
+				url: '@Url.Action("GetTotalBelanjaV3", "Home")',
+				success: function (response) {
+					$('#js-chart-belanja').removeClass('chart--loading')
+					if (response.Success) {
+						loadTotalBelanja(response.Data);
+					} else if (response.Message == "kosong") {
+						$('#js-chart-belanja').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+		function getPenerimaanLayananPertanahan() {
+			$.ajax({
+				url: '@Url.Action("GetPenerimaanPertanahanSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-penerimaan-layanan').removeClass('chart--loading')
+					if (response.Success && response.Data !== null) {
+
+						let responseData = [];
+						for (let data of response.Data) {
+							responseData.push([Date.UTC(2022, parseInt(data.bulan)-1, 1), data.totalpenerimaan])
+						}
+
+						loadPenerimaanJenisLayanan(responseData);
+					} else if (response.Message == "kosong") {
+						$('#js-chart-penerimaan-layanan').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+
+		function getPenerimaanLayananKKPR() {
+			$.ajax({
+				url: '@Url.Action("GetPenerimaanKKPRSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-penerimaan-layanan-kkpr').removeClass('chart--loading')
+					if (response.Success && response.Data !== null) {
+
+						let responseData = [];
+						for (let data of response.Data) {
+							responseData.push([Date.UTC(2022, parseInt(data.bulan)-1, 1), data.totalpenerimaan])
+						}
+
+						loadPenerimaanJenisLayananKKPR(responseData);
+					} else if (response.Message == "kosong") {
+						$('#js-chart-penerimaan-layanan-kkpr').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+		function getPenerimaanLayananTertinggi() {
+			$.ajax({
+				url: '@Url.Action("ListPenerimaanLayananTertinggiSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-penerimaan-tertinggi').removeClass('chart--loading')
+					if (response.Success) {
+						response.Data.sort((a, b) => {
+							return a.y < b.y ? 1 : -1;
+						});
+						loadBarChartV2(response.Data, 'js-chart-penerimaan-tertinggi', 'Penerimaan Layanan Tertinggi');
+					} else if (response.Message == "kosong") {
+						$('#js-chart-penerimaan-tertinggi').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+		function getBelanjaTertinggi() {
+			$.ajax({
+				url: '@Url.Action("ListBelanjaProvinsiTertinggiSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-belanja-tertinggi').removeClass('chart--loading')
+					if (response.Success) {
+						response.Data.sort((a, b) => {
+							return a.y < b.y ? 1 : -1;
+						});
+						loadBarChart(response.Data, 'js-chart-belanja-tertinggi', 'Belanja Provinsi Tertinggi');
+					} else if (response.Message == "kosong") {
+						$('#js-chart-belanja-tertinggi').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+		function getBelanjaSatkerTertinggi() {
+			$.ajax({
+				url: '@Url.Action("ListBelanjaSatkerTertinggiSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-belanja-tertinggi-satker').removeClass('chart--loading')
+					if (response.Success) {
+						response.Data.sort((a, b) => {
+							return a.y < b.y ? 1 : -1;
+						});
+						loadBarChart(response.Data, 'js-chart-belanja-tertinggi-satker', 'Belanja Satuan Kerja Tertinggi');
+					} else if (response.Message == "kosong") {
+						$('#js-chart-belanja-tertinggi-satker').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+		function getPenerimaanFisikTertinggi() {
+			$.ajax({
+				url: '@Url.Action("ListPenerimaanFisikTertinggiSummary", "Home")',
+				success: function (response) {
+					$('#js-chart-penerimaan-fisik').removeClass('chart--loading')
+					if (response.Success) {
+						response.Data.sort((a, b) => {
+							return a.y < b.y ? 1 : -1;
+						});
+						loadBarChartV3(response.Data, 'js-chart-penerimaan-fisik', 'Penerimaan Fisik Tertinggi');
+					} else if (response.Message == "kosong") {
+						$('#js-chart-penerimaan-fisik').addClass('chart--no-data')
+					}
+				},
+				error: function (response) {
+				}
+			});
+		}
+
+	});
+
+
+	function loadPenerimaan(seriesData) {
+		// Data retrieved from https://netmarketshare.com
+		Highcharts.chart('js-chart-penerimaan', {
+			chart: {
+				plotBackgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				type: 'pie'
+			},
+			title: {
+				text: 'Total Penerimaan <small>(banding target)</small>'
+			},
+			//tooltip: {
+			//	pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+			//},
+			//accessibility: {
+			//	point: {
+			//		valueSuffix: '%'
+			//	}
+			//},
+			tooltip: {
+				formatter: function (e) {
+					return `<b>${this.point.name}</b><br>Rp. ` + formatAngka(this.y);
+				},
+			},
+			plotOptions: {
+				pie: {
+					innerSize: 130,
+					cursor: 'pointer',
+					//dataLabels: {
+					//	enabled: false
+					//},
+					showInLegend: true
+				}
+			},
+			legend: {
+				enabled: true,
+				itemWidth: 200,
+				labelFormatter: function () {
+					return this.name + `<br>Rp. ${formatAngka(this.y)}`;
+				}
+			},
+			//plotOptions: {
+			//	pie: {
+			//		innerSize: 130,
+			//		//allowPointSelect: true,
+			//		cursor: 'pointer',
+			//		//dataLabels: {
+			//		//	enabled: true,
+			//		//	format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+			//		//}
+			//	}
+			//},
+			series: [{
+				name: 'Nilai',
+				colorByPoint: true,
+				data: seriesData,
+				//data: [{
+				//	name: 'Chrome',
+				//	y: 70.67,
+				//	sliced: true,
+				//	selected: true
+				//}, {
+				//	name: 'Edge',
+				//	y: 14.77
+				//}],
+			}]
+		});
+	}
+
+	function loadTotalBelanja(seriesData) {
+		Highcharts.chart('js-chart-belanja', {
+			chart: {
+				plotBackgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				type: 'pie'
+			},
+			colors: ['#3498db', '#455c73', '#9b59b6', '#bdc3c7', '#26b99a'],
+			title: {
+				text: 'Total Belanja <small>(banding Pagu)</small>'
+			},
+			tooltip: {
+				formatter: function (e) {
+					return `<b>${this.point.name}</b><br>Rp. ` + formatAngka(this.y);
+				},
+			},
+			plotOptions: {
+				pie: {
+					cursor: 'pointer',
+					//dataLabels: {
+					//	enabled: false
+					//},
+					showInLegend: true
+				}
+			},
+			legend: {
+				enabled: true,
+				itemWidth: 200,
+				labelFormatter: function () {
+					return this.name + `<br>Rp. ${formatAngka(this.y)}`;
+				}
+			},
+			series: [{
+				name: 'Nilai',
+				colorByPoint: true,
+				data: seriesData,
+			}]
+		});
+	}
+
+	// Data retrieved from https://www.vikjavev.no/ver/snjomengd
+
+	function loadPenerimaanJenisLayanan(seriesData) {
+		Highcharts.chart('js-chart-penerimaan-layanan', {
+			chart: {
+				type: 'spline',
+				height: '300',
+			},
+			title: {
+				text: 'Penerimaan Jenis Layanan Pertanahan</small>'
+			},
+			//subtitle: {
+			//	text: 'Irregular time data in Highcharts JS'
+			//},
+			xAxis: {
+				type: 'datetime',
+				dateTimeLabelFormats: { // don't display the year
+					month: '%b',
+					//month: '%e. %b',
+					//year: '%b'
+				},
+				//title: {
+				//	text: 'Date'
+				//}
+			},
+			yAxis: {
+				title: {
+					text: 'Penerimaan (Rp)'
+				},
+				//labels: {
+				//	format: '{value}',
+				//	formatter: function () {
+				//		return formatAngka(this.value);
+				//	},
+				//},
+				min: 0
+			},
+			tooltip: {
+				headerFormat: '',
+				//pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
+				//pointFormat: ': {point.y:.0f}',
+				formatter: function (e) {
+					return 'Rp. ' + formatAngka(this.y);
+				},
+			},
+
+			plotOptions: {
+				series: {
+					dataLabels: {
+						enabled: true,
+						formatter: function (e) {
+							return 'Rp. ' + formatAngka(this.y);
+						},
+					},
+					enableMouseTracking: true,
+					marker: {
+						enabled: true,
+						radius: 2.5
+					}
+				},
+			},
+
+			colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
+
+			// Define the data points. All series have a year of 1970/71 in order
+			// to be compared on the same x axis. Note that in JavaScript, months start
+			// at 0 for January, 1 for February etc.
+			series: [
+				{
+					name: "Tahun 2022",
+					//data: seriesData,
+					data: seriesData,
+				},
+			]
+		});
+	}
+
+
+	function loadPenerimaanJenisLayananKKPR(seriesData) {
+		Highcharts.chart('js-chart-penerimaan-layanan-kkpr', {
+			chart: {
+				type: 'spline',
+				height: '300',
+			},
+			title: {
+				text: 'Penerimaan Jenis Layanan KKPR</small>'
+			},
+			xAxis: {
+				type: 'datetime',
+				dateTimeLabelFormats: { // don't display the year
+					month: '%b',
+				},
+			},
+			yAxis: {
+				title: {
+					text: 'Penerimaan (Rp)'
+				},
+				min: 0
+			},
+			tooltip: {
+				headerFormat: '',
+				formatter: function (e) {
+					return 'Rp. ' + formatAngka(this.y);
+				},
+			},
+
+			plotOptions: {
+				series: {
+					dataLabels: {
+						enabled: true,
+						formatter: function (e) {
+							return 'Rp. ' + formatAngka(this.y);
+						},
+					},
+					enableMouseTracking: true,
+					marker: {
+						enabled: true,
+						radius: 2.5
+					}
+				},
+			},
+
+			colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
+
+			series: [
+				{
+					name: "Tahun 2022",
+					data: seriesData,
+				},
+			]
+		});
+	}
+
+
+	function loadBarChart(seriesData, containerId, title) {
+		Highcharts.chart(containerId, {
+			chart: {
+				type: 'bar'
+			},
+			colors: ['#26b99a'],
+			title: {
+				align: 'left',
+				text: title
+			},
+			accessibility: {
+				announceNewData: {
+					enabled: true
+				}
+			},
+			xAxis: {
+				type: 'category'
+			},
+			yAxis: {
+				title: {
+					text: 'Persentase Realisasi thd. Pagu (tahun 2022)'
+				},
+				max: 100,
+			},
+			legend: {
+				enabled: false
+			},
+			plotOptions: {
+				series: {
+					borderWidth: 0,
+					dataLabels: {
+						enabled: true,
+						format: '{point.y:.1f}%'
+					}
+				}
+			},
+			tooltip: {
+				//headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+				//pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+				//pointFormat: '<b>{point.y:.2f}%</b>'
+				formatter: function (e) {
+					return `Realisasi : <b>Rp. <b>${formatAngka(this.point.data1)}</b><br> Pagu : <b>Rp. <b>${formatAngka(this.point.data2)}</b>`;
+				},
+				//pointFormat: `Penerimaan : <b>Rp. <b>${this.y}</b><br> Pagu : <b>Rp. <b>${formatAngka(this.y)}</b>`
+			},
+			series: [
+				{
+					//name: "Browsers",
+					colorByPoint: true,
+					data: seriesData,
+				}
+			],
+		});
+	}
+
+	Highcharts.setOptions({
+		lang: {
+			numericSymbols: ['R', 'J', 'M','T']
+		}
+	});
+
+	function loadBarChartV2(seriesData, containerId, title) {
+		Highcharts.chart(containerId, {
+			chart: {
+				type: 'bar'
+			},
+			colors: ['#26b99a'],
+			title: {
+				align: 'left',
+				text: title
+			},
+			accessibility: {
+				announceNewData: {
+					enabled: true
+				}
+			},
+			xAxis: {
+				type: 'category'
+			},
+			yAxis: {
+				title: {
+					text: 'Tahun 2022'
+				}
+			},
+			legend: {
+				enabled: false
+			},
+			plotOptions: {
+				series: {
+					borderWidth: 0,
+					dataLabels: {
+						enabled: true,
+						//format: '{point.y:.0f}',
+						formatter: function (e) {
+							return 'Rp. ' + formatAngka(this.y);
+						},
+					}
+				}
+			},
+			tooltip: {
+				//headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+				//pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+				pointFormat: '<b>{point.y:.0f}</b>'
+			},
+			series: [
+				{
+					//name: "Browsers",
+					colorByPoint: true,
+					data: seriesData,
+					//data: [
+					//	{ name: 'Jawa', y: 380061078164 },
+					//	{ name: 'Jawa Barat', y: 380061078164 },
+					//],
+				}
+			],
+		});
+	}
+
+	function loadBarChartV3(seriesData, containerId, title) {
+		Highcharts.chart(containerId, {
+			chart: {
+				type: 'bar'
+			},
+			colors: ['#26b99a'],
+			title: {
+				align: 'left',
+				text: title
+			},
+			accessibility: {
+				announceNewData: {
+					enabled: true
+				}
+			},
+			xAxis: {
+				type: 'category'
+			},
+			yAxis: {
+				title: {
+					text: 'Tahun 2022'
+				}
+			},
+			legend: {
+				enabled: false
+			},
+			plotOptions: {
+				series: {
+					borderWidth: 0,
+					dataLabels: {
+						enabled: true,
+						//format: '{point.y:.0f}',
+						formatter: function (e) {
+							return formatAngka(this.y);
+						},
+					}
+				}
+			},
+			tooltip: {
+				//headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+				//pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+				pointFormat: '<b>{point.y:.0f}</b>'
+			},
+			series: [
+				{
+					//name: "Browsers",
+					colorByPoint: true,
+					data: seriesData,
+					//data: [
+					//	{ name: 'Jawa', y: 380061078164 },
+					//	{ name: 'Jawa Barat', y: 380061078164 },
+					//],
+				}
+			],
+		});
+	}
+
+	function formatAngka(data) {
+		if (data === undefined) {
+			return '';
+		}
+		let formattedString = formatangka(data);
+		if (formattedString == 'null') {
+			return '';
+		}
+		return formattedString;
+	}
+
+
+</script>
