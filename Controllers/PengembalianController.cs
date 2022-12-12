@@ -93,8 +93,8 @@ namespace Pnbp.Controllers
                 if (!String.IsNullOrEmpty(SetoranPnbp) && SetoranPnbp.ToLower() == "undefined") SetoranPnbp = "";
                 if (!String.IsNullOrEmpty(JumlahBayar) && JumlahBayar.ToLower() == "undefined") JumlahBayar = "";
 
-                string pegawaiId = (HttpContext.User.Identity as InternalUserIdentity).PegawaiId;
-                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string pegawaiId = new Pnbp.Codes.Functions().claimUser().PegawaiId;
+                string kantorId = new Pnbp.Codes.Functions().claimUser().KantorId;
                 Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
                 string tipe = OtorisasiUser.GetJenisKantorUser();
 
@@ -284,7 +284,7 @@ namespace Pnbp.Controllers
                 Formatting boldRegular = new Formatting();
                 boldRegular.Bold = true;
 
-                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string kantorId = new Pnbp.Codes.Functions().claimUser().KantorId;
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
                 Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
                 string tipe = OtorisasiUser.GetJenisKantorUser();
@@ -440,7 +440,7 @@ namespace Pnbp.Controllers
                 boldRegular.Bold = true;
                 Formatting normalRegular = new Formatting();
 
-                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string kantorId = new Pnbp.Codes.Functions().claimUser().KantorId;
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
                 Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
                 string namaPegawai = "";
@@ -517,7 +517,7 @@ namespace Pnbp.Controllers
                 Formatting boldRegular = new Formatting();
                 boldRegular.Bold = true;
 
-                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string kantorId = new Pnbp.Codes.Functions().claimUser().KantorId;
                 string kotaKantor = pengembalianmodel.GetKotaKantorById(kantorId);
                 Pegawai pegawai = pengembalianmodel.GetKepalaKantor(kantorId);
                 string namaPegawai = "";
@@ -1183,10 +1183,11 @@ namespace Pnbp.Controllers
                 //return Json(form, JsonRequestBehavior.AllowGet);
                 var ctx = new PnbpContext();
                 PnbpContext db = new PnbpContext();
-                string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-                string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-                string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-                string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                string kantoriduser = userIdentity.KantorId;
+                string namakantor = userIdentity.NamaKantor;
+                string pegawaiid = userIdentity.PegawaiId;
+                string namapegawai = userIdentity.NamaPegawai;
 
                 var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
 
@@ -2882,7 +2883,7 @@ namespace Pnbp.Controllers
                 data.PERMOHONANPENGEMBALIAN = data.PERMOHONANPENGEMBALIAN.Replace(".", String.Empty);
             }
 
-            var userIdentity = (HttpContext.User.Identity as Entities.InternalUserIdentity);
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
             string userid = userIdentity.UserId;
             string kantoriduser = userIdentity.KantorId;
             string pegawaiid = userIdentity.PegawaiId;
@@ -3183,7 +3184,7 @@ namespace Pnbp.Controllers
         {
             CommonResponse response = new CommonResponse() { Success = false, Message = "" };
 
-            string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+            string kantorid = new Pnbp.Codes.Functions().claimUser().KantorId;
             var noberkas = (form.AllKeys.Contains("noberkas") ? form["noberkas"] : "");
 
             if (string.IsNullOrEmpty(noberkas))
@@ -3351,7 +3352,7 @@ namespace Pnbp.Controllers
             }
 
             HakAksesModel model = new HakAksesModel();
-            string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            string kantoriduser = new Pnbp.Codes.Functions().claimUser().KantorId;
             int tipekantor = model.GetTipeKantor(kantoriduser);
 
             ViewBag.PreviewMode = "FALSE";
@@ -4052,10 +4053,10 @@ namespace Pnbp.Controllers
                 var fileid9 = ((form.AllKeys.Contains("fileid9")) ? form["fileid9"] : "");
                 var fileid10 = ((form.AllKeys.Contains("fileid10")) ? form["fileid10"] : "");
                 var fileid11 = ((form.AllKeys.Contains("fileid11")) ? form["fileid11"] : "");
-                string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-                string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-                string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-                string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+                string kantoriduser = new Pnbp.Codes.Functions().claimUser().KantorId;
+                string namakantor = new Pnbp.Codes.Functions().claimUser().NamaKantor;
+                string pegawaiid = new Pnbp.Codes.Functions().claimUser().PegawaiId;
+                string namapegawai = new Pnbp.Codes.Functions().claimUser().NamaPegawai;
 
                 var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
                 var AtasNama = ((form.AllKeys.Contains("NamaPemohon")) ? form["NamaPemohon"] : "");
@@ -4586,10 +4587,10 @@ namespace Pnbp.Controllers
                 var ctx = new PnbpContext();
                 PnbpContext db = new PnbpContext();
                 var pengembalianid = ((form.AllKeys.Contains("pengembalianpnbpid")) ? form["pengembalianpnbpid"] : "");
-                string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
-                string namakantor = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaKantor;
-                string pegawaiid = (HttpContext.User.Identity as Entities.InternalUserIdentity).PegawaiId;
-                string namapegawai = (HttpContext.User.Identity as Entities.InternalUserIdentity).NamaPegawai;
+                string kantoriduser = new Pnbp.Codes.Functions().claimUser().KantorId;
+                string namakantor = new Pnbp.Codes.Functions().claimUser().NamaKantor;
+                string pegawaiid = new Pnbp.Codes.Functions().claimUser().PegawaiId;
+                string namapegawai = new Pnbp.Codes.Functions().claimUser().NamaPegawai;
 
                 var NomorBerkas = ((form.AllKeys.Contains("NomorBerkas")) ? form["NomorBerkas"] : "");
                 var AtasNama = ((form.AllKeys.Contains("NamaPemohon")) ? form["NamaPemohon"] : "");
@@ -4814,7 +4815,7 @@ namespace Pnbp.Controllers
             //SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
             //List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
-            //string kantoriduser = (HttpContext.User.Identity as Entities.InternalUserIdentity).KantorId;
+            //string kantoriduser = new Pnbp.Codes.Functions().claimUser().KantorId;
             //int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
             //ViewData["tipekantorid"] = Convert.ToString(tipekantorid);

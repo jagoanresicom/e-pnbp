@@ -437,7 +437,7 @@ namespace Pnbp.Controllers
         public ActionResult ExportBelanja(string pTahun)
         {
             {
-                string kantorid = (User as Entities.InternalUserIdentity).KantorId;
+                string kantorid = new Pnbp.Codes.Functions().claimUser().KantorId;
                 string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
 
                 PnbpContext db = new PnbpContext();

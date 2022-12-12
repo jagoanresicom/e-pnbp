@@ -84,7 +84,7 @@
 
 <form class="form-horizontal" method="post" enctype="multipart/form-data" id="pengembalian_form" action="@Url.Action("PengajuanPengembalianDetailPusat", "Pengembalian")">
 
-	<input type="hidden" name="satker" id="satker" value="@((User as Pnbp.Entities.InternalUserIdentity).NamaKantor.Replace("Kantor Pertanahan", ""))" />
+	<input type="hidden" name="satker" id="satker" value="@((new Pnbp.Codes.Functions().claimUser()).NamaKantor.Replace("Kantor Pertanahan", ""))" />
 
 	<div class="" id="dynamic_content">
 

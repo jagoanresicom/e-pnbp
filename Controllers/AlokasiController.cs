@@ -1524,7 +1524,7 @@ namespace Pnbp.Controllers
             }
             else 
             {
-                string kantorId = (HttpContext.User.Identity as InternalUserIdentity).KantorId;
+                string kantorId = new Pnbp.Codes.Functions().claimUser().KantorId;
                 satker satker = _manfaatanModel.GetSatkerByKantorId(kantorId);
                 string currentYear = DateTime.Now.Year.ToString();
                 result = alm.GetSummaryAlokasiDaerah(currentYear, satker.kode);
