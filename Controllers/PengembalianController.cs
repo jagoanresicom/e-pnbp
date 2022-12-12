@@ -638,8 +638,6 @@ namespace Pnbp.Controllers
             SatuanKerjaModel mdlSatker = new SatuanKerjaModel();
             List<SatuanKerja> result = mdlSatker.ListSatuanKerja();
 
-            List<Entities.GetSatkerList> result = pengembalianmodel.GetSatker();
-
             string kantoriduser = userIdentity.KantorId;
             int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
 
