@@ -936,8 +936,8 @@ namespace Pnbp.Models
                             if (isSuccessProccessMove)
                             {
                                 string qSimpanBelanjaSatker = $@"
-                                    INSERT INTO REALISASISATKERSUMMARY(ALOKASISATKERSUMMARYid,amount,kdsatker)
-	                                select '{getLastAlokasiSummary.AlokasiSatkerSummaryId}',sum(amount), kdsatker from span_realisasi
+                                    INSERT INTO REALISASISATKERSUMMARY(ALOKASISATKERSUMMARYid,amount,kdsatker,tglakhir)
+                                 select '{getLastAlokasiSummary.AlokasiSatkerSummaryId}',sum(amount), kdsatker, max(to_date(tanggal, 'DD/MON/RR','NLS_DATE_LANGUAGE=AMERICAN')) from span_realisasi
                                         where 
                                     SUMBERDANA  = 'D'
                                     AND tahun = extract(year from sysdate)
@@ -996,8 +996,8 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
                 isProcessAlokasiSuccess = false;
-                _ = e.StackTrace;
                 trx.Rollback();
             }
 

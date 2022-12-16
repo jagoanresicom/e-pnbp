@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -85,5 +86,20 @@ namespace Pnbp.Codes
 
             return userlogin;
         }
+
+        public class Logging
+        {
+            public void LogEvent(string logMessage)
+            {
+                EventLogEntryType logEntryType = EventLogEntryType.Error;
+
+                using (EventLog eventLog = new EventLog("Application"))
+                {
+                    eventLog.Source = "Application";
+                    eventLog.WriteEntry(logMessage, logEntryType, 101, 1);
+                }
+            }
+        }
+
     }
 }
