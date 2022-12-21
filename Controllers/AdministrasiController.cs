@@ -763,7 +763,7 @@ namespace Pnbp.Controllers
                     KODESATKER,
                     NAMAKANTOR,
                     NAMAPROSEDUR,
-                    NOMORBERKAS,
+                    NVL(NOMORBERKAS,-999) NOMORBERKAS,
                     TAHUNBERKAS,
                     JENISPENERIMAAN,
                     KODEPENERIMAAN,
@@ -870,7 +870,10 @@ namespace Pnbp.Controllers
                     cell = rowBody.CreateCell(3);
                     cell.SetCellValue(rw.namaprosedur);
                     cell = rowBody.CreateCell(4);
-                    cell.SetCellValue(rw.nomorberkas);
+                    if (rw.nomorberkas == -999)
+                        cell.SetCellValue("");
+                    else
+                        cell.SetCellValue(rw.nomorberkas);
                     cell = rowBody.CreateCell(5);
                     cell.SetCellValue(rw.tahun);
                     cell = rowBody.CreateCell(6);
