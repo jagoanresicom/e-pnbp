@@ -15,11 +15,14 @@ namespace Pnbp.Controllers
         //
         // GET: /Account/
 
+        #if DEBUG
         public ActionResult Index()
         {
             return View();
         }
-
+        #endif
+        
+        #if DEBUG
         public ActionResult Login(Models.LoginModel model, string returnUrl)
         {
             if (ModelState.IsValid)
@@ -55,6 +58,7 @@ namespace Pnbp.Controllers
             // If we got this far, something failed, redisplay form
             return View("Index");
         }
+        #endif
 
         private ActionResult SetupFormsAuthTicket(string userName, bool persistanceFlag, string returnUrl)
         {
@@ -148,15 +152,19 @@ namespace Pnbp.Controllers
 
         }
 
+        #if DEBUG
         public ActionResult ForgotPassword()
         {
             return View();
         }
+        #endif
 
+        #if DEBUG
         public ActionResult Register()
         {
             return View();
         }
+        #endif
 
         //public ActionResult LogOff()
         //{
@@ -185,6 +193,7 @@ namespace Pnbp.Controllers
 
         }
 
+        #if DEBUG
         public ActionResult SetKantor(SelectOffice m)
         {
             string username = m.UserName;
@@ -250,6 +259,7 @@ namespace Pnbp.Controllers
 
             return RedirectToAction("BerandaPenerimaan", "Penerimaan");
         }
+        #endif
     }
 }
 
