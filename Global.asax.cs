@@ -14,6 +14,7 @@ namespace Pnbp
     {
         protected void Application_Start()
         {
+            MvcHandler.DisableMvcResponseHeader = true;
             AreaRegistration.RegisterAllAreas();
 
             RouteConfig.RegisterRoutes(RouteTable.Routes);
