@@ -1065,6 +1065,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult pn_provinsi_list(DatatablesRequest req, string tahun, string bulan, string satker, string provinsi)
         {
 
@@ -1142,6 +1143,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult pn_satker_list(DatatablesRequest req, string tahun, string bulan, string satker, string propinsi)
         {
 
@@ -1221,6 +1223,7 @@ namespace Pnbp.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult pn_layanan_list(DatatablesRequest req, string tahun, string bulan, string pid, string layanan)
         {
             var userIdentity = new Pnbp.Codes.Functions().claimUser();

@@ -49,6 +49,7 @@
 				<div class="x_content">
 
 					<form class="form-horizontal form-label-left" id="js-frm-pencarian" role="form" method="post" enctype="multipart/form-data">
+						@Html.AntiForgeryToken()
 						<div class="row">
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
@@ -161,7 +162,7 @@
 			"scrollX": false,
             "ajax": {
 			    url: '@Url.Action("rl_provinsi_list", "Pemanfaatan")',
-                type: "POST",
+				type: "POST",
 			    data: function (data, obj) {
                     var ftp = frmPencarian.serializeArray();
                     data.form = ftp;

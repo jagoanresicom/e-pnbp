@@ -1129,6 +1129,7 @@ namespace Pnbp.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult rl_kro_list(int? start, Entities.FindManfaat f, string KantorId, string kodeKRO, string tahun)
         {
             int recNumber = start ?? 0;
@@ -1187,6 +1188,7 @@ namespace Pnbp.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult rl_satker_list(int? start, Entities.FindManfaat f, int length, string tahun, string satker, string WilayahId)
         {
             int recNumber = start ?? 0;
@@ -1258,6 +1260,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult rl_provinsi_list(int? start, Entities.FindManfaat f, int length, string tahun, string bulan, string satker, string provinsi)
         {
             int recNumber = start ?? 0;
