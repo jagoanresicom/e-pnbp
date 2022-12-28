@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using Newtonsoft.Json.Linq;
+using NPOI.HSSF.Record;
 using Oracle.ManagedDataAccess.Client;
 using Pnbp.Entities;
 
@@ -2038,6 +2041,304 @@ namespace Pnbp.Models
             return tr;
         }
 
+        public TransactionResult InsertLogPengajuanPengembalianDaerah(string pengembalianid, string log_id, string pegawaiid, string urlpengembalian, string kantoriduser)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES (:log_id, 'Pengajuan Pengembalian PNBP Disimpan', :pegawaiid, SYSDATE, :urlpengembalian, :kantoriduser, :pengembalianid)";
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("log_id", log_id));
+                        lstParams.Add(new OracleParameter("pegawaiid", pegawaiid));
+                        lstParams.Add(new OracleParameter("urlpengembalian", urlpengembalian));
+                        lstParams.Add(new OracleParameter("kantoriduser", kantoriduser));
+                        lstParams.Add(new OracleParameter("pengembalianid", pengembalianid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+
+        public TransactionResult UpdatePengembalianBelumKirim(string pengembalianid, string AtasNama, string Status, string namakantor, string pegawaiid, string NPWP)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "UPDATE PENGEMBALIANPNBP SET NAMAPEGAWAIPENGAJU= :AtasNama , STATUSPENGEMBALIAN= :Status,NAMAKANTOR= :namakantor,PEGAWAIIDPENGAJU= :pegawaiid,NPWPPEGAWAIPENGAJU= :NPWP WHERE PENGEMBALIANPNBPID =  :pengembalianid";
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("Status", Status));
+                        lstParams.Add(new OracleParameter("namakantor", namakantor));
+                        lstParams.Add(new OracleParameter("pegawaiid", pegawaiid));
+                        lstParams.Add(new OracleParameter("NPWP", NPWP));
+                        lstParams.Add(new OracleParameter("pengembalianid", pengembalianid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+        
+        public TransactionResult UpdateBerkasKembalianBelumKirim(string pengembalianid, string BiayaLayanan, string NomorRekening, string NamaBank, string NamaRekening, string npwpberkas, string NomorSurat, string SetoranPnbp, string PermohonanPengembalian)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "UPDATE BERKASKEMBALIAN SET JUMLAHBAYAR = :BiayaLayanan, NOMORREKENING = :NomorRekening, NAMABANK = :NamaBank, NAMAREKENING = :NamaRekening, NPWP = :npwpberkas, NOMORSURAT = :NomorSurat, SETORANPNBP = :SetoranPnbp, PERMOHONANPENGEMBALIAN = :PermohonanPengembalian WHERE PENGEMBALIANPNBPID = :pengembalianid";
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("BiayaLayanan", BiayaLayanan));
+                        lstParams.Add(new OracleParameter("NomorRekening", NomorRekening));
+                        lstParams.Add(new OracleParameter("NamaBank", NamaBank));
+                        lstParams.Add(new OracleParameter("NamaRekening", NamaRekening));
+                        lstParams.Add(new OracleParameter("npwpberkas", npwpberkas));
+                        lstParams.Add(new OracleParameter("NomorSurat", NomorSurat));
+                        lstParams.Add(new OracleParameter("SetoranPnbp", SetoranPnbp));
+                        lstParams.Add(new OracleParameter("PermohonanPengembalian", PermohonanPengembalian));
+                        lstParams.Add(new OracleParameter("pengembalianid", pengembalianid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public TransactionResult UpdatePengembalianPnbp(string AtasNama, string Status, string namakantor, string pegawaiid, string NPWP, string NomorTelepon, string pengembalianpnbpid)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "UPDATE PENGEMBALIANPNBP SET NAMAPEGAWAIPENGAJU= :AtasNama , STATUSPENGEMBALIAN= :Status,NAMAKANTOR= :namakantor,PEGAWAIIDPENGAJU= :pegawaiid,NPWPPEGAWAIPENGAJU= :NPWP, NOMORTELEPON =  :NomorTelepon WHERE PENGEMBALIANPNBPID =  :pengembalianpnbpid"; ;
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("AtasNama", AtasNama));
+                        lstParams.Add(new OracleParameter("Status", Status));
+                        lstParams.Add(new OracleParameter("namakantor", namakantor));
+                        lstParams.Add(new OracleParameter("pegawaiid", pegawaiid));
+                        lstParams.Add(new OracleParameter("NPWP", NPWP));
+                        lstParams.Add(new OracleParameter("NomorTelepon", NomorTelepon));
+                        lstParams.Add(new OracleParameter("pengembalianpnbpid", pengembalianpnbpid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public TransactionResult UpdateBerkasKembalianPnbp(string BiayaLayanan, string NomorRekening, string NamaBank, string NamaRekening, string npwpberkas, string NomorSurat, string SetoranPnbp, string PermohonanPengembalian, string pengembalianpnbpid)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "UPDATE BERKASKEMBALIAN SET JUMLAHBAYAR= :BiayaLayanan,NOMORREKENING= :NomorRekening,NAMABANK= :NamaBank,NAMAREKENING= :NamaRekening,NPWP= :npwpberkas,NOMORSURAT= :NomorSurat,SETORANPNBP= :SetoranPnbp,PERMOHONANPENGEMBALIAN= :PermohonanPengembalian WHERE PENGEMBALIANPNBPID= :pengembalianpnbpid"; ;
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("BiayaLayanan", BiayaLayanan));
+                        lstParams.Add(new OracleParameter("NomorRekening", NomorRekening));
+                        lstParams.Add(new OracleParameter("NamaBank", NamaBank));
+                        lstParams.Add(new OracleParameter("NamaRekening", NamaRekening));
+                        lstParams.Add(new OracleParameter("npwpberkas", npwpberkas));
+                        lstParams.Add(new OracleParameter("NomorSurat", NomorSurat));
+                        lstParams.Add(new OracleParameter("SetoranPnbp", SetoranPnbp));
+                        lstParams.Add(new OracleParameter("PermohonanPengembalian", PermohonanPengembalian));
+                        lstParams.Add(new OracleParameter("pengembalianpnbpid", pengembalianpnbpid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public TransactionResult InsertLogAktivitasPengembalianDisimpan(string log_id, string pegawaiid, string url, string kantoriduser, string pengembalianid)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ( :log_id, 'Pengajuan Pengembalian PNBP Disimpan',  :pegawaiid, SYSDATE,  :url,  :kantoriduser,  :pengembalianid)";;
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("log_id", log_id));
+                        lstParams.Add(new OracleParameter("pegawaiid", pegawaiid));
+                        lstParams.Add(new OracleParameter("url", url));
+                        lstParams.Add(new OracleParameter("kantoriduser", kantoriduser));
+                        lstParams.Add(new OracleParameter("pengembalianid", pengembalianid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                                finally
+                                {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
+        public TransactionResult InsertLogAktivitasPengembalianDikirim(string log_id, string pegawaiid, string url, string kantoriduser, string pengembalianid)
+        {
+            TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
+
+            using (var ctx = new PnbpContext())
+            {
+                using (System.Data.Entity.DbContextTransaction tc = ctx.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        string sql = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ( :log_id, 'Pengajuan Pengembalian PNBP Dikirim',  :pegawaiid, SYSDATE,  :url,  :kantoriduser,  :pengembalianid)";;
+
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("log_id", log_id));
+                        lstParams.Add(new OracleParameter("pegawaiid", pegawaiid));
+                        lstParams.Add(new OracleParameter("url", url));
+                        lstParams.Add(new OracleParameter("kantoriduser", kantoriduser));
+                        lstParams.Add(new OracleParameter("pengembalianid", pengembalianid));
+
+                        ctx.Database.ExecuteSqlCommand(sql, lstParams.ToArray());
+
+                        tc.Commit();
+                        tr.Status = true;
+                        tr.Pesan = "Data berhasil disimpan";
+                    }
+                    catch (Exception ex)
+                    {
+                        tc.Rollback();
+                        tr.Pesan = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        tc.Dispose();
+                        ctx.Dispose();
+                    }
+                }
+            }
+
+            return tr;
+        }
+
         public TransactionResult UpdateLampiranKembalian(LampiranKembalian data)
         {
             TransactionResult tr = new TransactionResult() { Status = false, Pesan = "" };
@@ -2364,14 +2665,15 @@ namespace Pnbp.Models
         {
             Entities.LampiranKembalianTrain data = new Entities.LampiranKembalianTrain();
             ArrayList arrayListParameters = new ArrayList();
-            string query = @"SELECT * 
-                                FROM LAMPIRANKEMBALIAN WHERE UPPER(TIPEFILE) LIKE UPPER('%" + tipefile + "%') AND PENGEMBALIANPNBPID ='" + pengembalianpnbpid + "'";
+            string query = @"SELECT * FROM LAMPIRANKEMBALIAN WHERE UPPER(TIPEFILE) LIKE UPPER('%'||:tipeFile||'%') AND PENGEMBALIANPNBPID = :pengembalianpnbpid";
             query = sWhitespace.Replace(query, " ");
 
             using (var ctx = new PnbpContext())
             {
-                object[] parameters = arrayListParameters.OfType<object>().ToArray();
-                data = ctx.Database.SqlQuery<Entities.LampiranKembalianTrain>(query, parameters).FirstOrDefault();
+                List<object> lstParams = new List<object>();
+                lstParams.Add(new OracleParameter("tipefile", tipefile));
+                lstParams.Add(new OracleParameter("pengembalianpnbpid", pengembalianpnbpid));
+                data = ctx.Database.SqlQuery<Entities.LampiranKembalianTrain>(query, lstParams.ToArray()).FirstOrDefault();
             }
             return data;
         }
