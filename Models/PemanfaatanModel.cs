@@ -1504,11 +1504,11 @@ namespace Pnbp.Models
 
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
-            if (!String.IsNullOrEmpty(provinsi))
-            {
-                query += " and lower(prov.nama) like '%'||:param5||'%' ";
-                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
-            }
+            //if (!String.IsNullOrEmpty(provinsi))
+            //{
+            //    query += " and lower(prov.nama) like '%'||:param5||'%' ";
+            //    lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("param5", provinsi.ToLower()));
+            //}
 
             try
             {
