@@ -1067,7 +1067,7 @@ namespace Pnbp.Controllers
             Entities.FindManfaat fn = new Entities.FindManfaat();
             fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
-            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            fn.tahun = DateTime.Now.Year.ToString();
 
             if (!String.IsNullOrEmpty(pid))
             {
@@ -1095,7 +1095,7 @@ namespace Pnbp.Controllers
             Entities.FindManfaat fn = new Entities.FindManfaat();
             fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
-            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            fn.tahun = DateTime.Now.Year.ToString();
             return View(fn);
         }
 
@@ -1115,7 +1115,7 @@ namespace Pnbp.Controllers
             Entities.FindManfaat fn = new Entities.FindManfaat();
             fn.UserKaBiroPerencanaan = (indexKaBiroPerencanaan == -1) ? false : true;
             fn.UserKaBiroKeuangan = (indexKaBiroKeuangan == -1) ? false : true;
-            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            fn.tahun = DateTime.Now.Year.ToString();
 
             if (!String.IsNullOrEmpty(pid))
             {
@@ -1137,7 +1137,7 @@ namespace Pnbp.Controllers
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
-            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : DateTime.Now.Year.ToString();
             string kodesatker = f.KodeSatker;
             string namasatker = f.NamaSatker;
             string namaprogram = f.NamaProgram;

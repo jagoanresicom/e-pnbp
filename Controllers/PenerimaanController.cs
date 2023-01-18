@@ -1015,7 +1015,7 @@ namespace Pnbp.Controllers
 
             //ViewData["get_propinsi"] = get_propinsi;
             Entities.FilterPenerimaan fn = new Entities.FilterPenerimaan();
-            fn.tahun = ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            fn.tahun = DateTime.Now.Year.ToString();
 
             return View(fn);
         }
@@ -1036,8 +1036,8 @@ namespace Pnbp.Controllers
             }
 
             Entities.FilterPenerimaan fn = new Entities.FilterPenerimaan();
-            fn.tahun = string.IsNullOrEmpty(tahun) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : tahun;
-            fn.bulan = string.IsNullOrEmpty(bulan) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : bulan;
+            fn.tahun = string.IsNullOrEmpty(tahun) ? DateTime.Now.Year.ToString() : tahun;
+            fn.bulan = string.IsNullOrEmpty(bulan) ? DateTime.Now.Month.ToString() : bulan;
             //return Json(get_propinsi, JsonRequestBehavior.AllowGet);
 
             return View(fn);
@@ -1058,8 +1058,8 @@ namespace Pnbp.Controllers
             }
 
             Entities.FilterPenerimaan fn = new Entities.FilterPenerimaan();
-            fn.tahun = string.IsNullOrEmpty(tahun) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : tahun;
-            fn.bulan = string.IsNullOrEmpty(bulan) ? ConfigurationManager.AppSettings["TahunAnggaran"].ToString() : bulan;
+            fn.tahun = string.IsNullOrEmpty(tahun) ? DateTime.Now.Year.ToString() : tahun;
+            fn.bulan = string.IsNullOrEmpty(bulan) ? DateTime.Now.Month.ToString() : bulan;
 
             return View(fn);
         }
