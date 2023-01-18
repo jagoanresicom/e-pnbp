@@ -1191,12 +1191,34 @@ namespace Pnbp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult rl_satker_list(int? start, Entities.FindManfaat f, int length, string tahun, string satker, string WilayahId)
         {
+            #region sanitize input
+            var reqTahun = DateTime.Now.Year.ToString();
+            if (!string.IsNullOrEmpty(tahun))
+            {
+                int parseResultTahun = 0;
+                Int32.TryParse(tahun, out parseResultTahun);
+                if (parseResultTahun != 0)
+                {
+                    reqTahun = tahun;
+                }
+            }
+
+            if (!String.IsNullOrEmpty(WilayahId) && WilayahId.Length != 32)
+            {
+                WilayahId = "";
+            }
+
+            if (!String.IsNullOrEmpty(satker) && satker.Contains("(")) 
+            {
+                satker = satker.Replace("(", " ");
+            }
+            #endregion sanitize input
+
             int recNumber = start ?? 0;
             int RecordsPerPage = length;
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
-            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
             string kodesatker = f.KodeSatker;
             string namaprogram = f.NamaProgram;
             decimal? nilaianggaran = f.NilaiAnggaran;

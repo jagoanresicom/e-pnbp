@@ -100,29 +100,6 @@
             }
         });
 
-        $("#find-btn").on("click", function (e) {
-            let tahun = $("#tahun").val(),
-                bulan = $('#bulan').val(),
-                kodeSpopp = $('#pelayanan').val(),
-                satker = $('#satker').val();
-
-			if (tahun === '') {
-				getSummaryAlokasi();
-			} else {
-				$.ajax({
-					type: "GET",
-					url: '@Url.Action("SummaryAlokasi", "Alokasi")' + '?tahun=' + tahun,
-					success: function (res) {
-						writeDataTableSummary(res);
-					},
-					error: function (XMLHttpRequest, textStatus, errorThrown) { }
-				});
-			}
-
-            e.preventDefault();
-            return false;
-        });
-
         $('#propinsi').change(function () {
             var provinsi = $('#propinsi').val()
                 $.ajax({

@@ -1509,6 +1509,14 @@ namespace Pnbp.Controllers
 
         public ActionResult SummaryAlokasi(string tahun)
         {
+            if (!string.IsNullOrEmpty(tahun)) {
+                int parseResultTahun = 0;
+                Int32.TryParse(tahun, out parseResultTahun);
+                if (parseResultTahun == 0) {
+                    throw new Exception("Tahun tidak valid");
+                }
+            }
+
             string jenisKantorUser = OtorisasiUser.GetJenisKantorUser();
 
             var alm = new Models.AlokasiModel();
@@ -1528,7 +1536,7 @@ namespace Pnbp.Controllers
                 satker satker = _manfaatanModel.GetSatkerByKantorId(kantorId);
                 string currentYear = DateTime.Now.Year.ToString();
                 result = alm.GetSummaryAlokasiDaerah(currentYear, satker.kode);
-                if (result != null)
+                if (result != null && result.Count > 0)
                 {
                     result[result.Count - 1].Belanja = alm.GetCurrentYearRealisasi(satker.kode);
                 }
