@@ -213,6 +213,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessDeniedAuthorizeAttribute.cs" />
+    <Content Include="NotFound.aspx" />
+    <Content Include="Error.aspx" />
     <Compile Include="Codes\Functions.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiController.cs" />
