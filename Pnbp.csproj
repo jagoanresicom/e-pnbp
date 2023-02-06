@@ -253,6 +253,7 @@
     <Compile Include="Models\Entities\SatuanKerja.cs" />
     <Compile Include="Models\Entities\TargetEntity.cs" />
     <Compile Include="Models\Entities\TipeManfaat.cs" />
+    <Compile Include="Models\Entities\FilterRecordResponseEntity.cs" />
     <Compile Include="Models\SatuanKerjaModel.cs" />
     <Compile Include="Models\KodeSpanModel.cs" />
     <Compile Include="Models\KontentModel.cs" />

@@ -979,7 +979,7 @@ namespace Pnbp.Models
             return records;
         }
 
-        public List<Entities.BelanjaKRO> rl_kro(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to, string kantorId, string kodeKRO)
+        public List<Entities.BelanjaKRO> rl_kro(string tahun, int from, int to, string kantorId, string kodeKRO)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
 
@@ -1000,7 +1000,7 @@ namespace Pnbp.Models
 	                                    join SATKER s on s.KODESATKER = sr.KDSATKER 
 		                            where SUMBERDANA  = 'D'
 		                                and sr.tahun = :tahun
-{qKantor}
+                                        {qKantor}
 		                            group by (kegiatan, output)
 	                            )
 	                            SELECT 
@@ -1045,15 +1045,22 @@ namespace Pnbp.Models
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+                using (var ctx = new PnbpContext())
+                {
+                    records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+                }
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return records;
         }
 
-        public Entities.DaftarTotal rl_kro_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, string kantorId, string kodeKRO)
+        public Entities.DaftarTotal rl_kro_sum(string tahun, string kantorId, string kodeKRO)
         {
             Entities.DaftarTotal result = null;
             List<object> lstParams = new List<object>();
@@ -1091,13 +1098,13 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
         }
 
-        public List<Entities.BelanjaKRO> rl_satker(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, int from, int to, string wilayahId)
+        public List<Entities.BelanjaKRO> rl_satker(string tahun, string namasatker, int from, int to, string wilayahId)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
 
@@ -1156,15 +1163,22 @@ namespace Pnbp.Models
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+                using (var ctx = new PnbpContext())
+                {
+                    records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+                }
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return records;
         }
 
-        public Entities.DaftarTotal rl_satker_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, bool statusrevisi, string wilayahId)
+        public Entities.DaftarTotal rl_satker_sum(string tahun, string wilayahId)
         {
             Entities.DaftarTotal result = null;
             List<object> lstParams = new List<object>();
@@ -1209,13 +1223,13 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
         }
 
-        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, int from, int to, AlokasiSatkerSummary alskSummary)
+        public List<Entities.BelanjaKRO> rl_provinsi(string tahun, string provinsi, int from, int to)
         {
             List<Entities.BelanjaKRO> records = new List<Entities.BelanjaKRO>();
 
@@ -1300,9 +1314,16 @@ namespace Pnbp.Models
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+                using (var ctx = new PnbpContext())
+                {
+                    records = ctx.Database.SqlQuery<Entities.BelanjaKRO>(query, lstParams.ToArray()).ToList<Entities.BelanjaKRO>();
+                }
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return records;
@@ -1458,7 +1479,7 @@ namespace Pnbp.Models
             List<object> lstParams = new List<object>();
 
             string query = $@"
-                            SELECT 
+                            SELECT
                                 a.mp, max(a.revisi) revisi, a.tahun  
                             FROM 
                                 ALOKASISATKERSUMMARY a 
@@ -1469,15 +1490,22 @@ namespace Pnbp.Models
                             order by 
                                 mp desc";
 
-            using (var ctx = new PnbpContext())
+            try
             {
-                result = ctx.Database.SqlQuery<AlokasiSatkerSummary>(query, lstParams.ToArray()).FirstOrDefault();
+                using (var ctx = new PnbpContext())
+                {
+                    result = ctx.Database.SqlQuery<AlokasiSatkerSummary>(query, lstParams.ToArray()).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
         }
 
-        public Entities.DaftarTotal rl_provinsi_sum(string tahun, string kodesatker, string namasatker, string namaprogram, decimal? nilaianggaran, string provinsi, bool statusrevisi, AlokasiSatkerSummary alskSummary)
+        public Entities.DaftarTotal rl_provinsi_sum(string tahun)
         {
             Entities.DaftarTotal result = null;
             List<object> lstParams = new List<object>();
@@ -1519,7 +1547,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
@@ -1580,7 +1608,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
@@ -1612,7 +1640,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
@@ -1658,7 +1686,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return total;
@@ -1693,7 +1721,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
@@ -1738,7 +1766,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
@@ -1784,7 +1812,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return result;
@@ -2325,7 +2353,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                throw e;
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return userRoles.ToArray();

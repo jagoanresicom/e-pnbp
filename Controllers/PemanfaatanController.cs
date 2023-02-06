@@ -1146,50 +1146,67 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_kro(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to, KantorId, kodeKRO);
-
-            int custIndex = from;
-
-
-            decimal? total = 0;
-            if (result.Count > 0)
+            FilterRecordResponse response = new FilterRecordResponse()
             {
-                total = result[0].Total;
-            }
+                data = new List<dynamic>(),
+            };
 
-            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_kro_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, KantorId, kodeKRO);
-            AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
-            if (latestAlokasi != null)
+            try
             {
-                AlokasiSatkerSummary latestAlokasiProvinsi = _manfaatanModel.GetLatestAlokasiSatker(latestAlokasi.AlokasiSatkerSummaryId, KantorId);
-                daftarTotal.totalalokasi = latestAlokasiProvinsi.Alokasi;
-            }
+                List<BelanjaKRO> result = _manfaatanModel.rl_kro(reqTahun, from, to, KantorId, kodeKRO);
 
-            var dTableResult = result.Select(x =>
-            {
-                return new
+                int custIndex = from;
+
+
+                decimal? total = 0;
+                if (result.Count > 0)
                 {
-                    x.Alokasi,
-                    x.KRO,
-                    x.KantorId,
-                    x.KodeKRO,
-                    x.Total,
-                    x.WilayahId,
-                    x.RNumber,
-                    x.Pagu,
-                    x.Realisasi,
-                    daftarTotal.totalpagu,
-                    daftarTotal.totalalokasi,
-                };
-            });
+                    total = result[0].Total;
+                }
 
-            return Json(new { data = dTableResult, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+                DaftarTotal daftarTotal = _manfaatanModel.rl_kro_sum(reqTahun, KantorId, kodeKRO);
+                AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
+                if (latestAlokasi != null)
+                {
+                    AlokasiSatkerSummary latestAlokasiProvinsi = _manfaatanModel.GetLatestAlokasiSatker(latestAlokasi.AlokasiSatkerSummaryId, KantorId);
+                    daftarTotal.totalalokasi = latestAlokasiProvinsi.Alokasi;
+                }
+
+                var dTableResult = result.Select(x =>
+                {
+                    return new
+                    {
+                        x.Alokasi,
+                        x.KRO,
+                        x.KantorId,
+                        x.KodeKRO,
+                        x.Total,
+                        x.WilayahId,
+                        x.RNumber,
+                        x.Pagu,
+                        x.Realisasi,
+                        daftarTotal.totalpagu,
+                        daftarTotal.totalalokasi,
+                    };
+                });
+
+                response.data = dTableResult;
+                response.recordsTotal = result.Count;
+                response.recordsFiltered = total;
+                return Json(response, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+            }
+
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult rl_satker_list(int? start, Entities.FindManfaat f, int length, string tahun, string satker, string WilayahId)
+        public ActionResult rl_satker_list(int? start, FindManfaat f, int length, string tahun, string satker, string WilayahId)
         {
             #region sanitize input
             var reqTahun = DateTime.Now.Year.ToString();
@@ -1226,64 +1243,78 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_satker(reqTahun, kodesatker, satker, namaprogram, nilaianggaran, true, from, to, WilayahId);
+            FilterRecordResponse response = new FilterRecordResponse()
+            {
+                data = new List<dynamic>(),
+            };
 
-            //List<Entities.BelanjaKRO> resultSumList = _manfaatanModel.rl_satker_sum(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
+            try
+            {
+                List<BelanjaKRO> result = _manfaatanModel.rl_satker(reqTahun, satker, from, to, WilayahId);
 
-            //var resultSum = resultSumList.First();
+                //List<Entities.BelanjaKRO> resultSumList = _manfaatanModel.rl_satker_sum(tahun, kodesatker, namasatker, namaprogram, nilaianggaran, true, from, to);
 
-            //foreach (var item in result)
-            //{
+                //var resultSum = resultSumList.First();
+
+                //foreach (var item in result)
+                //{
                 //item.PersentaseAlokasi = ((item.Alokasi / resultSum.TotalAlokasi) * 100)?.ToString();
                 //var persenAlokasi = ((item.Pagu / resultSum.TotalPagu) * 100);
                 //item.PersentaseAlokasi = string.Format("{0:#,##0.##}", persenAlokasi) + " %"; ;
-            //}
+                //}
 
-            decimal? total = 0;
-            if (result.Count > 0)
-            {
-                total = result[0].Total;
-            }
-
-            //DaftarTotal daftarTotal = new DaftarTotal() { };
-            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_satker_sum(reqTahun, kodesatker, satker, namaprogram, nilaianggaran, true, WilayahId);
-            AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
-            if (latestAlokasi != null)
-            {
-                AlokasiSatkerSummary latestAlokasiProvinsi = _manfaatanModel.GetLatestAlokasiProvinsi(latestAlokasi.AlokasiSatkerSummaryId, WilayahId);
-                daftarTotal.totalalokasi = latestAlokasiProvinsi.Alokasi;
-            }
-            daftarTotal.totalrealisasi = _manfaatanModel.GetRealisasi(reqTahun, WilayahId);
-
-
-            var dTableResult = result.Select(x =>
-            {
-                //var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                //var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                return new
+                decimal? total = 0;
+                if (result.Count > 0)
                 {
-                    x.Alokasi,
-                    x.KRO,
-                    x.KantorId,
-                    x.KodeKRO,
-                    x.Total,
-                    x.WilayahId,
-                    x.RNumber,
-                    x.Pagu,
-                    x.Realisasi,
-                    daftarTotal.totalpagu,
-                    daftarTotal.totalalokasi,
-                    daftarTotal.totalrealisasi,
-                };
-            });
+                    total = result[0].Total;
+                }
 
-            return Json(new { data = dTableResult, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
-            //return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+                //DaftarTotal daftarTotal = new DaftarTotal() { };
+                DaftarTotal daftarTotal = _manfaatanModel.rl_satker_sum(reqTahun, WilayahId);
+                AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
+                if (latestAlokasi != null)
+                {
+                    AlokasiSatkerSummary latestAlokasiProvinsi = _manfaatanModel.GetLatestAlokasiProvinsi(latestAlokasi.AlokasiSatkerSummaryId, WilayahId);
+                    daftarTotal.totalalokasi = latestAlokasiProvinsi.Alokasi;
+                }
+                daftarTotal.totalrealisasi = _manfaatanModel.GetRealisasi(reqTahun, WilayahId);
+
+
+                var dTableResult = result.Select(x =>
+                {
+                    return new
+                    {
+                        x.Alokasi,
+                        x.KRO,
+                        x.KantorId,
+                        x.KodeKRO,
+                        x.Total,
+                        x.WilayahId,
+                        x.RNumber,
+                        x.Pagu,
+                        x.Realisasi,
+                        daftarTotal.totalpagu,
+                        daftarTotal.totalalokasi,
+                        daftarTotal.totalrealisasi,
+                    };
+                });
+
+                response.data = dTableResult;
+                response.recordsTotal = result.Count;
+                response.recordsFiltered = total;
+                return Json(response, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+            }
+
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult rl_provinsi_list(int? start, Entities.FindManfaat f, int length, string tahun, string bulan, string satker, string provinsi)
+        public ActionResult rl_provinsi_list(int? start, FindManfaat f, int length, string tahun, string provinsi)
         {
             int recNumber = start ?? 0;
             int RecordsPerPage = length;
@@ -1300,53 +1331,67 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            AlokasiSatkerSummary alskSummary = _manfaatanModel.GetLastAlokasiSatkerSummary();
-            List<Entities.BelanjaKRO> result = _manfaatanModel.rl_provinsi(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true, from, to, alskSummary);
-
-            decimal? totalrel = 0;
-            foreach (var item in result)
+            FilterRecordResponse response = new FilterRecordResponse()
             {
-                totalrel += item.Realisasi;
-            }
+                data = new List<dynamic>(),
+            };
 
-            decimal? total = 0;
-            if (result.Count > 0)
+            try
             {
-                total = result[0].Total;
-            }
 
-            //Entities.DaftarTotal daftarTotal = new DaftarTotal() { };
-            Entities.DaftarTotal daftarTotal = _manfaatanModel.rl_provinsi_sum(reqTahun, kodesatker, namasatker, namaprogram, nilaianggaran, provinsi, true, alskSummary);
-            AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
-            if (latestAlokasi != null)
-            {
-                daftarTotal.totalalokasi = latestAlokasi.Alokasi;
-            }
-            daftarTotal.totalrealisasi = _manfaatanModel.GetRealisasi(reqTahun);
+                //AlokasiSatkerSummary alskSummary = _manfaatanModel.GetLastAlokasiSatkerSummary();
+                List<BelanjaKRO> result = _manfaatanModel.rl_provinsi(reqTahun, provinsi, from, to);
 
-            var dTableResult = result.Select(x =>
-            {
-                //var penerimaan = x.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                //var jumlah = x.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                return new
+                decimal? totalrel = 0;
+                foreach (var item in result)
                 {
-                    x.Alokasi,
-                    x.KRO,
-                    x.KantorId,
-                    x.KodeKRO,
-                    x.Total,
-                    x.WilayahId,
-                    x.RNumber,
-                    x.Pagu,
-                    x.Realisasi,
-                    daftarTotal.totalpagu,
-                    daftarTotal.totalalokasi,
-                    daftarTotal.totalrealisasi,
-                };
-            });
+                    totalrel += item.Realisasi;
+                }
 
-            return Json(new { data = dTableResult, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
-            //return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+                decimal? total = 0;
+                if (result.Count > 0)
+                {
+                    total = result[0].Total;
+                }
+
+                DaftarTotal daftarTotal = _manfaatanModel.rl_provinsi_sum(reqTahun);
+                AlokasiSatkerSummary latestAlokasi = _manfaatanModel.GetLatestAlokasi(reqTahun);
+                if (latestAlokasi != null)
+                {
+                    daftarTotal.totalalokasi = latestAlokasi.Alokasi;
+                }
+                daftarTotal.totalrealisasi = _manfaatanModel.GetRealisasi(reqTahun);
+
+                var dTableResult = result.Select(x =>
+                {
+                    return new
+                    {
+                        x.Alokasi,
+                        x.KRO,
+                        x.KantorId,
+                        x.KodeKRO,
+                        x.Total,
+                        x.WilayahId,
+                        x.RNumber,
+                        x.Pagu,
+                        x.Realisasi,
+                        daftarTotal.totalpagu,
+                        daftarTotal.totalalokasi,
+                        daftarTotal.totalrealisasi,
+                    };
+                });
+
+                response.data = dTableResult;
+                response.recordsTotal = result.Count;
+                response.recordsFiltered = total;
+                return Json(response, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+            }
+
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
 
 
