@@ -3109,6 +3109,7 @@
     <Content Include="resources\js\id.js" />
     <Content Include="resources\js\infiniteScroll.js" />
     <Content Include="resources\js\jquery-1.10.2.js" />
+    <Content Include="resources\js\jquery-popover.min.js" />
     <Content Include="resources\js\jquery.blockUI.js" />
     <Content Include="resources\js\jquery.confirm.js" />
     <Content Include="resources\js\jquery.dataTables.min.js" />

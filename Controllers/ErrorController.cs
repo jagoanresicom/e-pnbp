@@ -11,6 +11,7 @@ namespace Pnbp.Controllers
 
         public ActionResult PageNotFound()
         {
+            Response.StatusCode = 404;
             return View();
         }
 

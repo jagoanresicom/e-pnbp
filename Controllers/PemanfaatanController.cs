@@ -1208,6 +1208,11 @@ namespace Pnbp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult rl_satker_list(int? start, FindManfaat f, int length, string tahun, string satker, string WilayahId)
         {
+            FilterRecordResponse response = new FilterRecordResponse()
+            {
+                data = new List<dynamic>(),
+            };
+
             #region sanitize input
             var reqTahun = DateTime.Now.Year.ToString();
             if (!string.IsNullOrEmpty(tahun))
@@ -1218,11 +1223,15 @@ namespace Pnbp.Controllers
                 {
                     reqTahun = tahun;
                 }
+                else
+                { 
+                    return Json(response, JsonRequestBehavior.AllowGet);
+                }
             }
 
             if (!String.IsNullOrEmpty(WilayahId) && WilayahId.Length != 32)
             {
-                WilayahId = "";
+                return Json(response, JsonRequestBehavior.AllowGet);
             }
 
             if (!String.IsNullOrEmpty(satker) && satker.Contains("(")) 
@@ -1242,11 +1251,6 @@ namespace Pnbp.Controllers
 
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
-
-            FilterRecordResponse response = new FilterRecordResponse()
-            {
-                data = new List<dynamic>(),
-            };
 
             try
             {
@@ -1316,6 +1320,11 @@ namespace Pnbp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult rl_provinsi_list(int? start, FindManfaat f, int length, string tahun, string provinsi)
         {
+            FilterRecordResponse response = new FilterRecordResponse()
+            {
+                data = new List<dynamic>(),
+            };
+
             int recNumber = start ?? 0;
             int RecordsPerPage = length;
             int from = recNumber + 1;
@@ -1330,11 +1339,6 @@ namespace Pnbp.Controllers
 
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
-
-            FilterRecordResponse response = new FilterRecordResponse()
-            {
-                data = new List<dynamic>(),
-            };
 
             try
             {
