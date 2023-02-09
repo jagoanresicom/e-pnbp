@@ -410,10 +410,12 @@ namespace Pnbp.Controllers
                         FROM
 	                        REKAPPENERIMAANDETAIL 
                         WHERE
-	                        TAHUN = '" + pTahun + "' AND ROWNUM <= 100000 ORDER BY URUTAN ASC";
+	                        TAHUN = :tahun AND ROWNUM <= 100000 ORDER BY URUTAN ASC";
 
 
-                var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query).ToList();
+                List<object> lstparams = new List<object>();
+                lstparams.Add(new OracleParameter("tahun", pTahun));
+                var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query, lstparams.ToArray()).ToList();
                 //return Json(pTahun, JsonRequestBehavior.AllowGet);
 
                 foreach (var rw in get)
@@ -527,9 +529,9 @@ namespace Pnbp.Controllers
                 order by kodesatker, kodekro";
 
                 List<object> lstparams = new List<object>();
-                lstparams.Add(new OracleParameter("pTahun", pTahun));
-                lstparams.Add(new OracleParameter("pTahun", pTahun));
-                lstparams.Add(new OracleParameter("pTahun", pTahun));
+                lstparams.Add(new OracleParameter("tahun", pTahun));
+                lstparams.Add(new OracleParameter("tahun", pTahun));
+                lstparams.Add(new OracleParameter("tahun", pTahun));
                 var get = db.Database.SqlQuery<Entities.RekapBelanja>(query, lstparams.ToArray()).ToList();
                 //return Json(pTahun, JsonRequestBehavior.AllowGet);
 
@@ -641,9 +643,11 @@ namespace Pnbp.Controllers
 
                 //List<Entities.Renaksi> result = _pm.GetRenaksi(pTahun);
                 string query =
-                @"SELECT DISTINCT * FROM MANFAAT WHERE TAHUN = "+ pTahun +" ORDER BY TIPE, RANKJAN ASC";
+                @"SELECT DISTINCT * FROM MANFAAT WHERE TAHUN = :tahun ORDER BY TIPE, RANKJAN ASC";
 
-                var get = db.Database.SqlQuery<Entities.Renaksi>(query).ToList();
+                List<object> lstparams = new List<object>();
+                lstparams.Add(new OracleParameter("tahun", pTahun));
+                var get = db.Database.SqlQuery<Entities.Renaksi>(query, lstparams.ToArray()).ToList();
 
                 ////return Json(pTahun, JsonRequestBehavior.AllowGet);
 
@@ -776,7 +780,7 @@ namespace Pnbp.Controllers
                     PENERIMAAN,
                     OPERASIONAL 
 	                FROM REKAPPENERIMAANDETAIL
-	                WHERE TAHUN = '{pTahun}' AND BULAN = '{pBulan}'
+	                WHERE TAHUN = :tahun AND BULAN = :bulan
                 )
                 SELECT DISTINCT TANGGAL,
                     KODESATKER,
@@ -796,7 +800,10 @@ namespace Pnbp.Controllers
                     OPERASIONAL
                 FROM d";
 
-            var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query).ToList();
+            List<object> lstparams = new List<object>();
+            lstparams.Add(new OracleParameter("tahun", pTahun));
+            lstparams.Add(new OracleParameter("bulan", pBulan));
+            var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query, lstparams.ToArray()).ToList();
 
             int tSheet;
             var value = get.Count;
