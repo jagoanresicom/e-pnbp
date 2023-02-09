@@ -2834,6 +2834,7 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         //public JsonResult SimpanPengembalianPnbpDev(Entities.DataPengembalianPnbpDev data)
         public JsonResult SimpanPengembalianDaerah(DetailDataBerkas data, string npwpberkas, FormCollection form)
         {
@@ -3184,6 +3185,8 @@ namespace Pnbp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public JsonResult GetBerkasByNoTahun(FormCollection form)
         {
             CommonResponse response = new CommonResponse() { Success = false, Message = "" };
