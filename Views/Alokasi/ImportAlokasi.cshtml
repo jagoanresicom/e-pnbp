@@ -38,6 +38,7 @@
                 </div>
                 <div class="x_content">
                     <form class="form-horizontal form-label-left" id="frmimportalok" method="post">
+                        @Html.AntiForgeryToken()
                         <div class="form-group">
                             <label class="control-label col-md-2 col-sm-2 col-xs-12">Import File Alokasi</label>
                             <div class="col-md-6 col-sm-6 col-xs-12 hide-inputbtns">
@@ -63,7 +64,7 @@
                             <label class="control-label col-md-2 col-sm-2 col-xs-12"></label>
                             <div class="col-md-6 col-sm-6 col-xs-12 hide-inputbtns">
                                 <span style="color:firebrick">Data Master Tidak Valid, Harap Isi Data Kode Span Dan Program</span>
-                                <br/>
+                                <br />
                                 <span style="color:firebrick">Silakan Click Button Kode Span Dan Program</span>
                             </div>
                         </div>
@@ -85,6 +86,7 @@
     <div class="x_panel">
 
         <form class="form-horizontal form-label-left pnbp-group-table" id="frmdatasatker" method="post" data-name="alokasi">
+            @Html.AntiForgeryToken()
             <div class="form-group" id="group_alokasi">
                 <div class="row text-center">
                     <label class="control-label"><h2><b>Riwayat MP</b></h2></label>
@@ -106,7 +108,7 @@
             </div>
 
             <div>
-                <br/>
+                <br />
             </div>
 
             <div class="form-group" id="group_alokasi" style="margin-top:10px;">
@@ -123,11 +125,11 @@
                             <th>Alokasi Saat Ini</th>
                             <th>Persentase</th>
                             @*<th class="text-center">
-                        Y/N
-                        <span>
-                            <input type="checkbox" class="checkbox-inline checkall" onchange="tableCheckAll(this, '#group_alokasi')" />
-                        </span>
-                    </th>*@
+                            Y/N
+                            <span>
+                                <input type="checkbox" class="checkbox-inline checkall" onchange="tableCheckAll(this, '#group_alokasi')" />
+                            </span>
+                        </th>*@
                         </tr>
                     </thead>
                     <tbody>

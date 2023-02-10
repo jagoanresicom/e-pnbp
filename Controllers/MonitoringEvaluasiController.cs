@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Pnbp.Controllers
 {
+    [AccessDeniedAuthorize]
     public class MonitoringEvaluasiController : Controller
     {
         Models.MonitoringEvaluasiModel monitoringevaluasimodel = new Models.MonitoringEvaluasiModel();
@@ -538,7 +539,6 @@ namespace Pnbp.Controllers
 
         public ActionResult AlokasiSummaryDetail(string id)
         {
-            List<Entities.Wilayah> listPropinsi = new List<Entities.Wilayah>();
             var ctx = new PnbpContext();
 
             var sqlQuery = $"SELECT KODESPOPP, NAMA FROM {_schemaKKP}.PROSEDUR WHERE STATUSHAPUS <> 1";
@@ -547,6 +547,7 @@ namespace Pnbp.Controllers
             var get_propinsi = ctx.Database.SqlQuery<Entities.propinsi>("SELECT kantorId, KODESATKER, NAMA_SATKER FROM satker WHERE tipekantorid in (1,2)").ToList();
             ViewData["get_propinsi"] = get_propinsi;
             ViewData["pelayanan"] = pelayanan;
+            ViewData["alokasi_id"] = id;
 
             return View();
         }

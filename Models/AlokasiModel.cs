@@ -1347,8 +1347,10 @@ namespace Pnbp.Models
                         TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH 
                     FROM ALOKASISATKER a 
                     JOIN SATKER s ON a.KDSATKER = s.KODESATKER and s.statusaktif = 1 
-                    WHERE ALOKASISATKERSUMMARYID = '{id}'";
-                result = db.Database.SqlQuery<Entities.AlokasiSatkerV2>(query).ToList();
+                    WHERE ALOKASISATKERSUMMARYID = :id";
+                List<object> lstparams = new List<object>();
+                lstparams.Add(new OracleParameter("id", id));
+                result = db.Database.SqlQuery<Entities.AlokasiSatkerV2>(query, lstparams.ToArray()).ToList();
 
                 string queryGetRevisi = $@"
                     SELECT ass.REVISI, a.kdsatker as KodeSatker, a.pagu, a.alokasi
@@ -1358,12 +1360,15 @@ namespace Pnbp.Models
 	                    SELECT ALOKASISATKERSUMMARYID  
 	                    FROM alokasisatkersummary
 	                    WHERE tahun = EXTRACT (YEAR FROM sysdate)
-                        AND mp = (select mp from ALOKASISATKERSUMMARY where alokasisatkersummaryid = '{id}') 
+                        AND mp = (select mp from ALOKASISATKERSUMMARY where alokasisatkersummaryid = :id) 
 	                    AND revisi > 0
                     )
                     ORDER BY kdsatker, revisi asc
                 ";
-                var listRevisi = db.Database.SqlQuery<Entities.AlokasiSatkerV2>(queryGetRevisi).ToList();
+
+                List<object> lstparamsRevisi = new List<object>();
+                lstparamsRevisi.Add(new OracleParameter("id", id));
+                var listRevisi = db.Database.SqlQuery<Entities.AlokasiSatkerV2>(queryGetRevisi, lstparamsRevisi.ToArray()).ToList();
 
                 string queryTempRevisi = $@"
                     SELECT 

@@ -93,6 +93,7 @@
 
 					@using (Html.BeginForm("Export", "Penerimaan", FormMethod.Post, new { id = "frmFindData", @class = "form-horizontal form-label-left" }))
 					{
+                        <input type="hidden" name="alokasi-id" value="@ViewBag.alokasi_id"/>
 						<div class="form-group">
 							<label class="control-label col-md-3 col-sm-3 col-xs-12">Provinsi</label>
 							<div class="col-md-6 col-sm-6 col-xs-12">
@@ -247,12 +248,8 @@
         //    tblAlokasi.ajax.url("/MonitoringEvaluasi/AlokasiDTV2?tahun=" + tahun).load();
         //}
 
-		var urlObject = new URL(document.location.href);
-        var params = urlObject.searchParams;
-        var id = params.get("id");
-
 		var frm = new FormData();
-		frm.append("id", id);
+        frm.append("id", $('#frmFindData [name="alokasi-id"]').val());
 		frm.append("bulan", bulan);
 		frm.append("satker", satker);
         frm.append("pelayanan", kodeSpopp);
@@ -304,12 +301,10 @@
     var dfAlokasi = null;
 
     function getAlokasi() {
-        var urlObject = new URL(document.location.href);
-        var params = urlObject.searchParams;
-        var id = params.get("id");
+        var alokasiId = $('#frmFindData [name="alokasi-id"]').val();
         $.ajax({
             type: "GET",
-            url: '@Url.Action("GetAlokasiBySummaryId", "Alokasi")?id='+id,
+            url: '@Url.Action("GetAlokasiBySummaryId", "Alokasi")?id='+alokasiId,
             success: function (res) {
                 if (!res.success || res.data.length == 0) {
                     $('#btn-alokasi').prop('disabled', true);

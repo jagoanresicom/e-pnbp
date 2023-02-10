@@ -66,92 +66,92 @@
 					<div class="clearfix"></div>
 				</div>
 				<div class="x_content" id="js-section-pencarian">
-					<form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">
+                    <form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        @if (jenisKantorUser == "Pusat")
+                        {
+                            <input type="hidden" name="jeniskantor" id="jeniskantor" value="Pusat" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="jeniskantor" id="jeniskantor" value="Kantah" />
+                        }
 
-						@if (jenisKantorUser == "Pusat")
-						{
-							<input type="hidden" name="jeniskantor" id="jeniskantor" value="Pusat" />
-						}
-						else
-						{
-							<input type="hidden" name="jeniskantor" id="jeniskantor" value="Kantah" />
-						}
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor Berkas : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CariNomorBerkas, new { @class = "form-control input-md" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Pemohon : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CariNamaPemohon, new { @class = "form-control input-md" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Status : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @{
+                                        var lsStatus = new List<SelectListItem>();
+                                        if (jenisKantorUser == "Pusat")
+                                        {
+                                            lsStatus.Add(new SelectListItem { Value = "1", Text = "Usulan Baru" });
+                                        }
+                                        else
+                                        {
+                                            lsStatus.Add(new SelectListItem { Value = "0", Text = "Belum Kirim" });
+                                            lsStatus.Add(new SelectListItem { Value = "1", Text = "Terkirim" });
+                                        }
+                                        lsStatus.Add(new SelectListItem { Value = "2", Text = "Proses" });
+                                        lsStatus.Add(new SelectListItem { Value = "3", Text = "Berkas Tidak Lengkap" });
+                                        lsStatus.Add(new SelectListItem { Value = "4", Text = "Selesai" });
+                                    }
+                                    @Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @class = "select2_single form-control input-md" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @class = "select2_single form-control input-md" })
+                                </div>
+                            </div>
+                        </div>
 
-						<div class="row">
-							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor Berkas : </label>
-								<div class="col-md-4 col-sm-4 col-xs-12">
-									@Html.TextBoxFor(m => m.CariNomorBerkas, new { @class = "form-control input-md" })
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Pemohon : </label>
-								<div class="col-md-4 col-sm-4 col-xs-12">
-									@Html.TextBoxFor(m => m.CariNamaPemohon, new { @class = "form-control input-md" })
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3 col-xs-12">Status : </label>
-								<div class="col-md-4 col-sm-4 col-xs-12">
-									@{
-										var lsStatus = new List<SelectListItem>();
-										if (jenisKantorUser == "Pusat")
-										{
-											lsStatus.Add(new SelectListItem { Value = "1", Text = "Usulan Baru" });
-										}
-										else
-										{
-											lsStatus.Add(new SelectListItem { Value = "0", Text = "Belum Kirim" });
-											lsStatus.Add(new SelectListItem { Value = "1", Text = "Terkirim" });
-										}
-										lsStatus.Add(new SelectListItem { Value = "2", Text = "Proses" });
-										lsStatus.Add(new SelectListItem { Value = "3", Text = "Berkas Tidak Lengkap" });
-										lsStatus.Add(new SelectListItem { Value = "4", Text = "Selesai" });
-									}
-									@Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @class = "select2_single form-control input-md" })
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
-								<div class="col-md-4 col-sm-4 col-xs-12">
-									@Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @class = "select2_single form-control input-md" })
-								</div>
-							</div>
-						</div>
+                        <div class="row">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <button type="submit" class="btn btn-success">Cari</button>
+                            </div>
+                        </div>
+                        <br>
 
-						<div class="row">
-							<label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-							<div class="col-md-6 col-sm-6 col-xs-12">
-								<button type="submit" class="btn btn-success">Cari</button>
-							</div>
-						</div>
-						<br>
+                        <div class="table-responsive">
+                            <table class="table --js-dtable table-striped table-bordered" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tipe</th>
+                                        @if (jenisKantorUser == "Pusat")
+                                        {
+                                            <th>Satuan Kerja</th>
+                                        }
+                                        <th>Nomor Berkas</th>
+                                        <th>Nama Pemohon</th>
+                                        <th>Nominal</th>
+                                        <th>Nomor Surat</th>
+                                        <th>Tangal Pengajuan</th>
+                                        <th>SP2D</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataplaceholder"></tbody>
+                            </table>
+                        </div>
 
-						<div class="table-responsive">
-							<table class="table --js-dtable table-striped table-bordered" style="width:100%">
-								<thead>
-									<tr>
-										<th>No</th>
-										<th>Tipe</th>
-										@if (jenisKantorUser == "Pusat")
-										{ 
-											<th>Satuan Kerja</th>
-										}
-										<th>Nomor Berkas</th>
-										<th>Nama Pemohon</th>
-										<th>Nominal</th>
-										<th>Nomor Surat</th>
-										<th>Tangal Pengajuan</th>
-										<th>SP2D</th>
-										<th>Status</th>
-										<th>Aksi</th>
-									</tr>
-								</thead>
-								<tbody id="dataplaceholder"></tbody>
-							</table>
-						</div>
-
-					</form>
+                    </form>
 				</div>
 			</div>
 		</div>

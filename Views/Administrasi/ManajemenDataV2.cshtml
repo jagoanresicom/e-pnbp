@@ -7,6 +7,7 @@
 
 @using (Html.BeginForm("ManajemenData", "administrasi", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
+    @Html.AntiForgeryToken()
     <script type="text/javascript">
         $(function () {
             $.validator.unobtrusive.parse(this);
@@ -35,6 +36,7 @@
                         </div>
                         <div class="x_content">
                             <form class="form-horizontal form-label-left" id="manajemendata" method="post" enctype="multipart/form-data">
+                                @Html.AntiForgeryToken()
                                 <div class="row">
 
                                     <div class="col-sm-6">

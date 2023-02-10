@@ -1454,7 +1454,7 @@ namespace Pnbp.Controllers
             return View();
         }
 
-        public ActionResult ImportAlokasiSummaryDetail(string id)
+        public ActionResult ImportAlokasiSummaryDetail()
         {
             return View();
         }
