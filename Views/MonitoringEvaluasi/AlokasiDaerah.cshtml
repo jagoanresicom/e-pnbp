@@ -20,7 +20,7 @@
 	var pelayanan = ViewBag.pelayanan;
 }
 
-<style>
+<style nonce="MjI3NzUzMQ">
 	.pnbp-group-table {
 	}
 </style>
@@ -85,7 +85,7 @@
 	</div>
 </div>
 
-<script>
+<script nonce="MjI3NzUzMQ">
     let tblAlokasi = null;
     $(document).ready(function () {
 
@@ -221,16 +221,5 @@
 		}
 		return x1 + x2;
 	}
-
-	function showDetailAlokasiSummary(id) {
-        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-        $.pjax({
-            container: '#dynamic_content',
-            type: "GET",
-            url: '@Url.Action("AlokasiSummaryDetail", "MonitoringEvaluasi")?id=' + id + '',
-            dataType: 'html',
-            contentType: "application/json; charset=utf-8"
-        });
-    }
 
 </script>

@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Pnbp.Entities;
+using System.Text.RegularExpressions;
+using System.Net;
 
 namespace Pnbp.Controllers
 {
@@ -1130,14 +1132,69 @@ namespace Pnbp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult rl_kro_list(int? start, Entities.FindManfaat f, string KantorId, string kodeKRO, string tahun)
+        public JsonResult rl_kro_list(string start, Entities.FindManfaat f, string KantorId, string kodeKRO, string tahun)
         {
-            int recNumber = start ?? 0;
+            FilterRecordResponse response = new FilterRecordResponse()
+            {
+                data = new List<dynamic>(),
+            };
+            List<string> errors = new List<string>();
+
+            if (!string.IsNullOrEmpty(kodeKRO))
+            {
+                string pattern = @" ";
+                Regex rg = new Regex(pattern);
+                MatchCollection matchesFilterId = rg.Matches(kodeKRO.Trim());
+                if (matchesFilterId.Count >= 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(KantorId))
+            {
+                string pattern = @"^[a-zA-Z0-9]*$";
+                Regex rg = new Regex(pattern);
+                MatchCollection matchesFilterId = rg.Matches(KantorId);
+                if (matchesFilterId.Count <= 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
+                }
+            }
+
+            int recNumber = 0;
+            if (!string.IsNullOrEmpty(start))
+            {
+                int parseRes = 0;
+                Int32.TryParse(start, out parseRes);
+                if (start != "0" && parseRes == 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
+                }
+            }
+
             int RecordsPerPage = 10;
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
-            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : DateTime.Now.Year.ToString();
+            var reqTahun = DateTime.Now.Year.ToString();
+            if (!string.IsNullOrEmpty(tahun))
+            {
+                int parseResultTahun = 0;
+                Int32.TryParse(tahun, out parseResultTahun);
+                if (parseResultTahun != 0)
+                {
+                    reqTahun = tahun;
+                }
+                else
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
+                }
+            }
             string kodesatker = f.KodeSatker;
             string namasatker = f.NamaSatker;
             string namaprogram = f.NamaProgram;
@@ -1146,10 +1203,6 @@ namespace Pnbp.Controllers
             this.ViewBag.UserKaBiroPerencanaan = f.UserKaBiroPerencanaan;
             this.ViewBag.UserKaBiroKeuangan = f.UserKaBiroKeuangan;
 
-            FilterRecordResponse response = new FilterRecordResponse()
-            {
-                data = new List<dynamic>(),
-            };
 
             try
             {
@@ -1206,12 +1259,14 @@ namespace Pnbp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult rl_satker_list(int? start, FindManfaat f, int length, string tahun, string satker, string WilayahId)
+        public JsonResult rl_satker_list(int? start, FindManfaat f, int length, string tahun, string satker, string WilayahId)
         {
             FilterRecordResponse response = new FilterRecordResponse()
             {
                 data = new List<dynamic>(),
             };
+            List<string> errors = new List<string>();
+
 
             #region sanitize input
             var reqTahun = DateTime.Now.Year.ToString();
@@ -1224,14 +1279,16 @@ namespace Pnbp.Controllers
                     reqTahun = tahun;
                 }
                 else
-                { 
-                    return Json(response, JsonRequestBehavior.AllowGet);
+                {   
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
                 }
             }
 
             if (!String.IsNullOrEmpty(WilayahId) && WilayahId.Length != 32)
             {
-                return Json(response, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json(errors, JsonRequestBehavior.DenyGet);
             }
 
             if (!String.IsNullOrEmpty(satker) && satker.Contains("(")) 
@@ -1318,19 +1375,62 @@ namespace Pnbp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult rl_provinsi_list(int? start, FindManfaat f, int length, string tahun, string provinsi)
+        public JsonResult rl_provinsi_list(string start, FindManfaat f, int length, string tahun, string provinsi)
         {
             FilterRecordResponse response = new FilterRecordResponse()
             {
                 data = new List<dynamic>(),
             };
+            List<string> errors = new List<string>();
 
-            int recNumber = start ?? 0;
+            if (!string.IsNullOrEmpty(provinsi))
+            {
+                //if (provinsi.Contains("("))
+                //{
+                //    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                //    return Json(errors, JsonRequestBehavior.DenyGet);
+                //}
+                string pattern = @"^[a-zA-Z ][ a-zA-Z]*$";
+                Regex rg = new Regex(pattern);
+                MatchCollection matchesFilterId = rg.Matches(provinsi);
+                if (matchesFilterId.Count <= 0) 
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
+                }
+            }
+
+            int recNumber = 0;
+            if (!string.IsNullOrEmpty(start))
+            {
+                int parseRes = 0;
+                Int32.TryParse(start, out parseRes);
+                if (start != "0" && parseRes == 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(errors, JsonRequestBehavior.DenyGet);
+                }
+            }
+
             int RecordsPerPage = length;
             int from = recNumber + 1;
             int to = from + RecordsPerPage - 1;
 
-            var reqTahun = (!string.IsNullOrEmpty(tahun)) ? tahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
+            var reqTahun = DateTime.Now.Year.ToString();
+            if (!string.IsNullOrEmpty(tahun))
+            {
+                int parseResultTahun = 0;
+                Int32.TryParse(tahun, out parseResultTahun);
+                if (parseResultTahun != 0)
+                {
+                    reqTahun = tahun;
+                }
+                else
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(response, JsonRequestBehavior.AllowGet);
+                }
+            }
 
             string kodesatker = f.KodeSatker;
             string namasatker = f.NamaSatker;

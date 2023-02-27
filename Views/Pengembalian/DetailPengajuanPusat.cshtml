@@ -21,7 +21,7 @@
 	bool isPengembalianDaerah = (Model.TIPEPENGEMBALIAN == "1");
 }
 
-<style>
+<style nonce="MjI3NzUzMQ">
 	/*panel style overwrite*/
 	.panel-heading {
 		background: white !important;
@@ -49,7 +49,7 @@
 		border-bottom: 2px solid #E6E9ED;
 	}
 </style>
-<style>
+<style nonce="MjI3NzUzMQ">
 	/*panel style overwrite*/
 	.panel-heading {
 		background: white !important;
@@ -777,7 +777,7 @@
 
 
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
-<script>
+<script nonce="MjI3NzUzMQ">
         $(document).ready(function() {
             var statuspengembalian = @Model.STATUSPENGEMBALIAN;
             if (statuspengembalian == 0 || statuspengembalian == 3 || statuspengembalian == 4) {
@@ -1001,7 +1001,7 @@
 
 		if (status) {
 			// alert('aaaaaaaaaa');
-			$('#cancel-' + this.id).html('<a href="javascript:void(0)" class="text-danger" onclick="cancelDoc(\'' + this.id + '\')" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
+            $('#cancel-' + this.id).html('<a href="#" class="text-danger MjI3NTU4Ng" data-id="' + this.id + '" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
 		} else {
 			$(this).val('')
 			$('#cancel-' + (this.id)).html('')
@@ -1014,6 +1014,13 @@
 		// alert(x)
 		$('#cancel-' + x).html('')
 		$('#label-' + x).html('Test')
-	}
+    }
+
+    $('body').on('click', (ev) => {
+        let el = ev.target.closest('.MjI3NTU4Ng');
+        if (el) {
+            cancelDoc(el.dataset.id);
+        }
+    })
 
 </script>

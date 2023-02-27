@@ -11,7 +11,7 @@
 
 <link href='@Url.Content("~/resources/css/smart_wizard.css")' rel="stylesheet" />
 <link href='@Url.Content("~/resources/css/smart_wizard_theme_dots.css")' rel="stylesheet" />
-<style>
+<style nonce="MjI3NzUzMQ">
 	/*panel style overwrite*/
 	.panel-heading {
 		background: white !important;
@@ -352,7 +352,7 @@
 
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
 <script src='@Url.Content("~/resources/js/jquery.smartWizard.js")'></script>
-<script>
+<script nonce="MjI3NzUzMQ">
 	$(document).ready(function () {
 
 		let isSubmit = false;
@@ -774,7 +774,7 @@
 		}
 
 		if (status) {
-			$('#cancel-' + this.id).html('<a href="javascript:void(0)" class="text-danger" onclick="cancelDoc(\'' + this.id + '\')" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
+            $('#cancel-' + this.id).html('<a href="#" class="text-danger MjI3NTU4Ng" data-id="' + this.id + '" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
 		} else {
 			$(this).val('')
 			$('#cancel-' + (this.id)).html('')
@@ -787,5 +787,13 @@
 		$('#cancel-' + x).html('')
 		$('#label-' + x).html('Test')
 	}
+
+
+    $('body').on('click', (ev) => {
+        let el = ev.target.closest('.MjI3NTU4Ng');
+        if (el) {
+            cancelDoc(el.dataset.id);
+        }
+    })
 
 </script>

@@ -3,7 +3,7 @@
 	ViewBag.Title = "PengajuanPengembalianForm";
 }
 
-<style>
+<style nonce="MjI3NzUzMQ">
 	/*panel style overwrite*/
 	.panel-heading {
 		background: white !important;
@@ -67,7 +67,7 @@
                                         <div class="col-sm-6">
                                             @Html.TextBoxFor(model => model.NomorBerkas, new { @class = "form-control", @id = "nomorberkas", @required = "required", @placeholder = "Nomor/Tahun" })
                                         </div>
-                                        <div class="col-sm-2 text-left"><button type="button" class="btn btn-primary" onclick="cari_berkas()" style="margin-left:0px;"><span class="fa fa-search"></span></button></button></div>
+                                        <div class="col-sm-2 text-left"><button type="button" class="btn btn-primary MjI3NTMwMg" data-cb="MjI3NTMzNA" style="margin-left:0px;"><span class="fa fa-search"></span></button></button></div>
                                     </div>
                                     <div class="form-group">
                                         <label for="inputPassword3" class="col-sm-4 control-label" style="text-align:left;">Atas Nama</label>
@@ -118,17 +118,17 @@
 
                                         <div class="form-group row">
                                             @*<div class="col-sm-12"><a href="@Url.Action("GeneratePermohonanPengembalian","Pengembalian")" class="btn btn-primary" download>Surat Permohonan</a>*@
-                                            <div class="col-sm-12"><button type="button" class="btn btn-primary" onclick="generate_permohonan()">Surat Permohonan</button></div>
+                                            <div class="col-sm-12"><button type="button" class="btn btn-primary MjI3NTMwMg" data-cb="MjI3NTM1Ng">Surat Permohonan</button></div>
                                             @*</div>*@
                                         </div>
 
                                         <div class="form-group row">
-                                            <div class="col-sm-12"><button type="button" class="btn btn-success" onclick="generate_keterangan()">Surat Keterangan</button></div>
+                                            <div class="col-sm-12"><button type="button" class="btn btn-success MjI3NTMwMg" data-cb="MjI3NTM3OQ">Surat Keterangan</button></div>
                                             @*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
                                         </div>
 
                                         <div class="form-group row">
-                                            <div class="col-sm-12"><button type="button" class="btn btn-success" onclick="generate_tidak_terlayani()">Surat Pernyataan Tidak Terlayani</button></div>
+                                            <div class="col-sm-12"><button type="button" class="btn btn-success MjI3NTMwMg" data-cb="MjI3NTM5Mg">Surat Pernyataan Tidak Terlayani</button></div>
                                             @*<div class="col-sm-12"><a href="@Url.Content("~/Assets/surat_keterangan.docx")" class="btn btn-primary" download>Surat Keterangan</a></div>*@
                                         </div>
                                     </div>
@@ -351,7 +351,7 @@
     </div>
 </form>
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
-<script>
+<script nonce="MjI3NzUzMQ">
 
     function hanyaAngka(evt) {
         var charCode = (evt.which) ? evt.which : event.keyCode
@@ -387,7 +387,7 @@
 
         if (status) {
             // alert('aaaaaaaaaa');
-            $('#cancel-'+this.id).html('<a href="javascript:void(0)" class="text-danger" onclick="cancelDoc(\''+this.id+'\')" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
+            $('#cancel-' + this.id).html('<a href="#" class="text-danger MjI3NTU4Ng" data-id="' + this.id + '" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
         } else {
             $(this).val('')
             $('#cancel-'+(this.id)).html('')
@@ -740,4 +740,27 @@
         var NamaProsedur = $('#NamaProsedur').val();
         window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker, '_blank');
     }
+
+    ;(function () {
+
+        let DOMEvents = {
+            clickable: {
+                'MjI3NTMzNA': () => cari_berkas(),
+                'MjI3NTM1Ng': () => generate_permohonan(),
+                'MjI3NTM3OQ': () => generate_keterangan(),
+                'MjI3NTM5Mg': () => generate_tidak_terlayani(),
+            },
+        };
+
+        window.listenOn('.MjI3NTMwMg', 'click', DOMEvents.clickable);
+
+        $('body').on('click', (ev) => {
+            let el = ev.target.closest('.MjI3NTU4Ng');
+            if (el) {
+                cancelDoc(el.dataset.id);
+            }
+        })
+
+    })();
+
 </script>

@@ -8,7 +8,7 @@
 }
 
 <script src='@Url.Content("~/resources/js/infiniteScroll.js")'></script>
-<style>
+<style nonce="MjI3NzUzMQ">
 	.panel-container {
 		padding: 16px;
 	}
@@ -71,7 +71,7 @@
 							<label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<button id="btn-cari" type="submit" class="btn btn-success">Cari</button>
-								<button onclick="history.back()" class="btn btn-info">Kembali</button>
+								<button class="MjI3NDA2Mw btn btn-info">Kembali</button>
 							</div>
 						</div>
 						<br>
@@ -113,7 +113,7 @@
 
 <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="MjI3NzUzMQ">
     $(function () {
         $("div#loading").hide();
 	});
@@ -168,7 +168,7 @@
 			    data: function (data, obj) {
                     var ftp = frmPencarian.serializeArray();
                     data.form = ftp;
-					ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }, { name: "draw", value: data.draw });
+					ftp.push({ name: "start", value: data.start });
                     return ftp;
 			    }
 			},
@@ -208,6 +208,10 @@
 			}
 			return formattedString;
 		}
+
+        $('.MjI3NDA2Mw').on('click', (ev) => {
+            history.back()
+        });
 
     });
 

@@ -92,12 +92,14 @@ namespace Pnbp.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        #if DEBUG
         public ActionResult Prioritas()
         {
             Models.AdmModel _adm = new Models.AdmModel();
             List<Entities.PrioritasAlokasi> _lsSatkerALokasi = _adm.GetPrioritasAlokasi();
             return View(_lsSatkerALokasi);
         }
+        #endif
 
         public ActionResult PrioritasManfaat(string Id)
         {

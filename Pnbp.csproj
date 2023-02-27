@@ -3145,14 +3145,12 @@
     <Content Include="resources\switchery\switchery.js" />
     <Content Include="resources\switchery\switchery.min.css" />
     <Content Include="resources\switchery\switchery.min.js" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <None Include="Scripts\jquery-1.8.0.intellisense.js" />
     <Content Include="Scripts\jquery-1.8.0.js" />
     <Content Include="Scripts\jquery-1.8.0.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="V2\resources\ckeditor\adapters\jquery.js" />
     <Content Include="V2\resources\ckeditor\ckeditor.js" />
     <Content Include="V2\resources\ckeditor\config.js" />
@@ -6086,6 +6084,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="resources\css\pages\" />
     <Folder Include="Views\Api\" />
     <Folder Include="Views\old\" />
   </ItemGroup>

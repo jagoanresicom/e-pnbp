@@ -86,6 +86,12 @@ namespace Pnbp.Entities
         public decimal TotalTerAlokasi { get; set; }
     }
 
+    public class DTableRequest
+    {
+        public int Start { get; set; }
+        public int Length{ get; set; }
+    }
+
     public class FindManfaat
     {
         public string KodeSatker { get; set; }

@@ -1,4 +1,4 @@
-﻿<style type="text/css">
+﻿<style type="text/css" nonce="MjI3NzUzMQ">
     .back-to-top {
         cursor: pointer;
         position: fixed;
@@ -143,7 +143,7 @@
 
 <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="MjI3NzUzMQ">
 
     $(document).ready(function () {
         $(window).scroll(function () {
@@ -473,9 +473,7 @@
                     + "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
                     + "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
                     + "<td class='text-right'>" + addCommas(data[x].Belanja) + "</td>"
-                    + "<td class='text-center' onclick='showDetailAlokasiSummary("
-                    + "\"" + data[x].AlokasiSatkerSummaryId + "\""
-                    + ");'> <i class='fa fa-eye'></i> </td>"
+                    + "<td class='text-center MjI3MzUwMg' data-id='" + data[x].AlokasiSatkerSummaryId+"'> <i class='fa fa-eye'></i> </td>"
                     + "</tr>";
             });
             $("#index").val(i);
@@ -496,6 +494,13 @@
             contentType: "application/json; charset=utf-8"
         });
     }
+
+    $('#summaryalokasisatker').on('click', (ev) => {
+        let el = ev.target.closest('.MjI3MzUwMg');
+        if (el) {
+            showDetailAlokasiSummary(el.dataset.id);
+        }
+    })
 
 </script>
 

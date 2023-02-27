@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Pnbp.Controllers
 {
@@ -539,6 +540,14 @@ namespace Pnbp.Controllers
 
         public ActionResult AlokasiSummaryDetail(string id)
         {
+            string pattern = @"^[a-zA-Z][a-zA-Z0-9]*$";
+            Regex rg = new Regex(pattern);
+            MatchCollection matchesFilterId = rg.Matches(id);
+            if (matchesFilterId.Count <= 0) 
+            {
+                return RedirectToAction("InternalServerError", "Error");
+            }
+
             var ctx = new PnbpContext();
 
             var sqlQuery = $"SELECT KODESPOPP, NAMA FROM {_schemaKKP}.PROSEDUR WHERE STATUSHAPUS <> 1";

@@ -20,11 +20,6 @@
 	var pelayanan = ViewBag.pelayanan;
 }
 
-<style>
-	.pnbp-group-table {
-	}
-</style>
-
 <div id="dynamic_content">
 	<div class="clearfix"></div>
 	<div class="row">
@@ -173,7 +168,7 @@
 	</div>
 </div>
 
-<script>
+<script nonce="MjI3NzUzMQ">
     let tblAlokasi = null;
     $(document).ready(function () {
 
@@ -311,9 +306,7 @@
 					+ "<td class='text-right'>" + addCommas(data[x].Alokasi) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
 					+ "<td class='text-right'>" + addCommas(data[x].Belanja) + "</td>"
 					//+ "<td class='text-right'>" + ((data[x].Alokasi / data[x].Pagu) * 100).toFixed(2) + "<input type='hidden' id='totalalokasi' name='totalalokasi' value='" + data[x].totalalokasi + "'></td>"
-					+ "<td class='text-center' onclick='showDetailAlokasiSummary("
-					+ "\"" + data[x].AlokasiSatkerSummaryId + "\""
-					+ ");'> <i class='fa fa-eye'></i> </td>"
+                    + "<td class='text-center'><a href='@Url.Action("AlokasiSummaryDetail", "MonitoringEvaluasi")/" + data[x].AlokasiSatkerSummaryId + "'><i class='fa fa-eye'></a></i></td>"
 					+ "</tr>";
 			});
 			$("#index").val(i);
@@ -335,16 +328,5 @@
 		}
 		return x1 + x2;
 	}
-
-	function showDetailAlokasiSummary(id) {
-        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-        $.pjax({
-            container: '#dynamic_content',
-            type: "GET",
-            url: '@Url.Action("AlokasiSummaryDetail", "MonitoringEvaluasi")?id=' + id + '',
-            dataType: 'html',
-            contentType: "application/json; charset=utf-8"
-        });
-    }
 
 </script>
