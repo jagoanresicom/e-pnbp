@@ -17,11 +17,11 @@
 
 <html>
 <head runat="server">
-    <title>Error</title>
+    <title>Terjadi Kesalahan</title>
 </head>
 <body>
     <div>
-        An error occurred while processing your request.
+        Kami melacak kesalahan ini secara otomatis, tetapi jika masalah tetap ada jangan ragu untuk menghubungi kami. Sementara itu, cobalah refresh halaman.
     </div>
 </body>
 </html>

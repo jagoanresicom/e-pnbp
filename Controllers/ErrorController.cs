@@ -6,6 +6,7 @@ namespace Pnbp.Controllers
     {
         public ActionResult Forbidden()
         {
+            Response.StatusCode = 403;
             return View();
         }
 
@@ -17,6 +18,7 @@ namespace Pnbp.Controllers
 
         public ActionResult InternalServerError()
         {
+            Response.StatusCode = 500;
             return View();
         }
     }
