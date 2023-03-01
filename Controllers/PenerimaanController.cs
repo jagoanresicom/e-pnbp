@@ -271,9 +271,9 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
 
-            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '"+kantorId+"' AND p.BERKASID = '"+berkasId+"' AND p.TAHUN="+tahun+" AND p.BULAN="+bulan+" ").First();
+            var penerimaan = ctx.Database.SqlQuery<Entities.DataPenerimaan>("SELECT * FROM PENERIMAAN p WHERE (p.statushapus is null or p.statushapus = '0') AND p.KANTORID = '" + kantorId+"' AND p.BERKASID = '"+berkasId+"' AND p.TAHUN="+tahun+" AND p.BULAN="+bulan+" ").First();
             var list_penerimaan = ctx.Database.SqlQuery<Entities
-                .DataPenerimaan>("SELECT p.*, k.namaprogram FROM PENERIMAAN p LEFT JOIN KODESPAN k ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) WHERE p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "' AND p.TAHUN=" + tahun + " AND p.bulan = "+bulan+" ")
+                .DataPenerimaan>("SELECT p.*, k.namaprogram FROM PENERIMAAN p LEFT JOIN KODESPAN k ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) WHERE (p.statushapus is null or p.statushapus = '0') AND p.KANTORID = '" + kantorId + "' AND p.KODESPOPP = '" + penerimaan.kodespopp + "' AND p.TAHUN=" + tahun + " AND p.bulan = "+bulan+" ")
                 .ToList();
 
 
@@ -341,7 +341,7 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
 
-            var queryPenerimaan = "SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun;
+            var queryPenerimaan = "SELECT * FROM PENERIMAAN p WHERE (p.statushapus is null or p.statushapus = '0') AND p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun;
 
             if (bulan != null)
             {
@@ -357,7 +357,7 @@ namespace Pnbp.Controllers
                 LEFT JOIN KODESPAN k 
                 ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) 
                     AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) 
-                WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1": "0");
+                WHERE (p.statushapus is null or p.statushapus = '0') AND  p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1": "0");
 
             if (bulan != null)
             {
@@ -409,7 +409,7 @@ namespace Pnbp.Controllers
         {
             var ctx = new PnbpContext();
 
-            var queryPenerimaan = "SELECT * FROM PENERIMAAN p WHERE p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun;
+            var queryPenerimaan = "SELECT * FROM PENERIMAAN p WHERE (p.statushapus is null or p.statushapus = '0') AND p.KANTORID = '" + kantorId + "' AND p.TAHUN=" + tahun;
 
             if(bulan != null)
             {

@@ -665,11 +665,19 @@ namespace Pnbp.Models
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 
-            using (var ctx = new PnbpContext())
+            try 
             {
-                object[] parameters = arrayListParameters.OfType<object>().ToArray();
-                records = ctx.Database.SqlQuery<Entities.PengembalianPnbpTrain>(query, parameters).ToList();
+                using (var ctx = new PnbpContext()) {
+                    object[] parameters = arrayListParameters.OfType<object>().ToArray();
+                    records = ctx.Database.SqlQuery<Entities.PengembalianPnbpTrain>(query, parameters).ToList();
+                }
             }
+            catch (Exception e) 
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+                throw;
+            }
+            
 
             return records;
         }

@@ -1053,6 +1053,7 @@ namespace Pnbp.Controllers
             }
         }
 
+        [HttpGet]
         public ActionResult rl_kro(string pid)
         {
             int indexKaBiroPerencanaan = -1;
@@ -1081,6 +1082,7 @@ namespace Pnbp.Controllers
             return View(fn);
         }
 
+        [HttpGet]
         public ActionResult rl_provinsi()
         {
             int indexKaBiroPerencanaan = -1;
@@ -1101,6 +1103,7 @@ namespace Pnbp.Controllers
             return View(fn);
         }
 
+        [HttpGet]
         public ActionResult rl_satker(string pid)
         {
             int indexKaBiroPerencanaan = -1;

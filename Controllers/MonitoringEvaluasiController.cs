@@ -456,7 +456,7 @@ namespace Pnbp.Controllers
                 LEFT JOIN KODESPAN k 
                 ON k.kode=SUBSTR(p.KODEPENERIMAAN, 0, 4) 
                     AND k.kegiatan=SUBSTR(p.KODEPENERIMAAN, -3) 
-                WHERE p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1" : "0");
+                WHERE (p.statushapus is null or p.statushapus = '0') AND p.TAHUN=" + tahun + " AND p.STATUSALOKASI=" + (statusAlokasi ? "1" : "0");
 
             if(!string.IsNullOrEmpty(kantorId))
             {

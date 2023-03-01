@@ -209,7 +209,7 @@ namespace Pnbp.Models
                           FROM
                             penerimaan
                           WHERE
-                            TANGGAL BETWEEN TO_DATE(:param2 || ' 00:00:00','dd/mm/yyyy hh24:mi:ss') AND TO_DATE(:param3 || ' 23:59:59','dd/mm/yyyy hh24:mi:ss') ";
+                            (statushapus is null or statushapus = '0') AND TANGGAL BETWEEN TO_DATE(:param2 || ' 00:00:00','dd/mm/yyyy hh24:mi:ss') AND TO_DATE(:param3 || ' 23:59:59','dd/mm/yyyy hh24:mi:ss') ";
 
                 if (!string.IsNullOrEmpty(pKantorId))
                 {
@@ -402,6 +402,7 @@ namespace Pnbp.Models
                     where
                       pn.kodebilling = :param1
                       or pn.ntpn = :param2
+                      and (pn.statushapus is null or pn.statushapus = '0')
                     group by
                       pn.berkasid, pn.ntpn, pn.kodebilling, pn.tanggal, pn.namakantor, pn.namaprosedur, pn.namawajibbayar ";
                 Oracle.ManagedDataAccess.Client.OracleParameter p1 = new Oracle.ManagedDataAccess.Client.OracleParameter("param1", (String.IsNullOrEmpty(pKodeBilling)) ? "kosong" : pKodeBilling);
