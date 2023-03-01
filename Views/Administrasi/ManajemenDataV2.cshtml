@@ -2,7 +2,7 @@
 @{
     ViewBag.Judul = "Manajemen Data";
     var baseurl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"));
-
+    var tipekantorid = ViewData["tipekantorid"].ToString();
 }
 
 @using (Html.BeginForm("ManajemenData", "administrasi", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -45,28 +45,62 @@
                                                 <h4 style="margin-left:20px"><b>Unduh Berkas</b></h4>
                                             </div>
 
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-7">
+                                                <div>Tahun Berkas :</div>
                                                 <select name="year" id="year" class="select2_single form-control input-md text-center">
-                                                    <option value="" class="text-center">-- Pilih Tahun --</option>
-                                                    @for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
+                                                    @for (var i = DateTime.Now.Year; i > (DateTime.Now.Year - 5); i--) 
                                                     {
-                                                        <option value="@i" class="text-center">@i</option>
+                                                        if (i == DateTime.Now.Year) 
+                                                        {
+                                                            <option value="@i" class="text-center" selected>@i</option>
+                                                        }
+                                                        else 
+                                                        {
+                                                            <option value="@i" class="text-center">@i</option>
+                                                        }
                                                     }
                                                 </select>
+                                                <div style="margin-bottom:1rem"></div>
+                                                @if (tipekantorid == "1") 
+                                                {
+                                                    <div>
+                                                        <div>Tipe Kantor :</div>
+                                                        <select id="tipe-kantor" class="select2_single form-control input-md text-center">
+                                                            <option value="" class="text-center">-- Pilih Tipe Kantor --</option>
+                                                            <option value="1" class="text-center">Kantor Pusat</option>
+                                                            <option value="2" class="text-center">Kantor Wilayah</option>
+                                                            <option value="3" class="text-center">Kantor Pertanahan</option>
+                                                        </select>
+                                                        <div style="margin-bottom:1rem"></div>
+
+                                                        <div>Satuan Kerja :</div>
+                                                        <select id="satuan-kerja" class="select2_single form-control input-md text-center">
+                                                            <option value="" class="text-center">-- Pilih Satuan Kerja --</option>
+                                                        </select>
+                                                        <small id="js-txt-loading-satker">Sedang memuat ...</small>
+                                                        <div style="margin-bottom:1rem"></div>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
 
-                                        <div class="row" style="margin-top: 25px">
-                                            <label class="col-sm-4" style="margin-left:20px">Penerimaan</label>
-                                            <a href="#" class="btn btn-success MjI3MTg4MQ" style="margin-left:7px" data-cb="MjI3MTgzNg"><span class="fa fa-floppy-o"></span> Unduh</a>
-                                            @*<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> Unduh </button>*@
-                                        </div>
+                                        @if (false) 
+                                        {
+                                            <div class="row" style="margin-top: 25px">
+                                                <label class="col-sm-4" style="margin-left:20px">Penerimaan</label>
+                                                <a href="javascript:void(0);" class="btn btn-success" style="margin-left:7px" onclick="exportFile();"><span class="fa fa-floppy-o"></span> Unduh</a>
+                                                @*<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> Unduh </button>*@
+                                            </div>
+                                        }
 
-                                        <div class="row" style="margin-top: 8px">
-                                            <label class="col-sm-4" style="margin-left:20px">Belanja</label>
-                                            <a href="#" class="btn btn-success MjI3MTg4MQ" style="margin-left:7px" data-cb="MjI3MjE4Ng"><span class="fa fa-floppy-o"></span> Unduh</a>
-                                            @*<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> Unduh </button>*@
-                                        </div>
+                                        @if (tipekantorid == "1") 
+                                        {
+                                            <div class="row" style="margin-top: 8px">
+                                                <label class="col-sm-4" style="margin-left:20px">Belanja</label>
+                                                <a href="#" class="btn btn-success MjI3MTg4MQ" style="margin-left:7px" data-cb="MjI3MjE4Ng"><span class="fa fa-floppy-o"></span> Unduh</a>
+                                                @*<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> Unduh </button>*@
+                                            </div>
+                                        }
 
                                         <div class="row" style="margin-top: 8px">
                                             <label class="col-sm-4" style="margin-left:20px">Rencana Aksi</label>
@@ -181,6 +215,8 @@
         });
 
         createPagingPengajuan();
+        initFilterKantor();
+        loadListSatker();
 
         $(window).scroll(function () {
             if ($(this).scrollTop() > 50) {
@@ -200,6 +236,82 @@
 
         $('#back-to-top').tooltip('show');
     });
+
+    let isLoadedKantor = false;
+
+    function initFilterKantor() {
+        $('#tipe-kantor').on('select2:select', function (e) {
+            filterListSatkerByTipe(this.value);
+        });
+    }
+
+    function filterListSatkerByTipe(tipeKantorId) {
+        if (isLoadedKantor) {
+            let filteredData = listSatker.filter(d => {
+                return (tipeKantorId == d.Tipe || tipeKantorId == '');
+            });
+            let mappedData = filteredData.map(d => {
+                return {
+                    id: d.Id,
+                    text: d.Nama,
+                }
+            })
+
+            let selectNode = $('#satuan-kerja');
+            selectNode.select2().empty();
+            if (mappedData.length > 0) {
+                selectNode.select2({
+                    data: mappedData,
+                    placeholder: "-- Pilih Satuan Kerja --",
+                    allowClear: true,
+                });
+                selectNode.val(null).trigger('change');
+            }
+        }
+    }
+
+    let listSatker = [];
+
+    function loadListSatker() {
+        $('#js-txt-loading-satker').toggleClass('hidden', false);
+        $.ajax({
+			type: "GET",
+			url: '@Url.Action("ListSatker", "Administrasi")',
+			contentType: false,
+			processData: false,
+            success: function (data) {
+                isLoadedKantor = true;
+                $('#js-txt-loading-satker').toggleClass('hidden', true);
+                listSatker = data;
+
+                if ($('#tipe-kantor').val() != '') {
+                    filterListSatkerByTipe($('#tipe-kantor').val());
+                    return;
+                }
+
+                let mappedData = data.map(d => {
+                    return {
+                        id: d.Id,
+                        text: d.Nama,
+                    }
+                })
+
+                let selectNode = $('#satuan-kerja');
+                selectNode.select2().empty();
+                if (mappedData.length > 0) {
+                    selectNode.select2({
+                        data: mappedData,
+                        placeholder: "-- Pilih Satuan Kerja --",
+                        allowClear: true,
+                    });
+                    selectNode.val(null).trigger('change');
+                }
+			},
+			error: function () {
+                $('#js-txt-loading-satker').toggleClass('hidden', true);
+			},
+		})
+    }
 
     $("#btnCreate").click(function (e) {
         window.location.href = '@Url.Action("EntriPengajuan", "Pengembalian")';
@@ -378,21 +490,25 @@
 
     function exportRenaksi() {
         var year = $('#year').val();
+        var tipeKantor = $('#tipe-kantor').val() ? $('#tipe-kantor').val() : '';
+        var kantorId = $('#satuan-kerja').val() ? $('#satuan-kerja').val() : '';
         if (year == '') {
             year = new Date().getFullYear();
         }
-        window.location.replace('@Url.Action("ExportRenaksi", "Administrasi")?pTahun=' + year);
+        window.location.replace('@Url.Action("ExportRenaksi", "Administrasi")?pTahun=' + year + '&pTipeKantor=' + tipeKantor + '&kantorId=' + kantorId);
         //window.location.href = + "Administrasi/ExportRenaksi";
     }
 
     function exportNtpn() {
         var year = $('#year').val();
         var month = $('#month').val();
+        var tipeKantor = $('#tipe-kantor').val() ? $('#tipe-kantor').val() : '';
+        var kantorId = $('#satuan-kerja').val() ? $('#satuan-kerja').val() : '';
         if (year == '') {
             year = new Date().getFullYear();
         }
         //window.location.href = + "Administrasi/Exportntpn";
-        window.location.replace('@Url.Action("ExportntpnV2", "Administrasi")?pTahun=' + year + '&pBulan=' + month);
+        window.location.replace('@Url.Action("ExportntpnV2", "Administrasi")?pTahun=' + year + '&pBulan=' + month + '&pTipeKantor=' + tipeKantor + '&pKantorId=' + kantorId);
     }
     $(document).ready(function () {
 

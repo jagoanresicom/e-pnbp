@@ -1276,7 +1276,7 @@ namespace Pnbp.Models
 			                            p.wilayahid = w.induk
 		                            WHERE
 			                            sr.SUMBER_DANA = 'D'
-			                            AND sr.tahun = '{tahun}'
+			                            AND sr.tahun = :tahun
 			                            AND sr.KDSATKER <> '524465' 
                             )
 	                            GROUP BY
@@ -1295,6 +1295,7 @@ namespace Pnbp.Models
 		                            sb.wilayahid = w.wilayahid
                                     LEFT JOIN realisasi r on r.wilayahid = w.wilayahid ";
 
+            lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
             //lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 

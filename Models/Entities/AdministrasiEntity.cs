@@ -43,6 +43,12 @@ namespace Pnbp.Entities
         public string Email { get; set; }
     }
 
+    public class ListKantorOptions {
+        public string Id { get; set; }
+        public string Nama { get; set; }
+        public string Tipe { get; set; }
+    }
+
     public class SatkerAlokasi
     {
         public decimal? RNumber { get; set; }

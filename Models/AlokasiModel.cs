@@ -9,6 +9,7 @@ using System.Web;
 using System.Threading.Tasks;
 using Oracle.ManagedDataAccess.Client;
 using Pnbp.Entities;
+using System.Web.Mvc;
 
 namespace Pnbp.Models
 {
@@ -1732,6 +1733,7 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
                 _ = e.StackTrace;
             }
 

@@ -2,6 +2,8 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.Streaming;
 using Oracle.ManagedDataAccess.Client;
+using Pnbp.Codes;
+using Pnbp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,6 +14,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Http.Results;
 using System.Web.Mvc;
 
 namespace Pnbp.Controllers
@@ -440,6 +443,7 @@ namespace Pnbp.Controllers
         [Authorize]
         public ActionResult ExportBelanja(string pTahun)
         {
+            try 
             {
                 string kantorid = new Pnbp.Codes.Functions().claimUser().KantorId;
                 string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
@@ -463,14 +467,14 @@ namespace Pnbp.Controllers
                 //string query =
                 //  @"
                 //       SELECT 
-		              //              ROW_NUMBER() over (ORDER BY kdsatker) urutan,
-		              //              KDSATKER KodeKRO,
-		              //              KDSATKER KodeSatker,
+                //              ROW_NUMBER() over (ORDER BY kdsatker) urutan,
+                //              KDSATKER KodeKRO,
+                //              KDSATKER KodeSatker,
                 //                    u.nama_satker NamaSatker,
-		              //              alsk.pagu pagu,
+                //              alsk.pagu pagu,
                 //                    alsk.alokasi alokasi,
                 //                    prov.nama namaprovinsi
-	               //             FROM 
+                //             FROM 
                 //                    alokasisatker alsk
                 //                    JOIN AlokasiSatkerSummary ass ON alsk.ALOKASISATKERSUMMARYID = ass.ALOKASISATKERSUMMARYID 
                 //                    JOIN SATKER u ON alsk.KDSATKER  = u.KODESATKER 
@@ -479,7 +483,7 @@ namespace Pnbp.Controllers
                 //                    LEFT JOIN wilayah prov ON prov.wilayahid = w.induk
                 //                WHERE 
                 //                    alsk.tahun = 2022";
-                
+
                 string query = @"
                        WITH realisasi AS (
 	                SELECT
@@ -537,33 +541,40 @@ namespace Pnbp.Controllers
                 var get = db.Database.SqlQuery<Entities.RekapBelanja>(query, lstparams.ToArray()).ToList();
                 //return Json(pTahun, JsonRequestBehavior.AllowGet);
 
-                foreach (var rw in get)
+                foreach (var rw in get) 
                 {
                     dt.Rows.Add(rw.urutan, rw.KodeKRO, rw.KodeSatker, rw.NamaSatker, rw.Pagu, rw.Realisasi, rw.NamaProvinsi);
                 }
 
-                using (XLWorkbook wb = new XLWorkbook())
+                using (XLWorkbook wb = new XLWorkbook()) 
                 {
                     wb.Worksheets.Add(dt);
-                    using (MemoryStream stream = new MemoryStream())
+                    using (MemoryStream stream = new MemoryStream()) 
                     {
                         wb.SaveAs(stream);
                         return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Belanja" + DateTime.Now.ToString("dd-mm-yyyy") + ".xlsx");
                     }
                 }
             }
+            catch (Exception e) 
+            {
+                new Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+            }
+
+            return new HttpStatusCodeResult(500, "Berkas gagal dibuat.");
         }
 
         [Authorize]
-        public ActionResult ExportRenaksi(string pTahun)
-        {
+        public ActionResult ExportRenaksi(string pTahun, string pTipeKantor, string pKantorId) {
             //pTahun = "2018";
             //int result = 1;
             //return Json(pTahun, JsonRequestBehavior.AllowGet);
             {
-                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                var userIdentity = new Functions().claimUser();
                 string kantorid = userIdentity.KantorId;
-                string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+                //string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+                int tipeKantorId = userIdentity.TipeKantorId;
+
 
                 //var ctx = new PnbpContext();
                 //var getRenaksi = ctx.Database.SqlQuery<Entities.Renaksi>("SELECT MANFAATID,KODESATKER,NAMAKANTOR,TAHUN FROM MANFAAT WHERE TAHUN = 2018");
@@ -644,25 +655,53 @@ namespace Pnbp.Controllers
                 });
 
                 //List<Entities.Renaksi> result = _pm.GetRenaksi(pTahun);
+
+                string pTipeKantorId = pTipeKantor;
+                string qTipeKantorId = "";
+                string qKantorId = (tipeKantorId != 1 || !String.IsNullOrEmpty(pKantorId)) ? " AND K.KANTORID = :pKantorId " : " AND K.KANTORID IS NOT NULL ";
+                if (tipeKantorId != 1) {
+                    pTipeKantorId = userIdentity.TipeKantorId.ToString();
+                }
+                if (!String.IsNullOrEmpty(pTipeKantor)) {
+                    qTipeKantorId = " AND K.TIPEKANTORID = :pTipeKantorId ";
+                }
+
                 string query =
-                @"SELECT DISTINCT * FROM MANFAAT WHERE TAHUN = :tahun ORDER BY TIPE, RANKJAN ASC";
+                $@"SELECT DISTINCT m.* 
+                    FROM 
+                        MANFAAT M LEFT JOIN 
+                        SATKER K ON K.KANTORID = M.KANTORID AND K.STATUSAKTIF = '1'
+                    WHERE 
+                        M.TAHUN = :pTahun 
+                        {qTipeKantorId} 
+                        {qKantorId} 
+                    ORDER BY TIPE, RANKJAN ASC";
 
                 List<object> lstparams = new List<object>();
-                lstparams.Add(new OracleParameter("tahun", pTahun));
+                lstparams.Add(new OracleParameter("pTahun", pTahun));
+                if (!String.IsNullOrEmpty(pTipeKantor)) {
+                    lstparams.Add(new OracleParameter("pTipeKantorId", pTipeKantorId));
+                }
+                if (tipeKantorId == 1) {
+                    if (!String.IsNullOrEmpty(pKantorId)) {
+                        lstparams.Add(new OracleParameter("pKantorId", pKantorId));
+                    }
+                }
+                else {
+                    lstparams.Add(new OracleParameter("pKantorId", userIdentity.KantorId));
+                }
+
                 var get = db.Database.SqlQuery<Entities.Renaksi>(query, lstparams.ToArray()).ToList();
 
                 ////return Json(pTahun, JsonRequestBehavior.AllowGet);
 
-                foreach (var rw in get)
-                {
+                foreach (var rw in get) {
                     dt.Rows.Add(rw.manfaatid, rw.tahun, rw.kantorid, rw.namakantor, rw.programid, rw.namaprogram, rw.tipe, rw.prioritaskegiatan, rw.nilaianggaran, rw.nilaialokasi, rw.statusfullalokasi, rw.statusedit, rw.statusaktif, rw.userinsert, rw.insertdate, rw.userupdate, rw.lastupdate, rw.totalgroup, rw.persengroup, rw.persenprogram, rw.totalalokasi, rw.sisaalokasi, rw.kodesatker, rw.prioritasasal, rw.anggjan, rw.rankjan, rw.anggfeb, rw.rankfeb, rw.anggmar, rw.rankmar, rw.anggapr, rw.rankapr, rw.anggmei, rw.rankmei, rw.anggjun, rw.rankjun, rw.anggjul, rw.rankjul, rw.anggagt, rw.rankagt, rw.anggsep, rw.ranksep, rw.anggokt, rw.rankokt, rw.anggnov, rw.ranknov, rw.anggdes, rw.rankdes, rw.alokjan, rw.alokfeb, rw.alokmar, rw.alokapr, rw.alokmei, rw.alokjun, rw.alokjul, rw.alokagt, rw.aloksep, rw.alokokt, rw.aloknov, rw.alokdes, rw.kode, rw.statusrevisi, rw.persetujuan1, rw.persetujuan2);
                 }
 
-                using (XLWorkbook wb = new XLWorkbook())
-                {
+                using (XLWorkbook wb = new XLWorkbook()) {
                     wb.Worksheets.Add(dt);
-                    using (MemoryStream stream = new MemoryStream())
-                    {
+                    using (MemoryStream stream = new MemoryStream()) {
                         wb.SaveAs(stream);
                         return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Rencana_Aksi" + DateTime.Now.ToString("dd-mm-yyyy") + ".xlsx");
                     }
@@ -754,11 +793,22 @@ namespace Pnbp.Controllers
         }
 
          [Authorize]
-        public ActionResult ExportntpnV2(string pTahun, string pBulan)
+        public ActionResult ExportntpnV2(string pTahun, string pBulan, string pTipeKantor, string pKantorId) 
         {
-            var userIdentity = new Pnbp.Codes.Functions().claimUser();
-            string kantorid = userIdentity.KantorId;
-            string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
+            var userIdentity = new Functions().claimUser();
+            string pTipeKantorId = pTipeKantor;
+            int tipeKantorId = userIdentity.TipeKantorId;
+            string qTipeKantorId = "";
+            string qKantorId = (tipeKantorId != 1 || !String.IsNullOrEmpty(pKantorId)) ? " AND K.KANTORID = :pKantorId " : " AND K.KANTORID IS NOT NULL ";
+            if (tipeKantorId != 1) 
+            {
+                pTipeKantorId = userIdentity.TipeKantorId.ToString();
+            }
+            if (!String.IsNullOrEmpty(pTipeKantor)) 
+            {
+                qTipeKantorId = " AND K.TIPEKANTORID = :pTipeKantorId ";
+            }
+
 
             PnbpContext db = new PnbpContext();
             string query =
@@ -766,7 +816,7 @@ namespace Pnbp.Controllers
                 WITH d AS (
 	                SELECT 
 	                TANGGAL,
-                    KODESATKER,
+                    R.KODESATKER,
                     NAMAKANTOR,
                     NAMAPROSEDUR,
                     NVL(NOMORBERKAS,-999) NOMORBERKAS,
@@ -774,17 +824,22 @@ namespace Pnbp.Controllers
                     JENISPENERIMAAN,
                     KODEPENERIMAAN,
                     BANKPERSEPSIID,
-                    TAHUN,
+                    R.TAHUN,
                     BULAN,
                     KODEBILLING,
                     NTPN,
                     JUMLAH,
                     PENERIMAAN,
                     OPERASIONAL 
-	                FROM REKAPPENERIMAANDETAIL
-	                WHERE TAHUN = :tahun AND BULAN = :bulan
+	                FROM REKAPPENERIMAANDETAIL R 
+                    LEFT JOIN SATKER K ON K.KANTORID = R.KANTORID AND K.STATUSAKTIF = '1'
+	                WHERE 
+                        R.TAHUN = :pTahun AND 
+                        BULAN = :pBulan 
+                        {qTipeKantorId}
+                        {qKantorId}
                 )
-                SELECT DISTINCT TANGGAL,
+                SELECT TANGGAL,
                     KODESATKER,
                     NAMAKANTOR,
                     NAMAPROSEDUR,
@@ -803,19 +858,34 @@ namespace Pnbp.Controllers
                 FROM d";
 
             List<object> lstparams = new List<object>();
-            lstparams.Add(new OracleParameter("tahun", pTahun));
-            lstparams.Add(new OracleParameter("bulan", pBulan));
+            lstparams.Add(new OracleParameter("pTahun", pTahun));
+            lstparams.Add(new OracleParameter("pBulan", pBulan));
+            if (!String.IsNullOrEmpty(pTipeKantor)) 
+            {
+                lstparams.Add(new OracleParameter("pTipeKantorId", pTipeKantorId));
+            }
+            if (tipeKantorId == 1) 
+            {
+                if (!String.IsNullOrEmpty(pKantorId)) 
+                {
+                    lstparams.Add(new OracleParameter("pKantorId", pKantorId));
+                }
+            }
+            else 
+            {
+                lstparams.Add(new OracleParameter("pKantorId", userIdentity.KantorId));
+            }
             var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query, lstparams.ToArray()).ToList();
 
             int tSheet;
             var value = get.Count;
             var maxRow = 1048575;
             var md = 0;
-            if (value < maxRow)
+            if (value < maxRow) 
             {
                 tSheet = 1;
             }
-            else
+            else 
             {
                 md = value % maxRow;
                 tSheet = (value / maxRow) + (md != 0 ? 1 : 0);
@@ -823,7 +893,7 @@ namespace Pnbp.Controllers
 
             int numb = 1;
             IWorkbook workbook = new SXSSFWorkbook();
-            for (int x = 0; x < tSheet; x++)
+            for (int x = 0; x < tSheet; x++) 
             {
                 ISheet sheet = workbook.CreateSheet($"Sheet {x}");
                 #region HEADER
@@ -867,8 +937,7 @@ namespace Pnbp.Controllers
                 var myData = get.GetRange((x * maxRow), (get.Count > maxRow ? ((x + 1) == tSheet ? md : maxRow) : get.Count));
 
                 var index = 1;
-                foreach (var rw in myData)
-                {
+                foreach (var rw in myData) {
                     var rowBody = sheet.CreateRow(index);
                     cell = rowBody.CreateCell(0);
                     cell.SetCellValue(numb);
@@ -914,9 +983,9 @@ namespace Pnbp.Controllers
             }
 
             byte[] byteArray = null;
-            try
+            try 
             {
-                using (MemoryStream stream = new MemoryStream())
+                using (MemoryStream stream = new MemoryStream()) 
                 {
                     workbook.Write(stream);
                     workbook.Close();
@@ -924,17 +993,17 @@ namespace Pnbp.Controllers
                     byteArray = stream.ToArray();
                 }
             }
-            catch(Exception e)
+            catch (Exception e) 
             {
                 _ = e.StackTrace;
                 workbook.Close();
             }
 
-            if (byteArray != null && byteArray.Length > 0)
+            if (byteArray != null && byteArray.Length > 0) 
             {
                 return File(byteArray, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"NTPN ({pTahun}/{pBulan}).xlsx");
             }
-            else
+            else 
             {
                 return new HttpStatusCodeResult(500, "Berkas gagal dibuat.");
             }
@@ -942,9 +1011,10 @@ namespace Pnbp.Controllers
 
 
 
-        public ActionResult ManajemenData()
-        { 
-            //return View();
+        public ActionResult ManajemenData() 
+        {
+            var userIdentity = new Functions().claimUser();
+            ViewData["tipekantorid"] = userIdentity.TipeKantorId.ToString();
             return View("ManajemenDataV2");
         }
 
@@ -1399,6 +1469,29 @@ namespace Pnbp.Controllers
                                             "VALUES ('" + KDSATKER + "','" + KPPN + "','" + BA + "','" + BAES1 + "','" + AKUN + "','" + PROGRAM + "','" + KEGIATAN + "','" + OUTPUT + "','" + KEWENANGAN + "','" + SUMBER_DANA + "','" + CARA_TARIK + "','" + LOKASI + "','" + BUDGET_TYPE + "'," + AMOUNT + ","+ currentYear + ")";
             db.Database.ExecuteSqlCommand(insert_belanja);
             return Json(form, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult ListSatker(string tipeKantorId) {
+            var list = new List<ListKantorOptions>();
+
+            string query =
+                @"SELECT kantorid id, nama_satker nama, to_char(tipekantorid) tipe
+                    FROM satker 
+                ORDER BY nama_satker";
+
+            try {
+                using (var ctx = new PnbpContext()) {
+                    List<object> lstparams = new List<object>();
+                    //lstparams.Add(new OracleParameter("tipeKantorId", tipeKantorId));
+                    list = ctx.Database.SqlQuery<ListKantorOptions>(query, lstparams.ToArray()).ToList();
+                }
+            }
+            catch (Exception ex) {
+                _ = ex.Message;
+            }
+
+            return Json(list, JsonRequestBehavior.AllowGet);
         }
 
     }
