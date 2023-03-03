@@ -31,7 +31,7 @@ namespace Pnbp.Controllers
 	                    b.NAMA_SATKER
                     FROM
 	                    LOG_AKTIFITAS a
-	                    JOIN SATKER b ON a.LOG_KANTORID = b.KANTORID 
+	                    JOIN KANTOR b ON a.LOG_KANTORID = b.KANTORID 
                     ORDER BY
 	                    a.LOG_CREATE_BY ASC";
             var get_data = ctx.Database.SqlQuery<Entities.AuditTrail>(query).ToList();
@@ -59,7 +59,7 @@ namespace Pnbp.Controllers
 	                c.NTPN 
                 FROM
 	                LOG_AKTIFITAS a
-	                LEFT JOIN SATKER b ON a.LOG_KANTORID = b.KANTORID
+	                LEFT JOIN KANTOR b ON a.LOG_KANTORID = b.KANTORID
 	                LEFT JOIN BERKASKEMBALIAN c ON a.LOG_DATA_ID = c.PENGEMBALIANPNBPID 
                 WHERE
 	                LOG_TIPE = 'PENGEMBALIANPNBP'";
@@ -87,7 +87,7 @@ namespace Pnbp.Controllers
 	                    b.NAMA_SATKER
                     FROM
 	                    LOG_AKTIFITAS a
-	                    LEFT JOIN SATKER b ON a.LOG_KANTORID = b.KANTORID 
+	                    LEFT JOIN KANTOR b ON a.LOG_KANTORID = b.KANTORID 
 	                    LEFT JOIN MANFAAT c ON a.LOG_DATA_ID = c.MANFAATID
 	                    LEFT JOIN PROGRAM d ON c.PROGRAMID = d.PROGRAMID
                     WHERE LOG_TIPE = 'RENAKSI'
@@ -115,7 +115,7 @@ namespace Pnbp.Controllers
 	                    b.NAMA_SATKER
                     FROM
 	                    LOG_AKTIFITAS a
-	                    JOIN SATKER b ON a.LOG_KANTORID = b.KANTORID 
+	                    JOIN KANTOR b ON a.LOG_KANTORID = b.KANTORID 
                     ORDER BY
 	                    a.LOG_CREATE_BY ASC";
             var get_data = ctx.Database.SqlQuery<Entities.AuditTrail>(query).ToList();

@@ -87,6 +87,51 @@ namespace Pnbp.Codes
             return userlogin;
         }
 
+
+        public static bool IsContainsRole(string[] roles) {
+            string[] userRoles = ListUserRoles();
+            foreach (string role in userRoles) {
+                if (roles.Any(s => role.Contains(s))) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string[] ListUserRoles() {
+
+            List<string> roles = new List<string>();
+
+            try {
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                var userlogin = new userIdentity();
+                if (HttpContext.Current.User.Identity.IsAuthenticated) {
+                    string _CookieName = System.Configuration.ConfigurationManager.AppSettings["CookieName"].ToString();
+                    var authCookie = HttpContext.Current.Request.Cookies[_CookieName];
+                    if (authCookie != null) {
+                        var kc = ClaimsPrincipal.Current.Claims;
+                        if (kc != null && kc.Count() > 0) {
+                            var access_token = kc.Where((claim) => claim.Type == "access_token").FirstOrDefault().Value;
+                            var handler = new JwtSecurityTokenHandler();
+                            var jwtSecurityToken = handler.ReadJwtToken(access_token);
+                            JObject obj = JObject.Parse(jwtSecurityToken.Claims.First(c => c.Type == "resource_access").Value);
+                            var roleAccess = obj.GetValue(System.Configuration.ConfigurationManager.AppSettings["ClientId"]).ToObject<JObject>().GetValue("roles");
+                            foreach (JToken role in roleAccess) {
+                                roles.Add(role.ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) {
+
+            }
+
+            return roles.ToArray();
+        }
+
         public class Logging
         {
             public void LogEvent(string logMessage)

@@ -799,7 +799,7 @@ namespace Pnbp.Models
 	                                                k.TIPE AS tipe, 
 	                                                p.PROGRAMID as programid, sb.kegiatan ||'.' ||sb.OUTPUT as kode, sum(sb.amount) as amount
                                                 FROM span_belanja sb
-                                                    LEFT JOIN satker s ON sb.KDSATKER = s.KODESATKER and s.statusaktif = 1 
+                                                    LEFT JOIN KANTOR s ON sb.KDSATKER = s.KODESATKER 
                                                     LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
                                                     LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
                                                 WHERE
@@ -859,7 +859,7 @@ namespace Pnbp.Models
                                                 sysdate,
                                                 1
                                             from span_belanja sb
-                                            left JOIN satker s ON sb.KDSATKER = s.KODESATKER and s.statusaktif = 1 
+                                            left JOIN KANTOR s ON sb.KDSATKER = s.KODESATKER 
                                             LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
                                             LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
                                             WHERE
@@ -999,171 +999,6 @@ namespace Pnbp.Models
             {
                 new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
                 isProcessAlokasiSuccess = false;
-                trx.Rollback();
-            }
-
-            return isProcessAlokasiSuccess;
-        }
-
-        public bool ProsesAlokasiOld()
-        {
-            var db = new PnbpContext();
-            var trx = db.Database.BeginTransaction();
-            List<Entities.DataProsesAlokasi> result = new List<Entities.DataProsesAlokasi>();
-            var isProcessAlokasiSuccess = true;
-
-            var idTrx = NewGuID();
-
-            try
-            {
-                string query = @"
-                SELECT * FROM (
-	                select 
-	                    s.KANTORID as kantorid, 
-	                    k.TIPE AS tipe, 
-	                    p.PROGRAMID as programid, 
-	                    p.nama AS programnama,
-	                    s.NAMA_SATKER as namasatker, 
-	                    sb.KDSATKER as kodesatker, sb.kegiatan as kegiatan, sb.OUTPUT as output, sum(sb.amount) as amount
-	                from span_belanja sb
-	                left JOIN satker s ON sb.KDSATKER = s.KODESATKER and s.statusaktif = 1 
-	                LEFT JOIN KODESPAN k ON sb.KEGIATAN  = k.KODE AND sb.OUTPUT = k.KEGIATAN 
-	                LEFT JOIN PROGRAM p ON p.KODE = k.KODEOUTPUT AND p.STATUSAKTIF = 1 AND p.TIPEOPS = k.TIPE
-	                WHERE
-                        sb.KDSATKER = '430210' AND
-                        sb.KDSATKER != '524465'  AND sb.SUMBER_DANA = 'D'
-	                GROUP BY
-	                    s.KANTORID, 
-	                    k.tipe,
-	                    s.NAMA_SATKER, 
-	                    sb.kdsatker, 
-	                    sb.kegiatan, 
-	                    sb.OUTPUT, 
-	                    p.PROGRAMID,
-	                    p.NAMA
-	                ORDER BY sb.kdsatker
-                )
-                WHERE programid IS NOT NULL
-                ";
-                //sb.KDSATKER = '430210' AND
-
-
-                result = db.Database.SqlQuery<Entities.DataProsesAlokasi>(query).ToList();
-
-                var queryCheckSummary = "select count(*) from alokasisatkersummary where tahun = extract(year from sysdate)";
-                var countSummary = db.Database.SqlQuery<int>(queryCheckSummary).FirstOrDefault();
-                
-                bool successInsert = true;
-                foreach (var item in result)
-                {
-                    var qInsertOrUpdate = "";
-                    if (countSummary > 0)
-                    {
-                        // update data ke manfaat
-                        qInsertOrUpdate = $@"update manfaat set NILAIANGGARAN = {item.Amount} 
-                            where tahun = extract(year from sysdate) and kantorid = '{item.KantorId}' 
-                            and programid = '{item.ProgramId}' and tipe = '{item.Tipe}' and kode = '{item.Kegiatan + "." + item.Output}'";
-
-                    }
-                    else
-                    {
-                        // insert data ke manfaat
-                        qInsertOrUpdate = BuildQuery(
-                            item.KantorId,
-                            item.NamaSatker,
-                            item.ProgramId,
-                            item.ProgramNama,
-                            item.Tipe,
-                            item.Amount,
-                            $"{item.Kegiatan}.{item.Output}",
-                            item.KodeSatker);
-
-                    }
-                    if (string.IsNullOrEmpty(qInsertOrUpdate))
-                    {
-                        successInsert = false;
-                        break;
-                    }
-
-                    var row = db.Database.ExecuteSqlCommand(qInsertOrUpdate);
-                    if (row <= 0)
-                    {
-                        successInsert = false;
-                        break;
-                    }
-                }
-
-                if (successInsert)
-                {
-                    var queryLastAlokasiSummary = @"SELECT 
-                            ALOKASISATKERSUMMARYID, 
-                            PAGU, 
-                            ALOKASI, 
-                            TO_CHAR(TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
-                            TO_CHAR(TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH,
-                            MP 
-                        FROM ALOKASISATKERSUMMARY a 
-                        WHERE tahun = extract(year from sysdate) AND MP = (SELECT * FROM (
-                            SELECT a2.mp FROM ALOKASISATKERSUMMARY a2 WHERE a2.tahun = extract(year from sysdate) ORDER BY a2.MP DESC
-                        ) WHERE rownum = 1)";
-
-                    var getLastAlokasiSummary = db.Database.SqlQuery<Entities.AlokasiSatkerSummary>(queryLastAlokasiSummary).FirstOrDefault();
-                    var mp = getLastAlokasiSummary == null ? 1 : (getLastAlokasiSummary.Mp + 1);
-
-                    var isSuccessProccessMove = true;
-                    var queryAlokasiSatkerSummary = $@"
-                        INSERT INTO ALOKASISATKERSUMMARY(ALOKASISATKERSUMMARYID, PAGU, ALOKASI, MP)
-                        SELECT '{idTrx}', sum(pagu), sum(alokasi), {mp} ALOKASI FROM TEMP_ALOKASI
-                        ";
-                    var rowSummary = db.Database.ExecuteSqlCommand(queryAlokasiSatkerSummary);
-                    if (rowSummary <= 0)
-                    {
-                        isSuccessProccessMove = false;
-                    }
-                    else
-                    {
-                        var queryMoveAlokasi = $@"
-                            INSERT INTO ALOKASISATKER(ALOKASISATKERID, KDSATKER, PAGU, ALOKASI, ALOKASISATKERSUMMARYID)
-                            SELECT sys_guid(), KDSATKER, PAGU, ALOKASI, '{idTrx}' FROM TEMP_ALOKASI
-                            ";
-                        var rowMoveAlokasi = db.Database.ExecuteSqlCommand(queryMoveAlokasi);
-                        if (rowMoveAlokasi <= 0)
-                        {
-                            isSuccessProccessMove = false;
-                        }
-                    }
-
-                    if (isSuccessProccessMove)
-                    {
-                        // clear
-                        var queryDelete = @"delete from TEMP_ALOKASI";
-                        var rowDelete = db.Database.ExecuteSqlCommand(queryDelete);
-                        if (rowDelete <= 0)
-                        {
-                            isProcessAlokasiSuccess = false;
-                            trx.Rollback();
-                        }
-                        else
-                        {
-                            trx.Commit();
-                        }
-                    }
-                    else
-                    {
-                        isProcessAlokasiSuccess = false;
-                        trx.Rollback();
-                    }
-                }
-                else
-                {
-                    isProcessAlokasiSuccess = false;
-                    trx.Rollback();
-                }
-            }
-            catch (Exception e)
-            {
-                isProcessAlokasiSuccess = false;
-                _ = e.StackTrace;
                 trx.Rollback();
             }
 
@@ -1347,7 +1182,7 @@ namespace Pnbp.Models
                         TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH 
                     FROM ALOKASISATKER a 
-                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER and s.statusaktif = 1 
+                    JOIN KANTOR s ON a.KDSATKER = s.KODESATKER 
                     WHERE ALOKASISATKERSUMMARYID = :id";
                 List<object> lstparams = new List<object>();
                 lstparams.Add(new OracleParameter("id", id));
@@ -1379,7 +1214,7 @@ namespace Pnbp.Models
                         to_char(ta.PAGU) AS pagu, 
                         to_char(ta.alokasi) AS alokasi 
                     FROM TEMP_ALOKASI_REVISI ta
-                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
+                    LEFT JOIN KANTOR s  ON ta.KDSATKER = s.KODESATKER 
                     WHERE ta.KDSATKER != '524465'
                 ";
                 var listTempRevisi = db.Database.SqlQuery<Entities.TempAlokasi>(queryTempRevisi).ToList();
@@ -1554,7 +1389,7 @@ namespace Pnbp.Models
                         TO_CHAR(a.TANGGALBUAT,'DD-MM-YYYY') as TANGGALBUAT, 
                         TO_CHAR(a.TANGGALUBAH,'DD-MM-YYYY') as TANGGALUBAH 
                     FROM ALOKASISATKER a 
-                    JOIN SATKER s ON a.KDSATKER = s.KODESATKER
+                    JOIN KANTOR s ON a.KDSATKER = s.KODESATKER
 	                LEFT JOIN belanja b on b.kdsatker = a.kdsatker ";
 
                 if (!String.IsNullOrEmpty(search.satker) && search.satker != "--Pilih Satker--")
@@ -1594,7 +1429,7 @@ namespace Pnbp.Models
                         to_char(ta.PAGU) AS pagu, 
                         to_char(ta.alokasi) AS alokasi 
                     FROM TEMP_ALOKASI_REVISI ta
-                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER 
+                    LEFT JOIN KANTOR s  ON ta.KDSATKER = s.KODESATKER 
                     WHERE ta.KDSATKER != '524465'
                 ";
                 var listTempRevisi = db.Database.SqlQuery<Entities.TempAlokasi>(queryTempRevisi).ToList();
@@ -1672,7 +1507,7 @@ namespace Pnbp.Models
 	                    sb.KDSATKER  AS kodesatker, 
 	                    TO_CHAR(sb.AMOUNT) AS amount
                     FROM sb
-                    LEFT JOIN satker s ON sb.kdsatker = s.KODESATKER and s.statusaktif = 1 
+                    LEFT JOIN KANTOR s ON sb.kdsatker = s.KODESATKER 
                     WHERE 
 	                    sb.KDSATKER != '524465' AND sb.kdsatker IS NOT NULL 
                     GROUP BY sb.KDSATKER, sb.AMOUNT 
@@ -1907,7 +1742,7 @@ namespace Pnbp.Models
                         to_char(ta.alokasi) AS alokasi, 
                         (CASE WHEN pagu >= alokasi THEN 1 ELSE 0 end) valid
                     FROM {tableName} ta
-                    LEFT JOIN satker s  ON ta.KDSATKER = s.KODESATKER  and s.statusaktif = 1 
+                    LEFT JOIN KANTOR s  ON ta.KDSATKER = s.KODESATKER 
                     WHERE ta.KDSATKER != '524465'
                 ) ORDER BY valid
                 ";

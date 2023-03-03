@@ -126,13 +126,11 @@
 
                 if (jenisKantor == "Kantah")
                 {
-                    string roles = "'KepalaSubBagianTataUsaha'";
-                    isAuthorized = model.CheckValidUserProfileRoles(pegawaiid, kantorid, roles);
+                    isAuthorized = Pnbp.Codes.Functions.IsContainsRole(new string[] { "KepalaSubBagianTataUsaha" });
                 }
                 else if (jenisKantor == "Kanwil")
                 { 
-                    string roles = "'KepalaUrusanKeuangan'";
-                    isAuthorized = model.CheckValidUserProfileRoles(pegawaiid, kantorid, roles);
+                    isAuthorized = Pnbp.Codes.Functions.IsContainsRole(new string[] { "KepalaUrusanKeuangan" });
                 }
 
             }

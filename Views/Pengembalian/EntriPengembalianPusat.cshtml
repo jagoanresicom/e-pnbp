@@ -62,6 +62,15 @@
                                 <input type="hidden" name="satker" id="satker" value="@((new Pnbp.Codes.Functions().claimUser()).NamaKantor.Replace("Kantor Pertanahan", ""))" />
                                 <div class="panel-body form-horizontal">
                                     @* form *@
+                                    @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat") 
+                                    {
+                                        <div class="form-group">
+                                            <div class="text-center">
+                                                <input type="radio" checked name="tipeKantorBerkas" id="Mjc3MDg0Mw" value="kantah"> <label for="Mjc3MDg0Mw">Kantor Pertanahan</label>
+                                                <input type="radio" name="tipeKantorBerkas" id="Mjc3MDg0Nw" value="kanwil" style="margin-left: 1rem;"> <label for="Mjc3MDg0Nw">Kantor Wilayah</label>
+                                            </div>
+                                        </div>
+                                    }
                                     <div class="form-group">
                                         <label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
                                         <div class="col-sm-6">
@@ -198,7 +207,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        @Html.LabelFor(model => model.NomorTelepon, new { @class = "col-sm-4 control-label" })
+                                        @Html.LabelFor(model => model.NomorTelepon, new { @class = "col-sm-4 control-label", @style = "text-align: left;" })
                                         <div class="col-sm-8">
                                             @*<input type="text" class="form-control" id="NamaBank" name="NamaBank" placeholder="Nama Bank">*@
                                             @Html.TextBoxFor(model => model.NomorTelepon, new { @class = "form-control", @required = "required" })
@@ -494,6 +503,7 @@
             type: 'post',
             data: {
                 noberkas: noBerkas,
+                tipeKantorBerkas: $('#pengembalian_form')[0].tipeKantorBerkas ? $('#pengembalian_form')[0].tipeKantorBerkas.value : null,
                 __RequestVerificationToken: token, 
             },
 			success: function (res) {

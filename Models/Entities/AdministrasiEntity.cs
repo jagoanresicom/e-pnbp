@@ -890,6 +890,7 @@ namespace Pnbp.Entities
         public string NikPemohon { get; set; }
         public string AlamatPemohon { get; set; }
         public string EmailPemohon { get; set; }
+        [Display(Name = "Nomor Telepon")]
         public string NomorTelepon { get; set; }
         public string NomorBerkas { get; set; }
         public string NomorRekening { get; set; }

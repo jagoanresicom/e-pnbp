@@ -1031,7 +1031,6 @@ namespace Pnbp.Controllers
             ViewData["provinsi_id"] = pid;
             if (!String.IsNullOrEmpty(pid))
             { 
-                //ViewData["nama_wilayah"] = model.GetNamaProvinsiBySatkerInduk(pid);
                 ViewData["nama_wilayah"] = model.GetNamaProvinsiByWilayahId(pid);
             }
 

@@ -179,18 +179,23 @@ namespace Pnbp.Controllers
                 return Json(resp, JsonRequestBehavior.AllowGet);
             }
 
+            decimal persenTercapai = Math.Floor((decimal)total.totalpenerimaan / (decimal)total.totaltarget * 10000) / 100;
+            decimal persenSisa = 100 - persenTercapai;
+
             List<ChartData> data = new List<ChartData>() { };
             data.Add(new ChartData()
             {
                 name = "Target",
-                y = total.totaltarget,
+                y = persenSisa,
                 legendIndex = 2,
+                data1 = total.totaltarget,
             });
             data.Add(new ChartData()
             {
                 name = "Total Penerimaan",
-                y = total.totalpenerimaan,
+                y = persenTercapai,
                 legendIndex = 1,
+                data1 = total.totalpenerimaan,
             });
 
             resp.Success = true;

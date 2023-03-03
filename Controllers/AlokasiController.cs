@@ -10,6 +10,7 @@ using System.Configuration;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 using Pnbp.Entities;
+using Oracle.ManagedDataAccess.Client;
 
 namespace Pnbp.Controllers
 {
@@ -84,7 +85,7 @@ namespace Pnbp.Controllers
             var get_data = ctx.Database.SqlQuery<Entities.getDataSatker>("SELECT DISTINCT KANTORID, KODESATKER, NAMAKANTOR,NVL (SUM (NILAIANGGARAN), 0)AS NILAIANGGARAN, NVL (SUM (TOTALALOKASI), 0) AS TOTALALOKASI, NVL (SUM (NILAIALOKASI), 0) AS NILAIALOKASI, NVL (SUM (SISAALOKASI), 0) AS SISAALOKASI, row_number() over (order by sum(NILAIANGGARAN) desc) as urutan FROM MANFAAT WHERE TIPE = 'NONOPS' GROUP BY KANTORID, NAMAKANTOR, KODESATKER").ToList();
             ViewData["get_data"] = get_data;
 
-            var get_approve = ctx.Database.SqlQuery<Entities.getDataApprove>("SELECT a.KANTORID, b.kodesatker, b.NAMA_SATKER, a.PAGU, a.TOTALALOKASI, a.REALISASI, a.MP, a.ALOKASI FROM ALOKASISATKERNONOPS a LEFT JOIN SATKER b ON a.KANTORID = b.KANTORID WHERE APPROVE = 'on' ").ToList();
+            var get_approve = ctx.Database.SqlQuery<Entities.getDataApprove>("SELECT a.KANTORID, b.kodesatker, b.NAMA_SATKER, a.PAGU, a.TOTALALOKASI, a.REALISASI, a.MP, a.ALOKASI FROM ALOKASISATKERNONOPS a LEFT JOIN KANTOR b ON a.KANTORID = b.KANTORID WHERE APPROVE = 'on' ").ToList();
             ViewData["get_approve"] = get_approve;
 
             //return Json(currentMonth, JsonRequestBehavior.AllowGet);
@@ -716,7 +717,7 @@ namespace Pnbp.Controllers
                         a.APPROVE 
                     FROM
 	                    ALOKASISATKERNONOPS a 
-	                    LEFT JOIN SATKER b ON a.KANTORID = b.KANTORID
+	                    LEFT JOIN KANTOR b ON a.KANTORID = b.KANTORID
                     WHERE a.APPROVE = 'on'";
             var get_data = ctx.Database.SqlQuery<Entities.getDataSatkerEselon>(query).ToList();
             return Json(get_data, JsonRequestBehavior.AllowGet);
@@ -788,8 +789,10 @@ namespace Pnbp.Controllers
         {
             //return Json(kantorid, JsonRequestBehavior.AllowGet);
             var ctx = new PnbpContext();
+            List<object> lstparams = new List<object>();
+            lstparams.Add(new OracleParameter("kantorid", kantorid));
             var get_data_custom = ctx.Database.SqlQuery<Entities.getDataSatker>("WITH aa AS ( SELECT DISTINCT A.kantorid, b.KODESATKER, b.NAMA_SATKER, SUM(A.NILAIANGGARAN) AS NILAIANGGARAN, NVL(SUM(A.TOTALALOKASI), 0) AS TOTALALOKASI, SUM(A.NILAIALOKASI) AS NILAIALOKASI, NVL(SUM(A.SISAALOKASI), 0) AS SISAALOKASI, ROUND( SUM(NILAIALOKASI / NILAIANGGARAN), 2 ) mp FROM MANFAAT A " +
-               "LEFT JOIN satker b ON A.kantorid = b.kantorid WHERE TIPE = 'NONOPS' GROUP BY A.kantorid, b.KODESATKER, b.NAMA_SATKER ) SELECT kantorid, KODESATKER, NAMA_SATKER, NILAIANGGARAN, TOTALALOKASI, NILAIALOKASI, SISAALOKASI, MP FROM aa WHERE kantorid = '" + kantorid + "' GROUP BY kantorid, KODESATKER, NAMA_SATKER, NILAIANGGARAN, TOTALALOKASI, NILAIALOKASI, SISAALOKASI, mp").ToList();
+               "LEFT JOIN KANTOR b ON A.kantorid = b.kantorid WHERE TIPE = 'NONOPS' GROUP BY A.kantorid, b.KODESATKER, b.NAMA_SATKER ) SELECT kantorid, KODESATKER, NAMA_SATKER, NILAIANGGARAN, TOTALALOKASI, NILAIALOKASI, SISAALOKASI, MP FROM aa WHERE kantorid = :kantorid GROUP BY kantorid, KODESATKER, NAMA_SATKER, NILAIANGGARAN, TOTALALOKASI, NILAIALOKASI, SISAALOKASI, mp", lstparams.ToArray()).ToList();
             return Json(get_data_custom, JsonRequestBehavior.AllowGet);
         }
 

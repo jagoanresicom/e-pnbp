@@ -80,7 +80,7 @@ namespace Pnbp.Models
 	                                (
 	                                SELECT
 		                                sr.KDSATKER kodesatker,
-		                                s.NAMA_SATKER namasatker,
+		                                k.NAMA_SATKER namasatker,
 		                                amount realisasi,
 		                                OUTPUT,
 		                                prov.kode kodeprovinsi,
@@ -88,10 +88,8 @@ namespace Pnbp.Models
 		                                sr.tahun
 	                                FROM
 		                                SPAN_REALISASI sr
-	                                JOIN satker s ON
-		                                s.KODESATKER = sr.KDSATKER
 	                                JOIN kantor k ON
-		                                k.kodesatker = s.KODESATKER
+		                                k.kodesatker = sr.KODESATKER
 	                                JOIN wilayah w ON
 		                                k.kode = w.kode
 	                                JOIN wilayah prov ON

@@ -99,7 +99,6 @@
 										<th>No</th>
 										<th>Provinsi</th>
 										<th>Fisik</th>
-										<th>Operasional</th>
 										<th>Penerimaan</th>
 										<th>Aksi</th>
 									</tr>
@@ -195,14 +194,12 @@
             },
             "headerCallback": function (thead, data, start, end, display) {
 				let totalfisik = '';
-                let totaloperasional = '';
                 let totalpenerimaan = '';
                 if (data.length > 0) {
 					totalfisik = formatAngka(data[0].totalfisik);
-					totaloperasional = formatAngka(data[0].totaloperasional);
 					totalpenerimaan = formatAngka(data[0].totalpenerimaan);
                 }
-				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="2" class="numeric">Total</th><th class="text-center">${totalfisik}</th><th class="text-center">${totaloperasional}</th><th class="text-center">${totalpenerimaan}</th><th class="disabled"></th></tr>`)
+				$(thead).parent().prepend(`<tr class="thead-row-no-border-bottom"><th colspan="2" class="numeric">Total</th><th class="text-center">${totalfisik}</th><th class="text-center">${totalpenerimaan}</th><th class="disabled"></th></tr>`)
                 if ($(thead).hasClass('thead-row-no-border-bottom')) {
                     $(thead).remove();
                 }
@@ -210,9 +207,7 @@
             "columns": [
                 { "data": "urutan", "className": "centertaligncolumn", "width": "10%" },
 			    { "data": "nama_provinsi", "width": "40%" },
-                //{ "data": "targetfisik", "className": "text-right", "width": "10%", "rendr": formatAngka },
                 { "data": "jumlah", "className": "text-right", "width": "15%", "render": formatAngka },
-                { "data": "operasional", "className": "text-right", "width": "20%", "rendr": formatAngka },
                 { "data": "penerimaan", "className": "text-right", "width": "20%", "rendr": formatAngka },
 			    {
                     "mData": "Name",

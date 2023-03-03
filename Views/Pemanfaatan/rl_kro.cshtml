@@ -211,7 +211,12 @@
 
         $('.MjI3NDA2Mw').on('click', (ev) => {
             history.back()
-        });
+		});
+
+        let getQueryParameter = (param) => new URLSearchParams(document.location.search.substring(1)).get(param);
+        if (getQueryParameter('pid')) {
+            frmPencarian.submit();
+        }
 
     });
 

@@ -6077,8 +6077,8 @@
     <Content Include="Views\Pengembalian\pusat.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalianPusat.cshtml" />
     <Content Include="Views\Pengembalian\EntriPengembalianDaerah.cshtml" />
+    <Content Include="Views\Pengembalian\FormVerifPengajuanPusat.cshtml" />
     <Content Include="Views\Pengembalian\DetailPengajuanPusat.cshtml" />
-    <Content Include="Views\Pengembalian\DetailPengajuanDaerah.cshtml" />
     <Content Include="Views\MonitoringEvaluasi\AlokasiDaerah.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>

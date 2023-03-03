@@ -334,7 +334,7 @@ namespace Pnbp.Models
             ArrayList arrayListParameters = new ArrayList();
 
             string query =
-//                kantor.kode,
+                //                kantor.kode,
                 @"SELECT * FROM (
                     SELECT
                         ROW_NUMBER() over (ORDER BY pengembalianpnbp.tanggalpengaju DESC, berkaskembalian.tanggalbayar, berkaskembalian.namapemohon) RNumber,
@@ -359,8 +359,7 @@ namespace Pnbp.Models
                     FROM
                         pengembalianpnbp
                         JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
-                        JOIN kantor ON kantor.kantorid = pengembalianpnbp.kantorid
-                        JOIN satker ON satker.kantorid = pengembalianpnbp.kantorid 
+                        JOIN KANTOR satker ON satker.kantorid = pengembalianpnbp.kantorid 
                         AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) 
                    WHERE berkaskembalian.nomorsurat IS NOT NULL AND berkaskembalian.permohonanpengembalian IS NOT NULL";
 
@@ -577,8 +576,7 @@ namespace Pnbp.Models
                     FROM
                         pengembalianpnbp
                         JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
-                        JOIN kantor ON kantor.kantorid = pengembalianpnbp.kantorid
-                        JOIN satker ON satker.kantorid = pengembalianpnbp.kantorid 
+                        JOIN KANTOR satker ON satker.kantorid = pengembalianpnbp.kantorid 
                         AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) ";
 
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorIdUser", kantoriduser));
@@ -590,11 +588,11 @@ namespace Pnbp.Models
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaKantor", String.Concat("%", namakantor.ToLower(), "%")));
                 query += " AND LOWER(pengembalianpnbp.nama) LIKE :NamaKantor ";
             }
-            if (tipekantorid == 1)
-            {
-                //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", String.Concat("%", kodebilling.ToLower(), "%")));
-                query += " AND pengembalianpnbp.StatusPengembalian != '0' ";
-            }
+            //if (tipekantorid == 1)
+            //{
+            //    //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", String.Concat("%", kodebilling.ToLower(), "%")));
+            //    query += " AND pengembalianpnbp.StatusPengembalian != '0' ";
+            //}
             if (!String.IsNullOrEmpty(judul))
             {
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Judul", String.Concat("%", judul.ToLower(), "%")));
@@ -2497,9 +2495,11 @@ namespace Pnbp.Models
             return result;
         }
 
-        public Entities.GetDataBerkasForm GetDataBerkasByNo(string NoTahun, string kantorid)
+        public Entities.GetDataBerkasForm GetDataBerkasByNo(string NoTahun, string kantorid, bool isAllKantor = false)
         {
             ArrayList arrayListParameters = new ArrayList();
+
+            string qSearchKantor = isAllKantor ? " AND BERKAS.KANTORID IS NOT NULL " : " AND BERKAS.KANTORID = :KantorId ";
 
             string query =
                 $@"WITH AA AS (SELECT 
@@ -2521,7 +2521,7 @@ namespace Pnbp.Models
                     FROM {_schemaKKP}.BERKAS 
                      LEFT JOIN REKAPPENERIMAANDETAIL ON BERKAS.BERKASID = REKAPPENERIMAANDETAIL.BERKASID
                      LEFT JOIN {_schemaKKP}.PEMILIK ON BERKAS.PEMILIKID = PEMILIK.PEMILIKID
-                    WHERE BERKAS.STATUSBERKAS = 4 AND BERKAS.NOMOR = :Nomor AND BERKAS.TAHUN = :Tahun AND BERKAS.KANTORID = :KantorId
+                    WHERE BERKAS.STATUSBERKAS = 4 AND BERKAS.NOMOR = :Nomor AND BERKAS.TAHUN = :Tahun {qSearchKantor} 
             ) SELECT 
                     NOTAHUNBERKAS,
                     NAMAPROSEDUR,
@@ -2548,7 +2548,10 @@ namespace Pnbp.Models
                 query = sWhitespace.Replace(query, " ");
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Nomor", nomor));
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Tahun", tahun));
-                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
+                if (!isAllKantor) 
+                {
+                    arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorId", kantorid));
+                }
 
                 using (var ctx = new PnbpContext())
                 {
@@ -2558,14 +2561,13 @@ namespace Pnbp.Models
             }
             catch (Exception e)
             {
-                _ = e.Message;
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
             }
 
             return null;
         }
 
-        public Entities.GetDataBerkasForm GetDataBerkasByNoKanwil(string NoTahun, string kantorid)
-        {
+        public Entities.GetDataBerkasForm GetDataBerkasByNoKanwil(string NoTahun, string kantorid, bool isAllKantor = false) {
             ArrayList arrayListParameters = new ArrayList();
 
             string query =
@@ -2604,19 +2606,33 @@ namespace Pnbp.Models
                     PENERIMAAN,
                     KANTORID
                 FROM AA
-            WHERE NOTAHUNBERKAS = :NoTahun AND KANTORID = :kantorid ";
+            WHERE NOTAHUNBERKAS = :NoTahun ";
+
+            query += isAllKantor ? " AND KANTORID IS NOT NULL " : " AND KANTORID = :kantorid ";
 
             query = sWhitespace.Replace(query, " ");
             //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NomorBerkas", String.Concat("%", NomorBerkas.ToLower(), "%")));
 
-            using (var ctx = new PnbpContext())
+            try 
             {
-                List<object> lstParams = new List<object>();
-                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NoTahun", NoTahun));
-                lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorid", kantorid));
-                var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query, lstParams.ToArray()).FirstOrDefault();
-                return records;
+                using (var ctx = new PnbpContext())
+                {
+                    List<object> lstParams = new List<object>();
+                    lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NoTahun", NoTahun));
+                    if (!isAllKantor) 
+                    { 
+                        lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kantorid", kantorid));
+                    }
+                    var records = ctx.Database.SqlQuery<Entities.GetDataBerkasForm>(query, lstParams.ToArray()).FirstOrDefault();
+                    return records;
+                }
             }
+            catch (Exception e) 
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+            }
+
+            return null;
         }
 
         public Entities.DetailDataBerkas GetDataPengembalianPnbpById(string pengembalianpnbpid)
@@ -2673,7 +2689,8 @@ namespace Pnbp.Models
         {
             Entities.LampiranKembalianTrain data = new Entities.LampiranKembalianTrain();
             ArrayList arrayListParameters = new ArrayList();
-            string query = @"SELECT * FROM LAMPIRANKEMBALIAN WHERE UPPER(TIPEFILE) LIKE UPPER('%'||:tipeFile||'%') AND PENGEMBALIANPNBPID = :pengembalianpnbpid";
+            //string query = @"SELECT * FROM LAMPIRANKEMBALIAN WHERE UPPER(TIPEFILE) LIKE UPPER('%'||:tipeFile||'%') AND PENGEMBALIANPNBPID = :pengembalianpnbpid";
+            string query = @"SELECT * FROM LAMPIRANKEMBALIAN WHERE UPPER(TIPEFILE) = UPPER(:tipeFile) AND PENGEMBALIANPNBPID = :pengembalianpnbpid";
             query = sWhitespace.Replace(query, " ");
 
             using (var ctx = new PnbpContext())

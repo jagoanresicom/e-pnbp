@@ -52,15 +52,17 @@ namespace Pnbp.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("ManajemenData");
         }
 
+        #if DEBUG
         public ActionResult Kantor()
         {
             Models.AdmModel _adm = new Models.AdmModel();
             List<Entities.SatkerAlokasi> _lsSatkerALokasi = _adm.GetSatkerAlokasi();
             return View(_lsSatkerALokasi);
         }
+        #endif
 
         public ActionResult ShowSatkerStatus(string s)
         {
@@ -440,6 +442,7 @@ namespace Pnbp.Controllers
             }
         }
 
+        #if DEBUG
         [Authorize]
         public ActionResult ExportBelanja(string pTahun)
         {
@@ -791,8 +794,9 @@ namespace Pnbp.Controllers
                 //return Json(result, JsonRequestBehavior.AllowGet);
             }
         }
+        #endif
 
-         [Authorize]
+        [Authorize]
         public ActionResult ExportntpnV2(string pTahun, string pBulan, string pTipeKantor, string pKantorId) 
         {
             var userIdentity = new Functions().claimUser();
@@ -832,7 +836,7 @@ namespace Pnbp.Controllers
                     PENERIMAAN,
                     OPERASIONAL 
 	                FROM REKAPPENERIMAANDETAIL R 
-                    LEFT JOIN SATKER K ON K.KANTORID = R.KANTORID AND K.STATUSAKTIF = '1'
+                    LEFT JOIN KANTOR K ON K.KANTORID = R.KANTORID 
 	                WHERE 
                         R.TAHUN = :pTahun AND 
                         BULAN = :pBulan 

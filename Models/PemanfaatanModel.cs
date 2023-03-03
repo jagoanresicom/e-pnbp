@@ -323,7 +323,7 @@ namespace Pnbp.Models
                 using (var ctx = new PnbpContext())
                 {
                     string sql = @"SELECT alokasi FROM alokasisatker b 
-                                JOIN SATKER s ON b.KDSATKER = s.KODESATKER 
+                                JOIN KANTOR s ON b.KDSATKER = s.KODESATKER 
                                 WHERE ALOKASISATKERSUMMARYID  = (
 	                                SELECT ALOKASISATKERSUMMARYID  
 	                                FROM alokasisatkersummary a
@@ -997,7 +997,7 @@ namespace Pnbp.Models
 	                            WITH realisasi AS (
 		                            select sum(amount) belanja, kegiatan, output 
                                     from SPAN_REALISASI sr 
-	                                    join SATKER s on s.KODESATKER = sr.KDSATKER 
+	                                    join KANTOR s on s.KODESATKER = sr.KDSATKER 
 		                            where SUMBERDANA  = 'D'
 		                                and sr.tahun = :tahun
                                         {qKantor}
@@ -1012,7 +1012,7 @@ namespace Pnbp.Models
                                     COUNT(1) OVER() TOTAL
                                 FROM 
                                     pnbp.span_belanja sb
-                                    JOIN pnbp.satker s ON s.kodesatker = sb.KDSATKER 
+                                    JOIN KANTOR s ON s.kodesatker = sb.KDSATKER 
                                     LEFT JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode
                                     LEFT JOIN realisasi r ON p.kode = r.kegiatan || '.' || r.OUTPUT 
                                 WHERE 
@@ -1035,7 +1035,7 @@ namespace Pnbp.Models
                 lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("kodeKRO", kodeKRO.ToLower()));
             }
 
-            subQuery += " GROUP BY (p.kode, nama,r.belanja)  ";
+            subQuery += " GROUP BY (p.kode, p.nama,r.belanja)  ";
 
             string query = @"SELECT * FROM ({0}) WHERE RNUMBER BETWEEN :startCnt AND :limitCnt";
 
@@ -1070,7 +1070,7 @@ namespace Pnbp.Models
                                     sum(amount) totalpagu
                                 FROM 
                                     pnbp.span_belanja sb
-                                    JOIN pnbp.satker s ON s.kodesatker = sb.KDSATKER 
+                                    JOIN KANTOR s ON s.kodesatker = sb.KDSATKER 
                                     JOIN pnbp.program p ON sb.kegiatan || '.' || sb.OUTPUT = p.kode 
                                 WHERE 
                                     sb.tahun = :tahun AND sumber_dana = 'D' AND KDSATKER <> '524465' ";
@@ -1127,7 +1127,7 @@ namespace Pnbp.Models
                                     COUNT(1) OVER() TOTAL
 	                            FROM 
 		                            span_belanja sb
-	                                JOIN satker s ON
+	                                JOIN KANTOR s ON
 		                                s.KODESATKER  = sb.KDSATKER
 	                                LEFT JOIN wilayah w ON
 		                                s.kode = w.kode
@@ -1195,7 +1195,7 @@ namespace Pnbp.Models
 		                        sum(sb.amount) totalpagu
 	                        FROM 
 		                        span_belanja sb
-	                            JOIN satker s ON
+	                            JOIN KANTOR s ON
 		                            s.KODESATKER  = sb.KDSATKER
 	                            LEFT JOIN wilayah w ON
 		                            s.kode = w.kode
@@ -1203,8 +1203,7 @@ namespace Pnbp.Models
                             WHERE 
                                 sb.tahun = :tahun AND
 		                        sb.SUMBER_DANA = 'D' AND
-		                        sb.KDSATKER <> '524465' AND
-                                s.STATUSAKTIF = 1 ";
+		                        sb.KDSATKER <> '524465' ";
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
             if (!String.IsNullOrEmpty(wilayahId))
@@ -1245,7 +1244,7 @@ namespace Pnbp.Models
 			                            when p.tipewilayahid = 1 then p.wilayahid
 		                            end wilayahid
 	                            from SPAN_REALISASI sr 
-	                            join satker s on s.KODESATKER = sr.KDSATKER 
+	                            join KANTOR s on s.KODESATKER = sr.KDSATKER 
 	                            join wilayah w on w.kode = s.KODE 
 	                            left join wilayah p on p.wilayahid = w.induk
 	                            where sr.SUMBERDANA ='D'
@@ -1268,7 +1267,7 @@ namespace Pnbp.Models
 			                            END wilayahid
 		                            FROM
 			                            SPAN_BELANJA sr
-		                            JOIN satker s ON
+		                            JOIN KANTOR s ON
 			                            s.KODESATKER = sr.KDSATKER
 		                            JOIN wilayah w ON
 			                            w.kode = s.KODE
@@ -1346,7 +1345,7 @@ namespace Pnbp.Models
 			                                when p.tipewilayahid = 1 then p.wilayahid
 		                                end wilayahid
 	                                from SPAN_REALISASI sr 
-	                                join satker s on s.KODESATKER = sr.KDSATKER 
+	                                join KANTOR s on s.KODESATKER = sr.KDSATKER 
 	                                join wilayah w on w.kode = s.KODE 
 	                                left join wilayah p on p.wilayahid = w.induk
 	                                where sr.SUMBERDANA ='D'
@@ -1369,7 +1368,7 @@ namespace Pnbp.Models
 			                                END wilayahid
 		                                FROM
 			                                SPAN_BELANJA sr
-		                                JOIN satker s ON
+		                                JOIN KANTOR s ON
 			                                s.KODESATKER = sr.KDSATKER
 		                                JOIN wilayah w ON
 			                                w.kode = s.KODE
@@ -1523,13 +1522,12 @@ namespace Pnbp.Models
 		                            sum(sb.amount) totalpagu
                                 FROM 
 		                            span_belanja sb
-	                                JOIN satker s ON
+	                                JOIN KANTOR s ON
 		                            s.KODESATKER  = sb.KDSATKER
                                 WHERE 
                                     sb.tahun = :tahun AND
 		                            sb.SUMBER_DANA = 'D' AND
-		                            sb.KDSATKER <> '524465'
-                                    and s.STATUSAKTIF = 1";
+		                            sb.KDSATKER <> '524465' ";
 
             lstParams.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("tahun", tahun));
 
@@ -1569,7 +1567,7 @@ namespace Pnbp.Models
 			                            when p.tipewilayahid = 1 then p.wilayahid
 		                            end wilayahid
 	                            from SPAN_REALISASI sr 
-	                            join satker s on s.KODESATKER = sr.KDSATKER 
+	                            join KANTOR s on s.KODESATKER = sr.KDSATKER 
 	                            join wilayah w on w.kode = s.KODE 
 	                            left join wilayah p on p.wilayahid = w.induk
 	                            where sr.SUMBERDANA ='D'
@@ -1662,7 +1660,7 @@ namespace Pnbp.Models
 			                            when p.tipewilayahid = 1 then p.wilayahid
 		                            end wilayahid
 	                            from SPAN_REALISASI sr 
-	                            join satker s on s.KODESATKER = sr.KDSATKER 
+	                            join KANTOR s on s.KODESATKER = sr.KDSATKER 
 	                            join wilayah w on w.kode = s.KODE 
 	                            left join wilayah p on p.wilayahid = w.induk
 	                            where sr.SUMBERDANA ='D'
@@ -1742,7 +1740,7 @@ namespace Pnbp.Models
 	                            end wilayahid
                             from alokasisatker a
                             join ALOKASISATKERSUMMARY a2 on a.ALOKASISATKERSUMMARYID = a2.ALOKASISATKERSUMMARYID 
-                            join satker s on a.KDSATKER =s.KODESATKER 
+                            join KANTOR s on a.KDSATKER =s.KODESATKER 
                             left join wilayah w on w.kode = s.kode
                             left join wilayah prov on prov.WILAYAHID = w.induk
                             where a2.ALOKASISATKERSUMMARYid = :alokasiSatkerSummaryId
@@ -1787,11 +1785,10 @@ namespace Pnbp.Models
 	                            end wilayahid
                             from alokasisatker a
                             join ALOKASISATKERSUMMARY a2 on a.ALOKASISATKERSUMMARYID = a2.ALOKASISATKERSUMMARYID 
-                            join satker s on a.KDSATKER =s.KODESATKER 
+                            join KANTOR s on a.KDSATKER =s.KODESATKER 
                             left join wilayah w on w.kode = s.kode
                             left join wilayah prov on prov.WILAYAHID = w.induk
-                            where a2.ALOKASISATKERSUMMARYid = :alokasiSatkerSummaryId  
-                            and s.statusaktif = 1 ";
+                            where a2.ALOKASISATKERSUMMARYid = :alokasiSatkerSummaryId ";
 
 
             lstParams.Add(new OracleParameter("alokasiSatkerSummaryId", alokasiSatkerSummaryId));

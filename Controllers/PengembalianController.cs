@@ -3193,6 +3193,7 @@ namespace Pnbp.Controllers
 
             string kantorid = new Pnbp.Codes.Functions().claimUser().KantorId;
             var noberkas = (form.AllKeys.Contains("noberkas") ? form["noberkas"] : "");
+            var tipeKantorBerkas = (form.AllKeys.Contains("tipeKantorBerkas") ? form["tipeKantorBerkas"] : "");
 
             if (string.IsNullOrEmpty(noberkas))
             {
@@ -3203,13 +3204,23 @@ namespace Pnbp.Controllers
             string tipe = OtorisasiUser.GetJenisKantorUser();
             GetDataBerkasForm result = null;
 
-            if (tipe == "Kantah")
-            {
+            if (tipe == "Kantah") {
                 result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorid);
             }
-            else if (tipe == "Kanwil")
-            {
+            else if (tipe == "Kanwil") {
                 result = pengembalianmodel.GetDataBerkasByNoKanwil(noberkas, kantorid);
+            }
+            else if (tipe == "Pusat") 
+            {
+                bool isAllKantor = true;
+                if (tipeKantorBerkas == "kantah") 
+                {
+                    result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorid, isAllKantor);
+                }
+                else if (tipeKantorBerkas == "kanwil") 
+                {
+                    result = pengembalianmodel.GetDataBerkasByNoKanwil(noberkas, kantorid, isAllKantor);
+                }
             }
 
             if (result == null)
@@ -3360,18 +3371,26 @@ namespace Pnbp.Controllers
 
             HakAksesModel model = new HakAksesModel();
             string kantoriduser = new Pnbp.Codes.Functions().claimUser().KantorId;
-            int tipekantor = model.GetTipeKantor(kantoriduser);
+            int tipekantorUser = model.GetTipeKantor(kantoriduser);
 
             ViewBag.PreviewMode = "FALSE";
 
-            if ((tipekantor == 1 && data.TIPEPENGEMBALIAN == "1") || (tipekantor != 1 && data.TIPEPENGEMBALIAN == "2" && data.STATUSPENGEMBALIAN == "2"))
+            if ((tipekantorUser == 1 && data.TIPEPENGEMBALIAN == "1") || (tipekantorUser != 1 && data.TIPEPENGEMBALIAN == "2" && data.STATUSPENGEMBALIAN == "2"))
             {
                 ViewBag.PreviewMode = "TRUE";
             }
 
-            string viewName = (tipekantor == 1 ? "DetailPengajuanPusat" : "DetailPengajuanDaerah");
-            //string viewName = (tipekantor == 1 ? "PengajuanPengembalianDetailPusat" : "PengajuanPengembalianDetail");
-            
+            string viewName = (tipekantorUser == 1) ? "FormVerifPengajuanPusat" : "DetailPengajuanPusat";
+
+            if (tipekantorUser == 1 && data.TIPEPENGEMBALIAN == "2")
+            {
+                viewName = "DetailPengajuanPusat";
+                if (data.STATUSPENGEMBALIAN == "1" || data.STATUSPENGEMBALIAN == "2")
+                {
+                    viewName = "FormVerifPengajuanPusat";
+                }
+            }
+
             ViewBag.BisaSelesaikan = (bisaSelesaikan ? "TRUE" : "FALSE");
             return View(viewName, data);
         }
@@ -4071,7 +4090,10 @@ namespace Pnbp.Controllers
                 var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "");
                 var NomorSurat = ((form.AllKeys.Contains("NomorSurat")) ? form["NomorSurat"] : "");
                 var NomorTelepon = ((form.AllKeys.Contains("NOMORTELEPON")) ? form["NOMORTELEPON"] : "");
-                var pengembalianid = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                if (string.IsNullOrEmpty(pengembalianpnbpid))
+                {
+                    pengembalianpnbpid = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                }
 
 
                 pengembalianmodel.UpdatePengembalianPnbp(AtasNama, Status, namakantor, pegawaiid, NPWP, NomorTelepon, pengembalianpnbpid);
@@ -4081,18 +4103,18 @@ namespace Pnbp.Controllers
                 string log_id = NewGuID();
                 if (Status == "0")
                 {
-                    pengembalianmodel.InsertLogAktivitasPengembalianDisimpan(log_id, pegawaiid, Url.Action("PengajuanPengembalianDetail", "Pengembalian"), kantoriduser, pengembalianid);
+                    pengembalianmodel.InsertLogAktivitasPengembalianDisimpan(log_id, pegawaiid, Url.Action("PengajuanPengembalianDetail", "Pengembalian"), kantoriduser, pengembalianpnbpid);
                 }
                 else if (Status == "1")
                 {
-                    pengembalianmodel.InsertLogAktivitasPengembalianDikirim(log_id, pegawaiid, Url.Action("PengajuanPengembalianDetail", "Pengembalian"), kantoriduser, pengembalianid);
+                    pengembalianmodel.InsertLogAktivitasPengembalianDikirim(log_id, pegawaiid, Url.Action("PengajuanPengembalianDetail", "Pengembalian"), kantoriduser, pengembalianpnbpid);
                 }
 
 
                 // Insert SURAT WAJIB BAYAR
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT WAJIB BAYAR",
                     UploadedFileNamePrefix = "SuratWajibBayar",
                     FileName = GetFormKeyValueOrDefault(form, "SuratWajibBayar", "NULL"),
@@ -4103,7 +4125,7 @@ namespace Pnbp.Controllers
                 // Insert SURAT PERNYATAAN TIDAK TERLAYANI
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT PERNYATAAN TIDAK TERLAYANI",
                     UploadedFileNamePrefix = "SuratPernyataanTidakTerlayani",
                     FileName = GetFormKeyValueOrDefault(form, "TidakTerlayani", "NULL"),
@@ -4114,7 +4136,7 @@ namespace Pnbp.Controllers
                 // Insert SURATPERMOHONAN
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT PERMOHONAN",
                     UploadedFileNamePrefix = "SuratPermohonan_",
                     FileName = GetFormKeyValueOrDefault(form, "SuratPermohonan", "NULL"),
@@ -4125,7 +4147,7 @@ namespace Pnbp.Controllers
                 // Insert SURAT KETERANGAN
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT KETERANGAN",
                     UploadedFileNamePrefix = "SuratKeterangan_",
                     FileName = GetFormKeyValueOrDefault(form, "SuratKeterangan", "NULL"),
@@ -4136,7 +4158,7 @@ namespace Pnbp.Controllers
                 // Insert BUKTI PENERIMAAN
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "BUKTI PENERIMAAN NEGARA",
                     UploadedFileNamePrefix = "BuktiPenerimaan_",
                     FileName = GetFormKeyValueOrDefault(form, "BuktiPenerimaan", "NULL"),
@@ -4147,7 +4169,7 @@ namespace Pnbp.Controllers
                 // Insert SURAT PERINTAH SETOR
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT PERINTAH SETOR",
                     UploadedFileNamePrefix = "SuratPerintah_",
                     FileName = GetFormKeyValueOrDefault(form, "SuratPerintah", "NULL"),
@@ -4158,7 +4180,7 @@ namespace Pnbp.Controllers
                 // Insert SURAT BUKTI SETOR
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT BUKTI SETOR",
                     UploadedFileNamePrefix = "BuktiSetor_",
                     FileName = GetFormKeyValueOrDefault(form, "BuktiSetor", "NULL"),
@@ -4169,7 +4191,7 @@ namespace Pnbp.Controllers
                 // Insert BUKTI KEPEMILIKAN REK TUJUAN
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "BUKTI KEPEMILIKAN REK TUJUAN",
                     UploadedFileNamePrefix = "BuktiRek_",
                     FileName = GetFormKeyValueOrDefault(form, "BuktiRek", "NULL"),
@@ -4180,7 +4202,7 @@ namespace Pnbp.Controllers
                 // Insert NPWP
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "NPWP",
                     UploadedFileNamePrefix = "NpwpFile_",
                     FileName = GetFormKeyValueOrDefault(form, "NpwpFile", "NULL"),
@@ -4191,7 +4213,7 @@ namespace Pnbp.Controllers
                 // Insert BUKTI DOMISILI PEMOHON
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "BUKTI DOMISILI PEMOHON",
                     UploadedFileNamePrefix = "BuktiDomisili_",
                     FileName = GetFormKeyValueOrDefault(form, "BuktiDomisili", "NULL"),
@@ -4202,12 +4224,23 @@ namespace Pnbp.Controllers
                 // Insert SURAT KUASA BERMATERAI
                 HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
                 {
-                    PengembalianId = pengembalianid,
+                    PengembalianId = pengembalianpnbpid,
                     TipeFile = "SURAT KUASA BERMATERAI",
                     UploadedFileNamePrefix = "SuratKuasa_",
                     FileName = GetFormKeyValueOrDefault(form, "SuratKuasa", "NULL"),
                     RequestFile = Request.Files["SuratKuasa"],
                     LampiranKembalianId = GetFormKeyValueOrDefault(form, "fileid9", ""),
+                }, db);
+
+                // Insert SURAT PERNYATAAN PNBP BERULANG
+                HandleFileUploadLampiranPengembalian(new LampiranKembalianUpload()
+                {
+                    PengembalianId = pengembalianpnbpid,
+                    TipeFile = "SURAT PERNYATAAN PNBP BERULANG",
+                    UploadedFileNamePrefix = "SuratPernyataanPNBPBerulang_",
+                    FileName = GetFormKeyValueOrDefault(form, "SuratPernyataanPNBPBerulang", "NULL"),
+                    RequestFile = Request.Files["SuratPernyataanPNBPBerulang"],
+                    LampiranKembalianId = GetFormKeyValueOrDefault(form, "fileid12", ""),
                 }, db);
 
 
@@ -4225,7 +4258,8 @@ namespace Pnbp.Controllers
             }
             catch (Exception e)
             {
-                resp.Pesan = "Terjadi kesalahan. " + e.Message;
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+                resp.Pesan = "Terjadi kesalahan";
             }
 
             return Json(resp, JsonRequestBehavior.AllowGet);
@@ -4256,24 +4290,43 @@ namespace Pnbp.Controllers
                 using (var fileStream = System.IO.File.Create(path))
                 {
                     stream.CopyTo(fileStream);
-                    string insert_lampiran10 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE= :Filefilepath, STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI= :Extension WHERE LAMPIRANKEMBALIANID= :fileId";
-                    List<object> lstParams = new List<object>();
-                    lstParams.Add(new OracleParameter("Filefilepath", Filefilepath));
-                    lstParams.Add(new OracleParameter("Extension", Extension));
-                    lstParams.Add(new OracleParameter("fileId", dataUpload.LampiranKembalianId));
-                    db.Database.ExecuteSqlCommand(insert_lampiran10, lstParams.ToArray());
+                    if (string.IsNullOrEmpty(dataUpload.LampiranKembalianId))
+                    {
+                        string id10 = db.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                        string insert_lampiran10 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, NAMAFILE, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE, EKSTENSI) VALUES ( :id10, :Filefilepath, :pengembalianid,'1',SYSDATE,'Pengajuan', :tipeFile, :Extension)";
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("id10", id10));
+                        lstParams.Add(new OracleParameter("Filefilepath", Filefilepath));
+                        lstParams.Add(new OracleParameter("pengembalianid", dataUpload.PengembalianId));
+                        lstParams.Add(new OracleParameter("tipeFile", dataUpload.TipeFile));
+                        lstParams.Add(new OracleParameter("Extension", Extension));
+                        db.Database.ExecuteSqlCommand(insert_lampiran10, lstParams.ToArray());
+                    }
+                    else
+                    {
+                        string insert_lampiran10 = "UPDATE LAMPIRANKEMBALIAN SET NAMAFILE= :Filefilepath, STATUSLAMPIRAN='1',TANGGAL=SYSDATE,EKSTENSI= :Extension WHERE LAMPIRANKEMBALIANID= :fileId";
+                        List<object> lstParams = new List<object>();
+                        lstParams.Add(new OracleParameter("Filefilepath", Filefilepath));
+                        lstParams.Add(new OracleParameter("Extension", Extension));
+                        lstParams.Add(new OracleParameter("fileId", dataUpload.LampiranKembalianId));
+                        db.Database.ExecuteSqlCommand(insert_lampiran10, lstParams.ToArray());
+                    }
                 }
             }
             else
             {
-                string id10 = db.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
-                string insert_lampiran10 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) VALUES ( :id10, :pengembalianid,'1',SYSDATE,'Pengajuan', :tipeFile)";
-                List<object> lstParams = new List<object>();
-                lstParams.Add(new OracleParameter("id10", id10));
-                lstParams.Add(new OracleParameter("pengembalianid", dataUpload.PengembalianId));
-                lstParams.Add(new OracleParameter("tipeFile", dataUpload.TipeFile));
-                db.Database.ExecuteSqlCommand(insert_lampiran10, lstParams.ToArray());
+                if (string.IsNullOrEmpty(dataUpload.LampiranKembalianId))
+                { 
+                    string id10 = db.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+                    string insert_lampiran10 = "INSERT INTO LAMPIRANKEMBALIAN (LAMPIRANKEMBALIANID, PENGEMBALIANPNBPID, STATUSLAMPIRAN,TANGGAL,JUDUL,TIPEFILE) VALUES ( :id10, :pengembalianid,'1',SYSDATE,'Pengajuan', :tipeFile)";
+                    List<object> lstParams = new List<object>();
+                    lstParams.Add(new OracleParameter("id10", id10));
+                    lstParams.Add(new OracleParameter("pengembalianid", dataUpload.PengembalianId));
+                    lstParams.Add(new OracleParameter("tipeFile", dataUpload.TipeFile));
+                    db.Database.ExecuteSqlCommand(insert_lampiran10, lstParams.ToArray());
+                }
             }
+
         }
 
         [HttpPost]
@@ -4429,18 +4482,16 @@ namespace Pnbp.Controllers
             var pengembalianpnbpid = ((form.AllKeys.Contains("pengembalianpnbpid")) ? form["pengembalianpnbpid"] : "");
 
             string kantoriduser = userIdentity.KantorId;
-            string namakantor = userIdentity.NamaKantor;
             string pegawaiid = userIdentity.PegawaiId;
-            string namapegawai = userIdentity.NamaPegawai;
 
             var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "");
-            var NomorSurat = ((form.AllKeys.Contains("NomorSurat")) ? form["NomorSurat"] : "");
             var pengembalianid = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
-            var pengembalianidberkas = db.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
-            var TanggalPengajuan = ConvertDateNow();
 
-            string insert_target = "UPDATE PENGEMBALIANPNBP SET STATUSPENGEMBALIAN='" + Status + "' WHERE PENGEMBALIANPNBPID = '" + pengembalianpnbpid + "'";
-            db.Database.ExecuteSqlCommand(insert_target);
+            string insert_target = "UPDATE PENGEMBALIANPNBP SET STATUSPENGEMBALIAN=:Status WHERE PENGEMBALIANPNBPID = :pengembalianpnbpid";
+            List<object> lstparamsInsert = new List<object>();
+            lstparamsInsert.Add(new OracleParameter("Status", Status));
+            lstparamsInsert.Add(new OracleParameter("pengembalianpnbpid", pengembalianpnbpid));
+            db.Database.ExecuteSqlCommand(insert_target, lstparamsInsert.ToArray());
 
             //log insert Audit Trail
             string log_id = NewGuID();
@@ -4461,33 +4512,92 @@ namespace Pnbp.Controllers
             }
             //log insert Audit Trail
 
-
-            //if (fileid.Length > 0)
-            //{
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < qcpusat.Length; i++)
             {
-                //if (qcpusat[i]!="" || qcpusat[i] != " ")
-                //{
-                string update_lampiran = "UPDATE LAMPIRANKEMBALIAN SET STATUSLAMPIRAN='" + qcpusat[i] + "' WHERE LAMPIRANKEMBALIANID='" + fileid[i] + "'";
-                db.Database.ExecuteSqlCommand(update_lampiran);
-                //}
-
+                string update_lampiran = "UPDATE LAMPIRANKEMBALIAN SET STATUSLAMPIRAN=:STATUSLAMPIRAN WHERE LAMPIRANKEMBALIANID=:LAMPIRANKEMBALIANID";
+                List<object> lstparams = new List<object>();
+                lstparams.Add(new OracleParameter("STATUSLAMPIRAN", qcpusat[i]));
+                lstparams.Add(new OracleParameter("LAMPIRANKEMBALIANID", fileid[i]));
+                db.Database.ExecuteSqlCommand(update_lampiran, lstparams.ToArray());
             }
-            //}
 
             if (ModelState.IsValid)
             {
                 TempData["Upload"] = "Data Berhasil Disimpan";
-                //return RedirectToAction("PengajuanPengembalianIndex");
+                if (form.AllKeys.Contains("pengembalianpnbpid"))
+                { 
+                    return RedirectToAction("DetailPengajuan", new { pengembalianpnbpid });
+                }
+
                 return RedirectToAction("mon_pengembalian");
             }
-            else
+
+            return RedirectToAction("mon_pengembalian");
+        }
+
+        [HttpPost]
+        public JsonResult PengajuanPengembalianDetailPusatV2(FormCollection form, string[] qcpusat, string[] fileid)
+        {
+            Entities.TransactionResult resp = new Entities.TransactionResult() { Status = false, Pesan = "" };
+
+            try
             {
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                var ctx = new PnbpContext();
+                PnbpContext db = new PnbpContext();
+                var pengembalianpnbpid = ((form.AllKeys.Contains("pengembalianpnbpid")) ? form["pengembalianpnbpid"] : "");
+
+                string kantoriduser = userIdentity.KantorId;
+                string pegawaiid = userIdentity.PegawaiId;
+
+                var Status = ((form.AllKeys.Contains("Status")) ? form["Status"] : "");
+                var pengembalianid = ctx.Database.SqlQuery<string>("SELECT RAWTOHEX(SYS_GUID()) FROM DUAL").FirstOrDefault();
+
+                string insert_target = "UPDATE PENGEMBALIANPNBP SET STATUSPENGEMBALIAN=:Status WHERE PENGEMBALIANPNBPID = :pengembalianpnbpid";
+                List<object> lstparamsInsert = new List<object>();
+                lstparamsInsert.Add(new OracleParameter("Status", Status));
+                lstparamsInsert.Add(new OracleParameter("pengembalianpnbpid", pengembalianpnbpid));
+                db.Database.ExecuteSqlCommand(insert_target, lstparamsInsert.ToArray());
+
+                //log insert Audit Trail
+                string log_id = NewGuID();
+                if (Status == "2")
+                {
+                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Diproses', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetailPusat", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
+                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                }
+                else if (Status == "3")
+                {
+                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Dikembalikan', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetailPusat", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
+                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                }
+                else
+                {
+                    string insert_log_aktivitas = "INSERT INTO LOG_AKTIFITAS (LOG_ID, LOG_NAME, LOG_CREATE_BY, LOG_CREATE_DATE, LOG_URL, LOG_KANTORID, LOG_DATA_ID) VALUES ('" + log_id + "', 'Pengajuan Pengembalian PNBP Selesai', '" + pegawaiid + "', SYSDATE, '" + Url.Action("PengajuanPengembalianDetailPusat", "Pengembalian") + "', '" + kantoriduser + "', '" + pengembalianid + "')";
+                    db.Database.ExecuteSqlCommand(insert_log_aktivitas);
+                }
+                //log insert Audit Trail
+
+                for (int i = 0; i < qcpusat.Length; i++)
+                {
+                    string update_lampiran = "UPDATE LAMPIRANKEMBALIAN SET STATUSLAMPIRAN=:STATUSLAMPIRAN WHERE LAMPIRANKEMBALIANID=:LAMPIRANKEMBALIANID";
+                    List<object> lstparams = new List<object>();
+                    lstparams.Add(new OracleParameter("STATUSLAMPIRAN", qcpusat[i]));
+                    lstparams.Add(new OracleParameter("LAMPIRANKEMBALIANID", fileid[i]));
+                    db.Database.ExecuteSqlCommand(update_lampiran, lstparams.ToArray());
+                }
+
+                resp.Status = true;
 
             }
+            catch (Exception e)
+            {
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
+                resp.Pesan = "Terjadi kesalahan";
+            }
+            
 
-            //return RedirectToAction("PengajuanPengembalianIndex");
-            return RedirectToAction("mon_pengembalian");
+            return Json(resp, JsonRequestBehavior.AllowGet);
         }
 
         public string NewGuID()
