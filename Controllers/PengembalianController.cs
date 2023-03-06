@@ -3193,7 +3193,6 @@ namespace Pnbp.Controllers
 
             string kantorid = new Pnbp.Codes.Functions().claimUser().KantorId;
             var noberkas = (form.AllKeys.Contains("noberkas") ? form["noberkas"] : "");
-            var tipeKantorBerkas = (form.AllKeys.Contains("tipeKantorBerkas") ? form["tipeKantorBerkas"] : "");
 
             if (string.IsNullOrEmpty(noberkas))
             {
@@ -3204,22 +3203,33 @@ namespace Pnbp.Controllers
             string tipe = OtorisasiUser.GetJenisKantorUser();
             GetDataBerkasForm result = null;
 
-            if (tipe == "Kantah") {
+            if (tipe == "Kantah") 
+            {
                 result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorid);
             }
-            else if (tipe == "Kanwil") {
+            else if (tipe == "Kanwil") 
+            {
                 result = pengembalianmodel.GetDataBerkasByNoKanwil(noberkas, kantorid);
             }
             else if (tipe == "Pusat") 
             {
-                bool isAllKantor = true;
-                if (tipeKantorBerkas == "kantah") 
+                HakAksesModel model = new HakAksesModel();
+                var kantorIdCari = (form.AllKeys.Contains("kantoridcari") ? form["kantoridcari"] : "");
+                if (string.IsNullOrEmpty(kantorIdCari))
                 {
-                    result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorid, isAllKantor);
+                    response.Message = "Harap untuk mengisi kolom Satuan Kerja berkas";
+                    return Json(response, JsonRequestBehavior.AllowGet);
                 }
-                else if (tipeKantorBerkas == "kanwil") 
+
+                int tipekantorUser = model.GetTipeKantor(kantorIdCari);
+
+                if (tipekantorUser == 2)
                 {
-                    result = pengembalianmodel.GetDataBerkasByNoKanwil(noberkas, kantorid, isAllKantor);
+                    result = pengembalianmodel.GetDataBerkasByNoKanwil(noberkas, kantorIdCari);
+                }
+                else if (tipekantorUser == 3)
+                {
+                    result = pengembalianmodel.GetDataBerkasByNo(noberkas, kantorIdCari);
                 }
             }
 

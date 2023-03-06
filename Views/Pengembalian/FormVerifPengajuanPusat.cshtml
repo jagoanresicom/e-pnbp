@@ -16,6 +16,18 @@
     var file10 = ViewBag.file10;
     var file11 = ViewBag.file11;
     var file12 = ViewBag.file12;
+    var file13 = ViewBag.file13;
+    var file20 = ViewBag.file20;
+    var file21 = ViewBag.file21;
+    var file22 = ViewBag.file22;
+    var fileSP2D = ViewBag.fileSP2D;
+
+    var isExistsFile11 = (file11 != null && !String.IsNullOrEmpty(file11.NamaFile));
+    var isExistsFile12 = (file12 != null && !String.IsNullOrEmpty(file12.NamaFile));
+    var isExistsFile13 = (file13 != null && !String.IsNullOrEmpty(file13.NamaFile));
+    var isExistsFile20 = (file20 != null && !String.IsNullOrEmpty(file20.NamaFile));
+    var isExistsFile21 = (file21 != null && !String.IsNullOrEmpty(file21.NamaFile));
+    var isExistsFile22 = (file22 != null && !String.IsNullOrEmpty(file22.NamaFile));
 
     bool isPreviewMode = (!String.IsNullOrEmpty(ViewBag.PreviewMode) && ViewBag.PreviewMode == "TRUE");
     bool isPengembalianDaerah = (Model.TIPEPENGEMBALIAN == "1");
@@ -497,52 +509,177 @@
 
                         @if (isPengembalianDaerah)
                         {
-                            <div class="">
+                            <div style="display: flex; flex-wrap: wrap;">
 
-                                @*template surat*@
+                                @* Surat Permohonan *@
                                 <div class="panel panel-default x_panel">
                                     <div class="panel-heading x_title">
-                                        Template Surat
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li>
-                                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            </li>
-                                            <li>
-                                                <a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
+                                        @if (isPengembalianDaerah && Model.STATUSPENGEMBALIAN == "4")
+                                        {
+                                            <div>Berkas Pengembalian</div>
+                                        }
+                                        else
+                                        {
+                                            <div>Kirim Permohonan</div>
+                                            <br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi .pdf maksimal 5MB</small>
+                                        }
                                     </div>
-                                    <div class="panel-body x_content ">
+                                    <div id="js-section-input-template-surat" class="panel-body ps-0 pe-0">
                                         @*Panel content*@
-                                        <div class="panel-body__template-surat">
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="permohonan-pengembalian">Surat Permohonan Pengembalian</button>
+
+                                        <div class="form-group">
+                                            <label for="SuratPermohonanPengembalian" class="col-sm-4 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
+                                            <div class="col-sm-6">
+                                                <input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/pdf" @(!isExistsFile13 ? "required=required" : "")>
+                                                <span id="cancel-SuratPermohonanPengembalian"></span>
                                             </div>
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-pnbp-berutang">Surat Pernyataan PNBP Berutang</button>
-                                            </div>
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
-                                            </div>
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
-                                            </div>
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="wajib-bayar">Surat Kuasa Wajib Bayar</button>
-                                            </div>
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan</button>
-                                            </div>
-                                            <div>
-                                                <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
-                                            </div>
+                                            @if (isExistsFile13)
+                                            {
+                                                <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                    <a href="@Url.Content("~/" + file13.NamaFile)" class="btn btn-default btn-xs" download>
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </div>
+                                            }
+                                            <input type="hidden" name="fileid13" value="@(file13 != null && !String.IsNullOrEmpty(file13.LampiranKembalianId)?file13.LampiranKembalianId:"")" />
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="SuratPNBPBerulang" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
+                                            <div class="col-sm-6">
+                                                <input type="file" class="form-control max_5mb" id="SuratPNBPBerulang" name="SuratPNBPBerulang" accept="application/pdf" @(!isExistsFile12 ? "required=required" : "")>
+                                                <span id="cancel-SuratPNBPBerulang"></span>
+                                            </div>
+                                            @if (file12 != null && !String.IsNullOrEmpty(file12.NamaFile))
+                                            {
+                                                <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                    <a href="@Url.Content("~/" + file12.NamaFile)" class="btn btn-default btn-xs" download>
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </div>
+                                            }
+                                            <input type="hidden" name="fileid12" value="@(file12 != null && !String.IsNullOrEmpty(file12.LampiranKembalianId)?file12.LampiranKembalianId:"")" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="SuratKuasaWajibBayar" class="col-sm-4 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
+                                            <div class="col-sm-6">
+                                                <input type="file" class="form-control max_5mb" id="SuratKuasaWajibBayar" name="SuratKuasaWajibBayar" accept="application/pdf">
+                                                <span id="cancel-SuratKuasaWajibBayar"></span>
+                                            </div>
+                                            @if (file10 != null && !String.IsNullOrEmpty(file10.NamaFile))
+                                            {
+                                                <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                    <a href="@Url.Content("~/" + file10.NamaFile)" class="btn btn-default btn-xs" download>
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </div>
+                                            }
+                                            <input type="hidden" name="fileid10" value="@(file10 != null && !String.IsNullOrEmpty(file10.LampiranKembalianId)?file10.LampiranKembalianId:"")" />
+                                        </div>
+
+                                        @* input file template surat *@
+                                        @if (Model.STATUSPENGEMBALIAN == "2" || Model.STATUSPENGEMBALIAN == "4")
+                                        {
+                                            <div class="ln_solid"></div>
+                                            <div class="form-group">
+                                                <label for="SuratKeteranganPengeluaran" class="col-sm-4 control-label" style="text-align:left;">Surat Keterangan Pengeluaran<span class="text-danger">*</span></label>
+                                                <div class="col-sm-6">
+                                                    <input type="file" class="form-control max_5mb" id="SuratKeteranganPengeluaran" name="SuratKeteranganPengeluaran" accept="application/pdf" @(!isExistsFile21 ? "required=required" : "")>
+                                                    <span id="cancel-SuratKeteranganPengeluaran"></span>
+                                                </div>
+                                                @if (file21 != null && !String.IsNullOrEmpty(file21.NamaFile))
+                                                {
+                                                    <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                        <a href="@Url.Content("~/" + file21.NamaFile)" class="btn btn-default btn-xs" download>
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                                <input type="hidden" name="fileid21" value="@(file21 != null && !String.IsNullOrEmpty(file21.LampiranKembalianId)?file21.LampiranKembalianId:"")" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="SuratPernyataanTidakTerlayani" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tidak Terlayani<span class="text-danger">*</span></label>
+                                                <div class="col-sm-6">
+                                                    <input type="file" class="form-control max_5mb" id="SuratPernyataanTidakTerlayani" name="SuratPernyataanTidakTerlayani" accept="application/pdf" @(!isExistsFile11 ? "required=required" : "")>
+                                                    <span id="cancel-SuratPernyataanTidakTerlayani"></span>
+                                                </div>
+                                                @if (file11 != null && !String.IsNullOrEmpty(file11.NamaFile))
+                                                {
+                                                    <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                        <a href="@Url.Content("~/" + file11.NamaFile)" class="btn btn-default btn-xs" download>
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                                <input type="hidden" name="fileid11" value="@(file11 != null && !String.IsNullOrEmpty(file11.LampiranKembalianId)?file11.LampiranKembalianId:"")" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="SuratPengembalianPNBP" class="col-sm-4 control-label" style="text-align:left;">Surat Persetujuan Pengembalian PNBP<span class="text-danger">*</span></label>
+                                                <div class="col-sm-6">
+                                                    <input type="file" class="form-control max_5mb" id="SuratPengembalianPNBP" name="SuratPengembalianPNBP" accept="application/pdf" @(!isExistsFile22 ? "required=required" : "")>
+                                                    <span id="cancel-SuratPengembalianPNBP"></span>
+                                                </div>
+                                                @if (file22 != null && !String.IsNullOrEmpty(file22.NamaFile))
+                                                {
+                                                    <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                        <a href="@Url.Content("~/" + file22.NamaFile)" class="btn btn-default btn-xs" download>
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                                <input type="hidden" name="fileid22" value="@(file22 != null && !String.IsNullOrEmpty(file22.LampiranKembalianId)?file22.LampiranKembalianId:"")" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="SuratTanggungJawabMutlak" class="col-sm-4 control-label" style="text-align:left;">Surat Pernyataan Tanggung Jawab Mutlak<span class="text-danger">*</span></label>
+                                                <div class="col-sm-6">
+                                                    <input type="file" class="form-control max_5mb" id="SuratTanggungJawabMutlak" name="SuratTanggungJawabMutlak" accept="application/pdf" @(!isExistsFile20 ? "required=required" : "")>
+                                                    <span id="cancel-SuratTanggungJawabMutlak"></span>
+                                                </div>
+                                                @if (file20 != null && !String.IsNullOrEmpty(file20.NamaFile))
+                                                {
+                                                    <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                        <a href="@Url.Content("~/" + file20.NamaFile)" class="btn btn-default btn-xs" download>
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                                <input type="hidden" name="fileid20" required value="@(file20 != null && !String.IsNullOrEmpty(file20.LampiranKembalianId)?file20.LampiranKembalianId:"")" />
+                                            </div>
+
+                                            if (Model.STATUSPENGEMBALIAN == "4")
+                                            {
+                                                <div class="ln_solid"></div>
+                                                <div class="form-group">
+                                                    <label for="FileSP2D" class="col-sm-4 control-label" style="text-align:left;">SP2D<span class="text-danger">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input type="file" class="form-control max_5mb" id="FileSP2D" name="FileSP2D" accept="application/pdf">
+                                                        <span id="cancel-FileSP2D"></span>
+                                                    </div>
+                                                    @if (fileSP2D != null && !String.IsNullOrEmpty(fileSP2D.NamaFile))
+                                                    {
+                                                        <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                                            <a href="@Url.Content("~/" + fileSP2D.NamaFile)" class="btn btn-default btn-xs" download>
+                                                                <i class="fa fa-download"></i>
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <button type="submit" id="js-btn-proses" class="btn btn-primary">Proses</button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
 
                                     </div>
                                 </div>
+
 
                             </div>
                         }

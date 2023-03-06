@@ -62,14 +62,15 @@
                                 <input type="hidden" name="satker" id="satker" value="@((new Pnbp.Codes.Functions().claimUser()).NamaKantor.Replace("Kantor Pertanahan", ""))" />
                                 <div class="panel-body form-horizontal">
                                     @* form *@
-                                    @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat") 
+                                    @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
                                     {
-                                        <div class="form-group">
-                                            <div class="text-center">
-                                                <input type="radio" checked name="tipeKantorBerkas" id="Mjc3MDg0Mw" value="kantah"> <label for="Mjc3MDg0Mw">Kantor Pertanahan</label>
-                                                <input type="radio" name="tipeKantorBerkas" id="Mjc3MDg0Nw" value="kanwil" style="margin-left: 1rem;"> <label for="Mjc3MDg0Nw">Kantor Wilayah</label>
-                                            </div>
-                                        </div>
+                                        <div>Satuan Kerja :</div>
+                                        <select id="satuan-kerja" class="select2_single form-control input-md text-center">
+                                            <option value="" class="text-center">-- Pilih Satuan Kerja --</option>
+                                        </select>
+                                        <small id="js-txt-loading-satker">Sedang memuat ...</small>
+                                        <div style="margin-bottom:1rem"></div>
+
                                     }
                                     <div class="form-group">
                                         <label for="inputEmail3" class="col-sm-4 control-label" style="text-align:left;">Nomor Berkas</label>
@@ -503,8 +504,8 @@
             type: 'post',
             data: {
                 noberkas: noBerkas,
-                tipeKantorBerkas: $('#pengembalian_form')[0].tipeKantorBerkas ? $('#pengembalian_form')[0].tipeKantorBerkas.value : null,
-                __RequestVerificationToken: token, 
+                kantoridcari: $('#satuan-kerja').val(),
+                __RequestVerificationToken: token,
             },
 			success: function (res) {
 				if (res.Success) {
@@ -750,6 +751,48 @@
         var NamaProsedur = $('#NamaProsedur').val();
         window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker, '_blank');
     }
+
+    function loadListSatker() {
+        $('#js-txt-loading-satker').toggleClass('hidden', false);
+        $.ajax({
+			type: "GET",
+			url: '@Url.Action("ListSatker", "Administrasi")',
+			contentType: false,
+			processData: false,
+            success: function (data) {
+
+                $('#js-txt-loading-satker').toggleClass('hidden', true);
+
+                let mappedData = data.map(d => {
+                    return {
+                        id: d.Id,
+                        text: d.Nama,
+                    }
+                })
+
+                let selectNode = $('#satuan-kerja');
+                selectNode.select2().empty();
+                if (mappedData.length > 0) {
+                    selectNode.select2({
+                        data: mappedData,
+                        placeholder: "-- Pilih Satuan Kerja --",
+                        allowClear: true,
+                    });
+                    selectNode.val(null).trigger('change');
+                }
+			},
+			error: function () {
+                $('#js-txt-loading-satker').toggleClass('hidden', true);
+			},
+		})
+    }
+
+    $(document).ready(function () {
+
+        $('.select2_single').select2({ width: 'resolve' });
+        loadListSatker();
+
+    });
 
     ;(function () {
 
