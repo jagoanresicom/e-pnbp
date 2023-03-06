@@ -91,7 +91,7 @@
                 <div>
                     @Html.HiddenFor(m => m.STATUSPENGEMBALIAN, new { @Name = "Status" })
                     <div class="text-right" style="margin-bottom:8px;">
-                        <a href="@Url.Action("mon_pengembalian", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
+                        <a href="@Url.Action("monitoring", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
                     </div>
                     <div class="pnbp-grid-panel">
                         <div class="">
@@ -966,7 +966,7 @@
                         if (pengembalianPnbpId && pengembalianPnbpId.trim().length > 0) {
                             window.location.reload();
                         } else {
-                            window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
+                            window.location.href = '@Url.Action("monitoring", "Pengembalian")';
                         }
                     });
                 } else {
@@ -1100,7 +1100,7 @@
 						type: "success",
 					}, function () {
 						$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
-						window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
+						window.location.href = '@Url.Action("monitoring", "Pengembalian")';
 					});
 				} else {
 					swal({

@@ -1164,7 +1164,7 @@ namespace Pnbp.Controllers
             if (ModelState.IsValid)
             {
                 TempData["Upload"] = "Data Berhasil Disimpan";
-                return RedirectToAction("mon_pengembalian");
+                return RedirectToAction("Monitoring");
                 //return RedirectToAction("PengajuanPengembalianIndex");
             }
             else
@@ -1172,7 +1172,7 @@ namespace Pnbp.Controllers
 
             }
 
-            return RedirectToAction("mon_pengembalian");
+            return RedirectToAction("Monitoring");
             //return RedirectToAction("PengajuanPengembalianIndex");
             //mati
         }
@@ -4045,7 +4045,7 @@ namespace Pnbp.Controllers
             if (ModelState.IsValid)
             {
                 TempData["Upload"] = "Data Berhasil Disimpan";
-                return RedirectToAction("mon_pengembalian");
+                return RedirectToAction("Monitoring");
                 //return RedirectToAction("PengajuanPengembalianIndex");
             }
             else
@@ -4054,7 +4054,7 @@ namespace Pnbp.Controllers
             }
 
             //return RedirectToAction("PengajuanPengembalianIndex");
-            return RedirectToAction("mon_pengembalian");
+            return RedirectToAction("Monitoring");
         }
 
         [HttpPost]
@@ -4529,10 +4529,10 @@ namespace Pnbp.Controllers
                     return RedirectToAction("DetailPengajuan", new { pengembalianpnbpid });
                 }
 
-                return RedirectToAction("mon_pengembalian");
+                return RedirectToAction("Monitoring");
             }
 
-            return RedirectToAction("mon_pengembalian");
+            return RedirectToAction("Monitoring");
         }
 
         [HttpPost]
@@ -4670,7 +4670,7 @@ namespace Pnbp.Controllers
             return View("EntriPengembalianDaerah", data);
         }
 
-        public ActionResult mon_pengembalian()
+        public ActionResult Monitoring()
         {
             var userIdentity = new Pnbp.Codes.Functions().claimUser();
             Entities.FindPengembalianPnbp find = new Entities.FindPengembalianPnbp();

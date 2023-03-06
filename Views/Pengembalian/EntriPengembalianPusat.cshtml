@@ -50,7 +50,7 @@
                     @if (!string.IsNullOrEmpty(Model.BerkasId))
                     {
                         <div class="text-right" style="margin-bottom:8px;">
-                            <a href="@Url.Action("mon_pengembalian", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
+                            <a href="@Url.Action("monitoring", "Pengembalian")" class="btn btn-default"><i class="fa fa-reply"></i> Kembali</a>
                         </div>
                     }
                     <div class="row">
@@ -465,7 +465,7 @@
 						closeOnEsc: true,
 						allowOutsideClick: false,
 					}, function () {
-						window.location.href = '@Url.Action("mon_pengembalian", "Pengembalian")';
+						window.location.href = '@Url.Action("monitoring", "Pengembalian")';
 					});
 				} else {
 					swal({
