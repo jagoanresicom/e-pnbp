@@ -1744,7 +1744,6 @@ namespace Pnbp.Models
                             left join wilayah w on w.kode = s.kode
                             left join wilayah prov on prov.WILAYAHID = w.induk
                             where a2.ALOKASISATKERSUMMARYid = :alokasiSatkerSummaryId
-                            and s.statusaktif = 1 
                             ) ";
 
 

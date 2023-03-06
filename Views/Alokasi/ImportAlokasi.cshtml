@@ -439,11 +439,13 @@
             var i = 0;
             $.each(data, function (x) {
                 i = x + 1;
+                let kodeSatker = data[x].KodeSatker ? data[x].KodeSatker : '';
+                let namaSatker = data[x].NamaSatker ? data[x].NamaSatker : '';
                 html += ""
                     + "<tr>"
                     + "<td class='text-center'>" + i + "</td>"
-                    + "<td class='text-left'>" + data[x].KodeSatker + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
-                    + "<td class='text-left'>" + data[x].NamaSatker + " <input type='hidden' id='namasatker' name='namasatker' value='" + data[x].namakantor + "'></td>"
+                    + "<td class='text-left'>" + kodeSatker + " <input type='hidden' id='kodesatker' name='kodesatker' value='" + data[x].kantorid + "'> </td>"
+                    + "<td class='text-left'>" + namaSatker + " <input type='hidden' id='namasatker' name='namasatker' value='" + data[x].namakantor + "'></td>"
                     + "<td class='text-right'>" + addCommas(data[x].Pagu) + "<input type='hidden' id='nilaianggaran' name='nilaianggaran' value='" + data[x].nilaianggaran + "'></td>"
                     + "<td class='text-right' "
                     + (data[x].Valid == 0 ? "style='color:red; font-weight: bold;'" : "")
