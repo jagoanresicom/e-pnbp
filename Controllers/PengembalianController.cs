@@ -3221,7 +3221,15 @@ namespace Pnbp.Controllers
                     return Json(response, JsonRequestBehavior.AllowGet);
                 }
 
-                int tipekantorUser = model.GetTipeKantor(kantorIdCari);
+                int tipekantorUser = -1;
+                try
+                {
+                    tipekantorUser = model.GetTipeKantor(kantorIdCari);
+                }
+                catch (Exception)
+                {
+
+                }
 
                 if (tipekantorUser == 2)
                 {
