@@ -1699,6 +1699,7 @@ namespace Pnbp.Controllers
             catch (Exception e)
             {
                 _ = e.Message;
+                new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
                 resp.Pesan = "Terjadi kesalahan. " + e.Message;
             }
 
@@ -3318,6 +3319,10 @@ namespace Pnbp.Controllers
         public ActionResult DetailPengajuan(string pengembalianpnbpid)
         {
             Entities.DetailDataBerkas data = pengembalianmodel.GetDataPengembalianPnbpById(pengembalianpnbpid);
+            if (data == null)
+            {
+                return RedirectToAction("Monitoring");
+            }
             if (!String.IsNullOrEmpty(data.STATUSSIMPAN) && (data.STATUSSIMPAN == "1" || data.STATUSSIMPAN == "2"))
             {
                 return RedirectToAction("Daerah", new { pengembalianpnbpid });
