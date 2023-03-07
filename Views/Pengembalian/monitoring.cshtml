@@ -290,16 +290,19 @@
 				}
 			},
 		];
-
+		asd=console.log
 		if ($('#jeniskantor').val() != 'Pusat') {
-			dTableColumns.forEach(function (item, index) {
-				if (item.data == 'NamaSatker') {
+			for (let index = 0; index < dTableColumns.length; index++) {
+				let item = dTableColumns[index];
+                if (item.data == 'permohonanpengembalian') {
+                    item.width = '20%';
+                }
+                if (item.data == 'NamaSatker' || item.data == 'KodeSatker') {
 					dTableColumns.splice(index, 1);
+					index -= 1;
 				}
-				if (item.data == 'permohonanpengembalian') {
-					item.width = '20%';
-				}
-			})
+			}
+            asd(dTableColumns)
 		};
 
 		let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
