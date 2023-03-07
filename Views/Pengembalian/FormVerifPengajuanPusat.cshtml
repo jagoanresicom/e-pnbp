@@ -178,7 +178,7 @@
                                         <div class="col-sm-8">
                                             @*<input type="text" class="form-control" id="SetoranPnbp" placeholder="Setoran PNBP">*@
                                             @*@Html.TextBoxFor(model => model.SetoranPnbp, new { @class = "form-control", @id = "SetoranPnbp", @placeholder = "Setoran PNBP" ,@value="@Model.SETORANPNBP" })*@
-                                            <input type="text" name="SetoranPnbp" id="SetoranPnbp" class="form-control text-right" value="@Convert.ToInt32(Model.SETORANPNBP).ToString("N0", new System.Globalization.CultureInfo("id-ID"))" />
+                                            <input type="text" name="SetoranPnbp" id="SetoranPnbp" class="form-control text-right" value="@Convert.ToInt32(Model.SETORANPNBP).ToString("N0", new System.Globalization.CultureInfo("id-ID"))" readonly/>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -200,7 +200,7 @@
                                     <div class="form-group">
                                         <label for="npwpberkas" class="col-sm-4 control-label" style="text-align:left;">NPWP</label>
                                         <div class="col-sm-8">
-                                            <input type="text" name="npwpberkas" id="npwpberkas" class="form-control npwp" placeholder="NPWP" data-mask="00.000.000.0-000.000" value="@Model.NPWP" required />
+                                            <input type="text" name="npwpberkas" id="npwpberkas" class="form-control npwp" placeholder="NPWP" data-mask="00.000.000.0-000.000" value="@Model.NPWP" required readonly/>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -887,6 +887,7 @@
 
 <script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
 <script nonce="MjI3NzUzMQ">
+
         $(document).ready(function() {
             var statuspengembalian = @Model.STATUSPENGEMBALIAN;
             if (statuspengembalian == 0 || statuspengembalian == 3 || statuspengembalian == 4) {
@@ -897,8 +898,9 @@
 
 			if ("@isPreviewMode".toLowerCase() == "true") {
 				$("#pengembalian_form :input:not(.js-btn-generate-surat)").prop("disabled", true);
-			}
+            }
         });
+
         function hanyaAngka(evt) {
             var charCode = (evt.which) ? evt.which : event.keyCode
             if (charCode > 31 && (charCode < 48 || charCode > 57))
