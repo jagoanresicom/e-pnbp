@@ -469,44 +469,13 @@ namespace Pnbp.Models
             if (tipekantorid != 1) 
             {
                 queryOrder = @" CASE WHEN pengembalianpnbp.StatusPengembalian = '3' THEN '1' 
-                                WHEN pengembalianpnbp.StatusPengembalian = '0' THEN '2' 
+                                WHEN NVL(pengembalianpnbp.StatusPengembalian, 0) = '0' THEN '2' 
                                 WHEN pengembalianpnbp.StatusPengembalian IN (1, 2) THEN '3' 
                                 WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '4' 
                                 ELSE '99' END statuspengembalianorder ";
             }
 
-            string query =
-            ////                kantor.kode,
-            //@"SELECT * FROM (
-            //    SELECT
-            //        ROW_NUMBER() over (ORDER BY pengembalianpnbp.tanggalpengaju DESC, berkaskembalian.tanggalbayar, berkaskembalian.namapemohon) RNumber,
-            //        pengembalianpnbp.pengembalianpnbpid, pengembalianpnbp.kantorid, pengembalianpnbp.namakantor,
-            //        pengembalianpnbp.pegawaiidpengaju, pengembalianpnbp.namapegawaipengaju, 
-            //        to_char(pengembalianpnbp.tanggalpengaju, 'dd-mm-yyyy') TanggalPengaju,
-            //        pengembalianpnbp.pegawaiidsetuju, pengembalianpnbp.namapegawaisetuju, 
-            //        to_char(pengembalianpnbp.tanggalsetuju, 'dd-mm-yyyy') TanggalSetuju,
-            //        pengembalianpnbp.statussetuju, pengembalianpnbp.judul,pengembalianpnbp.StatusPengembalian, 
-            //        berkaskembalian.berkasid, berkaskembalian.namaprosedur, berkaskembalian.kodebilling,
-            //        to_char(berkaskembalian.tanggalkodebilling, 'dd-mm-yyyy') TanggalKodeBilling,
-            //        to_char(berkaskembalian.tanggalbayar, 'dd-mm-yyyy') TanggalBayar,
-            //        berkaskembalian.ntpn, berkaskembalian.jumlahbayar, berkaskembalian.namabankpersepsi,
-            //        berkaskembalian.pemilikid, berkaskembalian.namapemohon, berkaskembalian.nikpemohon,
-            //        berkaskembalian.alamatpemohon, berkaskembalian.emailpemohon, berkaskembalian.nomortelepon,
-            //        berkaskembalian.nomorberkas, berkaskembalian.nomorrekening, berkaskembalian.namabank,
-            //        berkaskembalian.namacabang, to_number(berkaskembalian.jumlahbayar) JumlahBayarNumber,
-            //        berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
-            //        satker.kodesatker KodeSatker,
-            //        satker.nama_satker NamaSatker,
-            //        COUNT(1) OVER() Total
-            //    FROM
-            //        pengembalianpnbp
-            //        JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
-            //        JOIN kantor ON kantor.kantorid = pengembalianpnbp.kantorid
-            //        JOIN satker ON satker.kantorid = pengembalianpnbp.kantorid 
-            //        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) 
-            //   WHERE berkaskembalian.nomorsurat IS NOT NULL AND berkaskembalian.permohonanpengembalian IS NOT NULL";
-
-            $@"SELECT * FROM (SELECT 
+            string query = $@"SELECT * FROM (SELECT 
                   ROW_NUMBER() over (
                     ORDER BY 
                       statuspengembalianorder, tanggalpengaju DESC
@@ -557,7 +526,7 @@ namespace Pnbp.Models
                         to_char(pengembalianpnbp.tanggalpengaju, 'dd-mm-yyyy') TanggalPengaju,
                         pengembalianpnbp.pegawaiidsetuju, pengembalianpnbp.namapegawaisetuju, 
                         to_char(pengembalianpnbp.tanggalsetuju, 'dd-mm-yyyy') TanggalSetuju,
-                        pengembalianpnbp.statussetuju, pengembalianpnbp.judul,pengembalianpnbp.StatusPengembalian, 
+                        pengembalianpnbp.statussetuju, pengembalianpnbp.judul,NVL(pengembalianpnbp.StatusPengembalian, 0) StatusPengembalian, 
                         berkaskembalian.berkasid, berkaskembalian.namaprosedur, berkaskembalian.kodebilling,
                         to_char(berkaskembalian.tanggalkodebilling, 'dd-mm-yyyy') TanggalKodeBilling,
                         to_char(berkaskembalian.tanggalbayar, 'dd-mm-yyyy') TanggalBayar,
@@ -588,11 +557,6 @@ namespace Pnbp.Models
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("NamaKantor", String.Concat("%", namakantor.ToLower(), "%")));
                 query += " AND LOWER(pengembalianpnbp.nama) LIKE :NamaKantor ";
             }
-            //if (tipekantorid == 1)
-            //{
-            //    //arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KodeBilling", String.Concat("%", kodebilling.ToLower(), "%")));
-            //    query += " AND pengembalianpnbp.StatusPengembalian != '0' ";
-            //}
             if (!String.IsNullOrEmpty(judul))
             {
                 arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("Judul", String.Concat("%", judul.ToLower(), "%")));
@@ -643,8 +607,8 @@ namespace Pnbp.Models
             }
             if (!String.IsNullOrEmpty(status))
             {
-                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("StatusPengembalian", String.Concat("%", status.ToLower(), "%")));
-                query += " AND LOWER(pengembalianpnbp.StatusPengembalian) LIKE :StatusPengembalian ";
+                arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("StatusPengembalian", status));
+                query += " AND NVL(pengembalianpnbp.StatusPengembalian, 0) = :StatusPengembalian ";
             }
             if (!String.IsNullOrEmpty(namasatker))
             {
@@ -2644,7 +2608,7 @@ namespace Pnbp.Models
             string query =
                 $@"WITH AA AS(SELECT 
                     TO_CHAR(PENGEMBALIANPNBP.PENGEMBALIANPNBPID) PENGEMBALIANPNBPID,
-                    TO_CHAR(PENGEMBALIANPNBP.STATUSPENGEMBALIAN) STATUSPENGEMBALIAN,
+                    TO_CHAR(NVL(PENGEMBALIANPNBP.STATUSPENGEMBALIAN, 0)) STATUSPENGEMBALIAN,
                     TO_CHAR(PENGEMBALIANPNBP.NAMAPEGAWAIPENGAJU) NAMAPEGAWAIPENGAJU,
                     TO_CHAR(PENGEMBALIANPNBP.NPWPPEGAWAIPENGAJU) NPWPPEGAWAIPENGAJU,
                     TO_CHAR(pengembalianpnbp.TANGGALPENGAJU, 'dd-mm-yyyy') TANGGALPENGAJU,

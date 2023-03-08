@@ -3456,7 +3456,7 @@ namespace Pnbp.Controllers
             string tipePengembalian = pengembalianmodel.GetTipePengembalian(PengembalianPnbpId);
             if (!(tipePengembalian == "1" || tipePengembalian == "2"))
             {
-                tr.Pesan = "Tipe pengembalian tidak valid";
+                tr.Pesan = "Kewenangan pengembalian belum ditentukan. Silakan hubungi Administrator.";
                 return Json(tr, JsonRequestBehavior.AllowGet);
             }
 
