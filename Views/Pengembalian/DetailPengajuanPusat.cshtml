@@ -199,7 +199,7 @@
                                         <div class="col-sm-8">
                                             @*<input type="text" class="form-control" id="SetoranPnbp" placeholder="Setoran PNBP">*@
                                             @*@Html.TextBoxFor(model => model.SetoranPnbp, new { @class = "form-control", @id = "SetoranPnbp", @placeholder = "Setoran PNBP" ,@value="@Model.SETORANPNBP" })*@
-                                            <input type="text" name="SetoranPnbp" id="SetoranPnbp" class="form-control asd text-right MjI3NjI5Nw" value="@Convert.ToInt32(Model.SETORANPNBP).ToString("N0", new System.Globalization.CultureInfo("id-ID"))" />
+                                            <input type="text" name="SetoranPnbp" id="SetoranPnbp" class="form-control asd text-right MjI3NjI5Nw"  data-disabled="true" value="@Convert.ToInt32(Model.SETORANPNBP).ToString("N0", new System.Globalization.CultureInfo("id-ID"))" />
                                         </div>
                                     </div>
                                     <div class="form-group">

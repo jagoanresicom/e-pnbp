@@ -627,7 +627,7 @@ namespace Pnbp.Models
             }
 
             query +=
-                " ORDER BY pengembalianpnbp.tanggalpengaju DESC, statuspengembalianorder)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
+                " ORDER BY statuspengembalianorder, pengembalianpnbp.tanggalpengaju DESC)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
 
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
@@ -2197,7 +2197,8 @@ namespace Pnbp.Models
                 {
                     try
                     {
-                        string sql = "UPDATE BERKASKEMBALIAN SET JUMLAHBAYAR= :BiayaLayanan,NOMORREKENING= :NomorRekening,NAMABANK= :NamaBank,NAMAREKENING= :NamaRekening,NPWP= :npwpberkas,NOMORSURAT= :NomorSurat,SETORANPNBP= :SetoranPnbp,PERMOHONANPENGEMBALIAN= :PermohonanPengembalian WHERE PENGEMBALIANPNBPID= :pengembalianpnbpid"; ;
+                        //string sql = "UPDATE BERKASKEMBALIAN SET JUMLAHBAYAR= :BiayaLayanan,NOMORREKENING= :NomorRekening,NAMABANK= :NamaBank,NAMAREKENING= :NamaRekening,NPWP= :npwpberkas,NOMORSURAT= :NomorSurat,SETORANPNBP= :SetoranPnbp,PERMOHONANPENGEMBALIAN= :PermohonanPengembalian WHERE PENGEMBALIANPNBPID= :pengembalianpnbpid"; ;
+                        string sql = "UPDATE BERKASKEMBALIAN SET JUMLAHBAYAR= :BiayaLayanan,NOMORREKENING= :NomorRekening,NAMABANK= :NamaBank,NAMAREKENING= :NamaRekening,NPWP= :npwpberkas,NOMORSURAT= :NomorSurat,PERMOHONANPENGEMBALIAN= :PermohonanPengembalian WHERE PENGEMBALIANPNBPID= :pengembalianpnbpid"; ;
 
                         List<object> lstParams = new List<object>();
                         lstParams.Add(new OracleParameter("BiayaLayanan", BiayaLayanan));
@@ -2206,7 +2207,7 @@ namespace Pnbp.Models
                         lstParams.Add(new OracleParameter("NamaRekening", NamaRekening));
                         lstParams.Add(new OracleParameter("npwpberkas", npwpberkas));
                         lstParams.Add(new OracleParameter("NomorSurat", NomorSurat));
-                        lstParams.Add(new OracleParameter("SetoranPnbp", SetoranPnbp));
+                        //lstParams.Add(new OracleParameter("SetoranPnbp", SetoranPnbp));
                         lstParams.Add(new OracleParameter("PermohonanPengembalian", PermohonanPengembalian));
                         lstParams.Add(new OracleParameter("pengembalianpnbpid", pengembalianpnbpid));
 
