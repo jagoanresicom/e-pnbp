@@ -2521,7 +2521,7 @@ namespace Pnbp.Models
                     FROM {_schemaKKP}.BERKAS 
                      LEFT JOIN REKAPPENERIMAANDETAIL ON BERKAS.BERKASID = REKAPPENERIMAANDETAIL.BERKASID
                      LEFT JOIN {_schemaKKP}.PEMILIK ON BERKAS.PEMILIKID = PEMILIK.PEMILIKID
-                    WHERE BERKAS.STATUSBERKAS = 4 AND BERKAS.NOMOR = :Nomor AND BERKAS.TAHUN = :Tahun {qSearchKantor} 
+                    WHERE BERKAS.STATUSBERKAS IN (3, 4) AND BERKAS.NOMOR = :Nomor AND BERKAS.TAHUN = :Tahun {qSearchKantor} 
             ) SELECT 
                     NOTAHUNBERKAS,
                     NAMAPROSEDUR,
@@ -2590,7 +2590,7 @@ namespace Pnbp.Models
                     FROM {_schemaKKP}.BERKAS 
                      LEFT JOIN REKAPPENERIMAANDETAIL ON BERKAS.BERKASID = REKAPPENERIMAANDETAIL.BERKASID
                      LEFT JOIN {_schemaKKP}.PEMILIK ON BERKAS.PEMILIKID = PEMILIK.PEMILIKID
-                    WHERE BERKAS.STATUSBERKAS = 4
+                    WHERE BERKAS.STATUSBERKAS IN (3, 4)
             ) SELECT 
                     NOTAHUNBERKAS,
                     NAMAPROSEDUR,
