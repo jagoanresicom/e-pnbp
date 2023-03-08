@@ -462,23 +462,28 @@ namespace Pnbp.Models
 
             ArrayList arrayListParameters = new ArrayList();
 
-            string queryOrder = @" CASE WHEN pengembalianpnbp.StatusPengembalian = '2' THEN '1' 
-                                    WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '2' 
+            string queryOrder = @" CASE
+                                    WHEN NVL(pengembalianpnbp.StatusPengembalian, 0) = '0' THEN '1' 
+                                    WHEN pengembalianpnbp.StatusPengembalian = 1 THEN '2' 
+                                    WHEN pengembalianpnbp.StatusPengembalian = '3' THEN '3' 
+                                    WHEN pengembalianpnbp.StatusPengembalian = 2 THEN '4' 
+                                    WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '5' 
                                     ELSE '99' END statuspengembalianorder ";
 
             if (tipekantorid != 1) 
             {
                 queryOrder = @" CASE WHEN pengembalianpnbp.StatusPengembalian = '3' THEN '1' 
                                 WHEN NVL(pengembalianpnbp.StatusPengembalian, 0) = '0' THEN '2' 
-                                WHEN pengembalianpnbp.StatusPengembalian IN (1, 2) THEN '3' 
-                                WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '4' 
+                                WHEN pengembalianpnbp.StatusPengembalian = 1 THEN '3' 
+                                WHEN pengembalianpnbp.StatusPengembalian = 2 THEN '4' 
+                                WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '5' 
                                 ELSE '99' END statuspengembalianorder ";
             }
 
             string query = $@"SELECT * FROM (SELECT 
                   ROW_NUMBER() over (
                     ORDER BY 
-                      statuspengembalianorder, tanggalpengaju DESC
+                        statuspengembalianorder
                   ) RNumber,
                   pengembalianpnbpid, 
                   kantorid, 
@@ -622,7 +627,7 @@ namespace Pnbp.Models
             }
 
             query +=
-                " ORDER BY statuspengembalianorder, pengembalianpnbp.tanggalpengaju DESC)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
+                " ORDER BY pengembalianpnbp.tanggalpengaju DESC, statuspengembalianorder)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
 
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));

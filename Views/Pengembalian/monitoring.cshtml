@@ -91,13 +91,13 @@
                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                     @{
                                         var lsStatus = new List<SelectListItem>();
+                                        lsStatus.Add(new SelectListItem { Value = "0", Text = "Belum Kirim" });
                                         if (jenisKantorUser == "Pusat")
                                         {
                                             lsStatus.Add(new SelectListItem { Value = "1", Text = "Usulan Baru" });
                                         }
                                         else
                                         {
-                                            lsStatus.Add(new SelectListItem { Value = "0", Text = "Belum Kirim" });
                                             lsStatus.Add(new SelectListItem { Value = "1", Text = "Terkirim" });
                                         }
                                         lsStatus.Add(new SelectListItem { Value = "2", Text = "Proses" });
@@ -124,7 +124,7 @@
                         <br>
 
                         <div class="table-responsive">
-                            <table class="table --js-dtable table-striped table-bordered" style="width:100%">
+                            <table class="table --js-dtable table-striped table-bordered hover" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>No</th>

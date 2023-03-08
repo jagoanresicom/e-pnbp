@@ -3405,7 +3405,7 @@ namespace Pnbp.Controllers
 
             string viewName = (tipekantorUser == 1) ? "FormVerifPengajuanPusat" : "DetailPengajuanPusat";
 
-            if (tipekantorUser == 1 && data.TIPEPENGEMBALIAN == "2")
+            if (tipekantorUser == 1 && (string.IsNullOrEmpty(data.TIPEPENGEMBALIAN) || data.TIPEPENGEMBALIAN == "2"))
             {
                 viewName = "DetailPengajuanPusat";
                 if (data.STATUSPENGEMBALIAN == "1" || data.STATUSPENGEMBALIAN == "2")
