@@ -245,6 +245,7 @@
     <Compile Include="Controllers\PenerimaanController.cs" />
     <Compile Include="Controllers\PengembalianController.cs" />
     <Compile Include="Controllers\TargetController.cs" />
+    <Compile Include="Controllers\PanduanController.cs" />
     <Compile Include="Controllers\TipeManfaatController.cs" />
     <Compile Include="DomainModel\PnbpContext.cs" />
     <Compile Include="Global.asax.cs">
@@ -6091,10 +6092,12 @@
     <Content Include="Views\Pengembalian\DetailPengajuanPusat.cshtml" />
     <Content Include="Views\MonitoringEvaluasi\AlokasiDaerah.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Panduan\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="resources\css\pages\" />
+    <Folder Include="resources\docs\" />
     <Folder Include="Views\Api\" />
     <Folder Include="Views\old\" />
   </ItemGroup>
