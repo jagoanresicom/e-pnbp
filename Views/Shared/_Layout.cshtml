@@ -276,17 +276,17 @@
                                 <li>
                                     <a><i class="fa fa-edit"></i>Alokasi<span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        @if (jenisKantorUser == "Pusat") 
+                                        @if (jenisKantorUser == "Pusat")
                                         {
                                             @*<li><a href="@Url.Action("ImportAlokasi", "Alokasi")">Import Alokasi</a></li>
-                                    <li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>
-                                    <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Monitoring Evaluasi</a></li>*@
+                    <li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>
+                    <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Monitoring Evaluasi</a></li>*@
 
                                             <li><a href="@Url.Action("ImportAlokasi", "Alokasi")">Alokasi Pusat</a></li>
                                             @*<li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>*@
                                             <li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Monitoring Alokasi</a></li>
                                         }
-                                        else 
+                                        else
                                         {
                                             @*<li><a href="@Url.Action("ListDataManfaatKROV2", "Pemanfaatan")">Alokasi KRO</a></li>*@
                                             @*<li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Monitoring Alokasi</a></li>*@
@@ -301,17 +301,17 @@
                                         <li><a href="@Url.Action("pn_satker", "Penerimaan")">Satuan Kerja</a></li>
                                         <li><a href="@Url.Action("pn_layanan", "Penerimaan")">Layanan</a></li>
                                         @*<li><a href="@Url.Action("BerandaPenerimaan", "Penerimaan")">Beranda Penerimaan</a></li>
-                                <li>
-                                    <a>Realisasi Penerimaan<span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu">
-                                        <li><a href="@Url.Action("RealisasiPenerimaan", "Penerimaan")">Penerimaan Per Satker</a></li>
-                                        <li><a href="@Url.Action("RealisasiLayanan", "Penerimaan")">Penerimaan Per Layanan</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="@Url.Action("StatistikNTPN", "Penerimaan")">Statistik NTPN</a></li>
-                                <li><a href="@Url.Action("Rekonsiliasi", "Penerimaan")">Rekonsiliasi Simfoni</a></li>
-                                <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
-                                <li><a href="@Url.Action("PengajuanPengembalianIndex", "Pengembalian")">Pengembalian PNBP</a></li>*@
+                <li>
+                    <a>Realisasi Penerimaan<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="@Url.Action("RealisasiPenerimaan", "Penerimaan")">Penerimaan Per Satker</a></li>
+                        <li><a href="@Url.Action("RealisasiLayanan", "Penerimaan")">Penerimaan Per Layanan</a></li>
+                    </ul>
+                </li>
+                <li><a href="@Url.Action("StatistikNTPN", "Penerimaan")">Statistik NTPN</a></li>
+                <li><a href="@Url.Action("Rekonsiliasi", "Penerimaan")">Rekonsiliasi Simfoni</a></li>
+                <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
+                <li><a href="@Url.Action("PengajuanPengembalianIndex", "Pengembalian")">Pengembalian PNBP</a></li>*@
                                     </ul>
                                 </li>
                                 <li>
@@ -323,15 +323,15 @@
                                     </ul>
                                 </li>
                                 <!--<li>
-                    <a><i class="fa fa-file-text-o"></i>Pemanfaatan<span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                        <li><a href="@Url.Action("RincianAlokasi", "Pemanfaatan")">Rincian Alokasi</a></li>-->
+    <a><i class="fa fa-file-text-o"></i>Pemanfaatan<span class="fa fa-chevron-down"></span></a>
+    <ul class="nav child_menu">
+        <li><a href="@Url.Action("RincianAlokasi", "Pemanfaatan")">Rincian Alokasi</a></li>-->
                                 @*<li><a href="@Url.Action("ListDataManfaat", "Pemanfaatan")">Data Pemanfaatan</a></li>*@
                                 @*<li><a href="@Url.Action("ListDataManfaatV2", "Pemanfaatan")">Data Pemanfaatan</a></li>*@
                                 <!--<li><a href="@Url.Action("PersetujuanRevisiManfaat", "Pemanfaatan")">Persetujuan Revisi</a></li>
-                        </ul>
-                    </li>-->
-                                @if (isAuthorizedPengembalian || jenisKantorUser == "Pusat") 
+        </ul>
+    </li>-->
+                                @if (isAuthorizedPengembalian || jenisKantorUser == "Pusat")
                                 {
                                     <li>
                                         <a><i class="fa fa-file-text-o"></i>Pengembalian<span class="fa fa-chevron-down"></span></a>
@@ -341,7 +341,7 @@
                                                 <li><a href="@Url.Action("pusat", "Pengembalian")">Kewenangan Pusat</a></li>
                                                 <li><a href="@Url.Action("daerah", "Pengembalian")">Kewenangan Daerah</a></li>
                                             }
-                                            @if (jenisKantorUser == "Pusat") 
+                                            @if (jenisKantorUser == "Pusat")
                                             {
                                                 <li><a href="@Url.Action("pusat", "Pengembalian")">Pengajuan</a></li>
                                             }
@@ -351,66 +351,68 @@
                                     </li>
                                 }
                                 <!--<li>
-                    <a><i class="fa fa-files-o"></i>Monitoring Evaluasi<span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                        <li><a href="@Url.Action("Penerimaan", "MonitoringEvaluasi")">Penerimaan</a></li>
-                        <li><a href="@Url.Action("Belanja", "MonitoringEvaluasi")">Belanja</a></li>-->
+    <a><i class="fa fa-files-o"></i>Monitoring Evaluasi<span class="fa fa-chevron-down"></span></a>
+    <ul class="nav child_menu">
+        <li><a href="@Url.Action("Penerimaan", "MonitoringEvaluasi")">Penerimaan</a></li>
+        <li><a href="@Url.Action("Belanja", "MonitoringEvaluasi")">Belanja</a></li>-->
                                 @*<li><a href="@Url.Action("Alokasi", "MonitoringEvaluasi")">Alokasi</a></li>*@
                                 <!--</ul>
-                    </li>-->
+    </li>-->
                                 @*@if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
-                        {
-                            <li>
-                                <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="@Url.Action("Pengumuman", "Administrasi")">Pengumuman</a></li>
-                                    <li><a href="@Url.Action("AksesEditPagu", "Administrasi")">Akses Edit Pagu</a></li>
-                                    <li><a href="@Url.Action("ManajemenData", "Administrasi")">Manajemen Data</a></li>
-                                    <li><a href="@Url.Action("RincianBiaya", "Administrasi")">Rincian Biaya</a></li>
-                                    <li><a href="@Url.Action("Index", "Satkernomenklatur")">Data Nomenklatur</a></li>
-                                    <li><a href="@Url.Action("Index", "Program")">Data Program</a></li>
-                                    <li><a href="@Url.Action("Index", "KodeSpan")">Data Kode Span</a></li>
-                                </ul>
-                            </li>
-                        }
-                        <li><a href="@Url.Action("TargetIndex", "Target")"><i class="fa fa-money"></i> Target</a></li>
-                        @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
-                        {
-                            <li>
-                                <a><i class="fa fa-gears"></i>Audit Trail<span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="@Url.Action("AuditTrailPengembalian", "AuditTrail")"><i class="fa fa-money"></i> Pengembalian PNBP</a></li>
-                                    <li><a href="@Url.Action("AuditTrailEntri", "AuditTrail")"><i class="fa fa-money"></i> Entri Renaksi</a></li>
-                                    <li><a href="@Url.Action("AuditTrailAlokasi", "AuditTrail")"><i class="fa fa-money"></i> Alokasi Non Ops</a></li>
-                                </ul>
-                            </li>
-                        }*@
+        {
+            <li>
+                <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="@Url.Action("Pengumuman", "Administrasi")">Pengumuman</a></li>
+                    <li><a href="@Url.Action("AksesEditPagu", "Administrasi")">Akses Edit Pagu</a></li>
+                    <li><a href="@Url.Action("ManajemenData", "Administrasi")">Manajemen Data</a></li>
+                    <li><a href="@Url.Action("RincianBiaya", "Administrasi")">Rincian Biaya</a></li>
+                    <li><a href="@Url.Action("Index", "Satkernomenklatur")">Data Nomenklatur</a></li>
+                    <li><a href="@Url.Action("Index", "Program")">Data Program</a></li>
+                    <li><a href="@Url.Action("Index", "KodeSpan")">Data Kode Span</a></li>
+                </ul>
+            </li>
+        }
+        <li><a href="@Url.Action("TargetIndex", "Target")"><i class="fa fa-money"></i> Target</a></li>
+        @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
+        {
+            <li>
+                <a><i class="fa fa-gears"></i>Audit Trail<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="@Url.Action("AuditTrailPengembalian", "AuditTrail")"><i class="fa fa-money"></i> Pengembalian PNBP</a></li>
+                    <li><a href="@Url.Action("AuditTrailEntri", "AuditTrail")"><i class="fa fa-money"></i> Entri Renaksi</a></li>
+                    <li><a href="@Url.Action("AuditTrailAlokasi", "AuditTrail")"><i class="fa fa-money"></i> Alokasi Non Ops</a></li>
+                </ul>
+            </li>
+        }*@
                                 @*@if (OtorisasiUser.GetJenisKantorUser() == "Pusat")
-                        {
-                            <li>
-                                <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="@Url.Action("manajemendata", "administrasi")">Manajemen Data</a></li>
-                                </ul>
-                            </li>
-                        }*@
+        {
+            <li>
+                <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="@Url.Action("manajemendata", "administrasi")">Manajemen Data</a></li>
+                </ul>
+            </li>
+        }*@
 
                                 <li>
                                     <a><i class="fa fa-gears"></i>Administrasi<span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat") 
+                                        @if (@OtorisasiUser.GetJenisKantorUser() == "Pusat")
                                         {
                                             <li><a href="@Url.Action("ManajemenData", "administrasi")">Manajemen Data</a></li>
                                             <li><a href="@Url.Action("InformasiBerkas", "Administrasi")">Informasi Berkas</a></li>
                                             @*<li><a href="@Url.Action("Kantor", "Administrasi")">Kantor</a></li>*@
                                             @*<li><a href="@Url.Action("Prioritas", "Administrasi")">Prioritas</a></li>*@
                                         }
-                                        else 
+                                        else
                                         {
                                             <li><a href="@Url.Action("manajemendata", "administrasi")">Manajemen Data</a></li>
                                         }
                                     </ul>
                                 </li>
+
+                                <li><a href="@Url.Action("Index", "Panduan")"><i class="fa fa-info-circle"></i>Panduan</a></li>
 
                             </ul>
                         </div>
