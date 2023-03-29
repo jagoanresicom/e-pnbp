@@ -523,7 +523,8 @@ namespace Pnbp.Models
                   nomorsp2d, 
                   labeltipepengembalian, 
                   statuspengembalianorder,
-                  Total 
+                  Total,
+                  status_hapus
                 FROM (
                     SELECT
                         pengembalianpnbp.pengembalianpnbpid, pengembalianpnbp.kantorid, pengembalianpnbp.namakantor,
@@ -543,7 +544,7 @@ namespace Pnbp.Models
                         berkaskembalian.nomorsurat,berkaskembalian.permohonanpengembalian,
                         satker.kodesatker KodeSatker,
                         satker.nama_satker NamaSatker,
-                        nomorsp2d,
+                        nomorsp2d,berkaskembalian.status_hapus,
                         CASE WHEN tipepengembalian = '1' THEN 'Daerah' WHEN tipepengembalian = '2' THEN 'Pusat' END labeltipepengembalian,
                         COUNT(1) OVER() Total,
                         {queryOrder}
@@ -551,7 +552,8 @@ namespace Pnbp.Models
                         pengembalianpnbp
                         JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
                         JOIN KANTOR satker ON satker.kantorid = pengembalianpnbp.kantorid 
-                        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk) ";
+                        AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk)
+                        WHERE nvl(status_hapus,0)=0  ";
 
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("KantorIdUser", kantoriduser));
 
