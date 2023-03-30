@@ -54,9 +54,22 @@ namespace Pnbp
                 app.UseCookieAuthentication(new CookieAuthenticationOptions
                 {
                     CookieName = _CookieName,
-                    CookieDomain = _CookieDomain
+                    CookieDomain = _CookieDomain,
+                    ReturnUrlParameter = _redirectUri
                 });
             }
+            //else if (_ServerEnv == "Development")
+            //{
+            //    app.UseCookieAuthentication(new CookieAuthenticationOptions
+            //    {
+            //        CookieName = _CookieName,
+            //        CookieDomain = _CookieDomain
+
+            //        //CookieName = _CookieName,
+            //        //CookieDomain = _CookieDomain,
+            //        //ReturnUrlParameter = _redirectUri
+            //    });
+            //}
             else
             {
                 app.UseCookieAuthentication(new CookieAuthenticationOptions
