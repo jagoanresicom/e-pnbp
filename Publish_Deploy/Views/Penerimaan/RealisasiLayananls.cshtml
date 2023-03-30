@@ -1,0 +1,69 @@
+﻿@model Pnbp.Entities.FilterPenerimaan
+
+
+
+<table id="datatableTahapan" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th class="tdcenter">No.</th>
+            <th class="tdcenter">Jenis Layanan</th>
+            <th class="text-center">Realisasi Fisik</th>
+            <th class="text-center">Realisasi Penerimaan</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.lspenerimaan.Count > 0)
+        {
+            var no = 1;
+            foreach (var item in Model.lspenerimaan)
+            {
+                <tr onclick="showDetailPenerimaan('@item.namaprosedur', '@Model.tahun', '@Model.bulan')" style="cursor: pointer">
+                    <td class="numeric">@no</td>
+                    <td>@item.namaprosedur</td>
+                    <td class="text-center">@item.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                    <td class="text-right">@item.penerimaan.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                </tr>
+                no++;
+            }
+        }
+
+        @*<tr>
+                <td class="numeric">#</td>
+                <td style="text-align:right;">Total</td>
+                <td></td>
+                <td class="numeric">@Model.lspenerimaan.Sum(a => a.penerimaan).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                <td class="numeric">@Model.lspenerimaan.Sum(a => a.operasional).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+            </tr>*@
+    </tbody>
+
+</table>
+
+<script type="text/javascript">
+    var showDetailPenerimaan = function (k, n, v) {
+        window.location.href = "/penerimaan/realisasilayanandetail?id=" + k + "&pTahun=" + n + "&pBulan=" + v;;
+        //resetInfiniteScroll();
+        @*var pdata = { Id: k, pTahun: n, pBulan: v };
+        console.log(k);
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.pjax({
+            container: "#layananholder",
+            type: 'POST',
+            url: '@Url.Action("RealisasiLayananDetail", "Penerimaan")',
+            data: pdata,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#layananholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });
+        $.unblockUI();*@
+    }
+</script>

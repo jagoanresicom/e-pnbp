@@ -1,0 +1,53 @@
+﻿@model List<Pnbp.Entities.ManfaatPrioritas>
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="table-responsive">
+                <h3>Cek Prioritas</h3>
+                <button id="btncekulangprioritas" type="button" class="btn btn-info"><span class="fa fa-refresh"></span> Muat Ulang </button>
+                <table id="myTable" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Prioritas</th>
+                            <th>Nilai Anggaran (Rp)</th>
+                            <th>Sudah Alokasi (Rp)</th>
+                            <th>Persentase (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count > 0)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td style="text-align:right;">@item.Prioritaskegiatan</td>
+                                    <td style="text-align:right;">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    <td style="text-align:right;">@item.Nilaialokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    <td style="text-align:right;">@Math.Round((item.Nilaialokasi / item.Nilaianggaran * 100), 2)</td>
+                                </tr>
+                            }
+                            
+                            <tr>
+                                <td style="text-align:right;">Total</td>
+                                <td style="text-align:right;">@Model.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                <td style="text-align:right;">@Model.Sum(a => a.Nilaialokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                <td style="text-align:right;">@Math.Round((Model.Sum(a => a.Nilaialokasi) / Model.Sum(a => a.Nilaianggaran) * 100), 2)</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr><td colspan="6">Tidak Ada Data</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#btncekulangprioritas").click(function (e) {
+        cekprioritas();
+    });
+</script>

@@ -511,13 +511,20 @@ namespace Pnbp.Controllers
             List<ChartData> data = new List<ChartData>() { };
             foreach (BelanjaKRO item in res)
             {
-                data.Add(new ChartData()
+                if (res.Count() == 0 || res.Count < 0 || Convert.ToString(res.Count()) == null)
                 {
-                    name = item.KodeKRO,
-                    y = float.Parse(item.PersentaseRealisasiBelanja, CultureInfo.InvariantCulture),
-                    data1 = item.Realisasi,
-                    data2 = item.TotalPagu
-                });
+                    break;
+                }
+                else
+                {
+                    data.Add(new ChartData()
+                    {
+                        name = item.KodeKRO == null ? "" : item.KodeKRO,
+                        y = item.PersentaseRealisasiBelanja == null ? 0 : float.Parse(item.PersentaseRealisasiBelanja, CultureInfo.InvariantCulture),
+                        data1 = Convert.ToDecimal(item?.Realisasi.HasValue) == 0 ? 0 : Convert.ToDecimal(item?.Realisasi.HasValue),
+                        data2 = Convert.ToDecimal(item?.TotalPagu.HasValue) == 0 ? 0 : Convert.ToDecimal(item?.TotalPagu.HasValue),
+                    });
+                }
             }
 
             resp.Success = true;

@@ -1,0 +1,112 @@
+﻿@model List<Pnbp.Entities.SatkerAlokasi>
+
+@{
+    ViewBag.Judul = "Daftar Satker";
+}
+
+<style nonce="MjI3NzUzMQ">
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .editors {
+        display: none;
+    }
+
+    /*tr:hover,*/ 
+    tr.selected, tr.selected {
+        background-color: #B0BED9 !important;
+    }
+</style>
+
+@*<link href='@Url.Content("~/resources/css/table.css")' rel="stylesheet">*@
+
+<div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2 class="sub-header">@(ViewBag.Judul)</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="table-responsive" style="border:none">
+                        <section id="flip-scroll">
+                            <table class="table table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="numeric">No.</th>
+                                        <th>Kode Satker</th>
+                                        <th>Nama Satker</th>
+                                        <th class="numeric">Anggaran</th>
+                                        <th class="numeric">Alokasi</th>
+                                        <th>Status Aktif</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="listsatkerholder">
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr style="cursor: pointer" id="@item.Kantorid">
+                                            <td class="numeric">@(item.RNumber)</td>
+                                            <td>@item.Kodesatker</td> 
+                                            <td>@item.Namasatker</td>
+                                            <td class="numeric">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                            <td class="numeric">@item.Nilaialokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                            <td>@item.Statusaktif</td>
+                                        </tr>
+                                    }
+
+                                    <tr>
+                                        <td colspan="3" class="numeric">Total</td>
+                                        <td class="numeric">@Model.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        <td class="numeric">@Model.Sum(a => a.Nilaialokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        <td>#</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id='myModal' class='modal'>
+    <div id='myModalContent'>
+    </div>
+</div>
+
+<script type="text/javascript" nonce="MjI3NzUzMQ">
+    (function (a) { a.createModal = function (b) { defaults = { title: "", message: "Your Message Goes Here!", closeButton: true, scrollable: false }; var b = a.extend({}, defaults, b); var c = (b.scrollable === true) ? 'style="max-height: 420px;overflow-y: auto;"' : ""; html = '<div class="modal fade" id="myModal">'; html += '<div class="modal-dialog">'; html += '<div class="modal-content">'; html += '<div class="modal-header">'; html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'; if (b.title.length > 0) { html += '<h4 class="modal-title">' + b.title + "</h4>" } html += "</div>"; html += '<div class="modal-body" ' + c + ">"; html += b.message; html += "</div>"; html += '<div class="modal-footer">'; if (b.closeButton === true) { html += '<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-ok">OK</button>' } html += "</div>"; html += "</div>"; html += "</div>"; html += "</div>"; a("body").prepend(html); a("#myModal").modal().on("hidden.bs.modal", function () { a(this).remove() }) } })(jQuery);
+    function showmsg(judul, isi) { $.createModal({ title: judul, message: isi, closeButton: true, scrollable: false }); return false; };
+
+    $(document).on('dblclick', 'tr', function () {
+        $(this).addClass("selected");
+        var id = $(this).attr('id');
+        //alert(id);
+        showsatker(id);
+    });
+    $("tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+
+    function showsatker(id) {        
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        var pdata = { s: id };
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ShowSatkerStatus", "Administrasi")',
+            data: pdata,
+            success: function (data, textStatus, XMLHttpRequest) {
+                $('#myModal').show();
+                $('#myModalContent').html(data);
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { alert(textStatus); $.unblockUI(); }
+        });
+    };
+</script>

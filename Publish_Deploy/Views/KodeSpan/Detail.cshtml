@@ -1,0 +1,94 @@
+﻿
+
+@{
+    ViewBag.Judul = "Detai Kode Span";
+    var data = ViewBag.data;
+    var tipe = data.Tipe;
+    tipe = string.IsNullOrEmpty(data.Tipe) ? "-" : data.Tipe;
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .tdcenter {
+        text-align: center;
+    }
+</style>
+
+<div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:20px">
+                <div class="x_title">
+                    <h2 class="sub-header">@(ViewBag.Judul)</h2>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <form class="form-horizontal form-label-left" id="frmkodespan" role="form" action="Update" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Kode Output : </label>
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <input type="text" name="KodeOutput" id="KodeOutput" class="form-control" style="display:none;" placeholder="Kode Output" value="@data.KodeOutput" />
+                                        <input type="text" class="form-control" placeholder="Kode Output" value="@data.KodeOutput" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Kode : </label>
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <input type="text" name="Kode" id="Kode" class="form-control" placeholder="Kode" value="@data.Kode" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Kegiatan : </label>
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <input type="text" name="Kegiatan" id="kegiatan" class="form-control" placeholder="Kegiatan" value="@data.Kegiatan" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Program : </label>
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <input type="text" name="NamaProgram" id="NamaProgram" class="form-control" placeholder="Nama Program" maxlength="100" value="@data.NamaProgram" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Tipe : </label>
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        @{
+                                            if (tipe != "-")
+                                            {
+                                                <input type="text" name="Tipe" id="Tipe" class="form-control" style="display:none;" placeholder="Tipe" value="@tipe" />
+                                                <input type="text" class="form-control" placeholder="Tipe" maxlength="100" value="@tipe" disabled />
+                                            }
+                                            else
+                                            {
+                                                <select name="Tipe" id="Tipe" class="form-control" data-placeholder="Pilih Tipe">
+                                                    <option value="-" selected="@tipe.Equals("-")">-- Pilih Tipe --</option>
+                                                    <option value="OPS" selected="@tipe.Equals("OPS")">OPS</option>
+                                                    <option value="NONOPS" selected="@tipe.Equals("NONOPS")">NON OPS</option>
+                                                </select>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-top:20px;">
+                                    <div class="col-md-3 col-lg-offset-3 col-sm-3 col-xs-12">
+                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                        <a href="@Url.Action("Index", "KodeSpan")" class="btn btn-danger"><i class="fa fa-rotate-left"></i>&nbsp;Kembali</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
