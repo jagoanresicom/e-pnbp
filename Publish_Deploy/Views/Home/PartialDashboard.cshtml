@@ -1,0 +1,1057 @@
+﻿@model  Pnbp.Entities.CharDashboard
+@{
+    var penerimaan = ViewBag.total_penerimaan;
+    var persentase_penerimaan = ViewBag.persentase_penerimaan;
+    var pagu_mp = ViewBag.pagu_mp;
+    var get_mpbelanjaops = ViewBag.get_mpbelanjaops;
+    var get_mpbelanjanonops = ViewBag.get_mpbelanjanonops;
+    var nilai_mp = ViewBag.nilaimp;
+}
+<style>
+    .control-label {
+        padding-top: 8px;
+        padding-right: 0px;
+    }
+</style>
+
+<script src='@Url.Content("~/resources/js/echarts.min.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/highcharts.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/highcharts-more.js")'</script>
+<script src='@Url.Content("~/resources/js/highcharts/highcharts-3d.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/data.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/drilldown.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/exporting.js")'></script>
+<script src='@Url.Content("~/resources/js/highcharts/modules/offline-exporting.js")'></script>
+
+
+<div class="row">
+    <div class="col-sm-12">
+        @* Card Total Penerimaan *@
+        <div class="col-md-3">
+            <div class="tile-stats" style="height:135px">
+                @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
+                <h4 style="margin-top:20px"><center>Total<br>Penerimaan</center></h4>
+                <div style="margin:12px"><h2 style="font-size:15px; color:#02A35D" "><b><center>@penerimaan.jumlah.ToString("N0", new System.Globalization.CultureInfo("id-ID")) </center></b></h2></div>
+                <p></p>
+            </div>
+        </div>
+
+        @* Card Total Belanja *@
+        <div class="col-md-3">
+            <div class="tile-stats" style="height:135px">
+                @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
+                <h4 style="margin-top:20px"><center>Total<br>Belanja</center></h4>
+                <div style="margin-left:7px" class="text-cnter"><h2 style="font-size:15px; color:#FAAF2D;"><span><b><center id="totalbelanja">Loading</center></b></span></h2></div>
+                <p></p>
+            </div>
+        </div>
+
+        @*<div class="col-md-3 col-sm-2 col-xs-12">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-caret-square-o-right"></i></div>
+                    <div class="count">179</div>
+                    <h3>New Sign ups</h3>
+                    <p>Lorem ipsum psdea itgum rixt.</p>
+                </div>
+            </div>*@
+
+        @* Card Persentase Penerimaan *@
+        <div class="col-md-3 col-sm-2 col-xs-12">
+            <div class="tile-stats" style="height:135px">
+                @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
+                <h4 style="margin-top:20px"><center>Persentase<br>Penerimaan (%)</center></h4>
+                <div style="margin:12px"><h2 style="font-size:20px"><b><center>@persentase_penerimaan.persentase </center></b></h2></div>
+                <p></p>
+            </div>
+        </div>
+
+        @* Card Persentase Belanja *@
+        <div class="col-md-3 col-sm-2 col-xs-12">
+            <div class="tile-stats" style="height:135px">
+                @*<div class="icon"><i class="fa fa-caret-square-o-right"></i></div>*@
+                <h4 style="margin-top:20px"><center>Persentase<br>Belanja (%)</center></h4>
+                @*<div style="margin:12px"><h2 style="font-size:20px" id="persentase_belanja"><b>%</b></h2></div>*@
+                <div style="margin-left:7px" class="text-cnter"><h2 style="font-size:15px;"><span><b><center id="persentase_belanja">loading</center></b></span></h2></div>
+                <p></p>
+            </div>
+        </div>
+
+        @* spedo *@
+        <div class="col-md-3 col-sm-2 col-xs-12">
+            <div class="x_panel" id="paguvsmp" style="height:250px">
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-2 col-xs-12">
+            <div class="x_panel" id="mpvsbelanja" style="height:250px">
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-2 col-xs-12">
+            <div class="x_panel" id="belanjaops" style="height:250px">
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-2 col-xs-12">
+            <div class="x_panel" id="belanjanonops" style="height:250px">
+            </div>
+        </div>
+    </div>
+
+    @*Bar Chart penerimaan perbulan *@
+    @*<div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="x_panel" id="penerimaan_perbulan">
+
+            </div>
+        </div>*@
+    @*Bar Chart *@
+</div>
+
+@* Line Chart ALokasi VS Belanja OPS *@
+<div class="col-md-6">
+    <div class="x_panel" id="alokasibelanjaops" style="height:250px">
+    </div>
+</div>
+
+@* Line Chart ALokasi VS Belanja NON OPS *@
+<div class="col-md-6">
+    <div class="x_panel" id="alokasibelanjanonops" style="height:250px">
+    </div>
+</div>
+
+
+
+@* Penerimaan PerBulan *@
+<script>
+    //Chart Bar Penerimaan Perbulan
+    //Highcharts.chart('penerimaan_perbulan', {
+    //    chart: {
+    //        type: 'column'
+    //    },
+    //    title: {
+    //        text: 'Jumlah Penerimaan Perbulan'
+    //    },
+    //    subtitle: {
+    //        text: ''
+    //    },
+    //    xAxis: {
+    //        categories: [
+    //            'Jan',
+    //            '1 - 30',
+    //            '31 - 60',
+    //            '61 - 90'
+    //        ],
+    //        crosshair: true
+    //    },
+    //    yAxis: {
+    //        min: 0,
+    //        title: {
+    //            text: 'Rainfall (mm)'
+    //        }
+    //    },
+    //    tooltip: {
+    //        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+    //        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+    //            '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+    //        footerFormat: '</table>',
+    //        shared: true,
+    //        useHTML: true
+    //    },
+    //    plotOptions: {
+    //        column: {
+    //            pointPadding: 0.2,
+    //            borderWidth: 0
+    //        }
+    //    },
+    //    series: [{
+    //        name: 'Account Receivable',
+    //        data: [180.9, 71.5, 106.4, 129.2]
+
+    //    }, {
+    //        name: 'Account Payable',
+    //        data: [175.6, 78.8, 98.5, 93.4]
+
+    //    }]
+    //});
+
+    //Chart Spedometer Pagu VS MP
+    $(document).ready(function () {
+        pagu_mp();
+    });
+
+    function pagu_mp()
+    {
+        $.ajax({
+            url: '/Home/pagu_mp',
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                data: ['mp', data.totalalokasi]
+            }
+        });
+    }
+
+    function getPaguvsMp(pagu){
+        var persenMp = Math.round(((@Html.Raw(Json.Encode(ViewBag.datamp)) || 0) /(@Html.Raw(Json.Encode(ViewBag.datapagu))))*100);
+        var datamp = (@Html.Raw(Json.Encode(ViewBag.datamp)));
+        var datapagu = (@Html.Raw(Json.Encode(ViewBag.datapagu)));
+        //alert(isNAN(persenMp));
+        Highcharts.chart('paguvsmp', {
+            chart: {
+                renderTo: 'container',
+                plotBackgroundColor: null,
+                plotBackgroundImage: null,
+                plotBorderWidth: 0,
+                plotShadow: false,
+            },
+            title: {
+                text: 'PAGU VS MP',
+                align: 'center',
+                verticalAlign: 'top',
+                y: 40
+            },
+            tooltip: {
+                pointFormat: '{series.data[0]}: <b>{point.y}</b>'
+            },
+            pane: {
+                center: ['50%', '70%'],
+                size: '50%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    borderWidth: 0,
+                    backgroundColor: 'none',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: [{
+                lineWidth: 0,
+                min: 0,
+                max: 90,
+                minorTickLength: 0,
+                tickLength: 0,
+                tickWidth: 0,
+                labels: {
+                    enabled: false
+                },
+                title: {
+                    text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                    useHTML: true,
+                    y: 80
+                },
+                /*plotBands: [{
+                    from: 0,
+                    to: 46,
+                    color: 'pink',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                },{
+                    from: 46,
+                    to: 90,
+                    color: 'tan',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                }],*/
+                pane: 0,
+
+            }],
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -10,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white',
+                            textShadow: '0px 1px 2px black'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
+                },
+                gauge: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '100%'
+                    }
+                }
+            },
+
+            series: [{
+                type: 'pie',
+                name: 'Data',
+                innerSize: '55%',
+                data: [
+                        ['MP', persenMp],
+                        ['PAGU', 100]
+                    @*['PAGU', Math.round(persenbelanja)],
+                    ['MP', @nilai_mp[0]],*@
+
+                ]
+            }, {
+                type: 'gauge',
+                //data: [ Math.round(persenbelanja)],
+                data: [persenMp],
+                dial: {
+                    rearLength: 0
+                }
+            }],
+        });
+    }
+
+
+    $(document).ready(function() {
+        getdata_mpvbelanja();
+    });
+    function getdata_mpvbelanja(){
+        var realisasi = 0;
+        var realisasi_dipa = 0;
+        var dipa_belanja = 0;
+        var settings = {
+            "url": "https://spanint.kemenkeu.go.id/spanint/data/DataWebService/RealisasiKL",
+            "method": "GET",
+            "async": false,
+            "cache": false,
+            "timeout": 0,
+            "headers": {
+                "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJXZWJzZXJ2aWNlIEFUUlwvQlBOIiwidWlkIjoiQlBOIiwicm9sIjoid2Vic2VydmljZSIsImtkcyI6IldTVEVTMSIsImtkYiI6IiIsImtkdCI6IjIwMjEiLCJpYXQiOjE2MTM1NTIxNDcsIm5iZiI6MTYxMzU1MTU0Nywia2lkIjoiMjU2MSJ9.5suPkDFbEp2a079WYlGq8V-Xp3xm4WORaH81V4Ukpv4",
+                "Cookie": "PHPSESSID=r5fn3lrqd54ocn9kc7n4gd6ke5; cookiesession1=00E3B805TAOHCPUIMJEQ8I1XDTDO3661"
+            },
+        };
+
+        var settings2 = {
+            "url": "https://spanint.kemenkeu.go.id/spanint/data/DataWebService/DipaBelanjaKL/BELANJA",
+            "method": "GET",
+            "async": false,
+            "cache": false,
+            "timeout": 0,
+            "headers": {
+                "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJXZWJzZXJ2aWNlIEFUUlwvQlBOIiwidWlkIjoiQlBOIiwicm9sIjoid2Vic2VydmljZSIsImtkcyI6IldTVEVTMSIsImtkYiI6IiIsImtkdCI6IjIwMjEiLCJpYXQiOjE2MTM1NTIxNDcsIm5iZiI6MTYxMzU1MTU0Nywia2lkIjoiMjU2MSJ9.5suPkDFbEp2a079WYlGq8V-Xp3xm4WORaH81V4Ukpv4",
+                "Cookie": "PHPSESSID=r5fn3lrqd54ocn9kc7n4gd6ke5; cookiesession1=00E3B805TAOHCPUIMJEQ8I1XDTDO3661"
+            },
+        };
+
+        $.ajax(settings).done(function (response) {
+            //realisasi = 0;
+            //console.log(response);
+            var data = JSON.parse(response);
+            //console.log(data);
+            //console.log(JSON.parse(response).length);
+            for (var i = 0; i < data.length; i++) {
+                realisasi += parseInt(data[i].AMOUNT);
+            }
+        });
+
+        $.ajax(settings).done(function (response) {
+            //realisasi = 0;
+            //console.log(response);
+            var data = JSON.parse(response);
+            //console.log(data);
+            //console.log(JSON.parse(response).length);
+            for (var i = 0; i < data.length; i++) {
+                if(data[i].SUMBER_DANA == 'D' && data[i].KDSATKER != '524465'){
+                    realisasi_dipa += parseInt(data[i].AMOUNT);
+                }
+            }
+        });
+
+        $.ajax(settings2).done(function (response) {
+            //realisasi = 0;
+            //console.log(response);
+            var data = JSON.parse(response);
+            //console.log(data);
+            //console.log(JSON.parse(response).length);
+            for (var i = 0; i < data.length; i++) {
+                if(data[i].SUMBER_DANA == 'D' && data[i].KDSATKER != '524465'){
+                    dipa_belanja += parseInt(data[i].AMOUNT);
+                }
+            }
+        });
+
+        var persenMp =@Html.Raw(Json.Encode(ViewBag.persenmp));
+        //var persenbelanja = Math.round((realisasi/realisasi_dipa)*100);
+        var persenbelanja = Math.round((2414400030/realisasi_dipa)*100);
+        var pagu = dipa_belanja;
+        var realisasi = realisasi_dipa;
+        mpvsbelanja(Math.round(persenMp[0]),persenbelanja);
+        mpvsbelanjaops(persenbelanja);
+        //getPaguvsMp(persenbelanja);
+        mpbelanjanonops(persenbelanja);
+        $('#totalbelanja').html(addCommas(realisasi_dipa).toString());
+        getPaguvsMp(realisasi_dipa);
+
+        var persentase_belanja = (parseFloat(realisasi_dipa) / parseFloat(dipa_belanja)) * 100;
+        //console.log(persentase_belanja);
+        $('#persentase_belanja').html(addCommas(persentase_belanja.toFixed(2)).toString());
+        //getPaguvsMp(persentase_belanja);
+    }
+
+    function mpvsbelanja(realisasi_dipa){
+        //Chart Spedometer MP VS Belanja
+        var persenMp = ((@Html.Raw(Json.Encode(ViewBag.datamp)) || 0) / realisasi_dipa)*100;
+        var datamp = (@Html.Raw(Json.Encode(ViewBag.datamp)));
+        //alert(realisasi_dipa)
+        var datarealisasi = realisasi_dipa;
+        Highcharts.chart('mpvsbelanja', {
+            chart: {
+                renderTo: 'container',
+                plotBackgroundColor: null,
+                plotBackgroundImage: null,
+                plotBorderWidth: 0,
+                plotShadow: false,
+            },
+            title: {
+                text: 'MP VS Belanja',
+                align: 'center',
+                verticalAlign: 'top',
+                y: 40
+            },
+            tooltip: {
+                pointFormat: '{series.data[0]}: <b>{point.y}</b>'
+            },
+            pane: {
+                center: ['50%', '70%'],
+                size: '50%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    borderWidth: 0,
+                    backgroundColor: 'none',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: [{
+                lineWidth: 0,
+                min: 0,
+                max: 90,
+                minorTickLength: 0,
+                tickLength: 0,
+                tickWidth: 0,
+                labels: {
+                    enabled: false
+                },
+                title: {
+                    text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                    useHTML: true,
+                    y: 80
+                },
+                /*plotBands: [{
+                    from: 0,
+                    to: 46,
+                    color: 'pink',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                },{
+                    from: 46,
+                    to: 90,
+                    color: 'tan',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                }],*/
+                pane: 0,
+
+            }],
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -10,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white',
+                            textShadow: '0px 1px 2px black'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
+                },
+                gauge: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '100%'
+                    }
+                }
+            },
+
+            series: [{
+                type: 'pie',
+                name: 'Browser share',
+                innerSize: '55%',
+                data: [
+                    ['Belanja', 22],
+                    ['MP', 100],
+
+                ]
+            }, {
+                type: 'gauge',
+                data: [22],
+                dial: {
+                    rearLength: 0
+                }
+            }],
+        });
+    }
+
+    //Chart Spedometer MP VS Belanja OPS
+    function mpvsbelanjaops(persenbelanja)
+    {
+        //alert(persenbelanja)
+        var get_mpops = @Html.Raw(Json.Encode(ViewBag.getmpops));
+        var get_belanjaops = @Html.Raw(Json.Encode(ViewBag.getbelanjaops));
+        var persentaseops = Math.round((get_belanjaops/get_mpops)*100);
+        //alert(persentaseops)
+        Highcharts.chart('belanjaops', {
+            chart: {
+                renderTo: 'container',
+                plotBackgroundColor: null,
+                plotBackgroundImage: null,
+                plotBorderWidth: 0,
+                plotShadow: false
+            },
+            title: {
+                text: 'MP VS Belanja OPS',
+                align: 'center',
+                verticalAlign: 'top',
+                y: 40
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}%</b>'
+            },
+            pane: {
+                center: ['50%', '70%'],
+                size: '50%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    borderWidth: 0,
+                    backgroundColor: 'none',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: [{
+                lineWidth: 0,
+                min: 0,
+                max: 90,
+                minorTickLength: 0,
+                tickLength: 0,
+                tickWidth: 0,
+                labels: {
+                    enabled: false
+                },
+                title: {
+                    text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                    useHTML: true,
+                    y: 80
+                },
+                /*plotBands: [{
+                    from: 0,
+                    to: 46,
+                    color: 'pink',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                },{
+                    from: 46,
+                    to: 90,
+                    color: 'tan',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                }],*/
+                pane: 0,
+
+            }],
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -10,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white',
+                            textShadow: '0px 1px 2px black'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
+                },
+                gauge: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '100%'
+                    }
+                }
+            },
+
+            series: [{
+                type: 'pie',
+                name: '',
+                innerSize: '55%',
+                data: [
+                    ['Belanja<br>OPS', persentaseops],
+                    ['MP', 100],
+
+                ]
+            }, {
+                type: 'gauge',
+                data: [persentaseops],
+                dial: {
+                    rearLength: 0
+                }
+            }],
+        });
+    }
+
+    //Chart Spedometer MP VS Belanja NON OPS
+    function mpbelanjanonops (persenbelanja)
+    {
+        //alert(persenbelanja);
+        var getmpnonops = @Html.Raw(Json.Encode(ViewBag.getmpnonops));
+        var getbelanjanonops = @Html.Raw(Json.Encode(ViewBag.getbelanjanonops));
+        var persentaseops = Math.round((getbelanjanonops/getmpnonops)*100);
+        Highcharts.chart('belanjanonops', {
+            chart: {
+                renderTo: 'container',
+                plotBackgroundColor: null,
+                plotBackgroundImage: null,
+                plotBorderWidth: 0,
+                plotShadow: false
+            },
+            title: {
+                text: 'MP VS Belanja Non OPS',
+                align: 'center',
+                verticalAlign: 'top',
+                y: 40
+            },
+            tooltip: {
+                pointFormat: '{series.data[0]}: <b>{point.y}%</b>'
+            },
+            pane: {
+                center: ['50%', '75%'],
+                size: '50%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    borderWidth: 0,
+                    backgroundColor: 'none',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: [{
+                lineWidth: 0,
+                min: 0,
+                max: 90,
+                minorTickLength: 0,
+                tickLength: 0,
+                tickWidth: 0,
+                labels: {
+                    enabled: false
+                },
+                title: {
+                    text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                    useHTML: true,
+                    y: 80
+                },
+                /*plotBands: [{
+                    from: 0,
+                    to: 46,
+                    color: 'pink',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                },{
+                    from: 46,
+                    to: 90,
+                    color: 'tan',
+                    innerRadius: '100%',
+                    outerRadius: '0%'
+                }],*/
+                pane: 0,
+
+            }],
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -10,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white',
+                            textShadow: '0px 1px 2px black'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
+                },
+                gauge: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '100%'
+                    }
+                }
+            },
+
+            series: [{
+                type: 'pie',
+                name: 'Browser share',
+                innerSize: '55%',
+                data: [
+                    //['MP', get_mpbelanjaops.persentase],
+                    ['Belanja<br>Non OPS', persentaseops],
+                    ['MP', 100],
+
+                ]
+            }, {
+                type: 'gauge',
+                data: [persentaseops],
+                dial: {
+                    rearLength: 0
+                }
+            }],
+        });
+    }
+
+    //Chart Line Alokasi VS Belanja OPS
+    var resultArray = @Html.Raw(Json.Encode(ViewBag.RESULT));
+
+    var AlokasiOps = @Html.Raw(Json.Encode(ViewBag.RESULTALOKOPS));
+    console.log(AlokasiOps);
+    var BulanAlokasiOps = @Html.Raw(Json.Encode(ViewBag.BULANALOKOPS));
+
+    var belanjaNonOps = @Html.Raw(Json.Encode(ViewBag.belanjaNonOps));
+    var belanjaOps = @Html.Raw(Json.Encode(ViewBag.belanjaOps));
+    var bulan = @Html.Raw(Json.Encode(ViewBag.bulan));
+    var bulanNonOps = @Html.Raw(Json.Encode(ViewBag.bulanNonOps));
+    var bulanOps = @Html.Raw(Json.Encode(ViewBag.bulanOps));
+
+    $(document).ready(function () {
+        //console.log(resultArray[0]);
+        //console.log(bulan);
+        //if(resultArray){
+        var alokasi = [];
+        var alokasiops = [];
+        var nonOps = [];
+        var ops = [];
+        for (i=1;i<=12;i++){
+            var cek = true;
+            var cekNonOps = true;
+            var cekOps = true;
+            var cekAlokasiOps = true;
+            //Show Alokasi (Line Chart)
+            $.each(bulan, function(j,v){
+                if(i == v){
+                    alokasi.push(resultArray[j]);
+                    cek = false;
+                }
+            });
+
+            if(cek){
+                alokasi.push(0);
+                //console.log(bulan);
+            }
+
+            //Show Alokasi OPS
+            $.each(BulanAlokasiOps, function(j,v){
+                if(i == v){
+                    alokasiops.push(AlokasiOps[j]);
+                    cek = false;
+                }
+            });
+
+            if(cekAlokasiOps){
+                alokasiops.push(0);
+                //console.log(bulan);
+            }
+            //Show Alokasi OPS
+
+            //Show Belanja NonOps (Line Chart)
+            $.each(bulanNonOps, function(j,v){
+                if(i == v){
+                    nonOps.push(belanjaNonOps[j]);
+                    cekNonOps = false;
+                }
+            });
+
+            if(cekNonOps){
+                nonOps.push(0);
+                //console.log(bulan);
+            }
+
+            //Show Belanja Ops (Line Chart)
+            $.each(bulanOps, function(j,v){
+                if(i == v){
+                    ops.push(belanjaOps[j]);
+                    cekOps = false;
+                }
+            });
+
+            if(cekOps){
+                ops.push(0);
+                //console.log(bulan);
+            }
+
+        }
+
+        //console.log(alokasi);
+        //}
+        Highcharts.chart('alokasibelanjaops', {
+            chart: {
+                renderTo: 'container',
+                type: 'line'
+            },
+
+            title: {
+                text: 'Alokasi VS Belanja OPS'
+            },
+
+            subtitle: {
+                text: ''
+            },
+
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Miliar'
+                },
+                labels: {
+                    formatter: function() {
+                        //return this.value / 1000000000 + 'M';
+                        if (this.value >= 1E6) {
+                            return '' + this.value / 1000000000 + 'M';
+                        } else if(this.value == 0){
+                            return '0';
+                        }
+                        return '' + this.value / 1000000 + 'JT';
+                    }
+                }
+            },
+
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: false,
+                        //formatter: function() {
+                        //    //return this.value / 1000000000 + 'M';
+                        //    if (this.y >= 1E6) {
+                        //        return this.y / 1000000000;
+                        //    } else if(this.y == 0){
+                        //        return '0';
+                        //    }
+                        //    return '' + this.y / 1000000 + 'JT';
+                        //}
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            series: [{
+                name: 'Alokasi',
+                data: alokasiops
+            }, {
+                name: 'Belanja OPS',
+                //data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                data: ops
+            }]
+        });
+
+        function pembulatan(data) {
+            //return this.value / 1000000000 + 'M';
+            if (this.value >= 1E6) {
+                return '' + data / 1000000000 + 'M';
+            } else if(this.value == 0){
+                return '0';
+            }
+            return '' + data / 1000000 + 'JT';
+        }
+
+        //Chart Line Alokasi VS Belanja NON-OPS
+        Highcharts.chart('alokasibelanjanonops', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Alokasi VS Belanja Non-OPS'
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                title: {
+                    text: 'Miliar'
+                },
+                labels: {
+                    formatter: function() {
+                        //return this.value / 1000000000 + 'M';
+                        if (this.value >= 1E6) {
+                            return '' + this.value / 1000000000 + 'M';
+                        } else if(this.value == 0){
+                            return '0';
+                        }
+                        return '' + this.value / 1000000 + 'JT';
+                    }
+                }
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            series: [{
+                name: 'Alokasi',
+                color: "#F7B123",
+
+                data: alokasi
+            }, {
+                name: 'Belanja Non-OPS',
+                color: "#37659D",
+                //data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                data: nonOps
+            }]
+        });
+    });
+</script>
+
+<script>
+    //$(document).ready(function () {
+    //    //var settings = {
+    //    //    "url": "",
+    //    //    "method": "GET",
+    //    //    "timeout": 0,
+    //    //    "headers": {
+    //    //        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJXZWJzZXJ2aWNlIEFUUlwvQlBOIiwidWlkIjoiQlBOIiwicm9sIjoid2Vic2VydmljZSIsImtkcyI6IldTVEVTMSIsImtkYiI6IiIsImtkdCI6IjIwMjAiLCJpYXQiOjE2MDEzNTQ1NTksIm5iZiI6MTYwMTM1Mzk1OSwia2lkIjoiMjE2MSJ9.HEmyD45R6UCeACVI6qxFlq_uqiGf9lH8bWXSssFn9ns",
+    //    //        "Cookie": "PHPSESSID=r5fn3lrqd54ocn9kc7n4gd6ke5; cookiesession1=00E3B805TAOHCPUIMJEQ8I1XDTDO3661"
+    //    //    },
+    //    //};
+
+    //    //$.ajax(settings).done(function (response) {
+    //    //    var jml=0;
+    //    //    //console.log(response);
+    //    //    var data = JSON.parse(response);
+    //    //    //console.log(data);
+    //    //    //console.log(JSON.parse(response).length);
+    //    //    for (var i=0; i < data.length; i++) {
+
+
+    //    //        if(data[i].SUMBER_DANA != 'D' && data[i].KDSATKER != '524465'){
+
+    //    //            jml += parseInt(data[i].AMOUNT);
+    //    //        }
+    //    //    }
+    //    //    $('#totalbelanja').html(addCommas(jml).toString());
+    //    //    getPaguvsMp(jml);
+
+    //    //    var settings = {
+    //    //        "url": "",
+    //    //        "method": "GET",
+    //    //        "timeout": 0,
+    //    //        "headers": {
+    //    //            "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJXZWJzZXJ2aWNlIEFUUlwvQlBOIiwidWlkIjoiQlBOIiwicm9sIjoid2Vic2VydmljZSIsImtkcyI6IldTVEVTMSIsImtkYiI6IiIsImtkdCI6IjIwMjAiLCJpYXQiOjE2MDEzNTQ1NTksIm5iZiI6MTYwMTM1Mzk1OSwia2lkIjoiMjE2MSJ9.HEmyD45R6UCeACVI6qxFlq_uqiGf9lH8bWXSssFn9ns",
+    //    //            "Cookie": "PHPSESSID=r5fn3lrqd54ocn9kc7n4gd6ke5; cookiesession1=00E3B805TAOHCPUIMJEQ8I1XDTDO3661"
+    //    //        },
+    //    //    };
+
+    //    //    $.ajax(settings).done(function (response) {
+    //    //        var realisasi = 0;
+    //    //        //console.log(response);
+    //    //        var data = JSON.parse(response);
+    //    //        //console.log(data);
+    //    //        //console.log(JSON.parse(response).length);
+    //    //        for (var i = 0; i < data.length; i++) {
+    //    //            realisasi += parseInt(data[i].AMOUNT);
+    //    //        }
+    //    //        var persentase_belanja = (parseFloat(realisasi) / parseFloat(jml)) * 100;
+    //    //        //console.log(persentase_belanja);
+    //    //        $('#persentase_belanja').html(addCommas(persentase_belanja.toFixed(2)).toString());
+    //    //        //getPaguvsMp(persentase_belanja);
+    //    //    });
+    //    //});
+
+    //});
+
+    //function get_pagu() {
+    //    var settings = {
+    //        "url": "",
+    //        "method": "GET",
+    //        "timeout": 0,
+    //        "headers": {
+    //            "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJXZWJzZXJ2aWNlIEFUUlwvQlBOIiwidWlkIjoiQlBOIiwicm9sIjoid2Vic2VydmljZSIsImtkcyI6IldTVEVTMSIsImtkYiI6IiIsImtkdCI6IjIwMjEiLCJpYXQiOjE2MTM1NTIxNDcsIm5iZiI6MTYxMzU1MTU0Nywia2lkIjoiMjU2MSJ9.5suPkDFbEp2a079WYlGq8V-Xp3xm4WORaH81V4Ukpv4",
+    //            "Cookie": "PHPSESSID=r5fn3lrqd54ocn9kc7n4gd6ke5; cookiesession1=00E3B805TAOHCPUIMJEQ8I1XDTDO3661"
+    //        },
+    //    };
+
+    //    $.ajax(settings).done(function (response) {
+    //        var jml = 0;
+    //        var data = JSON.parse(response);
+    //        for (var i = 0; i < data.length; i++) {
+    //            jml += parseInt(data[i].AMOUNT);
+    //        }
+    //        //console.log(jml);
+    //        return parseFloat(jml);
+    //        //$('#totalbelanja').html(addCommas(jml).toString());
+    //    });
+    //}
+
+    //function get_realisasi()
+    //{
+    //    var settings = {
+    //        "url": "",
+    //        "method": "GET",
+    //        "timeout": 0,
+    //        "headers": {
+    //            "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJXZWJzZXJ2aWNlIEFUUlwvQlBOIiwidWlkIjoiQlBOIiwicm9sIjoid2Vic2VydmljZSIsImtkcyI6IldTVEVTMSIsImtkYiI6IiIsImtkdCI6IjIwMjEiLCJpYXQiOjE2MTM1NTIxNDcsIm5iZiI6MTYxMzU1MTU0Nywia2lkIjoiMjU2MSJ9.5suPkDFbEp2a079WYlGq8V-Xp3xm4WORaH81V4Ukpv4",
+    //            "Cookie": "PHPSESSID=r5fn3lrqd54ocn9kc7n4gd6ke5; cookiesession1=00E3B805TAOHCPUIMJEQ8I1XDTDO3661"
+    //        },
+    //    };
+
+    //    $.ajax(settings).done(function (response) {
+    //        var realisasi = 0;
+    //        //console.log(response);
+    //        var data = JSON.parse(response);
+    //        //console.log(data);
+    //        //console.log(JSON.parse(response).length);
+    //        for (var i = 0; i < data.length; i++) {
+    //            realisasi += parseInt(data[i].AMOUNT);
+    //        }
+    //        //console.log(realisasi);
+    //        return realisasi;
+    //        //$('#totalbelanja').html(addCommas(jml).toString());
+    //    });
+    //}
+
+    function addCommas(nStr) {
+        nStr += '';
+        x = nStr.split(',');
+        x1 = x[0];
+        x2 = x.length > 1 ? ',' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + '.' + '$2');
+        }
+        return x1 + x2;
+    }
+</script>
