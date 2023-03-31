@@ -12,9 +12,7 @@ namespace Pnbp.Models
         {
             var list = new List<SatuanKerja>();
             List<object> lstparams = new List<object>();
-            var sql = "SELECT * FROM SATKER WHERE STATUSAKTIF = '1'";
-
-
+            var sql = "SELECT * FROM PNBP.SATKER WHERE STATUSAKTIF = '1'";
             try
             {
                 using (var ctx = new PnbpContext())
