@@ -116,45 +116,65 @@
                         </div>
 
                         <div class="row">
-                            <label class="control-label col-md-3 col-md-12 col-xs-12"></label>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-success">Cari</button>
-                                <button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" onclick="" class="btn btn-warning" style="margin-left: 91% !important;">Export</button><button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" onclick="return ExportMonitoring();" class="btn btn-warning" style="margin-left: 91% !important;">Export Data</button>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" id="Button_CariData" ClientIDMode="Static" class="btn btn-success" style="margin-left: 100px !important;">Cari</button>
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
                             </div>
                         </div>
                     </form>
                     <br>
 
-                    @*<form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">*@
-                        <div class="col-12">
-                            
+                    <div class="row">
+                        <div class="col-md-2">
                         </div>
-                    @*</form>*@
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                            @*<button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="location.href='@Url.Action("ExportExcelMonitoring", "Pengembalian")'" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>*@
+                            <button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>
+                        </div>
+                    </div>
 
-                        <div class="table-responsive">
-                            <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Kewenangan</th>
-                                        @if (jenisKantorUser == "Pusat")
-                                        {
-                                            <th>Kode Satker</th>
-                                            <th>Satuan Kerja</th>
-                                        }
-                                        <th>Nomor Berkas</th>
-                                        <th>Nama Pemohon</th>
-                                        <th>Nominal</th>
-                                        <th>Nomor Surat</th>
-                                        <th>Tangal Pengajuan</th>
-                                        <th>SP2D</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dataplaceholder"></tbody>
-                            </table>
-                        </div>
+
+                    <div class="table-responsive">
+                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kewenangan</th>
+                                    @if (jenisKantorUser == "Pusat")
+                                    {
+                                        <th>Kode Satker</th>
+                                        <th>Satuan Kerja</th>
+                                    }
+                                    <th>Nomor Berkas</th>
+                                    <th>Nama Pemohon</th>
+                                    <th>Nominal</th>
+                                    <th>Nomor Surat</th>
+                                    <th>Tangal Pengajuan</th>
+                                    <th>SP2D</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataplaceholder"></tbody>
+                        </table>
+                    </div>
 
                 </div>
 			</div>
@@ -180,18 +200,6 @@
         $("div#loading").hide();
     });
 
-	function exportNtpn()
-	{
-            var CariNomorBerkas = $('#CariNomorBerkas').val();
-            var CariNamaPemohon = $('#CariNamaPemohon').val();
-			var CariStatus = $('#select2-DropdownCariStatus-container').val();
-            var Satker = $('#select2-DropdownSatker-container').val();
-        if (year == '') {
-            year = new Date().getFullYear();
-        }
-        window.location.replace('@Url.Action("ExportntpnV2", "Administrasi")?pTahun=' + year + '&pBulan=' + month);
-	}
-
 	function ExportMonitoring()
 	{
         var NomorBerkas = $('#CariNomorBerkas').val();
@@ -199,34 +207,36 @@
         var Status = $('#DropdownCariStatus option:selected').val();
 		var Satker = $('#DropdownSatker option:selected').val();
 		console.log(NomorBerkas, NamaPemohon, Status, Satker);
-		//window.location.replace('@Url.Action("ExportntpnV2", "Administrasi")?pTahun=' + year + '&pBulan=' + month);
-		var SendData =
+        @*window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);*@
+        var SendData =
         {
             NomorBerkas: NomorBerkas,
             NamaPemohon: NamaPemohon,
             Status: Status,
             Satker: Satker,
         }
-
         $.ajax
         ({
-			type: "POST",
-            url: "/Pengembalian/ExportExcel_Monitoring",
-            //url: "/Pengembalian/ExportExcel_Monitoring/", body:
-            //{
-            //    NomorBerkas: NomorBerkas,
-            //    NamaPemohon: NamaPemohon,
-            //    Status: Status,
-            //    Satker: Satker,
-            //},
+            type: "POST",
+            url: "/Pengembalian/ExportExcelMonitoring",
             contentType: "application/json; charset=utf-8",
-			datatype: "JSON",
+            datatype: "JSON",
             data: JSON.stringify(SendData),
-            /*data: SendData,*/
 			success: function (response)
 			{
-                if (response != null) {
-                    alert("Ok lurrr mantaap...!");
+				if (response != null)
+				{
+                    let currentDate = new Date().toLocaleDateString();
+                    var bytes = Base64ToBytes(response);
+                    var blob = new Blob([bytes], { type: "application/octetstream" });
+                    var DownloadURL = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    a.href = DownloadURL;
+                    a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
+                    document.body.appendChild(a);
+					a.click();
+
+                    alert("Download successfully...!");
                     return true;
                 }
                 else {
@@ -242,6 +252,16 @@
             }
         });
 	}
+
+    function Base64ToBytes(base64) {
+        var binary_string = window.atob(base64);
+        var len = binary_string.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
 
     $(document).ready(function () {
 

@@ -23,6 +23,10 @@ using NPOI.OpenXmlFormats.Spreadsheet;
 using Microsoft.Ajax.Utilities;
 using System.Web.Http.Results;
 using NPOI.Util;
+using DocumentFormat.OpenXml.Wordprocessing;
+using NPOI.SS.Formula.Functions;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace Pnbp.Controllers
 {
@@ -30,174 +34,6 @@ namespace Pnbp.Controllers
     public class PengembalianController : Controller
     {
         Models.PengembalianModel pengembalianmodel = new Models.PengembalianModel();
-
-        public async Task <ActionResult> ExportExcel_Monitoring([System.Web.Http.FromBody] string NomorBerkas, string NamaPemohon, string Status, string Satker, int? start, int? length, FindPengembalianPnbp f)
-        {
-            try
-            {
-                #region Test 1
-
-                #region Exsisting Property
-                var userIdentity = new Pnbp.Codes.Functions().claimUser();
-                int recNumber = start ?? 0;
-                int RecordsPerPage = length ?? 10;
-                int from = recNumber + 1;
-                int to = from + RecordsPerPage - 1;
-                decimal? total = 0;
-                string kantoriduser = userIdentity.KantorId;
-                string namakantor = f.CariNamaKantor;
-                string judul = f.CariJudul;
-                string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
-                string kodebilling = f.CariKodeBilling;
-                string ntpn = f.CariNTPN;
-                string namapemohon = f.CariNamaPemohon;
-                string nikpemohon = f.CariNikPemohon;
-                string alamatpemohon = f.CariAlamatPemohon;
-                string teleponpemohon = f.CariTeleponPemohon;
-                string bankpersepsi = f.CariBankPersepsi;
-                string status = f.CariStatus;
-                string namasatker = f.CariNamaSatker;
-                string kodesatker = f.CariKodeSatker;
-                int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
-                #endregion
-
-                #region DataColumn
-                DataTable dt = new DataTable();
-                dt.Columns.AddRange(new DataColumn[11] {
-                new DataColumn("No",typeof(int)),
-                new DataColumn("Kewenangan"),
-                new DataColumn("Kode Satker"),
-                new DataColumn("Satuan Kerja"),
-                new DataColumn("Nomor Berkas"),
-                new DataColumn("Nama Pemohon"),
-                new DataColumn("Nominal"),
-                new DataColumn("Nomor Surat"),
-                new DataColumn("Tangal Pengajuan"),
-                new DataColumn("SP2D"),
-                new DataColumn("Status")});
-                #endregion
-
-                #region Business Logic
-                List<Entities.PengembalianPnbpTrain> Result = pengembalianmodel.ListPengembalian_Export(NomorBerkas, NamaPemohon, Status, Satker, tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
-                //if (result.Count > 0)
-                //{
-                //    total = result[0].Total;
-                //}
-
-
-                foreach (var Obj in Result)
-                {
-                    dt.Rows.Add(Obj.NamaKantor, Obj.KodeSatker, Obj.NamaSatker);
-                }
-
-                using (XLWorkbook _XLWoorkBook = new XLWorkbook())
-                {
-                    _XLWoorkBook.Worksheets.Add(dt);
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        _XLWoorkBook.SaveAs(stream);
-                        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Monitoring" + DateTime.Now.ToString("dd-mm-yyyy") + ".xlsx");
-                    }
-                }
-                #endregion
-
-
-                #endregion
-
-                #region Test 2
-                //var userIdentity = new Pnbp.Codes.Functions().claimUser();
-                //string kantorid = userIdentity.KantorId;
-                //string tipekantorid = Pnbp.Models.AdmModel.GetTipeKantorId(kantorid);
-
-                //PnbpContext db = new PnbpContext();
-                //Pnbp.Models.AdmModel _pm = new Models.AdmModel();
-                //Entities.FilterManajemenData _frm = new Entities.FilterManajemenData();
-                //_frm.tahun = (!string.IsNullOrEmpty(pTahun)) ? pTahun : ConfigurationManager.AppSettings["TahunAnggaran"].ToString();
-                //DataTable dt = new DataTable(pTahun);
-                //dt.Columns.AddRange(new DataColumn[17] {
-                //new DataColumn("No",typeof(int)),
-                //new DataColumn("Kode_Satker"),
-                //new DataColumn("Nama_Kantor"),
-                //new DataColumn("Nama_Prosedur"),
-                //new DataColumn("Nomor_Berkas"),
-                //new DataColumn("Tahun_Berkas"),
-                //new DataColumn("Jenis_Penerimaan"),
-                //new DataColumn("Tanggal"),
-                //new DataColumn("Kode_Penerimaan"),
-                //new DataColumn("Bank_Persepsi_ID"),
-                //new DataColumn("Tahun"),
-                //new DataColumn("Bulan"),
-                //new DataColumn("Kode_Billing"),
-                //new DataColumn("NTPN"),
-                //new DataColumn("Jumlah"),
-                //new DataColumn("Penerimaan",typeof(decimal)),
-                //new DataColumn("Operasional",typeof(decimal)) });
-
-                ////List<Entities.Penerimaan> result = _pm.GetPenerimaanNasional(pTahun);
-                //string query =
-                //  @"
-                //        SELECT DISTINCT
-                //         TANGGAL,
-                //         KODESATKER,
-                //         NAMAKANTOR,
-                //         NAMAPROSEDUR,
-                //            NOMORBERKAS,
-                //            TAHUNBERKAS,
-                //         JENISPENERIMAAN,
-                //         KODEPENERIMAAN,
-                //         BANKPERSEPSIID,
-                //         TAHUN,
-                //         BULAN,
-                //         KODEBILLING,
-                //         NTPN,
-                //         JUMLAH,
-                //         PENERIMAAN,
-                //         OPERASIONAL,
-                //         row_number() over (ORDER BY KODESATKER ASC) AS URUTAN
-                //        FROM
-                //         REKAPPENERIMAANDETAIL 
-                //        WHERE
-                //         TAHUN = :tahun AND ROWNUM <= 100000 ORDER BY URUTAN ASC";
-
-
-                //List<object> lstparams = new List<object>();
-                //lstparams.Add(new OracleParameter("tahun", pTahun));
-                //var get = db.Database.SqlQuery<Entities.PenerimaanNTPN>(query, lstparams.ToArray()).ToList();
-                ////return Json(pTahun, JsonRequestBehavior.AllowGet);
-
-                //foreach (var rw in get)
-                //{
-                //    dt.Rows.Add(rw.urutan, rw.kodesatker, rw.namakantor, rw.namaprosedur, rw.nomorberkas, rw.tahunberkas, rw.jenispenerimaan, rw.tanggal, rw.kodepenerimaan, rw.bankpersepsiid, rw.tahun, rw.bulan, rw.kodebilling, rw.ntpn, rw.jumlah, rw.penerimaan, rw.operasional);
-                //}
-
-                //using (XLWorkbook wb = new XLWorkbook())
-                //{
-                //    wb.Worksheets.Add(dt);
-                //    using (MemoryStream stream = new MemoryStream())
-                //    {
-                //        wb.SaveAs(stream);
-                //        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Penerimaan" + DateTime.Now.ToString("dd-mm-yyyy") + ".xlsx");
-                //    }
-                //}
-                #endregion
-
-                return null;
-            }
-            catch (NullReferenceException ErrorNullReference)
-            {
-                Console.WriteLine(ErrorNullReference.Message);
-                throw;
-            }
-            catch (Exception ErrorException)
-            {
-                Console.WriteLine(ErrorException.Message);
-                throw new ApplicationException(ErrorException.Message);
-            }
-
-            finally
-            {
-            }
-        }
 
         public JsonResult GetListKantor()
         {
@@ -4915,6 +4751,138 @@ namespace Pnbp.Controllers
                 total = result[0].Total;
             }
             return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ExportExcelMonitoring(string NomorBerkas, string Namapemohon, string Status, string Satker, int? start, int? length, FindPengembalianPnbp f)
+        {
+            try
+            {
+
+
+                #region Property
+                var FileName = ConfigurationManager.AppSettings["ExcelNameMonitoring"];
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                int recNumber = start ?? 0;
+                object RecordsPerPage = NomorBerkas == "" ? 1000000000 : Namapemohon == "" ? 1000000000 : Status == "" ? 1000000000 : Satker == "" ? 1000000000 : length ?? 10;
+                int from = recNumber + 1;
+                int to = from + Convert.ToInt32(RecordsPerPage) - 1;
+                decimal? total = 0;
+                string kantoriduser = userIdentity.KantorId;
+                string namakantor = f.CariNamaKantor;
+                string judul = f.CariJudul;
+                string nomorberkas = (String.IsNullOrEmpty(NomorBerkas) ? f.CariNomorBerkas : NomorBerkas.Trim());
+                //string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
+                string kodebilling = f.CariKodeBilling;
+                string ntpn = f.CariNTPN;
+                string namapemohon = Namapemohon; //f.CariNamaPemohon;
+                string nikpemohon = f.CariNikPemohon;
+                string alamatpemohon = f.CariAlamatPemohon;
+                string teleponpemohon = f.CariTeleponPemohon;
+                string bankpersepsi = f.CariBankPersepsi;
+                string status = Status;
+                //string status = f.CariStatus;
+                string namasatker = f.CariNamaSatker;
+                string kodesatker = Satker;
+                //string kodesatker = f.CariKodeSatker;
+                int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+                #endregion
+
+                #region DataColumn
+                DataTable DT = new DataTable();
+                DT.Columns.AddRange(new DataColumn[11] {
+                new DataColumn("No",typeof(string)),
+                new DataColumn("Kewenangan",typeof(string)),
+                new DataColumn("Kode Satker",typeof(string)),
+                new DataColumn("Satuan Kerja",typeof(string)),
+                new DataColumn("Nomor Berkas",typeof(string)),
+                new DataColumn("Nama Pemohon",typeof(string)),
+                new DataColumn("Nominal", typeof(string)),
+                new DataColumn("Nomor Surat",typeof(string)),
+                new DataColumn("Tangal Pengajuan",typeof(string)),
+                new DataColumn("SP2D",typeof(string)),
+                new DataColumn("Status",typeof(string))});
+                #endregion
+
+                #region Business Logic
+                List<PengembalianPnbpTrain> Result = pengembalianmodel.ExportListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
+                if (Result.Count > 0)
+                {
+                    total = Result[0].Total;
+                }
+
+                var TempData = Result.Select(x => new
+                {
+                    Kewenangan = x.LabelTipePengembalian,
+                    Kode_Satker = x.KodeSatker,
+                    Satuan_Kerja = x.NamaSatker,
+                    Nomor_Berkas = x.NomorBerkas,
+                    Nama_Pemohon = x.NamaPegawaiSetuju,
+                    Nominal = x.permohonanpengembalian,
+                    Nomor_Surat = x.NomorSurat,
+                    Tangal_Pengajuan = x.TanggalPengaju,
+                    SP2D = x.NomorSP2D,
+                    Status = x.StatusPengembalian == 0 ? "Belum Terkirim" : x.StatusPengembalian == 1 ? "Terkirim" : x.StatusPengembalian == 2 ? "Proses" : x.StatusPengembalian == 3 ? "Berkas Tidak Lengkap" : x.StatusPengembalian == 4 ? "Selesai" : "Usulan Baru"
+                }).ToList();
+
+                var Data = TempData.Select((x, index) => new
+                {
+
+                    No = index + 1,
+                    Kewenangan = x.Kewenangan,
+                    Kode_Satker = x.Kode_Satker,
+                    Satuan_Kerja = x.Satuan_Kerja,
+                    Nomor_Berkas = x.Nomor_Berkas,
+                    Nama_Pemohon = x.Nama_Pemohon,
+                    Nominal = x.Nominal,
+                    Nomor_Surat = x.Nomor_Surat,
+                    Tangal_Pengajuan = x.Tangal_Pengajuan,
+                    SP2D = x.SP2D,
+                    Status = x.Status
+                }).ToList();
+
+                foreach (var Obj in Data)
+                {
+                    DT.Rows.Add
+                    (
+                        Obj.No,
+                        Obj.Kewenangan,
+                        Obj.Kode_Satker,
+                        Obj.Satuan_Kerja,
+                        Obj.Nomor_Berkas,
+                        Obj.Nama_Pemohon,
+                        Obj.Nominal,
+                        Obj.Nomor_Surat,
+                        Obj.Tangal_Pengajuan,
+                        Obj.SP2D,
+                        Obj.Status
+                    );
+                }
+                using (XLWorkbook _XLWorkbook = new XLWorkbook())
+                {
+                    DT.TableName = "Laporan Monitoring";
+                    _XLWorkbook.Worksheets.Add(DT);
+                    using (MemoryStream MS = new MemoryStream())
+                    {
+                        _XLWorkbook.SaveAs(MS);
+                        //return File(MS.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
+                        return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
+                    }
+                }
+                #endregion
+            }
+            catch (NullReferenceException ErrorNullReference)
+            {
+                Console.WriteLine(ErrorNullReference.Message);
+                throw;
+            }
+            catch (Exception ErrorException)
+            {
+                Console.WriteLine(ErrorException.Message);
+                throw new ApplicationException(ErrorException.Message);
+            }
+            finally
+            {
+            }
         }
 
     }
