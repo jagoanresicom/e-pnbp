@@ -61,16 +61,16 @@
 					</ul>
 					<div class="clearfix"></div>
 				</div>
-				<div class="x_content" id="js-section-pencarian">
+                <div class="x_content" id="js-section-pencarian">
                     <form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         @if (jenisKantorUser == "Pusat")
                         {
-                            <input type="hidden" name="jeniskantor" id="jeniskantor" value="Pusat" />
+                            <input type="hidden" name="jeniskantor" ClientIDMode="Static" id="jeniskantor" value="Pusat" />
                         }
                         else
                         {
-                            <input type="hidden" name="jeniskantor" id="jeniskantor" value="Kantah" />
+                            <input type="hidden" name="jeniskantor" ClientIDMode="Static" id="jeniskantor" value="Kantah" />
                         }
 
                         <div class="row">
@@ -104,24 +104,32 @@
                                         lsStatus.Add(new SelectListItem { Value = "3", Text = "Berkas Tidak Lengkap" });
                                         lsStatus.Add(new SelectListItem { Value = "4", Text = "Selesai" });
                                     }
-                                    @Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @class = "select2_single form-control input-md" })
+                                    @Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @id = "DropdownCariStatus", @class = "select2_single form-control input-md" }) @**@
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
                                 <div class="col-md-4 col-sm-4 col-xs-12">
-                                    @Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @class = "select2_single form-control input-md" })
+                                    @Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @id = "DropdownSatker", @class = "select2_single form-control input-md" })
                                 </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
+                            <label class="control-label col-md-3 col-md-12 col-xs-12"></label>
+                            <div class="col-12">
                                 <button type="submit" class="btn btn-success">Cari</button>
+                                <button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" onclick="" class="btn btn-warning" style="margin-left: 91% !important;">Export</button><button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" onclick="return ExportMonitoring();" class="btn btn-warning" style="margin-left: 91% !important;">Export Data</button>
                             </div>
                         </div>
-                        <br>
+                    </form>
+                    <br>
+
+                    @*<form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">*@
+                        <div class="col-12">
+                            
+                        </div>
+                    @*</form>*@
 
                         <div class="table-responsive">
                             <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
@@ -148,8 +156,7 @@
                             </table>
                         </div>
 
-                    </form>
-				</div>
+                </div>
 			</div>
 		</div>
 	</div>
@@ -172,6 +179,69 @@
     $(function () {
         $("div#loading").hide();
     });
+
+	function exportNtpn()
+	{
+            var CariNomorBerkas = $('#CariNomorBerkas').val();
+            var CariNamaPemohon = $('#CariNamaPemohon').val();
+			var CariStatus = $('#select2-DropdownCariStatus-container').val();
+            var Satker = $('#select2-DropdownSatker-container').val();
+        if (year == '') {
+            year = new Date().getFullYear();
+        }
+        window.location.replace('@Url.Action("ExportntpnV2", "Administrasi")?pTahun=' + year + '&pBulan=' + month);
+	}
+
+	function ExportMonitoring()
+	{
+        var NomorBerkas = $('#CariNomorBerkas').val();
+        var NamaPemohon = $('#CariNamaPemohon').val();
+        var Status = $('#DropdownCariStatus option:selected').val();
+		var Satker = $('#DropdownSatker option:selected').val();
+		console.log(NomorBerkas, NamaPemohon, Status, Satker);
+		//window.location.replace('@Url.Action("ExportntpnV2", "Administrasi")?pTahun=' + year + '&pBulan=' + month);
+		var SendData =
+        {
+            NomorBerkas: NomorBerkas,
+            NamaPemohon: NamaPemohon,
+            Status: Status,
+            Satker: Satker,
+        }
+
+        $.ajax
+        ({
+			type: "POST",
+            url: "/Pengembalian/ExportExcel_Monitoring",
+            //url: "/Pengembalian/ExportExcel_Monitoring/", body:
+            //{
+            //    NomorBerkas: NomorBerkas,
+            //    NamaPemohon: NamaPemohon,
+            //    Status: Status,
+            //    Satker: Satker,
+            //},
+            contentType: "application/json; charset=utf-8",
+			datatype: "JSON",
+            data: JSON.stringify(SendData),
+            /*data: SendData,*/
+			success: function (response)
+			{
+                if (response != null) {
+                    alert("Ok lurrr mantaap...!");
+                    return true;
+                }
+                else {
+                    alert("Something went wrong...!");
+                    return false;
+                }
+            },
+            failure: function (response) {
+                alert(response.responseText);
+            },
+            error: function (response) {
+                alert(response.responseText);
+            }
+        });
+	}
 
     $(document).ready(function () {
 
