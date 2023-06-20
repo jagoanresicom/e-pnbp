@@ -4824,7 +4824,7 @@ namespace Pnbp.Controllers
                     SP2D = x.NomorSP2D,
                     Status = x.StatusPengembalian == 0 ? "Belum Terkirim" : x.StatusPengembalian == 1 ? "Terkirim" : x.StatusPengembalian == 2 ? "Proses" : x.StatusPengembalian == 3 ? "Berkas Tidak Lengkap" : x.StatusPengembalian == 4 ? "Selesai" : "Usulan Baru"
                 }).ToList();
-
+                 
                 var Data = TempData.Select((x, index) => new
                 {
 
