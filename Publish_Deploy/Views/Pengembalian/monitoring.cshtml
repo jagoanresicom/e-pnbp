@@ -61,16 +61,16 @@
 					</ul>
 					<div class="clearfix"></div>
 				</div>
-				<div class="x_content" id="js-section-pencarian">
+                <div class="x_content" id="js-section-pencarian">
                     <form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         @if (jenisKantorUser == "Pusat")
                         {
-                            <input type="hidden" name="jeniskantor" id="jeniskantor" value="Pusat" />
+                            <input type="hidden" name="jeniskantor" ClientIDMode="Static" id="jeniskantor" value="Pusat" />
                         }
                         else
                         {
-                            <input type="hidden" name="jeniskantor" id="jeniskantor" value="Kantah" />
+                            <input type="hidden" name="jeniskantor" ClientIDMode="Static" id="jeniskantor" value="Kantah" />
                         }
 
                         <div class="row">
@@ -104,52 +104,79 @@
                                         lsStatus.Add(new SelectListItem { Value = "3", Text = "Berkas Tidak Lengkap" });
                                         lsStatus.Add(new SelectListItem { Value = "4", Text = "Selesai" });
                                     }
-                                    @Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @class = "select2_single form-control input-md" })
+                                    @Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @id = "DropdownCariStatus", @class = "select2_single form-control input-md" }) @**@
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
                                 <div class="col-md-4 col-sm-4 col-xs-12">
-                                    @Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @class = "select2_single form-control input-md" })
+                                    @Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @id = "DropdownSatker", @class = "select2_single form-control input-md" })
                                 </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <button type="submit" class="btn btn-success">Cari</button>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" id="Button_CariData" ClientIDMode="Static" class="btn btn-success" style="margin-left: 100px !important;">Cari</button>
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
                             </div>
                         </div>
-                        <br>
-
-                        <div class="table-responsive">
-                            <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Kewenangan</th>
-                                        @if (jenisKantorUser == "Pusat")
-                                        {
-                                            <th>Kode Satker</th>
-                                            <th>Satuan Kerja</th>
-                                        }
-                                        <th>Nomor Berkas</th>
-                                        <th>Nama Pemohon</th>
-                                        <th>Nominal</th>
-                                        <th>Nomor Surat</th>
-                                        <th>Tangal Pengajuan</th>
-                                        <th>SP2D</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dataplaceholder"></tbody>
-                            </table>
-                        </div>
-
                     </form>
-				</div>
+                    <br>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                            @*<button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="location.href='@Url.Action("ExportExcelMonitoring", "Pengembalian")'" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>*@
+                            <button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kewenangan</th>
+                                    @if (jenisKantorUser == "Pusat")
+                                    {
+                                        <th>Kode Satker</th>
+                                        <th>Satuan Kerja</th>
+                                    }
+                                    <th>Nomor Berkas</th>
+                                    <th>Nama Pemohon</th>
+                                    <th>Nominal</th>
+                                    <th>Nomor Surat</th>
+                                    <th>Tangal Pengajuan</th>
+                                    <th>SP2D</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataplaceholder"></tbody>
+                        </table>
+                    </div>
+
+                </div>
 			</div>
 		</div>
 	</div>
@@ -172,6 +199,69 @@
     $(function () {
         $("div#loading").hide();
     });
+
+	function ExportMonitoring()
+	{
+        var NomorBerkas = $('#CariNomorBerkas').val();
+        var NamaPemohon = $('#CariNamaPemohon').val();
+        var Status = $('#DropdownCariStatus option:selected').val();
+		var Satker = $('#DropdownSatker option:selected').val();
+		console.log(NomorBerkas, NamaPemohon, Status, Satker);
+        window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);
+	   //     var SendData =
+	   //     {
+	   //         NomorBerkas: NomorBerkas,
+	   //         NamaPemohon: NamaPemohon,
+	   //         Status: Status,
+	   //         Satker: Satker,
+	   //     }
+	   //     $.ajax
+	   //     ({
+	   //         type: "POST",
+	   //         url: "/Pengembalian/ExportExcelMonitoring",
+	   //         contentType: "application/json; charset=utf-8",
+	   //         datatype: "JSON",
+	   //         data: JSON.stringify(SendData),
+				//success: function (response)
+				//{
+				//	if (response != null)
+				//	{
+	   //                 let currentDate = new Date().toLocaleDateString();
+	   //                 var bytes = Base64ToBytes(response);
+	   //                 var blob = new Blob([bytes], { type: "application/octetstream" });
+	   //                 var DownloadURL = URL.createObjectURL(blob);
+	   //                 var a = document.createElement("a");
+	   //                 a.href = DownloadURL;
+	   //                 a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
+	   //                 document.body.appendChild(a);
+				//		a.click();
+
+	   //                 alert("Download successfully...!");
+	   //                 return true;
+	   //             }
+	   //             else {
+	   //                 alert("Something went wrong...!");
+	   //                 return false;
+	   //             }
+	   //         },
+	   //         failure: function (response) {
+	   //             alert(response.responseText);
+	   //         },
+	   //         error: function (response) {
+	   //             alert(response.responseText);
+	   //         }
+	   //     });
+	}
+
+    function Base64ToBytes(base64) {
+        var binary_string = window.atob(base64);
+        var len = binary_string.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
 
     $(document).ready(function () {
 
@@ -305,7 +395,7 @@
             asd(dTableColumns)
 		};
 
-		let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
+        let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
 			"bLengthChange": false,
 			"paging": true,
 			"pageLength": 10,

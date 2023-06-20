@@ -4793,7 +4793,7 @@ namespace Pnbp.Controllers
                 new DataColumn("No",typeof(string)),
                 new DataColumn("Kewenangan",typeof(string)),
                 new DataColumn("Kode Satker",typeof(string)),
-                new DataColumn("Satuan Kerja",typeof(string)),
+                new DataColumn("Nama Satker",typeof(string)),
                 new DataColumn("Nomor Berkas",typeof(string)),
                 new DataColumn("Nama Pemohon",typeof(string)),
                 new DataColumn("Nominal", typeof(string)),
@@ -4814,7 +4814,8 @@ namespace Pnbp.Controllers
                 {
                     Kewenangan = x.LabelTipePengembalian,
                     Kode_Satker = x.KodeSatker,
-                    Satuan_Kerja = x.NamaSatker,
+                    Nama_Kantor = x.NamaKantor,
+                    //Satuan_Kerja = x.NamaSatker,
                     Nomor_Berkas = x.NomorBerkas,
                     Nama_Pemohon = x.NamaPegawaiSetuju,
                     Nominal = x.permohonanpengembalian,
@@ -4830,7 +4831,8 @@ namespace Pnbp.Controllers
                     No = index + 1,
                     Kewenangan = x.Kewenangan,
                     Kode_Satker = x.Kode_Satker,
-                    Satuan_Kerja = x.Satuan_Kerja,
+                    Nama_Kantor = x.Nama_Kantor,
+                    //Satuan_Kerja = x.Satuan_Kerja,
                     Nomor_Berkas = x.Nomor_Berkas,
                     Nama_Pemohon = x.Nama_Pemohon,
                     Nominal = x.Nominal,
@@ -4847,7 +4849,8 @@ namespace Pnbp.Controllers
                         Obj.No,
                         Obj.Kewenangan,
                         Obj.Kode_Satker,
-                        Obj.Satuan_Kerja,
+                        Obj.Nama_Kantor,
+                        //Obj.Satuan_Kerja,
                         Obj.Nomor_Berkas,
                         Obj.Nama_Pemohon,
                         Obj.Nominal,
@@ -4864,8 +4867,8 @@ namespace Pnbp.Controllers
                     using (MemoryStream MS = new MemoryStream())
                     {
                         _XLWorkbook.SaveAs(MS);
-                        //return File(MS.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
-                        return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
+                        return File(MS.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
+                        //return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
                     }
                 }
                 #endregion

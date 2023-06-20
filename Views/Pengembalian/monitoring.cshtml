@@ -207,50 +207,50 @@
         var Status = $('#DropdownCariStatus option:selected').val();
 		var Satker = $('#DropdownSatker option:selected').val();
 		console.log(NomorBerkas, NamaPemohon, Status, Satker);
-        @*window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);*@
-        var SendData =
-        {
-            NomorBerkas: NomorBerkas,
-            NamaPemohon: NamaPemohon,
-            Status: Status,
-            Satker: Satker,
-        }
-        $.ajax
-        ({
-            type: "POST",
-            url: "/Pengembalian/ExportExcelMonitoring",
-            contentType: "application/json; charset=utf-8",
-            datatype: "JSON",
-            data: JSON.stringify(SendData),
-			success: function (response)
-			{
-				if (response != null)
-				{
-                    let currentDate = new Date().toLocaleDateString();
-                    var bytes = Base64ToBytes(response);
-                    var blob = new Blob([bytes], { type: "application/octetstream" });
-                    var DownloadURL = URL.createObjectURL(blob);
-                    var a = document.createElement("a");
-                    a.href = DownloadURL;
-                    a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
-                    document.body.appendChild(a);
-					a.click();
+        window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);
+	   //     var SendData =
+	   //     {
+	   //         NomorBerkas: NomorBerkas,
+	   //         NamaPemohon: NamaPemohon,
+	   //         Status: Status,
+	   //         Satker: Satker,
+	   //     }
+	   //     $.ajax
+	   //     ({
+	   //         type: "POST",
+	   //         url: "/Pengembalian/ExportExcelMonitoring",
+	   //         contentType: "application/json; charset=utf-8",
+	   //         datatype: "JSON",
+	   //         data: JSON.stringify(SendData),
+				//success: function (response)
+				//{
+				//	if (response != null)
+				//	{
+	   //                 let currentDate = new Date().toLocaleDateString();
+	   //                 var bytes = Base64ToBytes(response);
+	   //                 var blob = new Blob([bytes], { type: "application/octetstream" });
+	   //                 var DownloadURL = URL.createObjectURL(blob);
+	   //                 var a = document.createElement("a");
+	   //                 a.href = DownloadURL;
+	   //                 a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
+	   //                 document.body.appendChild(a);
+				//		a.click();
 
-                    alert("Download successfully...!");
-                    return true;
-                }
-                else {
-                    alert("Something went wrong...!");
-                    return false;
-                }
-            },
-            failure: function (response) {
-                alert(response.responseText);
-            },
-            error: function (response) {
-                alert(response.responseText);
-            }
-        });
+	   //                 alert("Download successfully...!");
+	   //                 return true;
+	   //             }
+	   //             else {
+	   //                 alert("Something went wrong...!");
+	   //                 return false;
+	   //             }
+	   //         },
+	   //         failure: function (response) {
+	   //             alert(response.responseText);
+	   //         },
+	   //         error: function (response) {
+	   //             alert(response.responseText);
+	   //         }
+	   //     });
 	}
 
     function Base64ToBytes(base64) {
