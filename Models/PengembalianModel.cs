@@ -551,7 +551,7 @@ namespace Pnbp.Models
                     FROM
                         pengembalianpnbp
                         JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
-                        JOIN KANTOR satker ON satker.kantorid = pengembalianpnbp.kantorid 
+                        JOIN SATKER satker ON satker.KANTORID = pengembalianpnbp.kantorid 
                         AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk)
                         WHERE nvl(status_hapus,0)=0  ";
 
