@@ -1,0 +1,472 @@
+﻿@model Pnbp.Entities.FindPengembalianPnbp
+@{
+	string jenisKantorUser = @OtorisasiUser.GetJenisKantorUser();
+}
+
+<script src='@Url.Content("~/resources/js/infiniteScroll.js")'></script>
+<style nonce="MjI3NzUzMQ">
+	.panel-container {
+		padding: 16px;
+	}
+
+	.dataTables_processing[style="display: block;"] {
+		display: flex !important;
+		justify-content: center;
+		align-items: center;
+		min-height: 37px;
+	}
+
+	.d-flex {
+		display: flex;
+	}
+
+	.justify-content-center {
+		justify-content: center;
+	}
+
+	.btn-edit {
+		background: #17a2b8;
+		border-color: #187787 !important;
+	}
+
+		.btn-edit:hover, .btn-edit:focus, .btn-edit:active {
+			background: #1594a8 !important;
+			border-color: #187787 !important;
+		}
+
+	.column-aksi button {
+		min-width: 80px;
+	}
+
+</style>
+
+
+<div class="" id="dynamic_content">
+
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel panel-container">
+				<div class="x_title">
+					<h2>Pengembalian PNBP</h2>
+					<ul class="nav navbar-right panel_toolbox hide">
+						<li>
+							<a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+						</li>
+						<li>
+							<a class="close-link"><i class="fa fa-close"></i></a>
+						</li>
+					</ul>
+					<div class="clearfix"></div>
+				</div>
+                <div class="x_content" id="js-section-pencarian">
+                    <form class="form-horizontal form-label-left" role="form" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        @if (jenisKantorUser == "Pusat")
+                        {
+                            <input type="hidden" name="jeniskantor" ClientIDMode="Static" id="jeniskantor" value="Pusat" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="jeniskantor" ClientIDMode="Static" id="jeniskantor" value="Kantah" />
+                        }
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor Berkas : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CariNomorBerkas, new { @class = "form-control input-md" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Pemohon : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @Html.TextBoxFor(m => m.CariNamaPemohon, new { @class = "form-control input-md" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Status : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @{
+                                        var lsStatus = new List<SelectListItem>();
+                                        lsStatus.Add(new SelectListItem { Value = "0", Text = "Belum Kirim" });
+                                        if (jenisKantorUser == "Pusat")
+                                        {
+                                            lsStatus.Add(new SelectListItem { Value = "1", Text = "Usulan Baru" });
+                                        }
+                                        else
+                                        {
+                                            lsStatus.Add(new SelectListItem { Value = "1", Text = "Terkirim" });
+                                        }
+                                        lsStatus.Add(new SelectListItem { Value = "2", Text = "Proses" });
+                                        lsStatus.Add(new SelectListItem { Value = "3", Text = "Berkas Tidak Lengkap" });
+                                        lsStatus.Add(new SelectListItem { Value = "4", Text = "Selesai" });
+                                    }
+                                    @Html.DropDownListFor(model => model.CariStatus, lsStatus, " -- Pilih Status --", new { @id = "DropdownCariStatus", @class = "select2_single form-control input-md" }) @**@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Satker : </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    @Html.DropDownListFor(model => model.CariKodeSatker, new List<SelectListItem>(), " -- Pilih Satuan Kerja --", new { @id = "DropdownSatker", @class = "select2_single form-control input-md" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" id="Button_CariData" ClientIDMode="Static" class="btn btn-success" style="margin-left: 100px !important;">Cari</button>
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                        </div>
+                    </form>
+                    <br>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-2">
+                            @*<button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="location.href='@Url.Action("ExportExcelMonitoring", "Pengembalian")'" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>*@
+                            <button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kewenangan</th>
+                                    @if (jenisKantorUser == "Pusat")
+                                    {
+                                        <th>Kode Satker</th>
+                                        <th>Satuan Kerja</th>
+                                    }
+                                    <th>Nomor Berkas</th>
+                                    <th>Nama Pemohon</th>
+                                    <th>Nominal</th>
+                                    <th>Nomor Surat</th>
+                                    <th>Tangal Pengajuan</th>
+                                    <th>SP2D</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataplaceholder"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<div id='myModalDocViewer' class='modal'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div id='myModalContent'></div>
+		</div>
+	</div>
+</div>
+
+
+<a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
+
+<script type="text/javascript" nonce="MjI3NzUzMQ">
+    $(function () {
+        $("div#loading").hide();
+    });
+
+	function ExportMonitoring()
+	{
+        var NomorBerkas = $('#CariNomorBerkas').val();
+        var NamaPemohon = $('#CariNamaPemohon').val();
+        var Status = $('#DropdownCariStatus option:selected').val();
+		var Satker = $('#DropdownSatker option:selected').val();
+		console.log(NomorBerkas, NamaPemohon, Status, Satker);
+        window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);
+	   //     var SendData =
+	   //     {
+	   //         NomorBerkas: NomorBerkas,
+	   //         NamaPemohon: NamaPemohon,
+	   //         Status: Status,
+	   //         Satker: Satker,
+	   //     }
+	   //     $.ajax
+	   //     ({
+	   //         type: "POST",
+	   //         url: "/Pengembalian/ExportExcelMonitoring",
+	   //         contentType: "application/json; charset=utf-8",
+	   //         datatype: "JSON",
+	   //         data: JSON.stringify(SendData),
+				//success: function (response)
+				//{
+				//	if (response != null)
+				//	{
+	   //                 let currentDate = new Date().toLocaleDateString();
+	   //                 var bytes = Base64ToBytes(response);
+	   //                 var blob = new Blob([bytes], { type: "application/octetstream" });
+	   //                 var DownloadURL = URL.createObjectURL(blob);
+	   //                 var a = document.createElement("a");
+	   //                 a.href = DownloadURL;
+	   //                 a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
+	   //                 document.body.appendChild(a);
+				//		a.click();
+
+	   //                 alert("Download successfully...!");
+	   //                 return true;
+	   //             }
+	   //             else {
+	   //                 alert("Something went wrong...!");
+	   //                 return false;
+	   //             }
+	   //         },
+	   //         failure: function (response) {
+	   //             alert(response.responseText);
+	   //         },
+	   //         error: function (response) {
+	   //             alert(response.responseText);
+	   //         }
+	   //     });
+	}
+
+    function Base64ToBytes(base64) {
+        var binary_string = window.atob(base64);
+        var len = binary_string.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
+
+    $(document).ready(function () {
+
+		$('.select2_single').select2({ width: 'resolve' });
+
+        $('#myModalDocViewer').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '98%',
+                height: '98 %',
+                'max-height': '98%'
+            });
+		});
+
+		$('#js-section-pencarian form').on('submit', function (e) {
+			e.preventDefault();
+			dTable.draw();
+		});
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#back-to-top').fadeIn();
+            } else {
+                $('#back-to-top').fadeOut();
+            }
+        });
+        // scroll body to 0px on click
+        $('#back-to-top').click(function () {
+            $('#back-to-top').tooltip('hide');
+            $('body,html').animate({
+                scrollTop: 0
+            }, 800);
+            return false;
+        });
+
+        //$('#back-to-top').tooltip('show');
+
+		let dTableColumns = [
+			{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "LabelTipePengembalian", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "KodeSatker", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "NamaSatker", "className": "centertaligncolumn", "width": "20%" },
+			{ "data": "NomorBerkas", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "NamaPemohon", "className": "centertaligncolumn", "width": "20%" },
+			{ "data": "permohonanpengembalian", "className": "rightaligncolumn", render: formatAngka },
+			{ "data": "NomorSurat", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "TanggalPengaju", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "NomorSP2D", "className": "centertaligncolumn", "width": "5%" },
+			{
+				"data": "StatusPengembalian",
+				"className": "centertaligncolumn",
+				"width": "10%",
+				render: function (data) {
+					if (data == null) {
+						return 'Belum Kirim'
+					}
+					if (data == '0') {
+						return 'Belum Kirim'
+					}
+					if (data == '1') {
+						if ($('#jeniskantor').val() == 'Pusat') {
+							return 'Usulan Baru'
+						} else {
+							return 'Terkirim'
+						}
+					}
+					if (data == '2') {
+						return 'Proses'
+					}
+					if (data == '3') {
+						return 'Berkas Tidak Lengkap'
+					}
+					if (data == '4') {
+						return 'Selesai'
+					}
+				}
+			},
+			{
+				"data": null,
+				"className": "centertaligncolumn column-aksi",
+				"width": "5%",
+				"render": function (data, type, row) {
+					let isPusat = ($('#jeniskantor').val() == 'Pusat');
+					let html = '';
+					let url = '@Url.Action("DetailPengajuan", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
+
+					switch (data.StatusPengembalian) {
+						case 1:
+							if (data.LabelTipePengembalian == "Pusat" && isPusat) {
+								html += '<a href="' + url + '" class="btn btn-success btn-edit"><i class="fa fa-pencil"></i> Edit</a>';
+							} else if ((data.LabelTipePengembalian == "Daerah" && !isPusat)) {
+								html += '<a href="' + url + '" class="btn btn-success">Selesai</a>';
+							} else {
+								html += '<a href="' + url + '" class="btn btn-primary"><i class="fa fa-eye"></i> Lihat</a>';
+							}
+							break;
+						case 3:
+						case 0:
+							html += '<a href="' + url + '" class="btn btn-success btn-edit"><i class="fa fa-pencil"></i> Edit</a>';
+							break;
+						case 2:
+							if ((data.LabelTipePengembalian == "Pusat" && isPusat) || (data.LabelTipePengembalian == "Daerah" && !isPusat)) {
+								html += '<a href="' + url + '" class="btn btn-success">Selesai</a>';
+							} else {
+								html += '<a href="' + url + '" class="btn btn-primary"><i class="fa fa-eye"></i> Lihat</a>';
+							}
+							break;
+						case 4:
+							html += '<a href="' + url + '" class="btn btn-primary"><i class="fa fa-eye"></i> Lihat</a>';
+							break;
+						default:
+							break;
+					}
+
+					html = '<div class="text-center d-flex justify-content-center" style="gap:6px">' + html + '</div>';
+					return html;
+				}
+			},
+		];
+		asd=console.log
+		if ($('#jeniskantor').val() != 'Pusat') {
+			for (let index = 0; index < dTableColumns.length; index++) {
+				let item = dTableColumns[index];
+                if (item.data == 'permohonanpengembalian') {
+                    item.width = '20%';
+                }
+                if (item.data == 'NamaSatker' || item.data == 'KodeSatker') {
+					dTableColumns.splice(index, 1);
+					index -= 1;
+				}
+			}
+            asd(dTableColumns)
+		};
+
+        let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
+			"bLengthChange": false,
+			"paging": true,
+			"pageLength": 10,
+			"bFilter": false,
+			"ordering": false,
+			"info": false,
+			"processing": true,
+			"serverSide": true,
+			"scrollX": false,
+			"ajax": {
+				url: '@Url.Action("ListPengembalian", "Pengembalian")',
+				type: "POST",
+				data: function (data, obj) { var ftp = $('#js-section-pencarian form').serializeArray(); data.form = ftp; ftp.push({ name: "start", value: data.start }, { name: "length", value: data.length }); return ftp; }
+			},
+			"columns": dTableColumns,
+		});
+
+		$('tbody', dTable.table().container()).delegate('tr td', 'click', function (e) {
+			var data = dTable.row($(this).closest('tr')).data();
+			if (e.target.classList.contains('--js-btn-selesai')) {
+				selesai(e);
+			}
+		});
+
+		function selesai(e) {
+			showmsg('Informasi', 'Fitur belum tersedia');
+		}
+
+		function formatAngka(data) {
+			let formattedString = formatangka(data);
+			if (formattedString == 'null') {
+				formattedString = '';
+			}
+			return formattedString;
+		}
+
+		function listSatker() {
+			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+			$.ajax({
+				url: '@Url.Action("ListSatker", "SatuanKerja")',
+				type: "GET",
+				success: function (data, textStatus, jqXHR) {
+
+					let docFrag = document.createDocumentFragment();
+
+					if (data.length > 0) {
+						for (let item of data) {
+							opt = document.createElement('option');
+							opt.value = item.KodeSatker;
+							opt.textContent = item.Nama_Satker;
+							docFrag.append(opt);
+						}
+					}
+
+					let selectNode = $('#js-section-pencarian [name="CariKodeSatker"]');
+					selectNode.innerHTML = '';
+					selectNode.append(docFrag);
+					selectNode.select2({ width: 'resolve' });
+
+					$.unblockUI();
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					showmsg("Error", "Gagal memuat satuan kerja");
+					$.unblockUI();
+				},
+			});
+		}
+
+		listSatker();
+
+    });
+
+</script>
+

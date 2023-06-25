@@ -1,0 +1,456 @@
+﻿@model Pnbp.Entities.DataPengembalianPnbp
+
+<script src='@Url.Content("~/resources/js/jqueryautocomplete/jquery.autocomplete.js")' type="text/javascript"></script>
+<script src='@Url.Content("~/resources/js/jquery.inputmask.bundle.min.js")' type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $.validator.unobtrusive.parse(this);
+    });
+</script>
+
+<div class="" id="dynamic_content">
+    <div class="page-title">
+        <div class="title_left"><h2 style="width:100%">Persetujuan Pengajuan Pengembalian PNBP</h2></div>
+        <div class="title_right" style="text-align:right;">
+            <div class="pull-right">
+                <span class="input-group-btn" style="padding-right:2px;">
+                    <button type="button" class="btn btn-warning" id="btnkembali">Kembali</button>
+                    <button type="button" class="btn btn-primary" id="btnentrilampiran" style="margin-left:3px;">Lihat Lampiran</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:7px; border:1px solid #E6E9ED;">
+                <div class="x_title">
+                    <h2>Data Persetujuan</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" id="frmEntriPersetujuan" role="form">
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tanggal <span style="color:red">*</span></label>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalSetuju, new { @class = "form-control", @id = "tanggalsetuju", @required = "required" })
+                                @Html.ValidationMessageFor(model => model.TanggalSetuju, "Tanggal wajib diisi")
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                <span class="input-group checkbox icheck-primary sr">
+                                    @Html.CheckBoxFor(model => model.IsStatusSetuju, new { @class = "form-control", @id = "statussetuju" })
+                                    @Html.LabelFor(model => model.IsStatusSetuju)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">File Lampiran</label>
+                            <div class="col-md-8 col-sm-8 col-xs-12">
+                                <div class="input-group" style="margin-bottom: 0px;">
+                                    @Html.TextBoxFor(model => model.FileDokumenSetuju, new { type = "file", accept = ".pdf", @class = "form-control", @id = "txtUploadFile", @style = "background-color:white; color:#000000; font-family: 'Varela Round', sans-serif; font-size: small;" })
+                                    <span class="input-group-addon button-success" id="btnlihatfile" style="cursor:pointer;">
+                                        <span class="fa fa-eye"></span>&nbsp;Lihat File
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                <button type="submit" class="btn btn-success" id="btnsimpandatapersetujuan">Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:7px; border:1px solid #E6E9ED;">
+                <div class="x_title">
+                    <h2>Data Pengajuan</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" id="frmEntriPengajuan" role="form">
+                        @Html.HiddenFor(m => m.PengembalianPnbpId, new { @id = "PengembalianPnbpId" })
+                        @Html.HiddenFor(m => m.EditMode, new { @id = "EditMode" })
+                        @Html.HiddenFor(m => m.EditModeLampiran, new { @id = "EditModeLampiran" })
+                        @Html.HiddenFor(m => m.SelectedKantorId, new { @id = "SelectedKantorId" })
+                        @Html.HiddenFor(m => m.BerkasId, new { @id = "BerkasId" })
+                        @Html.HiddenFor(m => m.PemilikId, new { @id = "PemilikId" })
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tanggal Pengajuan <span style="color:red">*</span></label>
+                            <div class="col-md-2 col-sm-2 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalPengaju, new { @class = "form-control", @id = "tanggalpengajuan", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="divider-dashed"></div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor & Tahun Berkas <span style="color:red">*</span></label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NomorBerkas, new { @class = "form-control", @id = "nomorberkas", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Nama Kegiatan Pelayanan</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaProsedur, new { @class = "form-control", @id = "namaprosedur", @placeholder = "Nama Kegiatan Pelayanan", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Tanggal & Kode Billing, NTPN</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalKodeBilling, new { @class = "form-control", @id = "tanggalkodebilling", @placeholder = "Tanggal", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.KodeBilling, new { @class = "form-control", @id = "kodebilling", @placeholder = "Kode Billing", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.Ntpn, new { @class = "form-control", @id = "ntpn", @placeholder = "NTPN", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Tanggal & Jumlah Bayar, Bank</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.TanggalBayar, new { @class = "form-control", @id = "tanggalbayar", @placeholder = "Tanggal Bayar", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.JumlahBayar, new { @class = "form-control", @id = "jumlahbayar", @placeholder = "Jumlah Bayar", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaBankPersepsi, new { @class = "form-control", @id = "namabankpersepsi", @placeholder = "Nama Bank Persepsi", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">NIK dan Nama Pemohon</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.NikPemohon, new { @class = "form-control", @id = "nikpemohon", @placeholder = "NIK Pemohon", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaPemohon, new { @class = "form-control", @id = "namapemohon", @placeholder = "Nama Pemohon", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" style="color: silver;">Alamat, Email, Telepon Pemohon</label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.AlamatPemohon, new { @class = "form-control", @id = "alamatpemohon", @placeholder = "Alamat", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.EmailPemohon, new { @class = "form-control", @id = "emailpemohon", @placeholder = "Email", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                @Html.TextBoxFor(model => model.NomorTelepon, new { @class = "form-control", @id = "nomortelepon", @placeholder = "Nomor Telepon", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="divider-dashed"></div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nomor Rekening <span style="color:red">*</span></label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NomorRekening, new { @class = "form-control", @id = "nomorrekening", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Bank <span style="color:red">*</span></label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaBank, new { @class = "form-control", @id = "namabank", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Nama Cabang</label>
+                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                @Html.TextBoxFor(model => model.NamaCabang, new { @class = "form-control", @id = "namacabang", @readonly = "readonly", @style = "color:#000000; border-color:#ffffff; box-shadow: none !important;  font-family: 'Varela Round', sans-serif; font-size: small;" })
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="myModalDocViewer" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="myModalContent"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.select2_single').select2({ width: 'resolve' });
+
+        $('#myModalDocViewer').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '98%',
+                height: '98 %',
+                'max-height': '98%'
+            });
+        });
+
+        $("#tanggalpengajuan").attr('data-inputmask', "'mask': '99-99-9999'");
+        $("#tanggalsetuju").attr('data-inputmask', "'mask': '99-99-9999'");
+
+        //---- binding List Kantor
+        @*$.ajax({
+            url: '@Url.Action("GetListKantor", "Pengembalian")',
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                $('#namakantor').autocomplete({
+                    lookup: data,
+                    lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
+                        var re = new RegExp('\\b' + $.Autocomplete.utils.escapeRegExChars(queryLowerCase), 'gi');
+                        return re.test(suggestion.value);
+                    },
+                    onSelect: function (suggestion) {
+                        $('#SelectedKantorId').val(suggestion.data);
+                    }
+                });
+            }
+        });*@
+        //------- Eof binding List Kantor
+
+
+        //---- binding List Nama Bank
+         $.ajax({
+            url: '@Url.Action("GetListBank", "Pengembalian")',
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                $('#namabank').autocomplete({
+                    lookup: data,
+                    lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
+                        var re = new RegExp('\\b' + $.Autocomplete.utils.escapeRegExChars(queryLowerCase), 'gi');
+                        return re.test(suggestion.value);
+                    }
+                });
+            }
+        });
+        //------- Eof binding List Nama Bank
+
+
+        //var editmode = $('#EditMode').val();
+        //if (editmode !== null && editmode !== '') {
+        //    if (editmode == "edit") {
+        //        $("#BtnCariBerkas").css("pointer-events", "none");
+        //        $("#BtnCariBerkas").attr('class', 'input-group-addon button-default');
+        //        $("#nomorberkas").prop('readonly', true);
+        //    }
+        //}
+
+    });
+
+    $("#btnkembali").on("click", function (e) {
+
+        window.location.href = '@Url.Action("PersetujuanPengembalian", "Pengembalian")';
+
+        e.preventDefault();
+        return false;
+    });
+
+    $("#btnentrilampiran").on("click", function (e) {
+
+        var pengembalianpnbpid = $('#PengembalianPnbpId').val();
+
+        if (pengembalianpnbpid !== null && pengembalianpnbpid !== '') {
+
+            window.location.href = '@Url.Action("LihatLampiran", "Pengembalian")?pengembalianpnbpid=' + pengembalianpnbpid;
+
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+    //var objpdf = null;
+    var dfFileDokumen = null;
+    $("#txtUploadFile").on("change", function (e) {
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1;
+        if (numFiles > 0) {
+            var file = dfFileDokumen = input.get(0).files[0];
+
+            if (file.size > 20000 * 1024) { dfFileDokumen = null; showmsg('Peringatan', 'File maksimum 20Mb'); return false; }
+
+            // Display File -----------------------------------------
+            @*var tipefile = input.get(0).files[0].type;
+            if (tipefile == 'application/pdf') {
+
+                // Display PDF --------------------------------------
+                var blob = new Blob([file], { type: "application/pdf;base64" }),
+                    objurl = window.URL.createObjectURL(blob);
+
+                objpdf = objurl;
+                var options = { "backdrop": "static", keyboard: true };
+                $.blockUI({ baseZ: 2000000, message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DocViewer", "Konten")',
+                    success: function (data) {
+
+                        $('#myModalContent').html(data);
+                        $('#myModalDocViewer').modal(options);
+                        $('#myModalDocViewer').modal('show');
+                        //$.unblockUI();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $.unblockUI();
+                    }
+                });
+            }*@
+            // Eof Display File -----------------------------------------
+        }
+    });
+
+    $("#btnlihatfile").on("click", function (e) {
+
+        var editmodelampiran = $('#EditModeLampiran').val();
+
+        if (editmodelampiran == 'baru') {
+
+            if (dfFileDokumen == null) {
+                return false;
+            }
+
+            var filedokumen = dfFileDokumen;
+            var tipefile = filedokumen.type;
+
+            if (tipefile == 'application/pdf') {
+                var blob = new Blob([dfFileDokumen], { type: "application/pdf;base64" }),
+                    objurl = window.URL.createObjectURL(blob);
+                objpdf = objurl;
+            }
+
+            if (tipefile == 'application/pdf') {
+
+                // Display PDF --------------------------------------
+
+                var options = { "backdrop": "static", keyboard: true };
+                $.blockUI({ baseZ: 2000000, message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DocViewer", "Konten")',
+                    success: function (data) {
+
+                        $('#myModalContent').html(data);
+                        $('#myModalDocViewer').modal(options);
+                        $('#myModalDocViewer').modal('show');
+                        //$.unblockUI();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $.unblockUI();
+                    }
+                });
+            }
+        }
+        else {
+            // load file lampiran persetujuan from Server
+            var pengembalianpnbpid = $('#PengembalianPnbpId').val();
+            $.ajax({
+                url: '@Url.Action("GetDaftarLampiranKembalian", "Pengembalian")',
+                type: "GET",
+                dataType: "JSON",
+                data: { id: pengembalianpnbpid, judul: 'Persetujuan' },
+                success: function (datalampiran) {
+                    if (datalampiran[0] != null) {
+                        var id = datalampiran[0].LampiranKembalianId;
+                        var ekstensi = datalampiran[0].Ekstensi;
+                        if (ekstensi.includes("pdf")) {
+
+                            var objurl = '@Url.Action("GetFileLampiranById", "Pengembalian")?lampirankembalianid=' + id;
+
+                            objpdf = objurl;
+                            var options = { "backdrop": "static", keyboard: true };
+                            $.blockUI({ baseZ: 1000000, message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+                            $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("DocViewer", "Konten")',
+                                success: function (data) {
+                                    $('#myModalContent').html(data);
+                                    $('#myModalDocViewer').modal(options);
+                                    $('#myModalDocViewer').modal('show');
+                                    $.unblockUI();
+                                },
+                                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    $.unblockUI();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+        
+
+        e.preventDefault();
+        return false;
+    });
+
+    $("#frmEntriPersetujuan").submit(function (e) {
+        if ($("#frmEntriPersetujuan").valid()) {
+
+            var pengembalianpnbpid = $('#PengembalianPnbpId').val();
+            if (pengembalianpnbpid !== null && pengembalianpnbpid !== '') {
+
+                //$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+                var frmdata = new FormData(this);
+                frmdata.append("PengembalianPnbpId", $('#PengembalianPnbpId').val());
+                frmdata.append("IsStatusSetuju", $('#statussetuju').val());
+                frmdata.append("JudulLampiran", "Persetujuan");
+
+                if (dfFileDokumen !== null) {
+                    var namafile = dfFileDokumen.name;
+                    var fileExt = '.' + namafile.toLowerCase().split('.').pop();
+                    if (fileExt !== null && fileExt !== '') {
+                        frmdata.append("NamaFile", namafile);
+                        frmdata.append("Ekstensi", fileExt);
+                        frmdata.append("file", dfFileDokumen);
+                    }
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SimpanPersetujuanPengembalian", "Pengembalian")',
+                    data: frmdata,
+                    contentType: false,
+                    processData: false,
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        if (data.Status) {
+
+                            showinfo(data.Pesan);
+                        }
+                        else {
+                            showalert(data.Pesan);
+                        }
+                        $.unblockUI();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+                });
+
+            }
+            else {
+                showalert("Gagal mendapatkan data Pengajuan");
+            }
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+</script>
+
+
+
