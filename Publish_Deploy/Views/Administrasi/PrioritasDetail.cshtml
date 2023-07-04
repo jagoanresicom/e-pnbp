@@ -1,0 +1,124 @@
+﻿@model List<Pnbp.Entities.PrioritasAlokasi>
+
+@{
+    ViewBag.Judul = "Daftar Prioritas Non Operasional";
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .editors {
+        display: none;
+    }
+
+    /*tr:hover,*/ 
+    tr.selected, tr.selected {
+        background-color: #B0BED9 !important;
+    }
+</style>
+
+<div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2 class="sub-header">@(ViewBag.Judul)</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="table-responsive" style="border:none">
+                        <section id="flip-scroll">
+                            <table class="table table-bordered dt-responsive nowrap" style="clear: both; border-collapse: collapse; width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="numeric">Prioritas</th>
+                                        <th>Satuan Kerja / Kode / Program </th>
+                                        @*<th>Satuan Kerja</th>
+                                        <th>Kode</th>
+                                        <th>Program</th>*@
+                                        <th>Status</th>
+                                        <th class="numeric">Anggaran (Rp)</th>
+                                        <th class="numeric">Alokasi (Rp)</th>
+                                        <th class="numeric">Persentase (%)</th>
+                                        <th class="numeric">Rencana <br/>Alokasi (Rp)</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="listmanfaatholder">
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr style="cursor: pointer" id="@item.Manfaatid">
+                                            <td class="numeric">@(item.Prioritaskegiatan)</td>
+                                            <td>@item.Namasatker <br/>@item.Kodesatker <br/>@item.Namaprogram</td>
+                                            @*<td>@item.Namasatker</td>
+                                            <td>@item.Kodesatker</td> 
+                                            <td>@item.Namaprogram</td>*@ 
+                                            <td>@item.Statusaktif</td> 
+                                            <td class="numeric">@item.Nilaianggaran.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                            <td class="numeric">@item.Teralokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                            <td class="numeric">@Math.Round((item.Teralokasi / item.Nilaianggaran * 100), 2)</td>
+                                            <td class="numeric">@item.Alokasi.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        </tr>
+                                    }
+
+                                    <tr>
+                                        <td colspan="3" class="numeric">Total</td>
+                                        <td class="numeric">@Model.Sum(a => a.Nilaianggaran).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        <td class="numeric">@Model.Sum(a => a.Teralokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                        <td class="numeric">@Math.Round((Model.Sum(a => a.Teralokasi) / Model.Sum(a => a.Nilaianggaran) * 100), 2)</td>
+                                        <td class="numeric">@Model.Sum(a => a.Alokasi).ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id='myModal' class='modal'>
+    <div id='myModalContent'>
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function (a) { a.createModal = function (b) { defaults = { title: "", message: "Your Message Goes Here!", closeButton: true, scrollable: false }; var b = a.extend({}, defaults, b); var c = (b.scrollable === true) ? 'style="max-height: 420px;overflow-y: auto;"' : ""; html = '<div class="modal fade" id="myModal">'; html += '<div class="modal-dialog">'; html += '<div class="modal-content">'; html += '<div class="modal-header">'; html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'; if (b.title.length > 0) { html += '<h4 class="modal-title">' + b.title + "</h4>" } html += "</div>"; html += '<div class="modal-body" ' + c + ">"; html += b.message; html += "</div>"; html += '<div class="modal-footer">'; if (b.closeButton === true) { html += '<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-ok">OK</button>' } html += "</div>"; html += "</div>"; html += "</div>"; html += "</div>"; a("body").prepend(html); a("#myModal").modal().on("hidden.bs.modal", function () { a(this).remove() }) } })(jQuery);
+    function showmsg(judul, isi) { $.createModal({ title: judul, message: isi, closeButton: true, scrollable: false }); return false; };
+
+    $(document).ready(function () {
+        $.unblockUI();
+    });
+
+    $(document).on('dblclick', 'tr', function () {
+        $(this).addClass("selected");
+        var id = $(this).attr('id');
+        //alert(id);
+        showprioritas(id);
+    });
+
+    $("tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+
+    function showprioritas(id) {
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        var pdata = { s: id };
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ShowPrioritas", "Administrasi")',
+            data: pdata,
+            success: function (data, textStatus, XMLHttpRequest) {
+                $('#myModal').show();
+                $('#myModalContent').html(data);
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { console.log(textStatus); $.unblockUI(); }
+        });
+    };
+</script>

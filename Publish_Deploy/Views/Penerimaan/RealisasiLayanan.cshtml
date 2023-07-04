@@ -1,0 +1,268 @@
+﻿@model Pnbp.Entities.FilterPenerimaan
+@{
+    ViewBag.Judul = "Realisasi Penerimaan Perjenis Layanan";
+    var lsbulan = new List<SelectListItem>();
+    lsbulan.Add(new SelectListItem { Value = "1", Text = "Januari" });
+    lsbulan.Add(new SelectListItem { Value = "2", Text = "Februari" });
+    lsbulan.Add(new SelectListItem { Value = "3", Text = "Maret" });
+    lsbulan.Add(new SelectListItem { Value = "4", Text = "April" });
+    lsbulan.Add(new SelectListItem { Value = "5", Text = "Mei" });
+    lsbulan.Add(new SelectListItem { Value = "6", Text = "Juni" });
+    lsbulan.Add(new SelectListItem { Value = "7", Text = "Juli" });
+    lsbulan.Add(new SelectListItem { Value = "8", Text = "Agustus" });
+    lsbulan.Add(new SelectListItem { Value = "9", Text = "September" });
+    lsbulan.Add(new SelectListItem { Value = "10", Text = "Oktober" });
+    lsbulan.Add(new SelectListItem { Value = "11", Text = "November" });
+    lsbulan.Add(new SelectListItem { Value = "12", Text = "Desember" });
+
+    var get_propinsi = ViewBag.get_propinsi;
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .tdcenter {
+        text-align: center;
+    }
+
+    #table-layanan-dt tbody tr td {
+        cursor: pointer;
+    }
+</style>
+
+<div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:20px">
+                <div class="x_title">
+                    <h2 class="sub-header">@(ViewBag.Judul)</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up" title="Hide Form"></i></a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    @using (Html.BeginForm("ExportLayanan", "Penerimaan", FormMethod.Post, new { id = "frmFindData", @class = "form-horizontal form-label-left" }))
+                    {
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <select name="tahun" id="tahun" class="select2_single form-control input-md">
+                                    <option value="">-- Pilih Tahun --</option>
+                                    @for (var i = DateTime.Now.Year; i >= (DateTime.Now.Year - 5); i--)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Bulan : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.DropDownListFor(model => model.bulan, lsbulan, " -- Pilih Bulan --", new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "bulan" })
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Provinsi</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select name="propinsi" id="propinsi" class="select2_single form-control input-md">
+                                        <option value="">--Pilih Provinsi--</option>
+                                        @if (get_propinsi.Count > 0)
+                                        {
+                                            foreach (var row in get_propinsi)
+                                            {
+                                                <option value="@row.kode">@row.nama</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>*@
+
+                        @*<div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Satker</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select name="satker" id="satker" class="select2_single form-control input-md">
+                                        <option value="">--Pilih Satker--</option>
+                                    </select>
+                                </div>
+                            </div>*@
+                    }
+                </div>
+                <div style="text-align:center;">
+                    <div style="text-align:center;">
+                        <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3">
+                            <button id="find-btn" type="button" class="btn btn-success">Cari</button>
+                            <button id="reset-btn" type="reset" class="btn btn-warning">Hapus</button>
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-xs-12">
+                            <button id="dl-btn" type="submit" form="frmFindData" class="btn btn-success"><span class="fa fa-floppy-o"></span> Excel </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <div class="row">
+                                <div class="clearfix"></div>
+                                <div>
+                                    <table id="table-layanan-dt" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="tdcenter">Jenis Layanan</th>
+                                                <th class="text-center">Realisasi Fisik</th>
+                                                <th class="text-center">Realisasi Penerimaan</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div id="layananholder" class="table-responsive">
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var tahun = "", bulan = "", dtinstance = null;
+
+    function loadDT() {
+        tahun = $('#tahun').val();
+        bulan = $('#bulan').val();
+
+        var url = "/Penerimaan/DaftarRealisasiLayananDT?tahun=" + tahun + "&bulan=" + bulan;
+
+        if (dtinstance != null) {
+            dtinstance.ajax.url(url).load();
+            return;
+        }
+
+        dtinstance = $('#table-layanan-dt').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": url,
+                "type": "POST"
+            },
+            "columns": [
+                {
+                    "data": "namaprosedur"
+                },
+                {
+                    "data": "jumlah"
+                },
+                {
+                    "data": "penerimaan"
+                }
+            ]
+        })
+
+        $('#table-layanan-dt tbody').on('click', 'tr', function () {
+            var data = dtinstance.row(this).data();
+            window.location.href = "/penerimaan/realisasilayanandetail?id=" + data.namaprosedur + "&pTahun=" + tahun + "&pBulan=" + bulan
+        });
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('.select2_single').select2({ width: 'resolve' });
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#back-to-top').fadeIn();
+            } else {
+                $('#back-to-top').fadeOut();
+            }
+        });
+        //createFirstPaging();
+    });
+
+    $("#reset-btn").on("click", function (e) {
+        $('#bulan').val('').trigger('change');
+        $('#tahun').prop('selectedIndex', 1).trigger('change');
+    });
+
+    var createFirstPaging = function () {
+        formToPost = $('#frmFindData');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarRealisasiLayanan", "Penerimaan")',
+            data: $('#frmFindData').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+                console.log(data);
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#layananholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });
+
+    };
+
+    $("#find-btn").on("click", function (e) {
+        loadDT();
+        return;
+        formToPost = $('#frmFindData');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarRealisasiLayanan", "Penerimaan")',
+            data: $('#frmFindData').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#layananholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });
+        e.preventDefault();
+        return false;
+    });
+
+    @*$('#propinsi').change(function () {
+        var provinsi = $('#propinsi').val()
+        $.ajax({
+            url: '@Url.Action("satker", "Penerimaan")',
+            type: "GET",
+            dataType: "JSON",
+            data: { kode: provinsi },
+            success: function (data) {
+                //console.log(data[0].Nama);
+                var html = "";
+                if (data.length > 0) {
+                    $.each(data, function (x) {
+                        html += ""
+                        + "<option value='" + data[x].KantorId + "'>" + data[x].Nama + "</option>"
+                    })
+                } else {
+                    + "<option>Data Kosong</option>"
+                }
+                $("#satker").html(html);
+            }
+        });
+    })*@
+</script>
+
