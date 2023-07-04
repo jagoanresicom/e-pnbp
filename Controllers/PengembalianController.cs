@@ -4757,8 +4757,6 @@ namespace Pnbp.Controllers
         {
             try
             {
-
-
                 #region Property
                 var FileName = ConfigurationManager.AppSettings["ExcelNameMonitoring"];
                 var userIdentity = new Pnbp.Codes.Functions().claimUser();
@@ -4835,7 +4833,7 @@ namespace Pnbp.Controllers
                     //Satuan_Kerja = x.Satuan_Kerja,
                     Nomor_Berkas = x.Nomor_Berkas,
                     Nama_Pemohon = x.Nama_Pemohon,
-                    Nominal = x.Nominal,
+                    Nominal = "Rp. " + x.Nominal,
                     Nomor_Surat = x.Nomor_Surat,
                     Tangal_Pengajuan = x.Tangal_Pengajuan,
                     SP2D = x.SP2D,
@@ -4860,17 +4858,14 @@ namespace Pnbp.Controllers
                         Obj.Status
                     );
                 }
-                using (XLWorkbook _XLWorkbook = new XLWorkbook())
-                {
-                    DT.TableName = "Laporan Monitoring";
-                    _XLWorkbook.Worksheets.Add(DT);
-                    using (MemoryStream MS = new MemoryStream())
-                    {
-                        _XLWorkbook.SaveAs(MS);
-                        return File(MS.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
-                        //return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
-                    }
-                }
+
+                var XLWorkbook = new XLWorkbook();
+                DT.TableName = "Laporan Monitoring";
+                XLWorkbook.Worksheets.Add(DT);
+                var MemoryStream = new MemoryStream();
+                XLWorkbook.SaveAs(MemoryStream);
+                return File(MemoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
+                //return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
                 #endregion
             }
             catch (NullReferenceException ErrorNullReference)
