@@ -1,0 +1,212 @@
+﻿@model Pnbp.Entities.FindPengembalianPnbp
+@{
+    string jenisKantorUser = @OtorisasiUser.GetJenisKantorUser();
+}
+
+<script src='@Url.Content("~/resources/js/infiniteScroll.js")'></script>
+<style nonce="MjI3NzUzMQ">
+    .panel-container {
+        padding: 16px;
+    }
+
+    .dataTables_processing[style="display: block;"] {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        min-height: 37px;
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-center {
+        justify-content: center;
+    }
+
+    .btn-edit {
+        background: #17a2b8;
+        border-color: #187787 !important;
+    }
+
+    .btn-edit:hover, .btn-edit:focus, .btn-edit:active {
+        background: #1594a8 !important;
+        border-color: #187787 !important;
+    }
+
+    #myModalDocViewer .modal-dialog {
+        width: 1200px !important;
+        max-width: 100%;
+    }
+</style>
+
+
+<div class="" id="dynamic_content">
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel panel-container">
+                <div class="x_title">
+                    <h2>Panduan</h2>
+                    <ul class="nav navbar-right panel_toolbox hide">
+                        <li>
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        </li>
+                        <li>
+                            <a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content" id="js-section-pencarian">
+
+                    <div class="table-responsive">
+                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Judul Dokumen</th>
+                                    <th>Ukuran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataplaceholder"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id='myModalDocViewer' class='modal'>
+    <div class="modal-dialog">
+        <div class="x_panel" style="padding:20px">
+            <div class="x_title">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                    
+                    <h3 class="js-txt-judul"></h3>
+                    <div class="row" style="margin-top:10px;padding-top:10px;border-radius:3px;border:none;max-width:1200px;margin:auto;" id="docviewpanel">
+                        <div class="col-md-12 col-sm-12 col-xs-12" id="docViewer" style="min-height:1px;display:none">...</div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
+
+<script src='@Url.Content("~/resources/js/pdfobject.min.js")'></script>
+<script type="text/javascript" nonce="MjI3NzUzMQ">
+    $(function () {
+        $("div#loading").hide();
+    });
+
+    $(document).ready(function () {
+
+        $('#myModalDocViewer').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '98%',
+                height: '98 %',
+                'max-height': '98%'
+            });
+		});
+
+        let listDokumen = [{
+            'nomor': 1,
+            'judul': "User Manual Modul Pengembalian (Kewenangan Daerah)",
+            'ukuran': '2.7 MB',
+            'url': '@Url.Content("~/resources/docs/USER MANUAL APLIKASI PNBP MODUL PENGEMBALIAN DAERAH.pdf")',
+        }, {
+            'nomor': 2,
+            'judul': "User Manual Modul Pengembalian (Kewenangan Pusat)",
+            'url': '@Url.Content("~/resources/docs/USER MANUAL APLIKASI PNBP MODUL PENGEMBALIAN PUSAT.pdf")',
+            'ukuran': '2.4 MB',
+        }]
+
+		let dTableColumns = [
+			{ "data": "nomor", "className": "centertaligncolumn", "width": "5%" },
+			{ "data": "judul", "className": "", "width": "60%" },
+			{ "data": "ukuran", "className": "centertaligncolumn", "width": "10%" },
+			{
+				"data": null,
+				"className": "centertaligncolumn column-aksi",
+				"width": "15%",
+				"render": function (data, type, row) {
+					let isPusat = ($('#jeniskantor').val() == 'Pusat');
+					let html = '';
+					let url = '@Url.Action("DetailPengajuan", "Pengembalian")?pengembalianpnbpid=' + data.PengembalianPnbpId;
+
+					html += '<button class="btn btn-primary js-btn-preview"><i class="fa fa-eye"></i></button>';
+                    html += '<button class="btn btn-primary js-btn-download"><i class="fa fa-download"></i></button>';
+
+                    return html;
+				}
+			},
+		];
+
+		let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
+			"bLengthChange": false,
+			"paging": true,
+			"pageLength": 10,
+			"bFilter": false,
+			"ordering": false,
+			"info": false,
+			"scrollX": false,
+            "data": listDokumen,
+			"columns": dTableColumns,
+		});
+
+		$('tbody', dTable.table().container()).delegate('tr td', 'click', function (e) {
+			let data = dTable.row($(this).closest('tr')).data();
+			if (e.target.closest('.js-btn-download')) {
+                downloadDokumen(data.url);
+            } else if (e.target.closest('.js-btn-preview')) {
+                previewDokumen(data.judul, data.url);
+            }
+		});
+
+        function downloadDokumen(url) {
+            let el = document.createElement('a');
+            el.href = url;
+            el.target = '_blank';
+            el.onclick = function () {
+                el.remove();
+            };
+            document.body.append(el);
+            el.click();
+        }
+
+        function previewDokumen(judul, url) {
+            let options = { "backdrop": "static", keyboard: true };
+            $('#myModalDocViewer').modal(options);
+            $('#myModalDocViewer').modal('show');
+            $('#myModalDocViewer .js-txt-judul').html(judul);
+
+            if ($("#docViewer").height() < 500)
+                $("#docViewer").height(500);
+            PDFObject.embed(url, $("#docViewer"), { forcePDFJS: true, PDFJS_URL: '@Url.Content("~/Contents/pdfviewer.html")' });
+            $('#docViewer').css('display', 'inline-block');
+        }
+
+        $('#myModalDocViewer').on('click', (e) => {
+            if (e.target.matches('#myModalDocViewer')) {
+                $('#myModalDocViewer').modal('hide');
+            }
+        })
+
+    });
+
+</script>
+

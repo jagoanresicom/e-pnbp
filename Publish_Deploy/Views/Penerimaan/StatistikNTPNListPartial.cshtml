@@ -1,0 +1,17 @@
+﻿@model Dictionary<int, Pnbp.Entities.StatistikNTPN>
+
+@foreach (var item in Model)
+{
+    <tr onclick="OpenDetailStatikNTPN('@item.Value.kantorid')" style=" cursor: pointer;">
+        <td>@item.Key</td>
+        <td>@item.Value.namakantor</td>
+        <td class="numeric" style="text-align:right;">@item.Value.jumlahntpn.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+        <td class="numeric" style="text-align:right;">@item.Value.jumlahberkas.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+        <td class="numeric" style="text-align:right;">Rp.@item.Value.nilaintpn.ToString("N0", new System.Globalization.CultureInfo("id-ID"))</td>
+    </tr>
+}
+
+<script>
+    moreRowsUrl = '@Url.Action("StatistikNTPNRows", "Laporan")';
+    $(window).scroll(scrollHandler);
+</script>

@@ -1,0 +1,119 @@
+﻿@model Pnbp.Models.LoginModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<title>Aplikasi Pengelolaan PNBP</title>
+	<link rel="shortcut icon" href="../../favicon.ico" />
+
+	<link href="/resources/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="/resources/css/icheck-bootstrap.css" rel="stylesheet" type="text/css">
+	<link href="/resources/css/login.css" rel="stylesheet" type="text/css" />
+	<script src='@Url.Content("~/resources/js/jquery-1.10.2.js")'></script>
+	<script src='@Url.Content("~/resources/js/bootstrap.min.js")'></script>
+
+	<style type="text/css">
+		.field-validation-error {
+			color: #ff0000;
+		}
+
+		.field-validation-valid {
+			display: none;
+		}
+
+		.input-validation-error {
+			border: 1px solid #ff0000 !important;
+			background-color: #ffeeee !important;
+		}
+
+		.validation-summary-errors {
+			font-weight: bold !important;
+			color: #ff0000 !important;
+		}
+
+		.validation-summary-valid {
+			display: none;
+		}
+
+		body {
+			background: url(/resources/images/2.jpg);
+			/*-webkit-background-size: cover;
+		  -moz-background-size: cover;
+		  -o-background-size: cover;
+		  background-size: cover;*/
+		}
+	</style>
+
+	<script type="text/javascript">
+		function showPassword() {
+
+			var key_attr = $('#password').attr('type');
+			console.log(key_attr);
+			if (key_attr != 'text') {
+
+				//$('#showpassword').addClass('show');
+				$('#password').attr('type', 'text');
+
+			} else {
+
+				//$('#showpassword').removeClass('show');
+				$('#password').attr('type', 'password');
+
+			}
+
+		}
+	</script>
+</head>
+<body style="">
+    <div class="login-container">
+        <div class="login-header bordered">
+            <h4 style="margin-top:0;margin-bottom:0">Sign in</h4>
+        </div>
+        <hr>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin", role = "form", @style = "display: block;" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+
+            <div class="login-field">
+                <label for="lg_username" class="sr-only">Email</label>
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @id = "lg_username", @placeholder = "user login", @style = "height:40px" })
+                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "error" })
+            </div>
+            <div class="login-field">
+                <label for="password" class="sr-only">Password</label>
+                <div class="input-group">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @id = "password", @placeholder = "password", @style = "height:40px" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "error" })
+                    <span class="input-group-addon checkbox icheck-success sr" style="height: 40px; padding-left: 10px">
+                        <input type="checkbox" id="someCheckboxId" onclick="showPassword()" />
+                        <label for="someCheckboxId">abc</label>
+                    </span>
+                </div>
+            </div>
+            @*<div class="checkbox icheck-success sr pull-left">
+                    @Html.CheckBoxFor(m => m.RememberMe)
+                    @Html.LabelFor(m => m.RememberMe)
+                </div>
+                <div class="form-group">
+                    <input type="submit" id="btn-login" class="btn btn-success pull-right" value="Log in">
+                </div>*@
+
+            <div class="login-button clearfix">
+                <div class="checkbox icheck-success sr pull-left">
+                    @Html.CheckBoxFor(m => m.RememberMe)
+                    @Html.LabelFor(m => m.RememberMe)
+                </div>
+                <input type="submit" id="btn-login" class="btn btn-success pull-right" value="Log in">
+            </div>
+        }
+    </div>
+</body>
+</html>

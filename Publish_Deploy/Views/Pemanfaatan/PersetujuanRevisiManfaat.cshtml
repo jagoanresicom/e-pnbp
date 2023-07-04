@@ -1,0 +1,211 @@
+﻿@model Pnbp.Entities.FindManfaat
+
+<script src='@Url.Content("~/resources/js/infiniteScroll.js")'></script>
+
+<div class="" id="dynamic_content">
+    <div class="page-title">
+        <div class="title_left"><h2 style="width:100%">Persetujuan Revisi Manfaat</h2></div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="clearfix" style="padding-bottom:15px"></div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:20px">
+                <div class="x_title">
+                    <h2>Pencarian Data Manfaat</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li>
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        </li>
+                        <li>
+                            <a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" id="frmCariManfaat" method="post">
+                        @Html.HiddenFor(m => m.UserKaBiroPerencanaan)
+                        @Html.HiddenFor(m => m.UserKaBiroKeuangan)
+                        <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                            <div class="form-group">
+                                <label class="control-label col-md-4 col-sm-4 col-xs-12">Kode Satker : </label>
+                                <div class="-md-8 col-sm-8 col-xs-12">
+                                    @Html.TextBoxFor(model => model.KodeSatker, new { @class = "form-control", type = "number" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                            <div class="form-group">
+                                <label class="control-label col-md-4 col-sm-4 col-xs-12">Nama Satker : </label>
+                                <div class="-md-8 col-sm-8 col-xs-12">
+                                    @Html.TextBoxFor(model => model.NamaSatker, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                            <div class="form-group">
+                                <label class="control-label col-md-4 col-sm-4 col-xs-12">Nama Program : </label>
+                                <div class="-md-8 col-sm-8 col-xs-12">
+                                    @Html.TextBoxFor(model => model.NamaProgram, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                            <div class="form-group">
+                                <label class="control-label col-md-4 col-sm-4 col-xs-12">Nilai Anggaran : </label>
+                                <div class="-md-8 col-sm-8 col-xs-12">
+                                    @Html.TextBoxFor(model => model.NilaiAnggaran, new { @class = "form-control", type = "number" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                                <div class="form-group">
+                                    <div class="-md-8 col-sm-8 col-xs-12 col-md-offset-4">
+                                        <button id="save-btn" type="submit" class="btn btn-success">Cari</button>
+                                        <button id="reset-btn" type="reset" class="btn btn-warning">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_content">
+                    <div class="table-responsive">
+                        <table id="eventsTable" class="table table-striped infinite-scroll" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th class="centertaligncolumn">No.</th>
+                                    <th class="centertaligncolumn">Kode Satker</th>
+                                    <th>Nama Satker</th>
+                                    <th>Nama Program</th>
+                                    <th class="rightaligncolumn">Anggaran</th>
+                                    <th class="rightaligncolumn">Alokasi</th>
+                                    <th class="centertaligncolumn">Persetujuan<br />Biro<br />Perencanaan</th>
+                                    <th class="centertaligncolumn">Persetujuan<br />Biro<br />Keuangan</th>
+                                    <th class="centertaligncolumn">Lihat File</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataplaceholder"></tbody>
+                        </table>
+                    </div>
+                    @Html.Partial("_Loading")
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div id='myModalDocViewer' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+<a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
+
+<script type="text/javascript">
+    $(function () {
+        $("div#loading").hide();
+    });
+
+    $(document).ready(function () {
+
+        loadData();
+
+        $('#myModalDocViewer').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '98%',
+                height: '98 %',
+                'max-height': '98%'
+            });
+        });
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#back-to-top').fadeIn();
+            } else {
+                $('#back-to-top').fadeOut();
+            }
+        });
+        // scroll body to 0px on click
+        $('#back-to-top').click(function () {
+            $('#back-to-top').tooltip('hide');
+            $('body,html').animate({
+                scrollTop: 0
+            }, 800);
+            return false;
+        });
+
+        $('#back-to-top').tooltip('show');
+    });
+
+    var loadData = function () {
+        resetInfiniteScroll();
+        formToPost = $('#frmCariManfaat');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarRevisiManfaat", "Pemanfaatan")',
+            data: $('#frmCariManfaat').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+
+                if (data == 'noresults') {
+                    $('#dataplaceholder').html('');
+                }
+                else {
+                    $('#dataplaceholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+        });
+    };
+
+    $("#frmCariManfaat").submit(function (e) {
+        resetInfiniteScroll();
+        formToPost = $('#frmCariManfaat');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarRevisiManfaat", "Pemanfaatan")',
+            data: $('#frmCariManfaat').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+
+                if (data == 'noresults') {
+                    $('#dataplaceholder').html('');
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#dataplaceholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { $.unblockUI(); }
+        });
+        e.preventDefault();
+        return false;
+    });
+
+    moreRowsUrl = '@Url.Action("DaftarRevisiManfaat", "Pemanfaatan", Model)';
+    $(window).scroll(scrollHandler);
+
+</script>
+

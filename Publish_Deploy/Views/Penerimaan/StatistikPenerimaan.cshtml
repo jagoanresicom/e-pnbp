@@ -1,0 +1,172 @@
+﻿@model Pnbp.Entities.FilterPenerimaan
+@{
+    ViewBag.Judul = "Statistik Penerimaan Nasional";
+    var lsbulan = new List<SelectListItem>();
+    lsbulan.Add(new SelectListItem { Value = "1", Text = "Januari" });
+    lsbulan.Add(new SelectListItem { Value = "2", Text = "Februari" });
+    lsbulan.Add(new SelectListItem { Value = "3", Text = "Maret" });
+    lsbulan.Add(new SelectListItem { Value = "4",  Text = "April" });
+    lsbulan.Add(new SelectListItem { Value = "5", Text = "Mei" });
+    lsbulan.Add(new SelectListItem { Value = "6", Text = "Juni" });
+    lsbulan.Add(new SelectListItem { Value = "7", Text = "Juli" });
+    lsbulan.Add(new SelectListItem { Value = "8", Text = "Agustus" });
+    lsbulan.Add(new SelectListItem { Value = "9", Text = "September" });
+    lsbulan.Add(new SelectListItem { Value = "10", Text = "Oktober" });
+    lsbulan.Add(new SelectListItem { Value = "11", Text = "November" });
+    lsbulan.Add(new SelectListItem { Value = "12", Text = "Desember" });
+}
+
+<style>
+    td.numeric, th.numeric {
+        text-align: right;
+    }
+
+    .tdcenter {
+        text-align: center;
+    }
+</style>
+
+<div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="padding-top:20px">
+                <div class="x_title">
+                    <h2 class="sub-header">@(ViewBag.Judul)</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up" title="Hide Form"></i></a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    @*<form class="form-horizontal form-label-left" id="frmFindData" method="post">*@
+                    @using (Html.BeginForm("Export", "Penerimaan", FormMethod.Post, new { id = "frmFindData", @class = "form-horizontal form-label-left" }))
+                    {
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Tahun : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.DropDownListFor(model => model.tahun, new SelectList(@Model.lstahun, "value", "tahun"), " -- Pilih Tahun --", new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "tahun" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Bulan : </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                @Html.DropDownListFor(model => model.bulan, lsbulan, " -- Pilih Bulan --", new { @class = "select2_single form-control input-md", @style = "width:100%", @id = "bulan" })
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div style="text-align:center;">
+                    <div style="text-align:center;">
+                        <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3">
+                            <button id="find-btn" type="button" class="btn btn-success">Cari</button>
+                            <button id="reset-btn" type="reset" class="btn btn-warning">Hapus</button>
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-xs-12">
+                            <button id="dl-btn" type="submit" form="frmFindData" class="btn btn-success"><span class="fa fa-floppy-o"></span> Excel </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_content">
+                    <div class="row">
+                        <div class="clearfix"></div>
+                        <div id="penerimaanholder" class="table-responsive">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select2_single').select2({ width: 'resolve' });
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#back-to-top').fadeIn();
+            } else {
+                $('#back-to-top').fadeOut();
+            }
+        });
+        //createFirstPaging();
+    });
+
+    $("#reset-btn").on("click", function (e) {
+        $('#bulan').val('').trigger('change');
+        $('#tahun').prop('selectedIndex', 1).trigger('change');
+    });
+
+    var createFirstPaging = function () {
+        formToPost = $('#frmFindData');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarPenerimaan", "Penerimaan")',
+            data: $('#frmFindData').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#penerimaanholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });
+
+    };
+
+    $("#find-btn").on("click", function (e) {
+        formToPost = $('#frmFindData');
+        $.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DaftarPenerimaan", "Penerimaan")',
+            data: $('#frmFindData').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+                if (data == 'noresults') {
+                    showmsg('Status', 'Tidak ada data yang ditemukan');
+                }
+                else {
+                    $('#penerimaanholder').html(data);
+                }
+                $.unblockUI();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+                $.unblockUI();
+            }
+        });
+        e.preventDefault();
+        return false;
+    });
+
+    @*$("#dl-btn").on("click", function (e) {
+        formToPost = $('#frmFindData');
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Export", "Penerimaan")',
+            data: $('#frmFindData').serialize(),
+            success: function (data, textStatus, XMLHttpRequest) {
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+            }
+        });
+        e.preventDefault();
+        return false;
+    });*@
+</script>

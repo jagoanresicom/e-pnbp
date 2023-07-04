@@ -1,0 +1,799 @@
+﻿@model Pnbp.Entities.DetailDataBerkas
+@{
+	var fileSuratPermohonan = ViewBag.fileSuratPermohonan;
+	var fileSuratPNBPBerulang = ViewBag.fileSuratPNBPBerulang;
+	var fileSuratWajibBayar = ViewBag.fileSuratWajibBayar;
+
+	var isExistsFileSuratPermohonan = (fileSuratPermohonan != null && !String.IsNullOrEmpty(fileSuratPermohonan.NamaFile));
+	var isExistsfileSuratPNBPBerulang= (fileSuratPNBPBerulang != null && !String.IsNullOrEmpty(fileSuratPNBPBerulang.NamaFile));
+	var isExistsfileSuratWajibBayar = (fileSuratWajibBayar != null && !String.IsNullOrEmpty(fileSuratWajibBayar.NamaFile));
+}
+
+<link href='@Url.Content("~/resources/css/smart_wizard.css")' rel="stylesheet" />
+<link href='@Url.Content("~/resources/css/smart_wizard_theme_dots.css")' rel="stylesheet" />
+<style nonce="MjI3NzUzMQ">
+	/*panel style overwrite*/
+	.panel-heading {
+		background: white !important;
+		padding: 10px 0 !important;
+		font-size: 1.6rem !important;
+	}
+
+	.panel-default {
+		padding: 0 12px !important;
+	}
+
+	.panel-body {
+		margin-top: 10px;
+	}
+
+	/* top nav z-layer smartwizard overlay fix */
+	.main_container .top_nav {
+		position: relative;
+		z-index: 6;
+	}
+
+	.sw-theme-default .sw-toolbar-bottom {
+		visibility: hidden;
+	}
+
+</style>
+
+<form class="form-horizontal" method="post" enctype="multipart/form-data" id="js-form-entri">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="satker" id="satker" value="@((new Pnbp.Codes.Functions().claimUser()).NamaKantor.Replace("Kantor Pertanahan", ""))" />
+    @Html.HiddenFor(m => m.PENGEMBALIANPNBPID)
+    @Html.HiddenFor(m => m.STATUSPENGEMBALIAN)
+    @Html.HiddenFor(m => m.STATUSSIMPAN)
+
+    <div id="smartwizard">
+        <ul style="padding:0">
+            <li><a href="#step-1"><span class="step-no">1</span></a></li>
+            <li><a href="#step-2"><span class="step-no">2</span></a></li>
+            <li><a href="#step-3"><span class="step-no">3</span></a></li>
+            <li><a href="#step-4"><span class="step-no">4</span></a></li>
+        </ul>
+        <div>
+
+            <div id="step-1">
+                @* STEP 1 *@
+
+                <div class="panel panel-default x_panel">
+                    <div class="panel-heading x_title">
+                        Data Berkas
+                    </div>
+                    <div class="panel-body form-horizontal x_content pb-4">
+
+                        <div class="row">
+                            <div class="col-md-offset-3 col-md-6 col-xs-12">
+                                @Html.HiddenFor(m => m.BERKASID)
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Nomor Berkas</label>
+                                    <div class="col-xs-8" style="display: flex;">
+                                        @if (String.IsNullOrEmpty(Model.BERKASID))
+                                        {
+                                            @Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @required = "required", @placeholder = "Nomor/Tahun" })
+                                            <div class="ps-3"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" style="margin-right:0px;"><span class="fa fa-search"></span></button></div>
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.NOMORBERKAS, new { @class = "form-control input-md", @readonly = "readonly", @required = "required", @placeholder = "Nomor/Tahun" })
+                                            <div class="ps-3"><button id="js-btn-cari-berkas" type="button" class="btn btn-primary" disabled style="margin-right:0px;"><span class="fa fa-search"></span></button></div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Atas Nama</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NAMAPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Nama Pemohon" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Alamat</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.ALAMATPEMOHON, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Alamat Pemohon" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">NPWP</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NPWP, new { @Value = "", @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })
+                                        @*@Html.TextBoxFor(m => m.NPWP, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NPWP", @Name = "NPWPPEMOHON" })*@
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Kode Biling</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.KODEBILLING, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "Kode Billing" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">NTPN</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NTPN, new { @class = "form-control input-md", @readonly = "readonly", @placeholder = "NTPN" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="ln_solid"></div>
+                            </div>
+
+                            <div class="col-md-offset-3 col-md-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-xs-offset-4 col-xs-8">
+                                        @if (ViewData["step"].ToString() != "0")
+                                        {
+                                            <button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="js-smartwizard-next btn btn-success disabled">Selanjutnya</button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                @* END STEP 1 *@
+            </div>
+
+            <div id="step-2" class="js-form-pristine">
+                @* STEP 2 *@
+
+                <div class="panel panel-default x_panel">
+                    <div class="panel-heading x_title">
+                        Data Pengembalian
+                    </div>
+                    <div class="panel-body form-horizontal x_content pb-4">
+
+                        <div class="row">
+                            <div class="col-md-offset-3 col-md-6">
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Setoran PNBP<span class="text-danger">*</span></label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.SETORANPNBP, new { @class = "form-control input-md js-input-currency text-right", @data_required_proses = "true", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Jumlah Biaya Layanan yang sudah dikeluarkan<span class="text-danger">*</span></label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.JUMLAHBAYAR, new { @class = "form-control input-md js-input-currency text-right", @data_required_proses = "true" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Permohonan Pengembalian</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.PERMOHONANPENGEMBALIAN, new { @class = "form-control input-md js-input-currency text-right", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="npwpberkas" class="col-xs-4 control-label" style="text-align:left;">NPWP<span class="text-danger">*</span></label>
+                                    <div class="col-xs-8">
+                                        <input type="text" name="npwpberkas" id="npwpberkas" class="form-control npwp" data-mask="00.000.000.0-000.000" placeholder="NPWP" value="@Model.NPWP" data-required-proses="true" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Nama Rekening<span class="text-danger">*</span></label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NAMAREKENING, new { @class = "form-control input-md", @data_required_proses = "true" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-xs-4 control-label" style="text-align:left;">Nomor Rekening<span class="text-danger">*</span></label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NOMORREKENING, new { @class = "form-control input-md", @data_required_proses = "true" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Nama Bank<span class="text-danger">*</span></label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NAMABANK, new { @class = "form-control input-md", @data_required_proses = "true" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-xs-4 control-label" style="text-align:left;">Nomor Telepon Pemohon</label>
+                                    <div class="col-xs-8">
+                                        @Html.TextBoxFor(m => m.NOMORTELEPON, new { @class = "form-control input-md", @maxlength = "12" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
+                                <button type="button" class="js-smartwizard-next btn btn-success">Selanjutnya</button>
+                                <button type="button" id="js-btn-simpan-step-2" class="btn btn-primary">Simpan</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                @* END STEP 2 *@
+            </div>
+
+            <div id="step-3">
+                @* STEP 3 *@
+
+                @*template surat*@
+                <div class="panel panel-default x_panel">
+                    <div class="panel-heading x_title">
+                        Template Surat
+                    </div>
+                    <div class="panel-body x_content pb-4">
+                        @*Panel content*@
+
+                        <div class="panel-body__template-surat">
+
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-6 col-xs-12" style="display:grid;">
+                                    <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="keterangan-pengeluaran">Surat Keterangan Pengeluaran</button>
+                                    <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="pernyataan-tidak-terlayani">Surat Pernyataan Tidak Terlayani</button>
+                                    <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="persetujuan">Surat Persetujuan Pengembalian PNBP</button>
+                                    <button type="button" class="btn btn-primary js-btn-generate-surat" data-template="tanggung-jawab">Surat Pernyataan Tanggung Jawab Mutlak</button>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="ln_solid"></div>
+                                    <div class="form-group">
+                                        <div class="text-center">
+                                            <button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
+                                            <button type="button" class="js-smartwizard-next btn btn-success disabled">Selanjutnya</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                @* END STEP 3 *@
+            </div>
+
+            <div id="step-4" class="js-form-pristine">
+                @* step 4 *@
+
+                @*kirim permohonan*@
+                <div class="panel panel-default x_panel">
+                    <div class="panel-heading x_title">
+                        Kirim Permohonan
+                        <br><small class="text-danger"><span class="text-danger">*</span>File yang dapat diupload berekstensi .pdf maksimal 5MB</small>
+                    </div>
+                    <div class="panel-body pe-0 ps-0">
+
+                        @* Upload Request Baru *@
+                        <div class="row">
+                            <div class="col-md-offset-3 col-md-6">
+                                <div class="form-group">
+                                    <label for="SuratPermohonanPengembalian" class="col-sm-4 col-xs-12 control-label" style="text-align:left;">Surat Permohonan Pengembalian<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @*<input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword, application/pdf">*@
+                                        <input type="file" class="form-control max_5mb" id="SuratPermohonanPengembalian" name="SuratPermohonanPengembalian" accept="application/pdf">
+                                        <span id="cancel-SuratPermohonanPengembalian"></span>
+                                    </div>
+                                    @if (isExistsFileSuratPermohonan)
+                                    {
+                                        <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                            <a href="@Url.Content("~/" + fileSuratPermohonan.NamaFile)" class="btn btn-default btn-xs" download>
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="form-group">
+                                    <label for="SuratPernyataanPNBPBerulang" class="col-sm-4 col-xs-12 control-label text-left" style="text-align:left;">Surat Pernyataan PNBP Berulang<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <input type="file" class="form-control max_5mb" id="SuratPernyataanPNBPBerulang" name="SuratPernyataanPNBPBerulang" accept="application/pdf">
+                                        <span id="cancel-SuratPernyataanPNBPBerulang"></span>
+                                    </div>
+                                    @if (isExistsfileSuratPNBPBerulang)
+                                    {
+                                        <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                            <a href="@Url.Content("~/" + fileSuratPNBPBerulang.NamaFile)" class="btn btn-default btn-xs" download>
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 col-xs-12 control-label" style="text-align:left;">Surat Kuasa Wajib Bayar</label>
+                                    <div class="col-sm-7">
+                                        <input type="file" class="form-control max_5mb" id="SuratWajibBayar" name="SuratWajibBayar" accept="application/pdf">
+                                        <span id="cancel-SuratWajibBayar"></span>
+                                    </div>
+                                    @if (isExistsfileSuratWajibBayar)
+                                    {
+                                        <div class="col-sm-1 text-left" style="margin-left:0px !important;">
+                                            <a href="@Url.Content("~/" + fileSuratWajibBayar.NamaFile)" class="btn btn-default btn-xs" download>
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-sm-8">
+                                        <p>Kolom bertanda (<span class="text-danger">*</span>) wajib diisi.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ln_solid"></div>
+                        @*<p style="margin-left: 10px">Kolom Bertanda (<span class="text-danger">*</span>) Wajib diisi.</p>*@
+                        <div class="form-group">
+                            <div class="text-center">
+                                @* dari EntriPengembalianPusat.cshtml *@
+                                <button type="button" class="js-smartwizard-prev btn btn-danger">Kembali</button>
+                                <button type="button" id="js-btn-simpan" class="btn btn-primary">Simpan</button>
+                                <button type="button" id="js-btn-proses" class="btn btn-primary">Proses</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                @* end 4 *@
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+<script type="text/javascript" src='@Url.Content("~/resources/js/jquery.mask.min.js")'></script>
+<script src='@Url.Content("~/resources/js/jquery.smartWizard.js")'></script>
+<script nonce="MjI3NzUzMQ">
+	$(document).ready(function () {
+
+		let isSubmit = false;
+		let currentStep = @Html.Raw(Json.Encode(ViewData["step"]));
+		if (currentStep == 3) {
+			$('#step-3 .js-smartwizard-next').removeClass('disabled');
+		}
+
+		window.onbeforeunload = function (e) {
+			if (isFormDirty() && !isSubmit) {
+				return ' ';
+			}
+		};
+
+        $('#smartwizard').smartWizard({
+			selected: currentStep,
+            theme: 'default',
+            transitionEffect: 'fade',
+            showStepURLhash: false,
+            keyNavigation: false,
+            toolbarSettings: {
+                showNextButton: false,
+                showPreviousButton: false
+            }
+		});
+
+		$('.js-smartwizard-next').on('click', (event) => {
+			if ($(event.target).hasClass('disabled'))
+				return;
+			$('#smartwizard').smartWizard('next');
+		});
+
+		$('.js-smartwizard-prev').on('click', () => {
+			$('#smartwizard').smartWizard('prev');
+		});
+
+		function isFormDirty() {
+			var hasChanges = false;
+
+			$(".js-form-pristine :input:not(:button):not([type=hidden])").each(function () {
+				if ((this.type == "text" || this.type == "textarea" || this.type == "hidden") && this.defaultValue != this.value) {
+					hasChanges = true;
+					return false;
+				} else {
+					if ((this.type == "radio" || this.type == "checkbox") && this.defaultChecked != this.checked) {
+						hasChanges = true;
+						return false;
+					}
+					else {
+						if ((this.type == "select-one" || this.type == "select-multiple")) {
+							for (var x = 0; x < this.length; x++) {
+								if (this.options[x].selected != this.options[x].defaultSelected) {
+									hasChanges = true;
+									return false;
+								}
+							}
+						}
+					}
+				}
+			});
+
+			return hasChanges;
+		}
+
+		function cariBerkas() {
+			let noBerkas = $('#js-form-entri [name="NOMORBERKAS"]').val();
+            let token = $('#js-form-entri [name="__RequestVerificationToken"]').val();
+			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+			$.ajax({
+				url: '@Url.Action("GetBerkasByNoTahun", "Pengembalian")',
+				type: 'POST',
+				data: {
+					noberkas: noBerkas,
+                    __RequestVerificationToken: token, 
+				},
+				success: function (res) {
+					if (res.Success) {
+						let data = res.Data;
+						$('#BERKASID').val(data.BERKASID);
+						$('#NAMAPEMOHON').val(data.NAMA);
+						$('#ALAMATPEMOHON').val(data.ALAMAT);
+						$('#NPWP').val(data.NPWP);
+						$('#KODEBILLING').val(data.KODEBILLING);
+						$('#NTPN').val(data.NTPN);
+						$('#SETORANPNBP').val(addCommas(data.PENERIMAAN));
+						cekBerkasPengembalian(noBerkas);
+					} else {
+						$.unblockUI();
+						$('#step-1 .js-smartwizard-next').addClass('disabled');
+						$('[href="#step-2"]').parent().removeClass();
+						resetFormDataBerkas();
+						swal({
+							title: "Perhatian",
+							text: res.Message,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
+			})
+		}
+
+		function cekBerkasPengembalian(noBerkas) {
+
+			$.ajax({
+				url: '@Url.Action("CekBerkasPengembalian", "Pengembalian")',
+				type: 'POST',
+				data: { noBerkas },
+				success: function (res) {
+					$.unblockUI();
+					if (res.Success) {
+						$('#step-1 .js-smartwizard-next').removeClass('disabled');
+					} else {
+						$('#step-1 .js-smartwizard-next').addClass('disabled');
+						$('[href="#step-2"]').parent().removeClass();
+						swal({
+							title: "Perhatian",
+							text: res.Message,
+							html: true,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					$.unblockUI();
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
+			});
+		}
+
+		function resetFormDataBerkas() {
+			$('#BERKASID').val('');
+			$('#NAMAPEMOHON').val('');
+			$('#ALAMATPEMOHON').val('');
+			$('#NPWP').val('');
+			$('#KODEBILLING').val('');
+			$('#NTPN').val('');
+			$('#SETORANPNBP').val('');
+		}
+
+		function addCommas(nStr) {
+			if (nStr == null) {
+				nStr = '0';
+			}
+
+			nStr += '';
+			x = nStr.split(',');
+			x1 = x[0];
+			x2 = x.length > 1 ? ',' + x[1] : '';
+			var rgx = /(\d+)(\d{3})/;
+			while (rgx.test(x1)) {
+				x1 = x1.replace(rgx, '$1' + '.' + '$2');
+			}
+			return x1 + x2;
+		}
+
+		function simpanPengembalian(e) {
+			e.preventDefault();
+			let frmData = new FormData($('#js-form-entri')[0]);
+			$.blockUI({ message: '<div style=\"padding:10px\"><b>Sedang proses... </b><p>harap tunggu</p></div>' });
+
+			$.ajax({
+				type: "POST",
+				url: '@Url.Action("SimpanPengembalianDaerah", "Pengembalian")',
+				data: frmData,
+				processData: false,
+				contentType: false,
+				success: function (data, textStatus, XMLHttpRequest) {
+					if (data.Status) {
+						swal({
+							title: "Sukses",
+							text: "Data berhasil disimpan",
+							type: "success",
+							closeOnEsc: true,
+							allowOutsideClick: false,
+						}, function () {
+							isSubmit = true;
+							let pengembalianPnbpId = $('#js-form-entri [name="PENGEMBALIANPNBPID"]').val();
+							if (pengembalianPnbpId && pengembalianPnbpId.trim().length > 0 && $('#STATUSPENGEMBALIAN').val() == 0) {
+								window.location.reload();
+							} else {
+								window.location.href = '@Url.Action("monitoring", "Pengembalian")';
+							}
+						});
+					} else {
+						swal({
+							title: "Proses Gagal",
+							text: data.Pesan,
+							html: true,
+							type: "warning",
+							closeOnEsc: true,
+							allowOutsideClick: true,
+						});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					swal({
+						title: "Proses Gagal",
+						text: "Terjadi kesalahan",
+						type: "error",
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				},
+			}).always(() => {
+				$.unblockUI();
+			});
+
+		}
+
+		function isNumberKey(evt) {
+			var key = (evt.which) ? evt.which : event.keyCode;
+			if (key != 188 // Comma
+				&& key != 8 // Backspace
+				&& key != 17 && key != 86 & key != 67 // Ctrl c, ctrl v
+				&& (key < 48 || key > 57) // Non digit
+			) {
+				if (key >= 96 && key <= 106) {
+					// numpad
+				} else {
+					evt.preventDefault();
+					return;
+				}
+			}
+		}
+
+		function convertRupiah(angka, prefix) {
+			var number_string = angka.replace(/[^,\d]/g, "").toString(),
+				split = number_string.split(","),
+				sisa = split[0].length % 3,
+				rupiah = split[0].substr(0, sisa),
+				ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+			if (ribuan) {
+				separator = sisa ? "." : "";
+				rupiah += separator + ribuan.join(".");
+			}
+
+			rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+			return prefix == undefined ? rupiah : rupiah ? prefix + rupiah : "";
+		}
+
+		$('#js-btn-cari-berkas').on('click', () => cariBerkas());
+		$('#js-btn-simpan').on('click', () => {
+			$('#js-form-entri').submit();
+			$('#STATUSPENGEMBALIAN').val(0)
+			$('#STATUSSIMPAN').val(2);
+		});
+		$('#js-btn-simpan-step-2').on('click', () => {
+			$('#js-form-entri').submit();
+			$('#STATUSPENGEMBALIAN').val(0);
+			if ($('#STATUSSIMPAN').val() != '2') {
+				$('#STATUSSIMPAN').val(1);
+			}
+		});
+		$('#js-btn-proses').on('click', () => {
+			$('#js-form-entri').submit();
+			$('#STATUSPENGEMBALIAN').val(2);
+		});
+		$('#js-form-entri').on('submit', (e) => {
+			e.preventDefault();
+			window.setTimeout(() => {
+				let isValid = true;
+				if ($('#STATUSPENGEMBALIAN').val() == "2") {
+					isValid = isValidProsesPengembalian();
+				}
+				if (isValid) {
+					simpanPengembalian(e);
+				} else {
+					swal({
+						title: 'Perhatian',
+						text: 'Periksa kembali inputan Anda. Masih terdapat isian wajib yang belum diisi.',
+						type: 'warning',
+						closeOnEsc: true,
+						allowOutsideClick: true,
+					});
+				}
+			}, 5);
+		});
+
+		function isValidProsesPengembalian() {
+			return $('[data-required-proses="true"]').get().every(node => $(node).val() != '');
+		}
+
+		// init input currency
+		$('.js-input-currency').on('keyup', (e) => {
+			e.target.value = convertRupiah(e.target.value);
+		});
+		$('.js-input-currency').on('keydown', (e) => {
+			return isNumberKey(event)
+		});
+		$('.js-input-currency').each((index, node) => node.value = convertRupiah(node.value));
+
+		// generate surat
+		$('.js-btn-generate-surat').on('click', generateSuratHandler);
+
+		let downloadedTemplate = [];
+		function generateSuratHandler(e) {
+			let tipe = e.target.dataset.template;
+			switch (tipe) {
+				case 'keterangan-pengeluaran': generate_keterangan(); break;
+				case 'pernyataan-tidak-terlayani': generate_tidak_terlayani(); break;
+				case 'persetujuan': generatePersetujuan(); break;
+				case 'tanggung-jawab': generateTanggungJawab(); break;
+			}
+
+			if (!downloadedTemplate.includes(tipe))
+				downloadedTemplate.push(tipe);
+			if (downloadedTemplate.length >= 4)
+				$('#step-3 .js-smartwizard-next').removeClass('disabled');
+		}
+
+		function generatePersetujuan() {
+			let params = [
+				"?namaBank=" + $('#NAMABANK').val(),
+				"&nomorRekening=" + $('#NOMORREKENING').val(),
+				"&namaRekening=" + $('#NAMAREKENING').val(),
+				"&namaPemohon=" + $('#NAMAPEMOHON').val(),
+				"&alamatPemohon=" + $('#ALAMATPEMOHON').val(),
+				"&permohonanPengembalian=" + $('#PERMOHONANPENGEMBALIAN').val(),
+			];
+			var url = '@Url.Action("GeneratePersetujuan","Pengembalian")';
+			window.open(url + params.join(''), '_blank');
+		}
+
+		function generateTanggungJawab() {
+			let params = [
+				"?namaBank=" + $('#NAMABANK').val(),
+				"&permohonanPengembalian=" + $('#PERMOHONANPENGEMBALIAN').val(),
+			];
+			var url = '@Url.Action("GenerateTanggungJawab","Pengembalian")';
+			window.open(url + params.join(''), '_blank');
+		}
+
+		function generate_keterangan() {
+			var url = '@Url.Action("GenerateSuratKeteranganPengeluaran","Pengembalian")';
+			var nomorsurat = $('#NomorSurat').val();
+			var nomorberkas = $('#NOMORBERKAS').val();
+			var namapemohon = $('#namapemohon').val();
+			var SetoranPnbp = $('#SetoranPnbp').val();
+			var JumlahBayar = $('#JumlahBayar').val();
+			var NamaProsedur = $('#NamaProsedur').val();
+			let params = [
+				"&atasNama=" + $('#NAMAPEMOHON').val(),
+				"&SetoranPnbp=" + $('#SETORANPNBP').val(),
+			];
+			window.open(url + '?NomorSurat=' + nomorsurat + '&nomorberkas=' + nomorberkas + '&namapemohon=' + namapemohon + '&JumlahBayar=' + JumlahBayar + '&NamaProsedur=' + NamaProsedur + params.join(''), '_blank');
+		}
+
+		function generate_tidak_terlayani() {
+			var url         = '@Url.Action("GenerateSuratPernyataanTidakTerlayani", "Pengembalian")';
+			var namapemohon = $('#namapemohon').val();
+			var AlamatPemohon = $('#AlamatPemohon').val();
+			var nomorberkas = $('#NOMORBERKAS').val();
+			var NamaProsedur = $('#NamaProsedur').val();
+			let params = [
+				"&atasNama=" + $('#NAMAPEMOHON').val(),
+			];
+			window.open(url + '?namapemohon=' + namapemohon + '&AlamatPemohon=' + AlamatPemohon + '&nomorberkas=' + nomorberkas + '&NamaProsedur=' + NamaProsedur + '&satker=' + satker + params.join(''), '_blank');
+		}
+
+		function hitungPermohonanPengembalian() {
+			let setoranPnbp = parseInt($('#SETORANPNBP').val().replace(/\./g, ''));
+			let jumlahBayar = parseInt($('#JUMLAHBAYAR').val().replace(/\./g, ''));
+			if (isNaN(setoranPnbp)) {
+				setoranPnbp = 0;
+			}
+			if (isNaN(jumlahBayar)) {
+				jumlahBayar = 0;
+			}
+			let permohonanPengembalian = setoranPnbp - jumlahBayar;
+			permohonanPengembalian = Math.max(0, permohonanPengembalian);
+			$('#PERMOHONANPENGEMBALIAN').val(convertRupiah(permohonanPengembalian.toString()));
+		}
+
+		$('#SETORANPNBP').on('input', () => hitungPermohonanPengembalian());
+		$('#JUMLAHBAYAR').on('input', () => hitungPermohonanPengembalian());
+
+	});
+
+	$('body').on('change', 'input:file', function () {
+		let status = true
+		if (['application/pdf'].includes(this.accept)) {
+			if (!["application/pdf", ".zip", ".rar", ".7zip"].includes($(this)[0].files[0].type)) {
+				alert('Format FIle Tidak Sesuai')
+				status = false
+			}
+		}
+
+		if ($(this).hasClass("max_5mb")) {
+			if ($(this)[0].files[0].size > 5000000) {
+				swal({
+					type: "error",
+					html: true,
+					title: "Gagal<br><small>Ukuran File Lebih Dari 5MB</small>",
+					confirmButtonColor: "#4CAF50"
+				});
+				status = false
+			}
+		}
+
+		if (status) {
+            $('#cancel-' + this.id).html('<a href="#" class="text-danger MjI3NTU4Ng" data-id="' + this.id + '" title="Cancel File"><i class="icon-trash-2"></i> Cancel File</a>')
+		} else {
+			$(this).val('')
+			$('#cancel-' + (this.id)).html('')
+			$('#label-' + (this.id)).html('Test')
+		}
+	})
+
+	const cancelDoc = (x) => {
+		$('#' + x).val('')
+		$('#cancel-' + x).html('')
+		$('#label-' + x).html('Test')
+	}
+
+
+    $('body').on('click', (ev) => {
+        let el = ev.target.closest('.MjI3NTU4Ng');
+        if (el) {
+            cancelDoc(el.dataset.id);
+        }
+    })
+
+</script>
