@@ -305,20 +305,20 @@
         //$('#back-to-top').tooltip('show');
 
 		let dTableColumns = [
-			{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "LabelTipePengembalian", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "KodeSatker", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "NamaSatker", "className": "centertaligncolumn", "width": "20%" },
-			{ "data": "NomorBerkas", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "NamaPemohon", "className": "centertaligncolumn", "width": "20%" },
-			{ "data": "permohonanpengembalian", "className": "rightaligncolumn", render: formatAngka },
-			{ "data": "NomorSurat", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "TanggalPengaju", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "NomorSP2D", "className": "centertaligncolumn", "width": "5%" },
+            { "data": "RNumber", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "LabelTipePengembalian", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "KodeSatker", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "NamaSatker", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "NomorBerkas", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "NamaPemohon", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "permohonanpengembalian", "className": "rightaligncolumn", "autoWidth": true, render: formatAngka },
+            { "data": "NomorSurat", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "TanggalPengaju", "className": "centertaligncolumn", "autoWidth": true },
+			{ "data": "NomorSP2D", "className": "centertaligncolumn", "autoWidth": true },
 			{
 				"data": "StatusPengembalian",
 				"className": "centertaligncolumn",
-				"width": "10%",
+                "autoWidth": true,
 				render: function (data) {
 					if (data == null) {
 						return 'Belum Kirim'
@@ -347,7 +347,7 @@
 			{
 				"data": null,
 				"className": "centertaligncolumn column-aksi",
-				"width": "5%",
+                "autoWidth": true,
 				"render": function (data, type, row) {
 					let isPusat = ($('#jeniskantor').val() == 'Pusat');
 					let html = '';
