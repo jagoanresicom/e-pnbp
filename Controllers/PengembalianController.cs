@@ -4865,7 +4865,7 @@ namespace Pnbp.Controllers
                     //Satuan_Kerja = x.NamaSatker,
                     Nomor_Berkas = x.NomorBerkas,
                     Nama_Pemohon = x.NamaPegawaiSetuju,
-                    Nominal = x.permohonanpengembalian,
+                    Nominal = x.permohonanpengembalian == null ? "0" : x.permohonanpengembalian,
                     Nomor_Surat = x.NomorSurat,
                     Tangal_Pengajuan = x.TanggalPengaju,
                     SP2D = x.NomorSP2D,

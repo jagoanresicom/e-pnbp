@@ -147,7 +147,7 @@
                         <div class="col-md-2">
                             @*<button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="location.href='@Url.Action("ExportExcelMonitoring", "Pengembalian")'" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>*@
                             @*<a id="Button_ExportMonitoring" onclick="return ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</a>*@
-                            <a id="Button_ExportMonitoring" ClientIDMode="" href="javascript:void(0);" class="btn btn-warning" onclick="ExportMonitoring();" style="margin-left: 100px !important;">Export</a>
+                            <a id="Button_ExportMonitoring" ClientIDMode="Static" href="javascript:void(0);" class="btn btn-warning" onclick="ExportMonitoring();" style="margin-left: 100px !important;">Export</a>
                         </div>
                     </div>
 
@@ -291,7 +291,8 @@
             } else {
                 $('#back-to-top').fadeOut();
             }
-        });
+		});
+
         // scroll body to 0px on click
         $('#back-to-top').click(function () {
             $('#back-to-top').tooltip('hide');
@@ -304,20 +305,20 @@
         //$('#back-to-top').tooltip('show');
 
 		let dTableColumns = [
-			{ "data": "RNumber", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "LabelTipePengembalian", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "KodeSatker", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "NamaSatker", "className": "centertaligncolumn", "width": "20%" },
-			{ "data": "NomorBerkas", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "NamaPemohon", "className": "centertaligncolumn", "width": "20%" },
-			{ "data": "permohonanpengembalian", "className": "rightaligncolumn", render: formatAngka },
-			{ "data": "NomorSurat", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "TanggalPengaju", "className": "centertaligncolumn", "width": "5%" },
-			{ "data": "NomorSP2D", "className": "centertaligncolumn", "width": "5%" },
+            { "data": "RNumber", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "LabelTipePengembalian", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "KodeSatker", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "NamaSatker", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "NomorBerkas", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "NamaPemohon", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "permohonanpengembalian", "className": "rightaligncolumn", "autoWidth": true, render: formatAngka },
+            { "data": "NomorSurat", "className": "centertaligncolumn", "autoWidth": true },
+            { "data": "TanggalPengaju", "className": "centertaligncolumn", "autoWidth": true },
+			{ "data": "NomorSP2D", "className": "centertaligncolumn", "autoWidth": true },
 			{
 				"data": "StatusPengembalian",
 				"className": "centertaligncolumn",
-				"width": "10%",
+                "autoWidth": true,
 				render: function (data) {
 					if (data == null) {
 						return 'Belum Kirim'
@@ -346,7 +347,7 @@
 			{
 				"data": null,
 				"className": "centertaligncolumn column-aksi",
-				"width": "5%",
+                "autoWidth": true,
 				"render": function (data, type, row) {
 					let isPusat = ($('#jeniskantor').val() == 'Pusat');
 					let html = '';
@@ -385,6 +386,7 @@
 				}
 			},
 		];
+
 		asd=console.log
 		if ($('#jeniskantor').val() != 'Pusat') {
 			for (let index = 0; index < dTableColumns.length; index++) {
