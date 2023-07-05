@@ -4716,7 +4716,7 @@ namespace Pnbp.Controllers
             return View(find);
         }
 
-        [HttpPost]
+        //[HttpPost]
         public ActionResult ListPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
             var userIdentity = new Pnbp.Codes.Functions().claimUser();

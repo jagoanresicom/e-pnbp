@@ -153,7 +153,7 @@
 
 
                     <div class="table-responsive">
-                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
+                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="DatatablesMonitoring" ClientIDMode="Static">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -291,7 +291,8 @@
             } else {
                 $('#back-to-top').fadeOut();
             }
-        });
+		});
+
         // scroll body to 0px on click
         $('#back-to-top').click(function () {
             $('#back-to-top').tooltip('hide');
@@ -385,6 +386,7 @@
 				}
 			},
 		];
+
 		asd=console.log
 		if ($('#jeniskantor').val() != 'Pusat') {
 			for (let index = 0; index < dTableColumns.length; index++) {
@@ -400,7 +402,8 @@
             asd(dTableColumns)
 		};
 
-        let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
+        let dTable = $('#DatatablesMonitoring').DataTable({
+        /*let dTable = $('#js-section-pencarian .--js-dtable').DataTable({ */
 			"bLengthChange": false,
 			"paging": true,
 			"pageLength": 10,
