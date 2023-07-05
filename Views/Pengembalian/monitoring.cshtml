@@ -146,13 +146,14 @@
                         </div>
                         <div class="col-md-2">
                             @*<button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="location.href='@Url.Action("ExportExcelMonitoring", "Pengembalian")'" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>*@
-                            <button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>
+                            @*<a id="Button_ExportMonitoring" onclick="return ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</a>*@
+                            <a id="Button_ExportMonitoring" ClientIDMode="" href="javascript:void(0);" class="btn btn-warning" onclick="ExportMonitoring();" style="margin-left: 100px !important;">Export</a>
                         </div>
                     </div>
 
 
                     <div class="table-responsive">
-                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="Datatables_Monitoring" ClientIDMode="Static">
+                        <table class="table --js-dtable table-striped table-bordered hover" style="width:100%" id="DatatablesMonitoring" ClientIDMode="Static">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -196,61 +197,65 @@
 <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 
 <script type="text/javascript" nonce="MjI3NzUzMQ">
-    $(function () {
+
+	$(function ()
+	{
         $("div#loading").hide();
     });
 
 	function ExportMonitoring()
 	{
-        var NomorBerkas = $('#CariNomorBerkas').val();
-        var NamaPemohon = $('#CariNamaPemohon').val();
-        var Status = $('#DropdownCariStatus option:selected').val();
+		var NomorBerkas = $('#CariNomorBerkas').val();
+		var NamaPemohon = $('#CariNamaPemohon').val();
+		var Status = $('#DropdownCariStatus option:selected').val();
 		var Satker = $('#DropdownSatker option:selected').val();
 		console.log(NomorBerkas, NamaPemohon, Status, Satker);
-        window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);
-	   //     var SendData =
-	   //     {
-	   //         NomorBerkas: NomorBerkas,
-	   //         NamaPemohon: NamaPemohon,
-	   //         Status: Status,
-	   //         Satker: Satker,
-	   //     }
-	   //     $.ajax
-	   //     ({
-	   //         type: "POST",
-	   //         url: "/Pengembalian/ExportExcelMonitoring",
-	   //         contentType: "application/json; charset=utf-8",
-	   //         datatype: "JSON",
-	   //         data: JSON.stringify(SendData),
-				//success: function (response)
-				//{
-				//	if (response != null)
-				//	{
-	   //                 let currentDate = new Date().toLocaleDateString();
-	   //                 var bytes = Base64ToBytes(response);
-	   //                 var blob = new Blob([bytes], { type: "application/octetstream" });
-	   //                 var DownloadURL = URL.createObjectURL(blob);
-	   //                 var a = document.createElement("a");
-	   //                 a.href = DownloadURL;
-	   //                 a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
-	   //                 document.body.appendChild(a);
-				//		a.click();
+		//window.location.href = "@Url.Action("ExportExcelMonitoring", "Pengembalian")" + "/?NomorBerkas=" + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker;
+		window.location.replace('@Url.Action("ExportExcelMonitoring", "Pengembalian")?NomorBerkas=' + NomorBerkas + '&NamaPemohon=' + NamaPemohon + '&Status=' + Status + '&Satker=' + Satker);
+		return true;
 
-	   //                 alert("Download successfully...!");
-	   //                 return true;
-	   //             }
-	   //             else {
-	   //                 alert("Something went wrong...!");
-	   //                 return false;
-	   //             }
-	   //         },
-	   //         failure: function (response) {
-	   //             alert(response.responseText);
-	   //         },
-	   //         error: function (response) {
-	   //             alert(response.responseText);
-	   //         }
-	   //     });
+		//  var SendData =
+		//  {
+		//      NomorBerkas: NomorBerkas,
+		//      NamaPemohon: NamaPemohon,
+		//      Status: Status,
+		//      Satker: Satker,
+		//  }
+		//  $.ajax
+		//  ({
+		//      type: "POST",
+		//      url: "/Pengembalian/ExportExcelMonitoring",
+		//      contentType: "application/json; charset=utf-8",
+		//      datatype: "JSON",
+		//      data: JSON.stringify(SendData),
+		//	  success: function (response)
+		//	  {
+		//		if (response != null)
+		//		{
+		//              let currentDate = new Date().toLocaleDateString();
+		//              var bytes = Base64ToBytes(response);
+		//              var blob = new Blob([bytes], { type: "application/octetstream" });
+		//              var DownloadURL = URL.createObjectURL(blob);
+		//              var a = document.createElement("a");
+		//              a.href = DownloadURL;
+		//              a.download = "Monitoring" + " (" + currentDate + ")" + ".xlsx";
+		//              document.body.appendChild(a);
+		//			  a.click();
+		//              alert("Download successfully...!");
+		//              return true;
+		//          }
+		//          else {
+		//              alert("Something went wrong...!");
+		//              return false;
+		//          }
+		//      },
+		//      failure: function (response) {
+		//          alert(response.responseText);
+		//      },
+		//      error: function (response) {
+		//          alert(response.responseText);
+		//      }
+		//  });
 	}
 
     function Base64ToBytes(base64) {
@@ -286,7 +291,8 @@
             } else {
                 $('#back-to-top').fadeOut();
             }
-        });
+		});
+
         // scroll body to 0px on click
         $('#back-to-top').click(function () {
             $('#back-to-top').tooltip('hide');
@@ -380,6 +386,7 @@
 				}
 			},
 		];
+
 		asd=console.log
 		if ($('#jeniskantor').val() != 'Pusat') {
 			for (let index = 0; index < dTableColumns.length; index++) {
@@ -395,7 +402,8 @@
             asd(dTableColumns)
 		};
 
-        let dTable = $('#js-section-pencarian .--js-dtable').DataTable({
+        let dTable = $('#DatatablesMonitoring').DataTable({
+        /*let dTable = $('#js-section-pencarian .--js-dtable').DataTable({ */
 			"bLengthChange": false,
 			"paging": true,
 			"pageLength": 10,

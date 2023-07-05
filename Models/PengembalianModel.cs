@@ -647,8 +647,6 @@ namespace Pnbp.Models
                 new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
                 throw;
             }
-
-
             return records;
         }
 
