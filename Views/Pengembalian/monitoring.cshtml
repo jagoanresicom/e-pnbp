@@ -146,8 +146,8 @@
                         </div>
                         <div class="col-md-2">
                             @*<button type="submit" id="Button_ExportMonitoring" ClientIDMode="Static" formmethod="post" onclick="location.href='@Url.Action("ExportExcelMonitoring", "Pengembalian")'" class="btn btn-warning" style="margin-left: 100px !important;">Export</button>*@
-                            @*<a id="Button_ExportMonitoring" onclick="return ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</a>*@
-                            <a id="Button_ExportMonitoring" ClientIDMode="Static" href="javascript:void(0);" class="btn btn-warning" onclick="ExportMonitoring();" style="margin-left: 100px !important;">Export</a>
+                            @*<a id="Button_ExportMonitoring" onclick="return ExportMonitoring();" class="btn btn-warning" style="margin-left: 100px !important;">Export</a>*@                            
+                            <input type="button" id="Button_ExportMonitoring" class="btn btn-warning" style="margin-left: 100px !important;" value="Export" />
                         </div>
                     </div>
 
@@ -202,6 +202,10 @@
 	{
         $("div#loading").hide();
     });
+
+    $('#Button_ExportMonitoring').click(function (e) {
+        ExportMonitoring();
+	});
 
 	function ExportMonitoring()
 	{
