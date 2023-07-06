@@ -4719,46 +4719,93 @@ namespace Pnbp.Controllers
         [HttpPost]
         public ActionResult ListPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
-            var userIdentity = new Pnbp.Codes.Functions().claimUser();
-            int recNumber = start ?? 0;
-            int RecordsPerPage = length ?? 10;
-            int from = recNumber + 1;
-            int to = from + RecordsPerPage - 1;
-
-            decimal? total = 0;
-
-            string kantoriduser = userIdentity.KantorId;
-
-            string namakantor = f.CariNamaKantor;
-            string judul = f.CariJudul;
-            string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
-            string kodebilling = f.CariKodeBilling;
-            string ntpn = f.CariNTPN;
-            string namapemohon = f.CariNamaPemohon;
-            string nikpemohon = f.CariNikPemohon;
-            string alamatpemohon = f.CariAlamatPemohon;
-            string teleponpemohon = f.CariTeleponPemohon;
-            string bankpersepsi = f.CariBankPersepsi;
-            string status = f.CariStatus;
-            string namasatker = f.CariNamaSatker;
-            string kodesatker = f.CariKodeSatker;
-            int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
-
-            List<Entities.PengembalianPnbpTrain> result = pengembalianmodel.ListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
-
-            if (result.Count > 0)
+            try
             {
-                total = result[0].Total;
+                #region Property
+                var userIdentity = new Pnbp.Codes.Functions().claimUser();
+                int recNumber = start ?? 0;
+                int RecordsPerPage = length ?? 10;
+                int from = recNumber + 1;
+                int to = from + RecordsPerPage - 1;
+                decimal? total = 0;
+                string kantoriduser = userIdentity.KantorId;
+                string namakantor = f.CariNamaKantor;
+                string judul = f.CariJudul;
+                string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
+                string kodebilling = f.CariKodeBilling;
+                string ntpn = f.CariNTPN;
+                string namapemohon = f.CariNamaPemohon;
+                string nikpemohon = f.CariNikPemohon;
+                string alamatpemohon = f.CariAlamatPemohon;
+                string teleponpemohon = f.CariTeleponPemohon;
+                string bankpersepsi = f.CariBankPersepsi;
+                string status = f.CariStatus;
+                string namasatker = f.CariNamaSatker;
+                string kodesatker = f.CariKodeSatker;
+                int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+                #endregion
+
+                #region Business Logic
+                List<Entities.PengembalianPnbpTrain> Result = pengembalianmodel.ListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
+
+                if (Result.Count > 0)
+                {
+                    total = Result[0].Total;
+                }
+
+                var TempData = Result.Select(x => new
+                {
+                    LabelTipePengembalian = x.LabelTipePengembalian,
+                    KodeSatker = x.KodeSatker,
+                    NamaSatker = x.NamaKantor,
+                    //SatuanKerja = x.NamaSatker,
+                    NomorBerkas = x.NomorBerkas,
+                    NamaPemohon = x.NamaPegawaiSetuju,
+                    permohonanpengembalian = x.permohonanpengembalian == null ? "0" : x.permohonanpengembalian,
+                    NomorSurat = x.NomorSurat,
+                    TanggalPengaju = x.TanggalPengaju,
+                    NomorSP2D = x.NomorSP2D,
+                    StatusPengembalian = x.StatusPengembalian
+                }).ToList();
+
+                var Data = TempData.Select((x, index) => new
+                {
+                    RNumber = index + 1,
+                    LabelTipePengembalian = x.LabelTipePengembalian,
+                    KodeSatker = x.KodeSatker,
+                    NamaSatker = x.NamaSatker,
+                    //SatuanKerja = x.SatuanKerja,
+                    NomorBerkas = x.NomorBerkas,
+                    NamaPemohon = x.NamaPemohon,
+                    permohonanpengembalian = "Rp. " + x.permohonanpengembalian,
+                    NomorSurat = x.NomorSurat,
+                    TanggalPengaju = x.TanggalPengaju,
+                    NomorSP2D = x.NomorSP2D,
+                    StatusPengembalian = x.StatusPengembalian
+                }).ToList();
+
+                return Json(new { data = Data, recordsTotal = Data.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+                #endregion
             }
-            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+            catch (NullReferenceException ErrorNullReference)
+            {
+                Console.WriteLine(ErrorNullReference.Message);
+                throw;
+            }
+            catch (Exception ErrorException)
+            {
+                Console.WriteLine(ErrorException.Message);
+                throw new ApplicationException(ErrorException.Message);
+            }
+            finally
+            {
+            }
         }
 
         public ActionResult ExportExcelMonitoring(string NomorBerkas, string Namapemohon, string Status, string Satker, int? start, int? length, FindPengembalianPnbp f)
         {
             try
             {
-
-
                 #region Property
                 var FileName = ConfigurationManager.AppSettings["ExcelNameMonitoring"];
                 var userIdentity = new Pnbp.Codes.Functions().claimUser();
@@ -4818,7 +4865,7 @@ namespace Pnbp.Controllers
                     //Satuan_Kerja = x.NamaSatker,
                     Nomor_Berkas = x.NomorBerkas,
                     Nama_Pemohon = x.NamaPegawaiSetuju,
-                    Nominal = x.permohonanpengembalian,
+                    Nominal = x.permohonanpengembalian == null ? "0" : x.permohonanpengembalian,
                     Nomor_Surat = x.NomorSurat,
                     Tangal_Pengajuan = x.TanggalPengaju,
                     SP2D = x.NomorSP2D,
@@ -4835,7 +4882,7 @@ namespace Pnbp.Controllers
                     //Satuan_Kerja = x.Satuan_Kerja,
                     Nomor_Berkas = x.Nomor_Berkas,
                     Nama_Pemohon = x.Nama_Pemohon,
-                    Nominal = x.Nominal,
+                    Nominal = "Rp. " + x.Nominal,
                     Nomor_Surat = x.Nomor_Surat,
                     Tangal_Pengajuan = x.Tangal_Pengajuan,
                     SP2D = x.SP2D,
@@ -4860,17 +4907,14 @@ namespace Pnbp.Controllers
                         Obj.Status
                     );
                 }
-                using (XLWorkbook _XLWorkbook = new XLWorkbook())
-                {
-                    DT.TableName = "Laporan Monitoring";
-                    _XLWorkbook.Worksheets.Add(DT);
-                    using (MemoryStream MS = new MemoryStream())
-                    {
-                        _XLWorkbook.SaveAs(MS);
-                        return File(MS.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
-                        //return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
-                    }
-                }
+
+                var XLWorkbook = new XLWorkbook();
+                DT.TableName = "Laporan Monitoring";
+                XLWorkbook.Worksheets.Add(DT);
+                var MemoryStream = new MemoryStream();
+                XLWorkbook.SaveAs(MemoryStream);
+                return File(MemoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName + "(" + DateTime.Now.ToString("dd-MM-yyyy") + ")" + ".xlsx");  //Jika tidak menggunakan AJAX (uncoment code ini untuk return File)
+                //return Json(Convert.ToBase64String(MS.ToArray(), 0, MS.ToArray().Length), JsonRequestBehavior.AllowGet); //Jika menggunakan metode AJAX (Uncoment code ini untuk return Json)
                 #endregion
             }
             catch (NullReferenceException ErrorNullReference)
