@@ -4716,90 +4716,128 @@ namespace Pnbp.Controllers
             return View(find);
         }
 
-        [HttpPost]
+        //[HttpPost]
+        //public ActionResult ListPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
+        //{
+        //    try
+        //    {
+        //        #region Property
+        //        var userIdentity = new Pnbp.Codes.Functions().claimUser();
+        //        int recNumber = start ?? 0;
+        //        int RecordsPerPage = length ?? 10;
+        //        int from = recNumber + 1;
+        //        int to = from + RecordsPerPage - 1;
+        //        decimal? total = 0;
+        //        string kantoriduser = userIdentity.KantorId;
+        //        string namakantor = f.CariNamaKantor;
+        //        string judul = f.CariJudul;
+        //        string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
+        //        string kodebilling = f.CariKodeBilling;
+        //        string ntpn = f.CariNTPN;
+        //        string namapemohon = f.CariNamaPemohon;
+        //        string nikpemohon = f.CariNikPemohon;
+        //        string alamatpemohon = f.CariAlamatPemohon;
+        //        string teleponpemohon = f.CariTeleponPemohon;
+        //        string bankpersepsi = f.CariBankPersepsi;
+        //        string status = f.CariStatus;
+        //        string namasatker = f.CariNamaSatker;
+        //        string kodesatker = f.CariKodeSatker;
+        //        int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+        //        #endregion
+
+        //        #region Business Logic
+        //        List<Entities.PengembalianPnbpTrain> Result = pengembalianmodel.ListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
+
+        //        if (Result.Count > 0)
+        //        {
+        //            total = Result[0].Total;
+        //        }
+
+        //        var TempData = Result.Select(x => new
+        //        {
+        //            LabelTipePengembalian = x.LabelTipePengembalian,
+        //            KodeSatker = x.KodeSatker,
+        //            NamaSatker = x.NamaKantor,
+        //            //SatuanKerja = x.NamaSatker,
+        //            NomorBerkas = x.NomorBerkas,
+        //            NamaPemohon = x.NamaPegawaiSetuju,
+        //            permohonanpengembalian = x.permohonanpengembalian == null ? "0" : x.permohonanpengembalian,
+        //            NomorSurat = x.NomorSurat,
+        //            TanggalPengaju = x.TanggalPengaju,
+        //            NomorSP2D = x.NomorSP2D,
+        //            StatusPengembalian = x.StatusPengembalian
+        //        }).ToList();
+
+        //        var Data = TempData.Select((x, index) => new
+        //        {
+        //            RNumber = index + 1,
+        //            LabelTipePengembalian = x.LabelTipePengembalian,
+        //            KodeSatker = x.KodeSatker,
+        //            NamaSatker = x.NamaSatker,
+        //            //SatuanKerja = x.SatuanKerja,
+        //            NomorBerkas = x.NomorBerkas,
+        //            NamaPemohon = x.NamaPemohon,
+        //            permohonanpengembalian = "Rp. " + x.permohonanpengembalian,
+        //            NomorSurat = x.NomorSurat,
+        //            TanggalPengaju = x.TanggalPengaju,
+        //            NomorSP2D = x.NomorSP2D,
+        //            StatusPengembalian = x.StatusPengembalian
+        //        }).ToList();
+
+        //        return Json(new { data = Data, recordsTotal = Data.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
+        //        #endregion
+        //    }
+        //    catch (NullReferenceException ErrorNullReference)
+        //    {
+        //        Console.WriteLine(ErrorNullReference.Message);
+        //        throw;
+        //    }
+        //    catch (Exception ErrorException)
+        //    {
+        //        Console.WriteLine(ErrorException.Message);
+        //        throw new ApplicationException(ErrorException.Message);
+        //    }
+        //    finally
+        //    {
+        //    }
+        //}
+
+
+        //[HttpPost]
         public ActionResult ListPengembalian(int? start, int? length, Entities.FindPengembalianPnbp f)
         {
-            try
+            var userIdentity = new Pnbp.Codes.Functions().claimUser();
+            int recNumber = start ?? 0;
+            int RecordsPerPage = length ?? 10;
+            int from = recNumber + 1;
+            int to = from + RecordsPerPage - 1;
+
+            decimal? total = 0;
+
+            string kantoriduser = userIdentity.KantorId;
+
+            string namakantor = f.CariNamaKantor;
+            string judul = f.CariJudul;
+            string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
+            string kodebilling = f.CariKodeBilling;
+            string ntpn = f.CariNTPN;
+            string namapemohon = f.CariNamaPemohon;
+            string nikpemohon = f.CariNikPemohon;
+            string alamatpemohon = f.CariAlamatPemohon;
+            string teleponpemohon = f.CariTeleponPemohon;
+            string bankpersepsi = f.CariBankPersepsi;
+            string status = f.CariStatus;
+            string namasatker = f.CariNamaSatker;
+            string kodesatker = f.CariKodeSatker;
+            int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
+
+            List<Entities.PengembalianPnbpTrain> result = pengembalianmodel.ListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
+
+            if (result.Count > 0)
             {
-                #region Property
-                var userIdentity = new Pnbp.Codes.Functions().claimUser();
-                int recNumber = start ?? 0;
-                int RecordsPerPage = length ?? 10;
-                int from = recNumber + 1;
-                int to = from + RecordsPerPage - 1;
-                decimal? total = 0;
-                string kantoriduser = userIdentity.KantorId;
-                string namakantor = f.CariNamaKantor;
-                string judul = f.CariJudul;
-                string nomorberkas = (String.IsNullOrEmpty(f.CariNomorBerkas) ? f.CariNomorBerkas : f.CariNomorBerkas.Trim());
-                string kodebilling = f.CariKodeBilling;
-                string ntpn = f.CariNTPN;
-                string namapemohon = f.CariNamaPemohon;
-                string nikpemohon = f.CariNikPemohon;
-                string alamatpemohon = f.CariAlamatPemohon;
-                string teleponpemohon = f.CariTeleponPemohon;
-                string bankpersepsi = f.CariBankPersepsi;
-                string status = f.CariStatus;
-                string namasatker = f.CariNamaSatker;
-                string kodesatker = f.CariKodeSatker;
-                int tipekantorid = pengembalianmodel.GetTipeKantor(kantoriduser);
-                #endregion
-
-                #region Business Logic
-                List<Entities.PengembalianPnbpTrain> Result = pengembalianmodel.ListPengembalian(tipekantorid, kantoriduser, judul, namakantor, nomorberkas, kodebilling, ntpn, namapemohon, nikpemohon, alamatpemohon, teleponpemohon, bankpersepsi, status, namasatker, kodesatker, from, to);
-
-                if (Result.Count > 0)
-                {
-                    total = Result[0].Total;
-                }
-
-                var TempData = Result.Select(x => new
-                {
-                    LabelTipePengembalian = x.LabelTipePengembalian,
-                    KodeSatker = x.KodeSatker,
-                    NamaSatker = x.NamaKantor,
-                    //SatuanKerja = x.NamaSatker,
-                    NomorBerkas = x.NomorBerkas,
-                    NamaPemohon = x.NamaPegawaiSetuju,
-                    permohonanpengembalian = x.permohonanpengembalian == null ? "0" : x.permohonanpengembalian,
-                    NomorSurat = x.NomorSurat,
-                    TanggalPengaju = x.TanggalPengaju,
-                    NomorSP2D = x.NomorSP2D,
-                    StatusPengembalian = x.StatusPengembalian
-                }).ToList();
-
-                var Data = TempData.Select((x, index) => new
-                {
-                    RNumber = index + 1,
-                    LabelTipePengembalian = x.LabelTipePengembalian,
-                    KodeSatker = x.KodeSatker,
-                    NamaSatker = x.NamaSatker,
-                    //SatuanKerja = x.SatuanKerja,
-                    NomorBerkas = x.NomorBerkas,
-                    NamaPemohon = x.NamaPemohon,
-                    permohonanpengembalian = "Rp. " + x.permohonanpengembalian,
-                    NomorSurat = x.NomorSurat,
-                    TanggalPengaju = x.TanggalPengaju,
-                    NomorSP2D = x.NomorSP2D,
-                    StatusPengembalian = x.StatusPengembalian
-                }).ToList();
-
-                return Json(new { data = Data, recordsTotal = Data.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
-                #endregion
+                total = result[0].Total;
             }
-            catch (NullReferenceException ErrorNullReference)
-            {
-                Console.WriteLine(ErrorNullReference.Message);
-                throw;
-            }
-            catch (Exception ErrorException)
-            {
-                Console.WriteLine(ErrorException.Message);
-                throw new ApplicationException(ErrorException.Message);
-            }
-            finally
-            {
-            }
+            return Json(new { data = result, recordsTotal = result.Count, recordsFiltered = total }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult ExportExcelMonitoring(string NomorBerkas, string Namapemohon, string Status, string Satker, int? start, int? length, FindPengembalianPnbp f)
@@ -4840,7 +4878,7 @@ namespace Pnbp.Controllers
                 new DataColumn("No",typeof(string)),
                 new DataColumn("Kewenangan",typeof(string)),
                 new DataColumn("Kode Satker",typeof(string)),
-                new DataColumn("Nama Satker",typeof(string)),
+                new DataColumn("Satuan Kerja",typeof(string)),
                 new DataColumn("Nomor Berkas",typeof(string)),
                 new DataColumn("Nama Pemohon",typeof(string)),
                 new DataColumn("Nominal", typeof(string)),

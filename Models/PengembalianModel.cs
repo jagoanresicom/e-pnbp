@@ -665,7 +665,7 @@ namespace Pnbp.Models
                                     WHEN pengembalianpnbp.StatusPengembalian = '4' THEN '5' 
                                     ELSE '99' END statuspengembalianorder ";
 
-            if (tipekantorid != 1) 
+            if (tipekantorid != 1)
             {
                 queryOrder = @" CASE WHEN pengembalianpnbp.StatusPengembalian = '3' THEN '1' 
                                 WHEN NVL(pengembalianpnbp.StatusPengembalian, 0) = '0' THEN '2' 
@@ -746,7 +746,7 @@ namespace Pnbp.Models
                     FROM
                         pengembalianpnbp
                         JOIN berkaskembalian ON berkaskembalian.pengembalianpnbpid = pengembalianpnbp.pengembalianpnbpid 
-                        JOIN KANTOR satker ON satker.kantorid = pengembalianpnbp.kantorid 
+                        JOIN SATKER satker ON satker.KANTORID = pengembalianpnbp.kantorid 
                         AND pengembalianpnbp.kantorid IN (SELECT kantorid FROM kantor START WITH kantorid = :KantorIdUser CONNECT BY NOCYCLE PRIOR kantorid = induk)
                         WHERE nvl(status_hapus,0)=0  ";
 
@@ -823,25 +823,25 @@ namespace Pnbp.Models
                 query += " AND LOWER(satker.kodesatker) LIKE :KodeSatker ";
             }
 
-            query +=" ORDER BY statuspengembalianorder, pengembalianpnbp.tanggalpengaju DESC)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
+            query +=
+                " ORDER BY statuspengembalianorder, pengembalianpnbp.tanggalpengaju DESC)) WHERE RNumber BETWEEN :startCnt AND :limitCnt";
 
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("startCnt", from));
             arrayListParameters.Add(new Oracle.ManagedDataAccess.Client.OracleParameter("limitCnt", to));
 
-            try 
+            try
             {
-                using (var ctx = new PnbpContext()) 
+                using (var ctx = new PnbpContext())
                 {
                     object[] parameters = arrayListParameters.OfType<object>().ToArray();
                     records = ctx.Database.SqlQuery<Entities.PengembalianPnbpTrain>(query, parameters).ToList();
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 new Codes.Functions.Logging().LogEvent(e.Message.ToString() + "\n" + e.StackTrace.ToString());
                 throw;
             }
-           
             return records;
         }
 
