@@ -203,7 +203,7 @@ namespace Pnbp.Models
                   FROM
                       berkaskembalian
                   WHERE
-                      nomorBerkas = TRIM(:nomorBerkas)";
+                      nomorBerkas = TRIM(:nomorBerkas) AND STATUS_HAPUS = 0";
 
             arrayListParameters.Add(new OracleParameter("nomorBerkas", noBerkas));
 
