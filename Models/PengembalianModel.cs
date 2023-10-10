@@ -2891,12 +2891,22 @@ namespace Pnbp.Models
 	                BERKASID,
 	                STATUSBERKAS,
 	                TAHUN,
-	                KODEBILLING,
-	                NTPN,
+	                (SELECT LISTAGG(x.KODEBILLING, ', ') within group (order by KODEBILLING)
+                    FROM (SELECT DISTINCT KODEBILLING
+                        FROM REKAPPENERIMAANDETAIL
+                        WHERE BERKASID = AA.BERKASID
+                        ORDER BY TANGGAL
+                    ) x) AS KODEBILLING,
+                    (SELECT LISTAGG(x.NTPN, ', ') within group (order by NTPN)
+                    FROM (SELECT DISTINCT NTPN
+                        FROM REKAPPENERIMAANDETAIL
+                        WHERE BERKASID = AA.BERKASID
+                        ORDER BY TANGGAL
+                    ) x) AS NTPN,
                     TO_CHAR(sum(PENERIMAAN)) as PENERIMAAN,
                     KANTORID
                 FROM AA 
-                GROUP BY NOTAHUNBERKAS, NAMAPROSEDUR, NAMA, ALAMAT, NPWP, NOMOR, BERKASID, STATUSBERKAS, TAHUN, KODEBILLING, NTPN, KANTORID";
+                GROUP BY NOTAHUNBERKAS, NAMAPROSEDUR, NAMA, ALAMAT, NPWP, NOMOR, BERKASID, STATUSBERKAS, TAHUN, KANTORID";
 
             try
             {
