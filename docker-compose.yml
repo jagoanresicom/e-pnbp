@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # Oracle Database 19c
+  oracle-db:
+    image: container-registry.oracle.com/database/enterprise:19.3.0.0
+    container_name: pnbp-oracle-db
+    hostname: oracle-db
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    environment:
+      - ORACLE_SID=ORCLCDB
+      - ORACLE_PDB=ORCLPDB1
+      - ORACLE_PWD=OraclePassword123
+      - INIT_SGA_SIZE=2048
+      - INIT_PGA_SIZE=1024
+      - ORACLE_EDITION=enterprise
+      - ORACLE_CHARACTERSET=AL32UTF8
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - oracle-backup:/opt/oracle/backup
+      - ./docker/oracle-scripts:/opt/oracle/scripts/startup
+    networks:
+      - pnbp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "sys/OraclePassword123@//localhost:1521/ORCLCDB as sysdba", "@healthcheck.sql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # PNBP Application
+  pnbp-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pnbp-application
+    hostname: pnbp-app
+    ports:
+      - "80:80"
+      - "9000:9000"
+    environment:
+      - ASPNET_ENVIRONMENT=Production
+      - ORACLE_CONNECTION_STRING=User Id=pnbp;Password=pnbp;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle-db)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));
+      - TZ=Asia/Jakarta
+    volumes:
+      - ./Uploads:/app/Uploads
+      - ./logs:/app/logs
+      - pnbp-temp:/tmp
+    networks:
+      - pnbp-network
+    depends_on:
+      oracle-db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Redis Cache (Optional)
+  redis-cache:
+    image: redis:7-alpine
+    container_name: pnbp-redis
+    hostname: redis-cache
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass RedisPassword123
+    volumes:
+      - redis-data:/data
+    networks:
+      - pnbp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Load Balancer (Optional - for multiple app instances)
+  nginx-lb:
+    image: nginx:alpine
+    container_name: pnbp-nginx-lb
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx-lb.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - pnbp-network
+    depends_on:
+      - pnbp-app
+    restart: unless-stopped
+    profiles:
+      - loadbalancer
+
+# Networks
+networks:
+  pnbp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volumes
+volumes:
+  oracle-data:
+    driver: local
+  oracle-backup:
+    driver: local
+  redis-data:
+    driver: local
+  pnbp-temp:
+    driver: local
