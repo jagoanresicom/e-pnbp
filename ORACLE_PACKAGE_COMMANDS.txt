@@ -1,0 +1,13 @@
+
+# Cara menggunakan dotnet add package untuk Oracle:
+
+# 1. Untuk menambah Oracle.ManagedDataAccess:
+# dotnet add package Oracle.ManagedDataAccess --version 23.5.1
+
+# 2. Untuk menambah Oracle.ManagedDataAccess.EntityFramework:
+# dotnet add package Oracle.ManagedDataAccess.EntityFramework --version 12.2.1100
+
+# Atau menggunakan NuGet CLI:
+# mono nuget.exe install Oracle.ManagedDataAccess -Version 23.5.1 -OutputDirectory packages
+# mono nuget.exe install Oracle.ManagedDataAccess.EntityFramework -Version 12.2.1100 -OutputDirectory packages
+
