@@ -1,0 +1,78 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README*
+CHANGELOG*
+LICENSE*
+
+# IDE and Editor files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userprefs
+.idea/
+
+# Build outputs
+bin/Debug/
+obj/
+*.dll.mdb
+*.exe.mdb
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker files
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Node modules (if any)
+node_modules/
+
+# Package restore artifacts
+packages/*/
+!packages/repositories.config
+!packages.config
+
+# Backup files
+*.backup
+*.bak
+
+# Test results
+TestResults/
+
+# Publish profiles
+PublishProfiles/
+*.pubxml
+*.pubxml.user
+
+# NuGet packages (keep packages.config)
+*.nupkg
+nuget.exe
+
+# Build scripts
+*.sh
+*.bat
+*.cmd
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Temporary build files
+BUILD_STATUS.txt
+ORACLE_PACKAGE_COMMANDS.txt
